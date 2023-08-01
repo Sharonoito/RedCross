@@ -44,6 +44,10 @@ namespace RedCrossChat
             // Register the BookingDialog.
             services.AddSingleton<BookingDialog>();
 
+            services.AddSingleton<CounselorDialog>();
+
+            services.AddSingleton<PersonalDialog>();
+
             // The MainDialog that will be run by the bot.
             services.AddSingleton<MainDialog>();
 
