@@ -20,8 +20,9 @@ namespace RedCrossChat.CognitiveModels
             BookFlight,
             Cancel,
             GetWeather,
-            None
-        };
+            None,
+            Awareness
+        }
         public Dictionary<Intent, IntentScore> Intents;
 
         public class _Entities

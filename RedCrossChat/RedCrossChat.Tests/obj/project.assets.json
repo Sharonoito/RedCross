@@ -9437,19 +9437,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\HP\\.nuget\\packages\\": {}
+    "C:\\Users\\oitos\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\projects\\RedCrossChat\\RedCrossChat\\RedCrossChat.Tests\\RedCrossChat.Tests.csproj",
+      "projectUniqueName": "D:\\RedCross-Chatbot\\RedCrossChat\\RedCrossChat.Tests\\RedCrossChat.Tests.csproj",
       "projectName": "RedCrossChat.Tests",
-      "projectPath": "D:\\projects\\RedCrossChat\\RedCrossChat\\RedCrossChat.Tests\\RedCrossChat.Tests.csproj",
-      "packagesPath": "C:\\Users\\HP\\.nuget\\packages\\",
-      "outputPath": "D:\\projects\\RedCrossChat\\RedCrossChat\\RedCrossChat.Tests\\obj\\",
+      "projectPath": "D:\\RedCross-Chatbot\\RedCrossChat\\RedCrossChat.Tests\\RedCrossChat.Tests.csproj",
+      "packagesPath": "C:\\Users\\oitos\\.nuget\\packages\\",
+      "outputPath": "D:\\RedCross-Chatbot\\RedCrossChat\\RedCrossChat.Tests\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\HP\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\oitos\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -9464,8 +9464,8 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "projectReferences": {
-            "D:\\projects\\RedCrossChat\\RedCrossChat\\RedCrossChat\\RedCrossChat.csproj": {
-              "projectPath": "D:\\projects\\RedCrossChat\\RedCrossChat\\RedCrossChat\\RedCrossChat.csproj"
+            "D:\\RedCross-Chatbot\\RedCrossChat\\RedCrossChat\\RedCrossChat.csproj": {
+              "projectPath": "D:\\RedCross-Chatbot\\RedCrossChat\\RedCrossChat\\RedCrossChat.csproj"
             }
           }
         }

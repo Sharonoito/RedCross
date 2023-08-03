@@ -22,12 +22,14 @@ namespace RedCrossChat.Dialogs
     {
         private readonly ILogger _logger;
         private readonly FlightBookingRecognizer _luisRecognizer;
+        private bool personalDialogComplete = false;
 
         // Dependency injection uses this constructor to instantiate MainDialog
         public MainDialog(FlightBookingRecognizer luisRecognizer, 
             BookingDialog bookingDialog,
             CounselorDialog counselorDialog,
             PersonalDialog personalDialog,
+            AwarenessDialog awarenessDialog,
             ILogger<MainDialog> logger)
             : base(nameof(MainDialog))
         {
@@ -38,11 +40,14 @@ namespace RedCrossChat.Dialogs
             AddDialog(bookingDialog);
             AddDialog(counselorDialog);
             AddDialog(personalDialog);
+            AddDialog(awarenessDialog);
 
             var waterfallSteps = new WaterfallStep[]
             {
                     IntroStepAsync,
                     ActStepAsync,
+                    //PersonalStepAsync,
+                    AwarenessStepAsync,
                     FinalStepAsync,
             };
 
@@ -52,33 +57,6 @@ namespace RedCrossChat.Dialogs
             InitialDialogId = nameof(WaterfallDialog);
         }
 
-        // Shows a warning if the requested From or To cities are recognized as entities but they are not in the Airport entity list.
-        // In some cases LUIS will recognize the From and To composite entities as a valid cities but the From and To Airport values
-        // will be empty if those entity values can't be mapped to a canonical item in the Airport.
-        private static async Task ShowWarningForUnsupportedCities(ITurnContext context, FlightBooking luisResult, CancellationToken cancellationToken)
-        {
-            var unsupportedCities = new List<string>();
-
-            var fromEntities = luisResult.FromEntities;
-            if (!string.IsNullOrEmpty(fromEntities.From) && string.IsNullOrEmpty(fromEntities.Airport))
-            {
-                unsupportedCities.Add(fromEntities.From);
-            }
-
-            var toEntities = luisResult.ToEntities;
-            if (!string.IsNullOrEmpty(toEntities.To) && string.IsNullOrEmpty(toEntities.Airport))
-            {
-                unsupportedCities.Add(toEntities.To);
-            }
-
-            if (unsupportedCities.Any())
-            {
-                var messageText = $"Sorry but the following airports are not supported: {string.Join(',', unsupportedCities)}";
-                var message = MessageFactory.Text(messageText, messageText, InputHints.IgnoringInput);
-                await context.SendActivityAsync(message, cancellationToken);
-            }
-        }
-
         private async Task<DialogTurnResult> IntroStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             // Use the text provided in FinalStepAsync or the default if it is the first time.
@@ -86,58 +64,36 @@ namespace RedCrossChat.Dialogs
             var promptMessage = MessageFactory.Text(messageText, messageText, InputHints.ExpectingInput);
             return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = promptMessage }, cancellationToken);
         }
-
         private async Task<DialogTurnResult> ActStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            if (!_luisRecognizer.IsConfigured)
+            // Check if PersonalDialog is not yet complete
+            if (!personalDialogComplete)
             {
-                // LUIS is not configured, we just run the BookingDialog path with an empty BookingDetailsInstance.
-                return await stepContext.BeginDialogAsync(nameof(CounselorDialog), new BookingDetails(), cancellationToken);
+                //return await PersonalStepAsync(stepContext, cancellationToken);
+                return await stepContext.BeginDialogAsync(nameof(PersonalDialog), null, cancellationToken);
+
             }
 
-            //return await stepContext.BeginDialogAsync(nameof(CounselorDialog), new BookingDetails(), cancellationToken);
+            // Reset the flag for the next turn
+            personalDialogComplete = false;
 
-            // Call LUIS and gather any potential booking details. (Note the TurnContext has the response to the prompt.)
-            var luisResult = await _luisRecognizer.RecognizeAsync<FlightBooking>(stepContext.Context, cancellationToken);
-            switch (luisResult.TopIntent().intent)
-            {
-                case FlightBooking.Intent.BookFlight:
-                    await ShowWarningForUnsupportedCities(stepContext.Context, luisResult, cancellationToken);
+            // Rest of the existing code for handling LUIS intents
+            // ...
 
-                    // Initialize BookingDetails with any entities we may have found in the response.
-                    var bookingDetails = new BookingDetails()
-                    {
-                        // Get destination and origin from the composite entities arrays.
-                        Destination = luisResult.ToEntities.Airport,
-                        Origin = luisResult.FromEntities.Airport,
-                        TravelDate = luisResult.TravelDate,
-                    };
+            // If the flow reaches here, it means we should continue to the next step in the waterfall.
+            return await AwarenessStepAsync(stepContext, cancellationToken);
+        }
 
-                    // Run the BookingDialog giving it whatever details we have from the LUIS call, it will fill out the remainder.
-                    return await stepContext.BeginDialogAsync(nameof(BookingDialog), bookingDetails, cancellationToken);
 
-                case FlightBooking.Intent.GetWeather:
-                    // We haven't implemented the GetWeatherDialog so we just display a TODO message.
-                    var getWeatherMessageText = "TODO: get weather flow here";
-                    var getWeatherMessage = MessageFactory.Text(getWeatherMessageText, getWeatherMessageText, InputHints.IgnoringInput);
-                    await stepContext.Context.SendActivityAsync(getWeatherMessage, cancellationToken);
-                    break;
-
-                default:
-                    // Catch all for unhandled intents
-                    var didntUnderstandMessageText = $"Sorry, I didn't get that. Please try asking in a different way (intent was {luisResult.TopIntent().intent})";
-                    var didntUnderstandMessage = MessageFactory.Text(didntUnderstandMessageText, didntUnderstandMessageText, InputHints.IgnoringInput);
-                    await stepContext.Context.SendActivityAsync(didntUnderstandMessage, cancellationToken);
-                    break;
-            }
-
-            return await stepContext.NextAsync(null, cancellationToken);
+        private async Task<DialogTurnResult> AwarenessStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        {
+            // Call the AwarenessDialog
+            return await stepContext.BeginDialogAsync(nameof(AwarenessDialog), null, cancellationToken);
         }
 
         private async Task<DialogTurnResult> FinalStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            // If the child dialog ("BookingDialog") was cancelled, the user failed to confirm or if the intent wasn't BookFlight
-            // the Result here will be null.
+            // Check if the result is of type BookingDetails (result from PersonalDialog)
             if (stepContext.Result is BookingDetails result)
             {
                 // Now we have all the booking details call the booking service.
@@ -149,11 +105,21 @@ namespace RedCrossChat.Dialogs
                 var messageText = $"I have you booked to {result.Destination} from {result.Origin} on {travelDateMsg}";
                 var message = MessageFactory.Text(messageText, messageText, InputHints.IgnoringInput);
                 await stepContext.Context.SendActivityAsync(message, cancellationToken);
+
+                // Continue to the next step in the waterfall
+                return await stepContext.NextAsync(null, cancellationToken);
+            }
+            else if (stepContext.Result is DialogTurnResult dialogResult && dialogResult.Result is BookingDetails)
+            {
+                // The result is from the AwarenessDialog, restart the main dialog with a different message
+                var promptMessage = "What else can I do for you?";
+                return await stepContext.ReplaceDialogAsync(InitialDialogId, promptMessage, cancellationToken);
             }
 
-            // Restart the main dialog with a different message the second time around
-            var promptMessage = "What else can I do for you?";
-            return await stepContext.ReplaceDialogAsync(InitialDialogId, promptMessage, cancellationToken);
+            // The result is null or of an unexpected type, return an empty response
+            return await stepContext.EndDialogAsync(cancellationToken);
         }
+
+
     }
 }
