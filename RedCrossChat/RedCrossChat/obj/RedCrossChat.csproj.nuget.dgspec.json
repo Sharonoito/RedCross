@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "D:\\projects\\RedCrossChat\\RedCrossChat\\RedCrossChat\\RedCrossChat.csproj": {}
+    "D:\\RedCross-Chatbot\\RedCrossChat\\RedCrossChat\\RedCrossChat.csproj": {}
   },
   "projects": {
-    "D:\\projects\\RedCrossChat\\RedCrossChat\\RedCrossChat\\RedCrossChat.csproj": {
+    "D:\\RedCross-Chatbot\\RedCrossChat\\RedCrossChat\\RedCrossChat.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\projects\\RedCrossChat\\RedCrossChat\\RedCrossChat\\RedCrossChat.csproj",
+        "projectUniqueName": "D:\\RedCross-Chatbot\\RedCrossChat\\RedCrossChat\\RedCrossChat.csproj",
         "projectName": "RedCrossChat",
-        "projectPath": "D:\\projects\\RedCrossChat\\RedCrossChat\\RedCrossChat\\RedCrossChat.csproj",
-        "packagesPath": "C:\\Users\\HP\\.nuget\\packages\\",
-        "outputPath": "D:\\projects\\RedCrossChat\\RedCrossChat\\RedCrossChat\\obj\\",
+        "projectPath": "D:\\RedCross-Chatbot\\RedCrossChat\\RedCrossChat\\RedCrossChat.csproj",
+        "packagesPath": "C:\\Users\\oitos\\.nuget\\packages\\",
+        "outputPath": "D:\\RedCross-Chatbot\\RedCrossChat\\RedCrossChat\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\HP\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\oitos\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [

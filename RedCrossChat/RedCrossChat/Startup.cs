@@ -48,6 +48,8 @@ namespace RedCrossChat
 
             services.AddSingleton<PersonalDialog>();
 
+            services.AddSingleton<AwarenessDialog>();
+
             // The MainDialog that will be run by the bot.
             services.AddSingleton<MainDialog>();
 
