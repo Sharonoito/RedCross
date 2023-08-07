@@ -2,6 +2,7 @@
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Dialogs.Choices;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using RedCrossChat.Objects;
 using System;
 using System.Collections.Generic;
@@ -18,7 +19,8 @@ namespace RedCrossChat.Dialogs
         protected readonly UserState _userState;
         private const string UserInfo = "user-info";
 
-        public AwarenessDialog(ILogger<AwarenessDialog> logger) : base(nameof(AwarenessDialog))
+        public AwarenessDialog(BreathingDialog breathingDialog, ILogger<AwarenessDialog> logger) : base(nameof(AwarenessDialog))
+
 
         {
             AddDialog(new ChoicePrompt(nameof(ChoicePrompt)));
@@ -27,13 +29,8 @@ namespace RedCrossChat.Dialogs
 
             AddDialog(new ChoicePrompt("select-option"));
 
-            //AddDialog(new ChoicePrompt("select-feeling"));
+            AddDialog(breathingDialog);
 
-            //AddDialog(new ChoicePrompt("select-terms"));
-
-            //AddDialog(new ChoicePrompt("select-age"));
-
-            //AddDialog(new ChoicePrompt("select-country"));
 
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
             {
@@ -42,7 +39,7 @@ namespace RedCrossChat.Dialogs
                 ProcessMentalEvaluationChoice,
                 HandleCaregiverChoiceAsync,
                 ProcessMentalEvaluationChoice,
-                EvauluateDialogTurnAsync,
+                EvaluateDialogTurnAsync,
                 ProfessionalStatusAsync,
                 CheckProfessionalSwitchAsync,
                 FinalStepAsync
@@ -61,6 +58,7 @@ namespace RedCrossChat.Dialogs
 
 
         }
+
         private async Task<DialogTurnResult> InitialStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             // You can create the 'User' object here or retrieve it from somewhere else.
@@ -68,6 +66,7 @@ namespace RedCrossChat.Dialogs
 
             // Set the 'User' object in the stepContext.Values dictionary.
             stepContext.Values[UserInfo] = user;
+
 
             // Move to the next step in the waterfall.
             return await stepContext.NextAsync(null, cancellationToken);
@@ -92,36 +91,48 @@ namespace RedCrossChat.Dialogs
 
 
         }
-
         private async Task<DialogTurnResult> ProcessMentalEvaluationChoice(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
+            User user;
 
-            User user = (User)stepContext.Values[UserInfo];
-
-
-            switch (((FoundChoice)stepContext.Result).Value)
+            if (!stepContext.Values.TryGetValue(UserInfo, out var userValue) || !(userValue is User))
             {
-                case "Yes":
+                user = new User();
+                stepContext.Values[UserInfo] = user;
+            }
+            else
+            {
+                user = (User)userValue;
+            }
 
-                    user.isAwareOfFeeling = true;
-                    return await stepContext.PromptAsync(nameof(ChoicePrompt),
-
-                    new PromptOptions()
-                      {
-                          Prompt = MessageFactory.Text("Have you talked to someone about it?"),
-                          Choices = _choices
-                      });
-                default:
-
-                    user.isAwareOfFeeling = false;
-
-                    return await stepContext.PromptAsync(nameof(ChoicePrompt),
-                       new PromptOptions()
-                       {
-                           Prompt= MessageFactory.Text("It is important to take care of your mental well-being. Would you like to have a trusted person to talk to?"),
-                           Choices = _choices
-                       });
-
+            if (stepContext.Result != null && stepContext.Result is FoundChoice choiceResult)
+            {
+                switch (choiceResult.Value)
+                {
+                    case "Yes":
+                        user.isAwareOfFeeling = true;
+                        return await stepContext.PromptAsync(nameof(ChoicePrompt),
+                            new PromptOptions()
+                            {
+                                Prompt = MessageFactory.Text("Have you talked to someone about it?"),
+                                Choices = _choices
+                            });
+                    default:
+                        user.isAwareOfFeeling = false;
+                        return await stepContext.PromptAsync(nameof(ChoicePrompt),
+                           new PromptOptions()
+                           {
+                               Prompt = MessageFactory.Text("It is important to take care of your mental well-being. Would you like to have a trusted person to talk to?"),
+                               Choices = _choices
+                           });
+                }
+            }
+            else
+            {
+                // Handle the case where stepContext.Result is null or not of the correct type.
+                // For example, you can prompt the user to repeat their response or handle the case accordingly.
+                await stepContext.Context.SendActivityAsync(MessageFactory.Text("Thank you for contacting us"), cancellationToken);
+                return await stepContext.EndDialogAsync(new DialogTurnResult(DialogTurnStatus.Waiting), cancellationToken);
             }
         }
 
@@ -152,7 +163,7 @@ namespace RedCrossChat.Dialogs
         }
 
 
-        private async Task<DialogTurnResult> EvauluateDialogTurnAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        private async Task<DialogTurnResult> EvaluateDialogTurnAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
 
             if (stepContext.Result == null)
@@ -178,8 +189,8 @@ namespace RedCrossChat.Dialogs
                         {
                             new Choice  { Value ="Single",Synonyms=new List<string>{"Single","S"}},
                             new Choice  { Value ="Married",Synonyms=new List<string>{"married"}},
-                            new Choice  { Value ="Divored",Synonyms=new List<string>{"divored"}},
-                            new Choice  { Value ="In A relationship",Synonyms=new List<string>{"dating","relaitions","casual"}},
+                            new Choice  { Value ="Divorced",Synonyms=new List<string>{"divorced"}},
+                            new Choice  { Value ="In A relationship",Synonyms=new List<string>{"dating","relations","casual"}},
                             new Choice  { Value ="Widow /Widower",Synonyms=new List<string>{"widow","widower"}},
                             new Choice  { Value ="Complicated",Synonyms=new List<string>{"complicated","comp","it's complicated"}},
 
@@ -210,7 +221,7 @@ namespace RedCrossChat.Dialogs
                         {
                             new Choice  { Value ="Student",},
                             new Choice  { Value ="Employed",},
-                            new Choice  { Value ="Entreprenuer"},
+                            new Choice  { Value ="Entrepreneur"},
                             new Choice  { Value ="Retired"},
                             new Choice  { Value ="Unemployed"},
                             new Choice  { Value ="Complicated"},
@@ -222,50 +233,55 @@ namespace RedCrossChat.Dialogs
 
         private async Task<DialogTurnResult> CheckProfessionalSwitchAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-
-
             return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions()
             {
-                Prompt = MessageFactory.Text("Would you wish to talk to a Professional Counselor ?"),
-                Choices =new List<Choice>()
-                {
-                    new Choice(){ Value="agent" ,Synonyms= new List<string>{"Yes","Y"}},
-                    new Choice() {Value="no",Synonyms=new List<string> {"no","n"}},
-                }
+                Prompt = MessageFactory.Text("Would you wish to talk to a Professional Counselor?"),
+                Choices = new List<Choice>()
+        {
+            new Choice() { Value = "agent", Synonyms = new List<string> { "Yes", "Y" } },
+            new Choice() { Value = "no", Synonyms = new List<string> { "no", "n" } },
+        }
             }, cancellationToken);
-
         }
 
         private async Task<DialogTurnResult> FinalStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            //evaulate if to push the user to the health ai bot
+            // Evaulate if to push the user to the health ai bot
             User user = (User)stepContext.Values[UserInfo];
 
             if (stepContext.Result != null)
             {
-
                 switch (((FoundChoice)stepContext.Result).Value)
                 {
-                    case "Yes":
+                    case "agent":
                         user.handOverToUser = true;
+
+                        // Send the message to the user about the next available agent or calling 1199.
+                        var agentMessage = "Next available agent will be with you shortly or you can also call 1199 to connect with our counselor.";
+                        await stepContext.Context.SendActivityAsync(MessageFactory.Text(agentMessage), cancellationToken);
                         break;
+                    case "no":
+                        user.handOverToUser = false;
+                        // Start the BreathingDialog
+                        return await stepContext.BeginDialogAsync(nameof(BreathingDialog), null, cancellationToken);
                     default:
                         user.handOverToUser = false;
                         break;
                 }
-
             }
 
-            return await stepContext.EndDialogAsync(null, cancellationToken);
+            // Continue the waterfall to the next step (if needed)
+            return await stepContext.NextAsync(null, cancellationToken);
         }
+
 
         private IList<Choice> GetChoices()
         {
             var cardOptions = new List<Choice>()
             {
-                new Choice() { Value = "Carrers", Synonyms = new List<string>() { "1" } },
+                new Choice() { Value = "Careers", Synonyms = new List<string>() { "1" } },
                 new Choice() { Value = "Volunteer and Membership", Synonyms = new List<string>() { "2" } },
-                new Choice() { Value = "Volunteer Opprtunities", Synonyms = new List<string>() { "3" } },
+                new Choice() { Value = "Volunteer Opportunities", Synonyms = new List<string>() { "3" } },
                 new Choice() { Value = "Mental Health", Synonyms = new List<string>() { "4" } },
 
             };
@@ -276,3 +292,5 @@ namespace RedCrossChat.Dialogs
 
     }
 }
+
+

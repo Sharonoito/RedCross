@@ -71,6 +71,7 @@ D:\projects\RedCrossChat\RedCrossChat\RedCrossChat\obj\Debug\net6.0\RedCrossChat
 D:\projects\RedCrossChat\RedCrossChat\RedCrossChat\obj\Debug\net6.0\RedCrossChat.genruntimeconfig.cache
 D:\projects\RedCrossChat\RedCrossChat\RedCrossChat\obj\Debug\net6.0\ref\RedCrossChat.dll
 D:\RedCross-Chatbot\RedCrossChat\RedCrossChat\bin\Debug\net6.0\appsettings.Development.json
+D:\RedCross-Chatbot\RedCrossChat\RedCrossChat\bin\Debug\net6.0\Cards\counties.json
 D:\RedCross-Chatbot\RedCrossChat\RedCrossChat\bin\Debug\net6.0\CognitiveModels\FlightBooking.json
 D:\RedCross-Chatbot\RedCrossChat\RedCrossChat\bin\Debug\net6.0\RedCrossChat.staticwebassets.runtime.json
 D:\RedCross-Chatbot\RedCrossChat\RedCrossChat\bin\Debug\net6.0\RedCrossChat.exe
@@ -142,4 +143,4 @@ D:\RedCross-Chatbot\RedCrossChat\RedCrossChat\obj\Debug\net6.0\refint\RedCrossCh
 D:\RedCross-Chatbot\RedCrossChat\RedCrossChat\obj\Debug\net6.0\RedCrossChat.pdb
 D:\RedCross-Chatbot\RedCrossChat\RedCrossChat\obj\Debug\net6.0\RedCrossChat.genruntimeconfig.cache
 D:\RedCross-Chatbot\RedCrossChat\RedCrossChat\obj\Debug\net6.0\ref\RedCrossChat.dll
-D:\RedCross-Chatbot\RedCrossChat\RedCrossChat\bin\Debug\net6.0\Cards\counties.json
+D:\RedCross-Chatbot\RedCrossChat\RedCrossChat\bin\Debug\net6.0\Cards\CountySelect.json

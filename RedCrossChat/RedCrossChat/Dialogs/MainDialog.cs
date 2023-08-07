@@ -22,14 +22,14 @@ namespace RedCrossChat.Dialogs
     {
         private readonly ILogger _logger;
         private readonly FlightBookingRecognizer _luisRecognizer;
-        private bool personalDialogComplete = false;
+       // private bool personalDialogComplete = false;
 
         // Dependency injection uses this constructor to instantiate MainDialog
         public MainDialog(FlightBookingRecognizer luisRecognizer, 
             BookingDialog bookingDialog,
             CounselorDialog counselorDialog,
             PersonalDialog personalDialog,
-            AwarenessDialog awarenessDialog,
+            //AwarenessDialog awarenessDialog,
             ILogger<MainDialog> logger)
             : base(nameof(MainDialog))
         {
@@ -40,14 +40,14 @@ namespace RedCrossChat.Dialogs
             AddDialog(bookingDialog);
             AddDialog(counselorDialog);
             AddDialog(personalDialog);
-            AddDialog(awarenessDialog);
+           // AddDialog(awarenessDialog);
 
             var waterfallSteps = new WaterfallStep[]
             {
                     IntroStepAsync,
                     ActStepAsync,
                     //PersonalStepAsync,
-                    AwarenessStepAsync,
+                    //AwarenessStepAsync,
                     FinalStepAsync,
             };
 
@@ -64,32 +64,36 @@ namespace RedCrossChat.Dialogs
             var promptMessage = MessageFactory.Text(messageText, messageText, InputHints.ExpectingInput);
             return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = promptMessage }, cancellationToken);
         }
+
+        //https://www.redcross.or.ke/ASSETS/DATA-PROTECTION-POLICY.pdf
+
         private async Task<DialogTurnResult> ActStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             // Check if PersonalDialog is not yet complete
-            if (!personalDialogComplete)
-            {
-                //return await PersonalStepAsync(stepContext, cancellationToken);
-                return await stepContext.BeginDialogAsync(nameof(PersonalDialog), null, cancellationToken);
+            //if (!personalDialogComplete)
+            //{
+            //    //return await PersonalStepAsync(stepContext, cancellationToken);
+            //    return await stepContext.BeginDialogAsync(nameof(PersonalDialog), null, cancellationToken);
 
-            }
+            //}
+            return await stepContext.BeginDialogAsync(nameof(PersonalDialog), null, cancellationToken);
 
-            // Reset the flag for the next turn
-            personalDialogComplete = false;
+            //// Reset the flag for the next turn
+            //personalDialogComplete = false;
 
-            // Rest of the existing code for handling LUIS intents
-            // ...
+            //// Rest of the existing code for handling LUIS intents
+            //// ...
 
-            // If the flow reaches here, it means we should continue to the next step in the waterfall.
-            return await AwarenessStepAsync(stepContext, cancellationToken);
+            //// If the flow reaches here, it means we should continue to the next step in the waterfall.
+            //return await AwarenessStepAsync(stepContext, cancellationToken);
         }
 
 
-        private async Task<DialogTurnResult> AwarenessStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
-        {
-            // Call the AwarenessDialog
-            return await stepContext.BeginDialogAsync(nameof(AwarenessDialog), null, cancellationToken);
-        }
+        //private async Task<DialogTurnResult> AwarenessStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        //{
+        //    // Call the AwarenessDialog
+        //    return await stepContext.BeginDialogAsync(nameof(AwarenessDialog), null, cancellationToken);
+        //}
 
         private async Task<DialogTurnResult> FinalStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
@@ -117,7 +121,7 @@ namespace RedCrossChat.Dialogs
             }
 
             // The result is null or of an unexpected type, return an empty response
-            return await stepContext.EndDialogAsync(cancellationToken);
+            return await stepContext.EndDialogAsync(null,cancellationToken);
         }
 
 

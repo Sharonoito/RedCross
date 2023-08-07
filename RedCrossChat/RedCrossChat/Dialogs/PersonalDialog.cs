@@ -3,8 +3,11 @@ using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.AI.Luis;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Dialogs.Choices;
+using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
+using Microsoft.Recognizers.Text.DateTime;
 using Newtonsoft.Json;
+using RedCrossChat.Cards;
 using RedCrossChat.Objects;
 using System;
 using System.Collections.Generic;
@@ -24,9 +27,11 @@ namespace RedCrossChat.Dialogs
 
         private const string UserInfo = "user-info";
 
-        public PersonalDialog(ILogger<PersonalDialog> logger) : base(nameof(PersonalDialog))
+        public PersonalDialog(AwarenessDialog awarenessDialog, ILogger<PersonalDialog> logger) : base(nameof(PersonalDialog))
         {
             AddDialog(new ChoicePrompt(nameof(ChoicePrompt)));
+
+            AddDialog(new TextPrompt(nameof(TextPrompt)));
 
             AddDialog(new ChoicePrompt("select-choice"));
 
@@ -42,33 +47,39 @@ namespace RedCrossChat.Dialogs
 
             AddDialog(new ChoicePrompt("select-awareness"));
 
+            AddDialog(awarenessDialog);
 
 
 
 
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
+
             {
                 InitialStepAsync,
-                TermsAndConditionsAsync,
+                HandleChoiceAsync,
+                ConfirmTermsAndConditionAsync,
+                PrivatePersonalFeelingAsync,
                 PrivateDetailsGenderAsync,
                 PrivateDetailsAgeBracketAsync,
-                //AgePromptValidatorAsync,
-                //ValidateAgeAsync,
                 PrivateDetailsCountryBracketAsync,
                 PrivateDetailsCountyDropdownAsync,
                 ValidateCountyAsync,
-               // EvauluateDialogTurnAsync,
-
-
-
                 FinalStepAsync,
+                //AwarenessStepAsync,
+
             }));
 
-            _choices = new List<Choice>();
+            AddDialog(new WaterfallDialog(nameof(PrivatePersonalFeelingAsync), new WaterfallStep[]
             {
-                new Choice() { Value = "Yes", Synonyms = new List<string> { "y", "Y", "YES", "YE", "ye", "yE", "1" } };
-                new Choice() { Value = "No", Synonyms = new List<string> { "n", "N", "no" } };
-            }
+                // Implement the steps for 'PrivatePersonalFeelingAsync' dialog here
+            }));
+
+
+            _choices = new List<Choice>()
+            {
+                new Choice() { Value = "Yes", Synonyms = new List<string> { "y", "Y", "YES", "YE", "ye", "yE", "1" } },
+                new Choice() { Value = "No", Synonyms = new List<string> { "n", "N", "no" } }
+            };
 
             // The initial child Dialog to run.
             InitialDialogId = nameof(WaterfallDialog);
@@ -78,16 +89,83 @@ namespace RedCrossChat.Dialogs
         {
             var options = new PromptOptions()
             {
-                Prompt = MessageFactory.Text("Welcome to the the chat bot we are working on this"),
+                Prompt = MessageFactory.Text("Please select options below to be assisted"),
 
                 Choices =GetChoices(),
             };
 
             return await stepContext.PromptAsync("select-terms", options, cancellationToken);
         }
-
-        private async Task<DialogTurnResult> TermsAndConditionsAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        private async Task<DialogTurnResult> HandleChoiceAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
+            var choiceValue = ((FoundChoice)stepContext.Result).Value;
+
+            if (choiceValue == "Mental Health")
+            {
+                // If choice 4 (Mental Health) is selected, send the Terms and Conditions as an adaptive card attachment
+                var termsAndConditionsCard = PersonalDialogCard.GetKnowYouCard();
+                var attachment = new Attachment
+                {
+                    ContentType = HeroCard.ContentType,
+                    Content = termsAndConditionsCard
+                };
+
+                var message = MessageFactory.Attachment(attachment);
+                await stepContext.Context.SendActivityAsync(message, cancellationToken);
+
+                // Prompt the user if they agree with the terms and conditions
+                var options = new PromptOptions()
+                {
+                    Prompt = MessageFactory.Text("Do you agree to the Terms and Conditions? Please select 'Yes' or 'No'."),
+                    RetryPrompt = MessageFactory.Text("Please select a valid option ('Yes' or 'No')."),
+                    Choices = new List<Choice>
+            {
+                new Choice() { Value = "Yes", Synonyms = new List<string> { "y", "Y", "YES", "YE", "ye", "yE", "1" } },
+                new Choice() { Value = "No", Synonyms = new List<string> { "n", "N", "no" } }
+            },
+                };
+
+                return await stepContext.PromptAsync("select-terms", options, cancellationToken);
+            }
+            else
+            {
+                // If choice 1, 2, or 3 is selected, redirect the user to the URL
+                var termsAndConditionsCard = PersonalDialogCard.GetKnowledgeBaseCard();
+                var attachment = new Attachment
+                {
+                    ContentType = HeroCard.ContentType,
+                    Content = termsAndConditionsCard
+                };
+                var message = MessageFactory.Attachment(attachment);
+                await stepContext.Context.SendActivityAsync(message, cancellationToken);
+
+         
+                return await stepContext.EndDialogAsync(null, cancellationToken);
+            }
+        }
+
+        private async Task<DialogTurnResult> ConfirmTermsAndConditionAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        {
+            string confirmation = ((FoundChoice)stepContext.Result).Value;
+
+            if (confirmation.Equals("Yes", StringComparison.OrdinalIgnoreCase))
+            {
+                // If the user confirms with 'Yes', proceed to TermsAndConditionsAsync
+                return await stepContext.BeginDialogAsync(nameof(PrivatePersonalFeelingAsync), null, cancellationToken);
+            }
+            else
+            {
+                // If the user does not confirm, end the dialog
+                await stepContext.Context.SendActivityAsync(MessageFactory.Text("You need to agree to the data protection policy to proceed."));
+                return await stepContext.EndDialogAsync(null, cancellationToken);
+            }
+        }
+        //private async Task<DialogTurnResult> PrivatePersonalFeelingAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+    
+
+        private async Task<DialogTurnResult> PrivatePersonalFeelingAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        {
+
             var options = new PromptOptions()
             {
                 Prompt = MessageFactory.Text("How would you describe how you are feeling today?"),
@@ -105,7 +183,9 @@ namespace RedCrossChat.Dialogs
 
             // Prompt the user with the configured PromptOptions.
             return await stepContext.PromptAsync("select-feeling", options, cancellationToken);
+
         }
+
 
         private async Task<DialogTurnResult> PrivateDetailsGenderAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
@@ -295,68 +375,21 @@ namespace RedCrossChat.Dialogs
         }
 
 
-        //private async Task<DialogTurnResult> EvauluateDialogTurnAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
-        //{
-
-        //    if (stepContext.Result == null)
-        //    {
-        //        await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions()
-        //        {
-        //            Prompt = MessageFactory.Text("Would you like me to take you through some breathing exercises or tips on managing mental health?"),
-        //            Choices = _choices
-
-        //        }, cancellationToken);
-
-        //        return await stepContext.EndDialogAsync(null, cancellationToken);
-
-        //    }
-
-        //    switch (((FoundChoice)stepContext.Result).Value)
-        //    {
-        //        case "Yes":
-        //            return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions()
-        //            {
-        //                Prompt=MessageFactory.Text("What is your relationship status ?"),
-        //                Choices =new List<Choice>()
-        //                {
-        //                    new Choice  { Value ="Single",Synonyms=new List<string>{"Single","S"}},
-        //                    new Choice  { Value ="Married",Synonyms=new List<string>{"married"}},
-        //                    new Choice  { Value ="Divored",Synonyms=new List<string>{"divored"}},
-        //                    new Choice  { Value ="In A relationship",Synonyms=new List<string>{"dating","relaitions","casual"}},
-        //                    new Choice  { Value ="Widow /Widower",Synonyms=new List<string>{"widow","widower"}},
-        //                    new Choice  { Value ="Complicated",Synonyms=new List<string>{"complicated","comp","it's complicated"}},
-
-        //                }
-        //            }, cancellationToken);
-
-
-        //        default:
-
-        //            await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions()
-        //            {
-        //                Prompt=MessageFactory.Text("Would you like me to take you through some breathing exercises or tips on managing mental health?"),
-        //                Choices= _choices
-
-        //            }, cancellationToken);
-
-        //            return await stepContext.EndDialogAsync(null, cancellationToken);
-        //    }
-        //}
-
-
 
         private async Task<DialogTurnResult> FinalStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            return await stepContext.EndDialogAsync(null, cancellationToken);
+            //return await stepContext.EndDialogAsync(null, cancellationToken);
+            return await stepContext.BeginDialogAsync(nameof(AwarenessDialog), null, cancellationToken);
+
         }
 
         private IList<Choice> GetChoices()
         {
             var cardOptions = new List<Choice>()
             {
-                new Choice() { Value = "Carrers", Synonyms = new List<string>() { "1" } },
+                new Choice() { Value = "Careers", Synonyms = new List<string>() { "1" } },
                 new Choice() { Value = "Volunteer and Membership", Synonyms = new List<string>() { "2" } },
-                new Choice() { Value = "Volunteer Opprtunities", Synonyms = new List<string>() { "3" } },
+                new Choice() { Value = "Volunteer Opportunities", Synonyms = new List<string>() { "3" } },
                 new Choice() { Value = "Mental Health", Synonyms = new List<string>() { "4" } },
 
             };
