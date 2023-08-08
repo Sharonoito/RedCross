@@ -1,0 +1,48 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.3",
+  "body": [
+    //{
+    //  "type": "TextBlock",
+    //  "text": "working",
+    //  "wrap": true
+    //},
+    {
+      "type": "Input.ChoiceSet",
+      "id": "countySelection",
+      "choices": [
+        {
+          "title": "Mombasa",
+          "value": 1,
+          "capital": "Mombasa City"
+        },
+        {
+          "title": "Kwale",
+          "value": 2,
+          "capital": "Kwale"
+        },
+        {
+          "title": "Kilifi",
+          "value": 3,
+          "capital": "Kilifi"
+        },
+        {
+          "title": "Tana River",
+          "value": 4,
+          "capital": "Hola"
+
+        }
+      ],
+      "placeholder": "Select County"
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.Submit",
+      "title": "  Submit"
+    }
+  ]
+
+
+}
