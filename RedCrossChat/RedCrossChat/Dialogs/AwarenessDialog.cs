@@ -263,7 +263,7 @@ namespace RedCrossChat.Dialogs
                     case "no":
                         user.handOverToUser = false;
                         // Start the BreathingDialog
-                        return await stepContext.BeginDialogAsync(nameof(BreathingDialog), null, cancellationToken);
+                        return await stepContext.BeginDialogAsync(nameof(BreathingDialog), user, cancellationToken);
                     default:
                         user.handOverToUser = false;
                         break;

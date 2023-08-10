@@ -33,5 +33,22 @@ namespace RedCrossChat.Cards
             return heroCard;
         }
 
+        public static HeroCard GetIntendedActivity()
+        {
+            return new HeroCard
+            {
+                Text = "You can upload an image or select one of the following choices",
+                Buttons = new List<CardAction>
+                {
+                    // Note that some channels require different values to be used in order to get buttons to display text.
+                    // In this code the emulator is accounted for with the 'title' parameter, but in other channels you may
+                    // need to provide a value for other parameters like 'text' or 'displayText'.
+                    new CardAction(ActionTypes.ImBack, title: "1. Inline Attachment", value: "1"),
+                    new CardAction(ActionTypes.ImBack, title: "2. Internet Attachment", value: "2"),
+                    new CardAction(ActionTypes.ImBack, title: "3. Uploaded Attachment", value: "3"),
+                },
+            };
+        }
+
     }
 }

@@ -56,9 +56,6 @@ namespace RedCrossChat.Dialogs
 
             {
                 InitialStepAsync,
-                HandleChoiceAsync,
-                ConfirmTermsAndConditionAsync,
-                PrivatePersonalFeelingAsync,
                 PrivateDetailsGenderAsync,
                 PrivateDetailsAgeBracketAsync,
                 PrivateDetailsCountryBracketAsync,
@@ -69,7 +66,7 @@ namespace RedCrossChat.Dialogs
 
             }));
 
-            AddDialog(new WaterfallDialog(nameof(PrivatePersonalFeelingAsync), new WaterfallStep[]
+            AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
             {
                 // Implement the steps for 'PrivatePersonalFeelingAsync' dialog here
             }));
@@ -84,86 +81,8 @@ namespace RedCrossChat.Dialogs
             // The initial child Dialog to run.
             InitialDialogId = nameof(WaterfallDialog);
         }
-
+   
         private async Task<DialogTurnResult> InitialStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
-        {
-            var options = new PromptOptions()
-            {
-                Prompt = MessageFactory.Text("Please select options below to be assisted"),
-
-                Choices =GetChoices(),
-            };
-
-            return await stepContext.PromptAsync("select-terms", options, cancellationToken);
-        }
-        private async Task<DialogTurnResult> HandleChoiceAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
-        {
-            var choiceValue = ((FoundChoice)stepContext.Result).Value;
-
-            if (choiceValue == "Mental Health")
-            {
-                // If choice 4 (Mental Health) is selected, send the Terms and Conditions as an adaptive card attachment
-                var termsAndConditionsCard = PersonalDialogCard.GetKnowYouCard();
-                var attachment = new Attachment
-                {
-                    ContentType = HeroCard.ContentType,
-                    Content = termsAndConditionsCard
-                };
-
-                var message = MessageFactory.Attachment(attachment);
-                await stepContext.Context.SendActivityAsync(message, cancellationToken);
-
-                // Prompt the user if they agree with the terms and conditions
-                var options = new PromptOptions()
-                {
-                    Prompt = MessageFactory.Text("Do you agree to the Terms and Conditions? Please select 'Yes' or 'No'."),
-                    RetryPrompt = MessageFactory.Text("Please select a valid option ('Yes' or 'No')."),
-                    Choices = new List<Choice>
-            {
-                new Choice() { Value = "Yes", Synonyms = new List<string> { "y", "Y", "YES", "YE", "ye", "yE", "1" } },
-                new Choice() { Value = "No", Synonyms = new List<string> { "n", "N", "no" } }
-            },
-                };
-
-                return await stepContext.PromptAsync("select-terms", options, cancellationToken);
-            }
-            else
-            {
-                // If choice 1, 2, or 3 is selected, redirect the user to the URL
-                var termsAndConditionsCard = PersonalDialogCard.GetKnowledgeBaseCard();
-                var attachment = new Attachment
-                {
-                    ContentType = HeroCard.ContentType,
-                    Content = termsAndConditionsCard
-                };
-                var message = MessageFactory.Attachment(attachment);
-                await stepContext.Context.SendActivityAsync(message, cancellationToken);
-
-         
-                return await stepContext.EndDialogAsync(null, cancellationToken);
-            }
-        }
-
-        private async Task<DialogTurnResult> ConfirmTermsAndConditionAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
-        {
-            string confirmation = ((FoundChoice)stepContext.Result).Value;
-
-            if (confirmation.Equals("Yes", StringComparison.OrdinalIgnoreCase))
-            {
-                // If the user confirms with 'Yes', proceed to TermsAndConditionsAsync
-                return await stepContext.BeginDialogAsync(nameof(PrivatePersonalFeelingAsync), null, cancellationToken);
-            }
-            else
-            {
-                // If the user does not confirm, end the dialog
-                await stepContext.Context.SendActivityAsync(MessageFactory.Text("You need to agree to the data protection policy to proceed."));
-                return await stepContext.EndDialogAsync(null, cancellationToken);
-            }
-        }
-        //private async Task<DialogTurnResult> PrivatePersonalFeelingAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
-    
-
-        private async Task<DialogTurnResult> PrivatePersonalFeelingAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
 
             var options = new PromptOptions()
