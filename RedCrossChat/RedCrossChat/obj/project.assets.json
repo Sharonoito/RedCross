@@ -8020,19 +8020,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\oitos\\.nuget\\packages\\": {}
+    "C:\\Users\\HP\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\RedCross-Chatbot\\RedCrossChat\\RedCrossChat\\RedCrossChat.csproj",
+      "projectUniqueName": "D:\\projects\\RedCross-Chatbot\\RedCrossChat\\RedCrossChat\\RedCrossChat.csproj",
       "projectName": "RedCrossChat",
-      "projectPath": "D:\\RedCross-Chatbot\\RedCrossChat\\RedCrossChat\\RedCrossChat.csproj",
-      "packagesPath": "C:\\Users\\oitos\\.nuget\\packages\\",
-      "outputPath": "D:\\RedCross-Chatbot\\RedCrossChat\\RedCrossChat\\obj\\",
+      "projectPath": "D:\\projects\\RedCross-Chatbot\\RedCrossChat\\RedCrossChat\\RedCrossChat.csproj",
+      "packagesPath": "C:\\Users\\HP\\.nuget\\packages\\",
+      "outputPath": "D:\\projects\\RedCross-Chatbot\\RedCrossChat\\RedCrossChat\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\oitos\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\HP\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -8040,7 +8040,7 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "C:\\Program Files\\dotnet\\sdk\\7.0.306\\Sdks\\Microsoft.NET.Sdk.Web\\library-packs": {},
+        "C:\\Program Files\\dotnet\\sdk\\7.0.304\\Sdks\\Microsoft.NET.Sdk.Web\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -8099,7 +8099,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.306\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.304\\RuntimeIdentifierGraph.json"
       }
     }
   }

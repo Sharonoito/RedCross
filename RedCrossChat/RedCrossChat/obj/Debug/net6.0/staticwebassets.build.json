@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "216tqPs99uylY9ePpMDKbYYrPSGNLrfU6GcY2gir750=",
+  "Hash": "hRiBn536HG6ReWVEianKgwJ+8lTghw7RY9eMm2JKpPU=",
   "Source": "RedCrossChat",
   "BasePath": "_content/RedCrossChat",
   "Mode": "Default",
@@ -10,17 +10,17 @@
     {
       "Name": "RedCrossChat\\wwwroot",
       "Source": "RedCrossChat",
-      "ContentRoot": "D:\\RedCross-Chatbot\\RedCrossChat\\RedCrossChat\\wwwroot\\",
+      "ContentRoot": "D:\\projects\\RedCross-Chatbot\\RedCrossChat\\RedCrossChat\\wwwroot\\",
       "BasePath": "_content/RedCrossChat",
       "Pattern": "**"
     }
   ],
   "Assets": [
     {
-      "Identity": "D:\\RedCross-Chatbot\\RedCrossChat\\RedCrossChat\\wwwroot\\default.htm",
+      "Identity": "D:\\projects\\RedCross-Chatbot\\RedCrossChat\\RedCrossChat\\wwwroot\\default.htm",
       "SourceId": "RedCrossChat",
       "SourceType": "Discovered",
-      "ContentRoot": "D:\\RedCross-Chatbot\\RedCrossChat\\RedCrossChat\\wwwroot\\",
+      "ContentRoot": "D:\\projects\\RedCross-Chatbot\\RedCrossChat\\RedCrossChat\\wwwroot\\",
       "BasePath": "_content/RedCrossChat",
       "RelativePath": "default.htm",
       "AssetKind": "All",
