@@ -90,6 +90,8 @@ namespace RedCrossChat.Dialogs
                     new Choice() { Value = "Mental Health", Synonyms = new List<string>() { "4","Mental","mental","mental Health","Mental Health","Help" } },
 
                 }
+                ,
+                Style=ListStyle.HeroCard
             }, cancellationToken);
         }
 
