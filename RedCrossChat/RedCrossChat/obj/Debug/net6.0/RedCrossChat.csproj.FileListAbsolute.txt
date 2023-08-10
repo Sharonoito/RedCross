@@ -218,3 +218,7 @@ D:\projects\RedCross-Chatbot\RedCrossChat\RedCrossChat\obj\Debug\net6.0\refint\R
 D:\projects\RedCross-Chatbot\RedCrossChat\RedCrossChat\obj\Debug\net6.0\RedCrossChat.pdb
 D:\projects\RedCross-Chatbot\RedCrossChat\RedCrossChat\obj\Debug\net6.0\RedCrossChat.genruntimeconfig.cache
 D:\projects\RedCross-Chatbot\RedCrossChat\RedCrossChat\obj\Debug\net6.0\ref\RedCrossChat.dll
+D:\projects\RedCross-Chatbot\RedCrossChat\RedCrossChat\bin\Debug\net6.0\Sentry.dll
+D:\projects\RedCross-Chatbot\RedCrossChat\RedCrossChat\bin\Debug\net6.0\Sentry.AspNetCore.dll
+D:\projects\RedCross-Chatbot\RedCrossChat\RedCrossChat\bin\Debug\net6.0\Sentry.Extensions.Logging.dll
+D:\projects\RedCross-Chatbot\RedCrossChat\RedCrossChat\obj\Debug\net6.0\Sentry.Attributes.cs

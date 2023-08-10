@@ -25,6 +25,16 @@ namespace RedCrossChat
                         logging.AddDebug();
                         logging.AddConsole();
                     });
+
+                    webBuilder.UseSentry(o =>
+                    {
+                        o.Dsn = "https://77bf24fb168419b5781f1c19a20c8017@o4505249614462976.ingest.sentry.io/4505680692707328";
+                        // When configuring for the first time, to see what the SDK is doing:
+                        o.Debug = true;
+                        // Set TracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
+                        // We recommend adjusting this value in production.
+                        o.TracesSampleRate = 1.0;
+                    });
                     webBuilder.UseStartup<Startup>();
                 });
     }

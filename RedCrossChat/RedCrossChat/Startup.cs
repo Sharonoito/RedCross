@@ -70,6 +70,7 @@ namespace RedCrossChat
             }
 
             app.UseDefaultFiles()
+                .UseSentryTracing()
                 .UseStaticFiles()
                 .UseWebSockets()
                 .UseRouting()
