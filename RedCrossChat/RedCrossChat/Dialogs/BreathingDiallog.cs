@@ -1,6 +1,8 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Dialogs.Choices;
+using Microsoft.IdentityModel.Clients.ActiveDirectory;
+using RedCrossChat.Objects;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,6 +13,10 @@ namespace RedCrossChat.Dialogs
     {
 
         private List<Choice> _choice;
+
+        private List<BreathingTip> _breathingTips;
+
+        protected string iterations = "user-iterations";
 
         public BreathingDialog() : base(nameof(BreathingDialog))
         {
@@ -39,6 +45,8 @@ namespace RedCrossChat.Dialogs
                   new Choice() { Value = "No", Synonyms = new List<string> { "n", "N", "no" } }
             };
 
+            _breathingTips = GetBreathingTips();
+
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), waterFallSteps));
 
           
@@ -48,6 +56,29 @@ namespace RedCrossChat.Dialogs
 
         public async Task<DialogTurnResult> InitialDialogTest(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
+
+            var user = (User)stepContext.Options;
+
+            if (stepContext.Values[iterations] == null)
+            {
+                stepContext.Values[iterations] = 1;
+            }
+            else
+            {
+                stepContext.Values[iterations] = (int)stepContext.Values[iterations] +1;
+            }
+
+            // feelings happy sad
+
+            //loop 
+           
+            foreach(var tips in _breathingTips)
+            {
+
+                //if feeling == tips.feeling 
+
+            }
+           
 
             var prompts = new PromptOptions
             {
@@ -145,6 +176,17 @@ namespace RedCrossChat.Dialogs
         private async Task<DialogTurnResult> FinalStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             return await stepContext.EndDialogAsync(cancellationToken);
+        }
+
+
+        private List<BreathingTip> GetBreathingTips()
+        {
+
+            return new List<BreathingTip>
+            {
+
+                new BreathingTip{ Feeling="Sad",Exercise="Remember, you are not alone in your struggles. Reach out to friends, family, or a mental health professional if you need someone to talk to. Asking for help is a sign of strength" }
+            };
         }
 
 
