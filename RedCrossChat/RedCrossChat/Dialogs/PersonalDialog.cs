@@ -9,12 +9,14 @@ using Microsoft.Recognizers.Text.DateTime;
 using Newtonsoft.Json;
 using RedCrossChat.Cards;
 using RedCrossChat.Objects;
+using Sentry;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using User = RedCrossChat.Objects.User;
 
 namespace RedCrossChat.Dialogs
 {
@@ -25,9 +27,9 @@ namespace RedCrossChat.Dialogs
         protected readonly ILogger _logger;
         private List<Choice> _choices;
 
-        private const string UserInfo = "user-info";
+        private const string UserInfo = "Client-info";
 
-        public PersonalDialog(AwarenessDialog awarenessDialog, ILogger<PersonalDialog> logger) : base(nameof(PersonalDialog))
+        public PersonalDialog(AwarenessDialog awarenessDialog,BreathingDialog breathingDialog, ILogger<PersonalDialog> logger) : base(nameof(PersonalDialog))
         {
             AddDialog(new ChoicePrompt(nameof(ChoicePrompt)));
 
@@ -49,8 +51,7 @@ namespace RedCrossChat.Dialogs
 
             AddDialog(awarenessDialog);
 
-
-
+            AddDialog(breathingDialog);
 
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
 
@@ -62,13 +63,12 @@ namespace RedCrossChat.Dialogs
                 PrivateDetailsCountyDropdownAsync,
                 ValidateCountyAsync,
                 LaunchAwarenessDialogAsync,
+                HandleCasesWithAI,
                 FinalStepAsync,
          
             }));
 
-           
-
-
+        
             _choices = new List<Choice>()
             {
                 new Choice() { Value = "Yes", Synonyms = new List<string> { "y", "Y", "YES", "YE", "ye", "yE", "1" } },
@@ -81,6 +81,7 @@ namespace RedCrossChat.Dialogs
    
         private async Task<DialogTurnResult> InitialStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
+            stepContext.Values[UserInfo] = new Client();
 
             var options = new PromptOptions()
             {
@@ -88,12 +89,12 @@ namespace RedCrossChat.Dialogs
                 RetryPrompt = MessageFactory.Text("Please select a valid feeling"),
                 Choices = new List<Choice>
                 {
-                    new Choice() { Value ="Happy 😀"},
-                    new Choice() { Value="Angry 😡"},
-                    new Choice() {Value="Anxious 🥴"},
-                    new Choice() {Value="Sad 😪"},
-                    new Choice() {Value="Flat Effect 🫥"},
-                    new Choice() {Value="Expressionless 🫤"},
+                    new Choice() { Value =Feelings.Happy,Synonyms=new List<string>{"happy","HAPPY","Happy"}},
+                    new Choice() { Value=Feelings.Angry,Synonyms=new List<string>{"Angry","angry","ANGRY"}},
+                    new Choice() { Value=Feelings.Anxious},
+                    new Choice() { Value=Feelings.FlatEffect},
+                    new Choice() { Value=Feelings.Expressionless},
+                    new Choice() { Value=Feelings.Sad},
                 },
             };
 
@@ -106,7 +107,14 @@ namespace RedCrossChat.Dialogs
         private async Task<DialogTurnResult> PrivateDetailsGenderAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
 
-            var options = new PromptOptions()
+            if (stepContext.Values != null)
+            {
+                var client=(Client)stepContext.Values[UserInfo];
+
+                client.Feeling= ((FoundChoice)stepContext.Result).Value;
+            }
+
+                var options = new PromptOptions()
             {
                 Prompt = MessageFactory.Text("What is your Gender"),
                 RetryPrompt = MessageFactory.Text("Please select a valid Gender"),
@@ -256,15 +264,20 @@ namespace RedCrossChat.Dialogs
 
             //var options = new PromptOptions()
             {
-                Prompt = MessageFactory.Text("Which county are you located in?"),
+                Prompt = MessageFactory.Text("Which county are you located in? kiambu,kenya"),
                 RetryPrompt = MessageFactory.Text("Please select a county from the dropdown"),
                 //Choices = counties.Select(county => new Choice(county)).ToList(),
             };
 
-            return await stepContext.PromptAsync(nameof(TextPrompt), promptOptions, cancellationToken);
+            if (((FoundChoice)stepContext.Result).Value == "Kenya")
+            {
+                return await stepContext.PromptAsync(nameof(TextPrompt), promptOptions, cancellationToken);
+            }
+            else
+            {
+                return await stepContext.NextAsync(null);
+            }  
         }
-
-
 
         private async Task<DialogTurnResult> ValidateCountyAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
@@ -301,6 +314,21 @@ namespace RedCrossChat.Dialogs
 
         private async Task<DialogTurnResult> HandleCasesWithAI(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
+
+            if(stepContext.Result !=null)
+            {
+
+                User user = (User)stepContext.Result;
+
+                if (!user.wantsToTalkToSomeone)
+                {
+                    return await stepContext.BeginDialogAsync(nameof(BreathingDialog), null, cancellationToken);
+                }
+                else{
+
+                }
+
+            }
             var promptOptions = new PromptOptions
             {
                 Prompt = MessageFactory.Text("Handle with ai "),

@@ -19,7 +19,7 @@ namespace RedCrossChat.Dialogs
         protected readonly UserState _userState;
         private const string UserInfo = "user-info";
 
-        public AwarenessDialog(BreathingDialog breathingDialog, ILogger<AwarenessDialog> logger) : base(nameof(AwarenessDialog))
+        public AwarenessDialog(ILogger<AwarenessDialog> logger) : base(nameof(AwarenessDialog))
 
 
         {
@@ -29,34 +29,39 @@ namespace RedCrossChat.Dialogs
 
             AddDialog(new ChoicePrompt("select-option"));
 
-            AddDialog(breathingDialog);
 
+            AddDialog(new WaterfallDialog(nameof(WaterfallDialog), CreateWaterFallSteps()));
 
-            AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
+            _choices = GetSelectChoices();
+
+            // The initial child Dialog to run.
+            InitialDialogId = nameof(WaterfallDialog);
+        }
+
+        private WaterfallStep[] CreateWaterFallSteps()
+        {
+            return new WaterfallStep[]
             {
                 InitialStepAsync,
                 HandleMentalValuationAsync,
                 ProcessMentalEvaluationChoice,
                 HandleCaregiverChoiceAsync,
-                ProcessMentalEvaluationChoice,
+       //this is where there were duplicates         ProcessMentalEvaluationChoice,
                 EvaluateDialogTurnAsync,
+                RelationShipStatusAsync,
                 ProfessionalStatusAsync,
                 CheckProfessionalSwitchAsync,
                 FinalStepAsync
+            };
+        }
 
-
-            }));
-
-            _choices = new List<Choice>()
+        private List<Choice> GetSelectChoices()
+        {
+            return new List<Choice>()
                 {
                      new Choice() { Value ="Yes",Synonyms=new List<string>{"y","Y","YES","YE","ye","yE","1"}},
                      new Choice() { Value="No",Synonyms=new List<string>{"n","N","no"} }
                 };
-
-            // The initial child Dialog to run.
-            InitialDialogId = nameof(WaterfallDialog);
-
-
         }
 
         private async Task<DialogTurnResult> InitialStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
@@ -147,45 +152,54 @@ namespace RedCrossChat.Dialogs
             {
                 case "Yes":
                     user.hasTalkedToSomeone =true;
-                    return await stepContext.PromptAsync(nameof(ChoicePrompt),
-                                new PromptOptions()
-                                {
-                                    Prompt = MessageFactory.Text("It is good to have a trusted person, family, friend or an expert whom you can talk to. Would you like to have a trusted expert from Kenya Red Cross to talk to?"),
-                                    Choices = _choices
-                                });
+                    break;
                 default:
-                    //check if false
+                   
                     user.hasTalkedToSomeone =false;
 
-                    return  await stepContext.EndDialogAsync(user);
+                    if (!user.hasTalkedToSomeone && !user.isAwareOfFeeling)
+                    {
+                        return await stepContext.EndDialogAsync(user);
+                    }
+                    break;
+                    
 
             }
+
+            return await stepContext.PromptAsync(nameof(ChoicePrompt),
+                               new PromptOptions()
+                               {
+                                   Prompt = MessageFactory.Text("It is good to have a trusted person, family, friend or an expert whom you can talk to. Would you like to have a trusted expert from Kenya Red Cross to talk to?"),
+                                   Choices = _choices
+                               });
         }
 
 
         private async Task<DialogTurnResult> EvaluateDialogTurnAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
 
+            User user = (User)stepContext.Values[UserInfo];
+
             if (stepContext.Result == null)
             {
-                await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions()
-                {
-                    Prompt = MessageFactory.Text("Would you like me to take you through some breathing exercises or tips on managing mental health?"),
-                    Choices = _choices
-
-                }, cancellationToken);
-
-                return await stepContext.EndDialogAsync(null, cancellationToken);
-
+                return await stepContext.EndDialogAsync(user, cancellationToken);
             }
 
             switch (((FoundChoice)stepContext.Result).Value)
             {
                 case "Yes":
-                    return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions()
-                    {
-                        Prompt=MessageFactory.Text("What is your relationship status ?"),
-                        Choices =new List<Choice>()
+                    return await stepContext.NextAsync(user, cancellationToken);
+                default:
+                    return await stepContext.EndDialogAsync(user, cancellationToken);
+            }
+        }
+
+        private async Task<DialogTurnResult> RelationShipStatusAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        {
+            return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions()
+            {
+                Prompt = MessageFactory.Text("What is your relationship status ?"),
+                Choices = new List<Choice>()
                         {
                             new Choice  { Value ="Single",Synonyms=new List<string>{"Single","S"}},
                             new Choice  { Value ="Married",Synonyms=new List<string>{"married"}},
@@ -195,41 +209,8 @@ namespace RedCrossChat.Dialogs
                             new Choice  { Value ="Complicated",Synonyms=new List<string>{"complicated","comp","it's complicated"}},
 
                         }
-                    }, cancellationToken);
-
-
-                default:
-
-                    return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions()
-                    {
-                        Prompt=MessageFactory.Text("Would you like me to take you through some breathing exercises or tips on managing mental health?"),
-                        Choices= _choices
-
-                    }, cancellationToken);
-
-                    return await stepContext.EndDialogAsync(null, cancellationToken);
-            }
+            }, cancellationToken);
         }
-
-        //private async Task<DialogTurnResult> EvaluateBreathingChoiceAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
-        //{
-
-        //    switch (((FoundChoice)stepContext.Result).Value)
-        //    {
-        //        case "Yes":
-
-        //            break;
-        //        default:
-        //            return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions()
-        //            {
-        //                Prompt = MessageFactory.Text("Would you like me to take you through some breathing exercises or tips on managing mental health?"),
-        //                Choices = _choices
-
-        //            }, cancellationToken);
-                   
-        //    }
-
-        //}
 
         private async Task<DialogTurnResult> ProfessionalStatusAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
