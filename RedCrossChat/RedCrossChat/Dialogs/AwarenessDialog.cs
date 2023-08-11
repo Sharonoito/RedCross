@@ -157,7 +157,7 @@ namespace RedCrossChat.Dialogs
                     //check if false
                     user.hasTalkedToSomeone =false;
 
-                    return await stepContext.NextAsync();
+                    return  await stepContext.EndDialogAsync(user);
 
             }
         }
@@ -200,7 +200,7 @@ namespace RedCrossChat.Dialogs
 
                 default:
 
-                    await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions()
+                    return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions()
                     {
                         Prompt=MessageFactory.Text("Would you like me to take you through some breathing exercises or tips on managing mental health?"),
                         Choices= _choices
@@ -210,6 +210,26 @@ namespace RedCrossChat.Dialogs
                     return await stepContext.EndDialogAsync(null, cancellationToken);
             }
         }
+
+        //private async Task<DialogTurnResult> EvaluateBreathingChoiceAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        //{
+
+        //    switch (((FoundChoice)stepContext.Result).Value)
+        //    {
+        //        case "Yes":
+
+        //            break;
+        //        default:
+        //            return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions()
+        //            {
+        //                Prompt = MessageFactory.Text("Would you like me to take you through some breathing exercises or tips on managing mental health?"),
+        //                Choices = _choices
+
+        //            }, cancellationToken);
+                   
+        //    }
+
+        //}
 
         private async Task<DialogTurnResult> ProfessionalStatusAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
@@ -254,6 +274,9 @@ namespace RedCrossChat.Dialogs
                 switch (((FoundChoice)stepContext.Result).Value)
                 {
                     case "agent":
+
+                        user.wantstoTalkToAProfessional= true;
+
                         user.handOverToUser = true;
 
                         // Send the message to the user about the next available agent or calling 1199.
@@ -270,8 +293,7 @@ namespace RedCrossChat.Dialogs
                 }
             }
 
-            // Continue the waterfall to the next step (if needed)
-            return await stepContext.NextAsync(null, cancellationToken);
+            return await stepContext.EndDialogAsync(user);
         }
 
 

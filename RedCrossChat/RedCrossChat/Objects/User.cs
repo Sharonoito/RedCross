@@ -8,6 +8,7 @@
 
         public bool wantsToTalkToSomeone { get; set; } = false;
 
+        public bool wantstoTalkToAProfessional { get; set; } = false;
 
         public bool handOverToUser { get; set; } = false;
     }

@@ -61,15 +61,12 @@ namespace RedCrossChat.Dialogs
                 PrivateDetailsCountryBracketAsync,
                 PrivateDetailsCountyDropdownAsync,
                 ValidateCountyAsync,
+                LaunchAwarenessDialogAsync,
                 FinalStepAsync,
-                //AwarenessStepAsync,
-
+         
             }));
 
-            AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
-            {
-                // Implement the steps for 'PrivatePersonalFeelingAsync' dialog here
-            }));
+           
 
 
             _choices = new List<Choice>()
@@ -282,7 +279,7 @@ namespace RedCrossChat.Dialogs
                 // County is not valid, reprompt the user to enter again
                 var promptOptions = new PromptOptions
                 {
-                    Prompt = MessageFactory.Text("Please enter a valid county name."),
+                    Prompt = MessageFactory.Text("Please enter a valid county name. example Kiambu,Meru,Machakos,Nandi "),
                     RetryPrompt = MessageFactory.Text("The county you entered is not valid. Please try again."),
                 };
 
@@ -294,6 +291,26 @@ namespace RedCrossChat.Dialogs
         }
 
 
+        //validation for mental awarenesss
+        private async Task<DialogTurnResult> LaunchAwarenessDialogAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        {
+           
+            return await stepContext.BeginDialogAsync(nameof(AwarenessDialog), null, cancellationToken);
+
+        }
+
+        private async Task<DialogTurnResult> HandleCasesWithAI(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        {
+            var promptOptions = new PromptOptions
+            {
+                Prompt = MessageFactory.Text("Handle with ai "),
+                RetryPrompt = MessageFactory.Text("The county you entered is not valid. Please try again."),
+            };
+
+            //validation to check if its breathing extercices or its handle to ai
+
+            return await stepContext.PromptAsync(nameof(TextPrompt), promptOptions, cancellationToken);
+        }
 
         private async Task<DialogTurnResult> FinalStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {

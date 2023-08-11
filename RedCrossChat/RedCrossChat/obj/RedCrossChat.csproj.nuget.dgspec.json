@@ -1,20 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "D:\\projects\\RedCross-Chatbot\\RedCrossChat\\RedCrossChat\\RedCrossChat.csproj": {}
+    "E:\\Asp.net\\RedCross-Chatbot\\RedCrossChat\\RedCrossChat\\RedCrossChat.csproj": {}
   },
   "projects": {
-    "D:\\projects\\RedCross-Chatbot\\RedCrossChat\\RedCrossChat\\RedCrossChat.csproj": {
+    "E:\\Asp.net\\RedCross-Chatbot\\RedCrossChat\\RedCrossChat\\RedCrossChat.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\projects\\RedCross-Chatbot\\RedCrossChat\\RedCrossChat\\RedCrossChat.csproj",
+        "projectUniqueName": "E:\\Asp.net\\RedCross-Chatbot\\RedCrossChat\\RedCrossChat\\RedCrossChat.csproj",
         "projectName": "RedCrossChat",
-        "projectPath": "D:\\projects\\RedCross-Chatbot\\RedCrossChat\\RedCrossChat\\RedCrossChat.csproj",
-        "packagesPath": "C:\\Users\\HP\\.nuget\\packages\\",
-        "outputPath": "D:\\projects\\RedCross-Chatbot\\RedCrossChat\\RedCrossChat\\obj\\",
+        "projectPath": "E:\\Asp.net\\RedCross-Chatbot\\RedCrossChat\\RedCrossChat\\RedCrossChat.csproj",
+        "packagesPath": "C:\\Users\\ambuh\\.nuget\\packages\\",
+        "outputPath": "E:\\Asp.net\\RedCross-Chatbot\\RedCrossChat\\RedCrossChat\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "D:\\VisualStudioSharedComponents\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\HP\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\ambuh\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -22,7 +26,8 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\sdk\\7.0.304\\Sdks\\Microsoft.NET.Sdk.Web\\library-packs": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
+          "C:\\Program Files\\dotnet\\sdk\\7.0.306\\Sdks\\Microsoft.NET.Sdk.Web\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -85,7 +90,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.304\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.306\\RuntimeIdentifierGraph.json"
         }
       }
     }
