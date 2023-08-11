@@ -100,6 +100,9 @@ namespace RedCrossChat.Dialogs
         private async Task<DialogTurnResult> ActStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
 
+            var turnContext = stepContext.Context;
+
+           
             var termsAndConditionsCard = PersonalDialogCard.GetKnowledgeBaseCard();
 
             var attachment = new Attachment
@@ -117,8 +120,11 @@ namespace RedCrossChat.Dialogs
 
                 if (choiceValue==null)
                 {
-                     
-                    await stepContext.Context.SendActivityAsync(message, cancellationToken);
+
+                    await (turnContext.Activity.ChannelId == "telegram" ? 
+                        turnContext.SendActivityAsync("This is a Telegram channel.") :
+                        stepContext.Context.SendActivityAsync(message, cancellationToken));
+                   
 
                     return await stepContext.EndDialogAsync(null);
                 }
@@ -132,8 +138,10 @@ namespace RedCrossChat.Dialogs
                 }
              
             }
-         
-            await stepContext.Context.SendActivityAsync(message, cancellationToken);
+
+            await (turnContext.Activity.ChannelId == "telegram" ?
+                        turnContext.SendActivityAsync("This is a Telegram channel.") :
+                        stepContext.Context.SendActivityAsync(message, cancellationToken));
 
             return await stepContext.EndDialogAsync(null);
 
