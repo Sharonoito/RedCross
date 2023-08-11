@@ -56,34 +56,13 @@ namespace RedCrossChat.Dialogs
 
         public async Task<DialogTurnResult> InitialDialogTest(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-
             var user = (User)stepContext.Options;
 
-            if (stepContext.Values[iterations] == null)
-            {
-                stepContext.Values[iterations] = 1;
-            }
-            else
-            {
-                stepContext.Values[iterations] = (int)stepContext.Values[iterations] +1;
-            }
-
-            // feelings happy sad
-
-            //loop 
+            stepContext.Values[iterations] = 1;
            
-            foreach(var tips in _breathingTips)
-            {
-
-                //if feeling == tips.feeling 
-
-            }
-           
-
             var prompts = new PromptOptions
             {
-                Prompt = MessageFactory.Text("Feeling overwhelmed? Let's do a quick deep breathing exercise together. Inhale deeply for a count of 4, hold for 4," +
-                " and exhale slowly for a count of 6. Repeat this 3-5 times. Remember to focus on your breath and let go of any tension.\""),
+                Prompt = MessageFactory.Text("Would you like me to take you through some breathing exercises or tips on managing mental health?\r\n\r\n "),
             };
 
             return await stepContext.PromptAsync(nameof(ChoicePrompt), prompts, cancellationToken);
@@ -185,7 +164,8 @@ namespace RedCrossChat.Dialogs
             return new List<BreathingTip>
             {
 
-                new BreathingTip{ Feeling="Sad",Exercise="Remember, you are not alone in your struggles. Reach out to friends, family, or a mental health professional if you need someone to talk to. Asking for help is a sign of strength" }
+                new BreathingTip{ Feeling="Sad",Exercise="Remember, you are not alone in your struggles. Reach out to friends, family, or a mental health professional if you need someone to talk to. Asking for help is a sign of strength" },
+                new BreathingTip{},
             };
         }
 

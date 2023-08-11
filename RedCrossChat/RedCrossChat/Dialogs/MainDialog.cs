@@ -99,38 +99,43 @@ namespace RedCrossChat.Dialogs
 
         private async Task<DialogTurnResult> ActStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            if (stepContext.Result == null)
+
+            var termsAndConditionsCard = PersonalDialogCard.GetKnowledgeBaseCard();
+
+            var attachment = new Attachment
             {
-                await stepContext.EndDialogAsync(cancellationToken);
-            }
-            else
+                ContentType = HeroCard.ContentType,
+                Content = termsAndConditionsCard
+            };
+
+            var message = MessageFactory.Attachment(attachment);
+
+            if (stepContext.Result != null)
             {
+           
                 var choiceValue = ((FoundChoice)stepContext.Result).Value;
 
-                if(choiceValue == "Mental Health")
+                if (choiceValue==null)
+                {
+                     
+                    await stepContext.Context.SendActivityAsync(message, cancellationToken);
+
+                    return await stepContext.EndDialogAsync(null);
+                }
+
+                if (choiceValue == "Mental Health")
                 {
 
                     //return await stepContext.BeginDialogAsync(nameof(PersonalDialog), null, cancellationToken);
 
                     return await stepContext.NextAsync(null);
                 }
-                else
-                {
-                    var termsAndConditionsCard = PersonalDialogCard.GetKnowledgeBaseCard();
-                    var attachment = new Attachment
-                    {
-                        ContentType = HeroCard.ContentType,
-                        Content = termsAndConditionsCard
-                    };
-
-                    var message = MessageFactory.Attachment(attachment);
-                    await stepContext.Context.SendActivityAsync(message, cancellationToken);
-
-                    return await stepContext.EndDialogAsync(null);   
-                }
+             
             }
+         
+            await stepContext.Context.SendActivityAsync(message, cancellationToken);
 
-            return await stepContext.EndDialogAsync(cancellationToken);
+            return await stepContext.EndDialogAsync(null);
 
         }
 
