@@ -113,6 +113,20 @@ namespace RedCrossChat.Dialogs
 
             var message = MessageFactory.Attachment(attachment);
 
+            var choices = new List<Choice>
+            {
+                new Choice { Value = "Google", Action = new CardAction { Title = "Visit Google", Type = ActionTypes.OpenUrl, Value = "https://www.google.com" } },
+                new Choice { Value = "Microsoft", Action = new CardAction { Title = "Visit Microsoft", Type = ActionTypes.OpenUrl, Value = "https://www.microsoft.com" } },
+                // Add more choices as needed
+            };
+
+            var options = new PromptOptions
+            {
+                Prompt = MessageFactory.Text("To access our Volunteer or membership opportunities click on the links below"),
+                Choices = choices,
+                Style = ListStyle.HeroCard,
+            };
+
             if (stepContext.Result != null)
             {
            
@@ -121,27 +135,34 @@ namespace RedCrossChat.Dialogs
                 if (choiceValue==null)
                 {
 
-                    await (turnContext.Activity.ChannelId == "telegram" ? 
-                        turnContext.SendActivityAsync("This is a Telegram channel.") :
-                        stepContext.Context.SendActivityAsync(message, cancellationToken));
-                   
+                    
+                    if(turnContext.Activity.ChannelId == "telegram")
+                    {
+                        await stepContext.PromptAsync(nameof(ChoicePrompt), options, cancellationToken);
+                    }
+                    else
+                    {
+                        await stepContext.Context.SendActivityAsync(message, cancellationToken);
+                    }
 
                     return await stepContext.EndDialogAsync(null);
                 }
 
                 if (choiceValue == "Mental Health")
                 {
-
-                    //return await stepContext.BeginDialogAsync(nameof(PersonalDialog), null, cancellationToken);
-
                     return await stepContext.NextAsync(null);
                 }
              
             }
 
-            await (turnContext.Activity.ChannelId == "telegram" ?
-                        turnContext.SendActivityAsync("This is a Telegram channel.") :
-                        stepContext.Context.SendActivityAsync(message, cancellationToken));
+            if (turnContext.Activity.ChannelId == "telegram")
+            {
+                await stepContext.PromptAsync(nameof(ChoicePrompt), options, cancellationToken);
+            }
+            else
+            {
+                await stepContext.Context.SendActivityAsync(message, cancellationToken);
+            }
 
             return await stepContext.EndDialogAsync(null);
 
