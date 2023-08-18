@@ -32,7 +32,7 @@ namespace RedCrossChat.Dialogs
 
         // Dependency injection uses this constructor to instantiate MainDialog
         public MainDialog(FlightBookingRecognizer luisRecognizer, 
-            BookingDialog bookingDialog,
+            
             CounselorDialog counselorDialog,
             PersonalDialog personalDialog,
             //AwarenessDialog awarenessDialog,
@@ -44,7 +44,7 @@ namespace RedCrossChat.Dialogs
 
             AddDialog(new TextPrompt(nameof(TextPrompt)));
             AddDialog(new ChoicePrompt(nameof(ChoicePrompt)));
-            AddDialog(bookingDialog);
+         
             AddDialog(counselorDialog);
             AddDialog(personalDialog);
            // AddDialog(awarenessDialog);
@@ -120,8 +120,8 @@ namespace RedCrossChat.Dialogs
 
             var choices = new List<Choice>
             {
-                new Choice { Value = "Membership", Action = new CardAction { Title = "Membership", Type = ActionTypes.OpenUrl, Value = "https://www.google.com" } },
-                new Choice { Value = "Volunteer", Action = new CardAction { Title = "Volunteer", Type = ActionTypes.OpenUrl, Value = "https://www.microsoft.com" } },
+                new Choice { Value = "Membership", Action = new CardAction { Title = "Membership", Type = ActionTypes.OpenUrl, Value = "https://www.redcross.or.ke/individualmember" } },
+                new Choice { Value = "Volunteer", Action = new CardAction { Title = "Volunteer", Type = ActionTypes.OpenUrl, Value = "https://www.redcross.or.ke/volunteer" } },
                 // Add more choices as needed
             };
 
@@ -221,27 +221,10 @@ namespace RedCrossChat.Dialogs
         private async Task<DialogTurnResult> FinalStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             // Check if the result is of type BookingDetails (result from PersonalDialog)
-            if (stepContext.Result is BookingDetails result)
-            {
-                // Now we have all the booking details call the booking service.
 
-                // If the call to the booking service was successful tell the user.
+            //add ai todo
 
-                var timeProperty = new TimexProperty(result.TravelDate);
-                var travelDateMsg = timeProperty.ToNaturalLanguage(DateTime.Now);
-                var messageText = $"I have you booked to {result.Destination} from {result.Origin} on {travelDateMsg}";
-                var message = MessageFactory.Text(messageText, messageText, InputHints.IgnoringInput);
-                await stepContext.Context.SendActivityAsync(message, cancellationToken);
-
-                // Continue to the next step in the waterfall
-                return await stepContext.NextAsync(null, cancellationToken);
-            }
-            else if (stepContext.Result is DialogTurnResult dialogResult && dialogResult.Result is BookingDetails)
-            {
-                // The result is from the AwarenessDialog, restart the main dialog with a different message
-                var promptMessage = "What else can I do for you?";
-                return await stepContext.ReplaceDialogAsync(InitialDialogId, promptMessage, cancellationToken);
-            }
+            await stepContext.Context.SendActivityAsync(MessageFactory.Text("Thank you for reaching out good bye 😀."));
 
             // The result is null or of an unexpected type, return an empty response
             return await stepContext.EndDialogAsync(null,cancellationToken);

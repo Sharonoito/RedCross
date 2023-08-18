@@ -31,6 +31,7 @@ namespace RedCrossChat.Dialogs
 
         public PersonalDialog(AwarenessDialog awarenessDialog,BreathingDialog breathingDialog, ILogger<PersonalDialog> logger) : base(nameof(PersonalDialog))
         {
+            _logger = logger;
             AddDialog(new ChoicePrompt(nameof(ChoicePrompt)));
 
             AddDialog(new TextPrompt(nameof(TextPrompt)));
@@ -49,6 +50,8 @@ namespace RedCrossChat.Dialogs
 
             AddDialog(new ChoicePrompt("select-awareness"));
 
+            AddDialog(new TextPrompt(RedCrossDialogTypes.SelectCounty, ValidateCountyAsync));
+
             AddDialog(awarenessDialog);
 
             AddDialog(breathingDialog);
@@ -61,7 +64,6 @@ namespace RedCrossChat.Dialogs
                 PrivateDetailsAgeBracketAsync,
                 PrivateDetailsCountryBracketAsync,
                 PrivateDetailsCountyDropdownAsync,
-                ValidateCountyAsync,
                 LaunchAwarenessDialogAsync,
                 HandleCasesWithAI,
                 FinalStepAsync,
@@ -250,6 +252,19 @@ namespace RedCrossChat.Dialogs
             return counties;
         }
 
+        public static List<County> ReadCountyFromFile()
+        {
+
+            var paths = new[] { ".", "Cards", "counties.json" };
+            var adaptiveCardJson = File.ReadAllText(Path.Combine(paths));
+
+
+            using StreamReader reader = new(Path.Combine(paths));
+            var json = reader.ReadToEnd();
+            List<County> counties = JsonConvert.DeserializeObject<List<County>>(json);
+            return counties;
+        }
+
         public List<string> GetListOfCounties()
         {
             List<County> counties = ReadJsonFile();
@@ -260,18 +275,20 @@ namespace RedCrossChat.Dialogs
         private async Task<DialogTurnResult> PrivateDetailsCountyDropdownAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             //List<string> counties = GetListOfCounties();
+
+            var hint = "hint type in kiambu or 022,Nairobi or 047";
             var promptOptions = new PromptOptions
 
             //var options = new PromptOptions()
             {
-                Prompt = MessageFactory.Text("Which county are you located in? kiambu,kenya"),
-                RetryPrompt = MessageFactory.Text("Please select a county from the dropdown"),
+                Prompt = MessageFactory.Text($"Which county are you located in? \n ${hint} "),
+                RetryPrompt = MessageFactory.Text($"Please input a county \n ${hint} "),
                 //Choices = counties.Select(county => new Choice(county)).ToList(),
             };
 
             if (((FoundChoice)stepContext.Result).Value == "Kenya")
             {
-                return await stepContext.PromptAsync(nameof(TextPrompt), promptOptions, cancellationToken);
+                return await stepContext.PromptAsync(RedCrossDialogTypes.SelectCounty, promptOptions, cancellationToken);
             }
             else
             {
@@ -279,28 +296,34 @@ namespace RedCrossChat.Dialogs
             }  
         }
 
-        private async Task<DialogTurnResult> ValidateCountyAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        private static Task<bool> ValidateCountyAsync(PromptValidatorContext<string> promptContext, CancellationToken cancellationToken)
         {
-            string county = (string)stepContext.Result;
+            var response = promptContext.Context.Activity.Text.Trim();
 
-            List<string> validCounties = GetListOfCounties();
+            List<County> counties = ReadCountyFromFile();
 
-            bool isValidCounty = validCounties.Contains(county, StringComparer.OrdinalIgnoreCase);
+            var status = false;
 
-            if (!isValidCounty)
+            var code = 0;
+            try
             {
-                // County is not valid, reprompt the user to enter again
-                var promptOptions = new PromptOptions
-                {
-                    Prompt = MessageFactory.Text("Please enter a valid county name. example Kiambu,Meru,Machakos,Nandi "),
-                    RetryPrompt = MessageFactory.Text("The county you entered is not valid. Please try again."),
-                };
-
-                return await stepContext.PromptAsync(nameof(TextPrompt), promptOptions, cancellationToken);
+                code = int.Parse(response);
+            }
+            catch (FormatException exception)
+            {
+               // _logger.LogError(exception);
             }
 
-            // County is valid, continue to the next step in the waterfall dialog
-            return await stepContext.NextAsync(county, cancellationToken);
+            foreach (var county in counties) {
+
+                if (county.Title == response || county.Value == code)
+                {
+                    status = true; break;
+                }
+
+            }
+
+            return Task.FromResult(status);
         }
 
 
@@ -321,7 +344,7 @@ namespace RedCrossChat.Dialogs
 
                 if (!user.wantsToTalkToSomeone)
                 {
-                    return await stepContext.BeginDialogAsync(nameof(BreathingDialog), null, cancellationToken);
+                    return await stepContext.BeginDialogAsync(nameof(BreathingDialog), user, cancellationToken);
                 }
             }
             var promptOptions = new PromptOptions
@@ -335,10 +358,15 @@ namespace RedCrossChat.Dialogs
             return await stepContext.PromptAsync(nameof(TextPrompt), promptOptions, cancellationToken);
         }
 
+     
+
         private async Task<DialogTurnResult> FinalStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             //return await stepContext.EndDialogAsync(null, cancellationToken);
-            return await stepContext.BeginDialogAsync(nameof(AwarenessDialog), null, cancellationToken);
+
+           
+
+            return await stepContext.EndDialogAsync(null);
 
         }
 

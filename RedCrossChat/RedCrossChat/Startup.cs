@@ -42,8 +42,6 @@ namespace RedCrossChat
             services.AddSingleton<FlightBookingRecognizer>();
 
             // Register the BookingDialog.
-            services.AddSingleton<BookingDialog>();
-
             services.AddSingleton<CounselorDialog>();
 
             services.AddSingleton<PersonalDialog>();

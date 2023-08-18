@@ -4,6 +4,7 @@
     {
         private string selectedFeeling;
 
+        public int Iteration = 1;
         public bool isAwareOfFeeling { get; set; } = false;
         public bool hasTalkedToSomeone { get; set; } = false;
         public bool wantsToTalkToSomeone { get; set; } = false;
