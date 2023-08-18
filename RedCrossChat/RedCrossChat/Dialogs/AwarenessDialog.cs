@@ -46,7 +46,6 @@ namespace RedCrossChat.Dialogs
                 HandleMentalValuationAsync,
                 ProcessMentalEvaluationChoice,
                 HandleCaregiverChoiceAsync,
-       //this is where there were duplicates         ProcessMentalEvaluationChoice,
                 EvaluateDialogTurnAsync,
                 RelationShipStatusAsync,
                 ProfessionalStatusAsync,

@@ -4,5 +4,7 @@
     {
         public string Feeling;
         public string Exercise;
+
+        public int Value;
     }
 }

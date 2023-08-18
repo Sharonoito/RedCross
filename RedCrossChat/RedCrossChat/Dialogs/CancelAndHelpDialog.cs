@@ -13,7 +13,7 @@ namespace RedCrossChat.Dialogs
 {
     public class CancelAndHelpDialog : ComponentDialog
     {
-        private const string HelpMsgText = "Show help here";
+        private const string HelpMsgText = "Do you wish to talk to an agent?";
         private const string CancelMsgText = "Cancelling...";
 
         public CancelAndHelpDialog(string id)
