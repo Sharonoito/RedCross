@@ -317,17 +317,12 @@ namespace RedCrossChat.Dialogs
 
             if(stepContext.Result !=null)
             {
-
                 User user = (User)stepContext.Result;
 
                 if (!user.wantsToTalkToSomeone)
                 {
                     return await stepContext.BeginDialogAsync(nameof(BreathingDialog), null, cancellationToken);
                 }
-                else{
-
-                }
-
             }
             var promptOptions = new PromptOptions
             {

@@ -3,15 +3,18 @@
 //
 // Generated with Bot Builder V4 SDK Template for Visual Studio CoreBot v4.18.1
 
+using Microsoft.AspNetCore.Http;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Dialogs.Choices;
 using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Microsoft.Recognizers.Text.DataTypes.TimexExpression;
 using RedCrossChat;
 using RedCrossChat.Cards;
 using RedCrossChat.CognitiveModels;
+using RedCrossChat.Objects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +27,7 @@ namespace RedCrossChat.Dialogs
     {
         private readonly ILogger _logger;
         private readonly FlightBookingRecognizer _luisRecognizer;
+        private readonly string UserInfo="Clien-info";
        // private bool personalDialogComplete = false;
 
         // Dependency injection uses this constructor to instantiate MainDialog
@@ -66,6 +70,8 @@ namespace RedCrossChat.Dialogs
             var messageText = stepContext.Options?.ToString() ?? "Hello Welcome to Kenya Red Cross Society. How can I help you today?";
             var promptMessage = MessageFactory.Text(messageText, messageText, InputHints.ExpectingInput);
 
+            stepContext.Values[UserInfo] = new Client();
+
 
             var termsAndConditionsCard = PersonalDialogCard.GetIntendedActivity();
             var attachment = new Attachment
@@ -102,7 +108,6 @@ namespace RedCrossChat.Dialogs
 
             var turnContext = stepContext.Context;
 
-           
             var termsAndConditionsCard = PersonalDialogCard.GetKnowledgeBaseCard();
 
             var attachment = new Attachment
@@ -115,8 +120,8 @@ namespace RedCrossChat.Dialogs
 
             var choices = new List<Choice>
             {
-                new Choice { Value = "Google", Action = new CardAction { Title = "Visit Google", Type = ActionTypes.OpenUrl, Value = "https://www.google.com" } },
-                new Choice { Value = "Microsoft", Action = new CardAction { Title = "Visit Microsoft", Type = ActionTypes.OpenUrl, Value = "https://www.microsoft.com" } },
+                new Choice { Value = "Membership", Action = new CardAction { Title = "Membership", Type = ActionTypes.OpenUrl, Value = "https://www.google.com" } },
+                new Choice { Value = "Volunteer", Action = new CardAction { Title = "Volunteer", Type = ActionTypes.OpenUrl, Value = "https://www.microsoft.com" } },
                 // Add more choices as needed
             };
 
@@ -134,8 +139,6 @@ namespace RedCrossChat.Dialogs
 
                 if (choiceValue==null)
                 {
-
-                    
                     if(turnContext.Activity.ChannelId == "telegram")
                     {
                         await stepContext.PromptAsync(nameof(ChoicePrompt), options, cancellationToken);
@@ -145,7 +148,6 @@ namespace RedCrossChat.Dialogs
                         await stepContext.Context.SendActivityAsync(message, cancellationToken);
                     }
 
-                    return await stepContext.EndDialogAsync(null);
                 }
 
                 if (choiceValue == "Mental Health")
