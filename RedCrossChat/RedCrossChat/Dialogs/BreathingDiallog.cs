@@ -2,8 +2,11 @@
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Dialogs.Choices;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
+using Newtonsoft.Json;
 using RedCrossChat.Objects;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -28,6 +31,7 @@ namespace RedCrossChat.Dialogs
             var waterFallSteps = new WaterfallStep[]
             {
                 InitialDialogTest,
+                ExecuteExerciseAsync,
                 GroundingTechniqueStepAsync,
                 SelfCompassionStepAsync,
                 PositiveAffirmationAsync,
@@ -67,6 +71,35 @@ namespace RedCrossChat.Dialogs
 
             return await stepContext.PromptAsync(nameof(ChoicePrompt), prompts, cancellationToken);
         }
+
+        private async Task<DialogTurnResult> ExecuteExerciseAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        {
+            var userChoice = ((FoundChoice)stepContext.Result)?.Value;
+
+            if (!string.IsNullOrEmpty(userChoice))
+            {
+                var user = (User)stepContext.Options;
+
+                // Replace this with your method to get the feeling-exercise mapping from JSON data
+                var feelingToExerciseMap = GetFeelingToExerciseMap();
+
+                if (feelingToExerciseMap.TryGetValue(user.SelectedFeeling, out string exercise))
+                {
+                    var prompts = new PromptOptions
+                    {
+                        Prompt = MessageFactory.Text(exercise),
+                        Choices = new List<Choice>(_choice)  // Provide choices if necessary
+                    };
+
+                    // Prompt the user for their response to the exercise prompt
+                    return await stepContext.PromptAsync(nameof(ChoicePrompt), prompts, cancellationToken);
+                }
+            }
+
+            // If userChoice is not valid or if no exercise is found, proceed to the next step
+            return await stepContext.NextAsync(null, cancellationToken);
+        }
+
 
         private async Task<DialogTurnResult> GroundingTechniqueStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
@@ -157,6 +190,19 @@ namespace RedCrossChat.Dialogs
             return await stepContext.EndDialogAsync(cancellationToken);
         }
 
+        private Dictionary<string, string> GetFeelingToExerciseMap()
+        {
+
+            var paths = new[] { ".", "Cards", "Exercise.json" };
+            var adaptiveCardJson = File.ReadAllText(Path.Combine(paths));
+            using StreamReader reader = new(Path.Combine(paths));
+            var json = reader.ReadToEnd();
+            var jsonData = JsonConvert.DeserializeObject<List<BreathingTip>>(json);
+
+            var feelingToExerciseMap = jsonData.ToDictionary(item => item.Feeling, item => item.Exercise);
+
+            return feelingToExerciseMap;
+        }
 
         private List<BreathingTip> GetBreathingTips()
         {
