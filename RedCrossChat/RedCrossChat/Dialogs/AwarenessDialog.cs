@@ -1,4 +1,5 @@
-﻿using Microsoft.Bot.Builder;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Dialogs.Choices;
 using Microsoft.Extensions.Logging;
@@ -49,6 +50,7 @@ namespace RedCrossChat.Dialogs
                 EvaluateDialogTurnAsync,
                 RelationShipStatusAsync,
                 ProfessionalStatusAsync,
+                CheckFeelingAware,
                 CheckProfessionalSwitchAsync,
                 FinalStepAsync
             };
@@ -229,6 +231,29 @@ namespace RedCrossChat.Dialogs
                         }
             }, cancellationToken);
 
+        }
+
+        public async Task<DialogTurnResult> CheckFeelingAware(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        {
+            return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions()
+            {
+                Prompt = MessageFactory.Text("Is your result due to :"),
+                Choices = new List<Choice>()
+                        {
+                            new Choice  { Value ="Stress",},
+                            new Choice  { Value ="Family and relationship issues",},
+                            new Choice  { Value ="Suicidal thoughts"},
+                            new Choice  { Value ="Depression"},
+                            new Choice  { Value ="Anxiety"},
+                            new Choice  { Value ="Addiction"},
+                            new Choice  { Value ="Drugs and Substance Abuse"},
+                            new Choice  { Value ="Traumatic experience"},
+                            new Choice  { Value ="Gender based violence"},
+                            new Choice  { Value ="HIV related"},
+                            new Choice  { Value ="Other"},
+
+                        }
+            }, cancellationToken);
         }
 
         private async Task<DialogTurnResult> CheckProfessionalSwitchAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
