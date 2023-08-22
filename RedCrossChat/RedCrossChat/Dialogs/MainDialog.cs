@@ -154,10 +154,27 @@ namespace RedCrossChat.Dialogs
                     return await stepContext.NextAsync(null);
                 }
 
-                if(choiceValue == InitialActions.Careers)
+                if(choiceValue == InitialActions.Careers  && turnContext.Activity.ChannelId != "telegram")
                 {
                     await stepContext.Context.SendActivityAsync(CareerAttachmentMessage, cancellationToken);
                   
+                    return await stepContext.EndDialogAsync(null);
+                }
+
+                if (choiceValue == InitialActions.Careers  && turnContext.Activity.ChannelId == "telegram")
+                {
+                    await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions
+                    {
+                        Prompt = MessageFactory.Text("To access our career or membership opportunities click on the links below"),
+                        Choices = new List<Choice>
+                        {
+                              new Choice { Value = InitialActions.Careers, Action = new CardAction { Title = "Careers", Type = ActionTypes.OpenUrl, Value = "https://www.redcross.or.ke/careers" } },
+                              new Choice { Value = InitialActions.VolunteerAndMemberShip, Action = new CardAction { Title = "Volunteer", Type = ActionTypes.OpenUrl, Value = "https://www.redcross.or.ke/volunteer" } },
+
+                        },
+                        Style = ListStyle.HeroCard,
+                    }, cancellationToken);
+
                     return await stepContext.EndDialogAsync(null);
                 }
 
