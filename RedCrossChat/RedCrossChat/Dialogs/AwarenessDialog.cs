@@ -287,7 +287,8 @@ namespace RedCrossChat.Dialogs
                         // Send the message to the user about the next available agent or calling 1199.
                         var agentMessage = "Next available agent will be with you shortly or you can also call 1199 to connect with our counselor.";
                         await stepContext.Context.SendActivityAsync(MessageFactory.Text(agentMessage), cancellationToken);
-                        break;
+                        return await stepContext.EndDialogAsync(user);
+                        //break;
                     case "no":
                         user.handOverToUser = false;
                         // Start the BreathingDialog

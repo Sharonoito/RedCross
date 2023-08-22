@@ -276,13 +276,13 @@ namespace RedCrossChat.Dialogs
         {
             //List<string> counties = GetListOfCounties();
 
-            var hint = "hint type in kiambu or 022,Nairobi or 047";
+            var hint = "( hint: type in Kiambu or 022,Nairobi or 047 )";
             var promptOptions = new PromptOptions
 
             //var options = new PromptOptions()
             {
-                Prompt = MessageFactory.Text($"Which county are you located in? \n ${hint} "),
-                RetryPrompt = MessageFactory.Text($"Please input a county \n ${hint} "),
+                Prompt = MessageFactory.Text($"Which county are you located in? \n {hint} "),
+                RetryPrompt = MessageFactory.Text($"Please input a county \n {hint} "),
                 //Choices = counties.Select(county => new Choice(county)).ToList(),
             };
 
@@ -302,6 +302,8 @@ namespace RedCrossChat.Dialogs
 
             List<County> counties = ReadCountyFromFile();
 
+            var validatedResponse = response.ToLower();
+
             var status = false;
 
             var code = 0;
@@ -316,9 +318,10 @@ namespace RedCrossChat.Dialogs
 
             foreach (var county in counties) {
 
-                if (county.Title == response || county.Value == code)
-                {
-                    status = true; break;
+                if (county.Title.ToLower() == validatedResponse || county.Value == code)
+
+                    {
+                        status = true; break;
                 }
 
             }
