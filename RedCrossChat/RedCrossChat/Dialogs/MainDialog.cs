@@ -17,6 +17,7 @@ using RedCrossChat.CognitiveModels;
 using RedCrossChat.Objects;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -90,10 +91,10 @@ namespace RedCrossChat.Dialogs
                 Prompt = promptMessage ,
                 Choices= new List<Choice>()
                 {
-                    new Choice() { Value = "Careers", Synonyms = new List<string>() { "1", "Careers", "careers" } },
-                    new Choice() { Value = "Volunteer and Membership", Synonyms = new List<string>() { "2", "Membership" } },
-                    new Choice() { Value = "Volunteer Opportunities", Synonyms = new List<string>() { "3" ,"Volunteer", "Opportunities" } },
-                    new Choice() { Value = "Mental Health", Synonyms = new List<string>() { "4","Mental","mental","mental Health","Mental Health","Help" } },
+                    new Choice() { Value = InitialActions.Careers, Synonyms = new List<string>() { "1", "Careers", "careers" } },
+                    new Choice() { Value = InitialActions.VolunteerAndMemberShip, Synonyms = new List<string>() { "2", "Membership" } },
+                    new Choice() { Value = InitialActions.VolunteerOpportunities, Synonyms = new List<string>() { "3" ,"Volunteer", "Opportunities" } },
+                    new Choice() { Value = InitialActions.MentalHealth, Synonyms = new List<string>() { "4","Mental","mental","mental Health","Mental Health","Help" } },
 
                 }
                 ,
@@ -101,28 +102,26 @@ namespace RedCrossChat.Dialogs
             }, cancellationToken);
         }
 
-        //https://www.redcross.or.ke/ASSETS/DATA-PROTECTION-POLICY.pdf
-
         private async Task<DialogTurnResult> ActStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-
+         
             var turnContext = stepContext.Context;
 
             var termsAndConditionsCard = PersonalDialogCard.GetKnowledgeBaseCard();
 
-            var attachment = new Attachment
-            {
-                ContentType = HeroCard.ContentType,
-                Content = termsAndConditionsCard
-            };
+            var career = PersonalDialogCard.GetKnowledgeCareerCard();
 
-            var message = MessageFactory.Attachment(attachment);
+            var choiceValues = ((FoundChoice)stepContext.Result).Value;
+
+            var VolunteerAttachmentMessage = MessageFactory.Attachment(new Attachment { Content=termsAndConditionsCard, ContentType = HeroCard.ContentType });
+
+            var CareerAttachmentMessage = MessageFactory.Attachment(new Attachment { Content=career, ContentType = HeroCard.ContentType });
 
             var choices = new List<Choice>
             {
                 new Choice { Value = "Membership", Action = new CardAction { Title = "Membership", Type = ActionTypes.OpenUrl, Value = "https://www.redcross.or.ke/individualmember" } },
                 new Choice { Value = "Volunteer", Action = new CardAction { Title = "Volunteer", Type = ActionTypes.OpenUrl, Value = "https://www.redcross.or.ke/volunteer" } },
-                // Add more choices as needed
+                // Add more choices as needed : todo :
             };
 
             var options = new PromptOptions
@@ -134,28 +133,36 @@ namespace RedCrossChat.Dialogs
 
             if (stepContext.Result != null)
             {
-           
+
                 var choiceValue = ((FoundChoice)stepContext.Result).Value;
 
                 if (choiceValue==null)
                 {
-                    if(turnContext.Activity.ChannelId == "telegram")
+                    if (turnContext.Activity.ChannelId == "telegram")
                     {
                         await stepContext.PromptAsync(nameof(ChoicePrompt), options, cancellationToken);
                     }
                     else
                     {
-                        await stepContext.Context.SendActivityAsync(message, cancellationToken);
+                        await stepContext.Context.SendActivityAsync(VolunteerAttachmentMessage, cancellationToken);
                     }
 
                 }
 
-                if (choiceValue == "Mental Health")
+                if (choiceValue == InitialActions.MentalHealth)
                 {
                     return await stepContext.NextAsync(null);
                 }
-             
+
+                if(choiceValue == InitialActions.Careers)
+                {
+                    await stepContext.Context.SendActivityAsync(CareerAttachmentMessage, cancellationToken);
+                  
+                    return await stepContext.EndDialogAsync(null);
+                }
+
             }
+           
 
             if (turnContext.Activity.ChannelId == "telegram")
             {
@@ -163,7 +170,7 @@ namespace RedCrossChat.Dialogs
             }
             else
             {
-                await stepContext.Context.SendActivityAsync(message, cancellationToken);
+                await stepContext.Context.SendActivityAsync(VolunteerAttachmentMessage, cancellationToken);
             }
 
             return await stepContext.EndDialogAsync(null);
