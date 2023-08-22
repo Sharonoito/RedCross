@@ -79,21 +79,55 @@ namespace RedCrossChat.Dialogs
             return await stepContext.PromptAsync(nameof(ChoicePrompt), prompts, cancellationToken);
         }
 
-        private async Task<DialogTurnResult> TakeUserThroughExerciseAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        //private async Task<DialogTurnResult> TakeUserThroughExerciseAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        //{
+        //    var prompts = new PromptOptions
+        //    {
+        //        Prompt = MessageFactory.Text("Do you wish to continue?"),
+        //        Choices = new List<Choice>(_choice)  // Provide choices if necessary
+        //    };
+
+        //    var feelings = GetFeelingToExerciseMap();
+
+        //    var random =new Random();
+
+        //    await stepContext.Context.SendActivityAsync(MessageFactory.Text(GetFeelingToExerciseMap()[random.Next(1,feelings.Count)].Exercise));
+
+        //    return await stepContext.PromptAsync(nameof(ChoicePrompt), prompts, cancellationToken);
+        //}
+
+        private int _exerciseIndex = 1;
+
+        public async Task<DialogTurnResult> TakeUserThroughExerciseAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             var prompts = new PromptOptions
             {
                 Prompt = MessageFactory.Text("Do you wish to continue?"),
-                Choices = new List<Choice>(_choice)  // Provide choices if necessary
+                Choices = new List<Choice>(_choice)
             };
 
             var feelings = GetFeelingToExerciseMap();
 
-            var random =new Random();
+            if (_exerciseIndex < feelings.Count)
+            {
+                var currentExercise = feelings[_exerciseIndex];
+                await stepContext.Context.SendActivityAsync(MessageFactory.Text(currentExercise.Exercise));
+                _exerciseIndex++;
 
-            await stepContext.Context.SendActivityAsync(MessageFactory.Text(GetFeelingToExerciseMap()[random.Next(1,feelings.Count)].Exercise));
+                if (_exerciseIndex >= feelings.Count)
+                {
+                    _exerciseIndex = 1; // Reset the index to 0 when all exercises are shown
+                }
 
-            return await stepContext.PromptAsync(nameof(ChoicePrompt), prompts, cancellationToken);
+
+
+                return await stepContext.PromptAsync(nameof(ChoicePrompt), prompts, cancellationToken);
+            }
+            else
+            {
+                //await stepContext.Context.SendActivityAsync(MessageFactory.Text("No more exercises available."));
+                return await stepContext.EndDialogAsync(null);
+            }
         }
 
         private async Task<DialogTurnResult> BreathingExcercisesAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
