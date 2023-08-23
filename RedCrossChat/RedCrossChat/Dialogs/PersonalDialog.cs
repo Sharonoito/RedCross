@@ -29,6 +29,8 @@ namespace RedCrossChat.Dialogs
 
         private const string UserInfo = "Client-info";
 
+        protected string iterations = "user-iterations";
+
         public PersonalDialog(AwarenessDialog awarenessDialog,BreathingDialog breathingDialog, ILogger<PersonalDialog> logger) : base(nameof(PersonalDialog))
         {
             _logger = logger;
@@ -65,7 +67,7 @@ namespace RedCrossChat.Dialogs
                 PrivateDetailsCountryBracketAsync,
                 PrivateDetailsCountyDropdownAsync,
                 LaunchAwarenessDialogAsync,
-                HandleCasesWithAI,
+                //HandleCasesWithAI,
                 FinalStepAsync,
          
             }));
@@ -338,41 +340,30 @@ namespace RedCrossChat.Dialogs
 
         }
 
-        private async Task<DialogTurnResult> HandleCasesWithAI(WaterfallStepContext stepContext, CancellationToken cancellationToken)
-        {
-
-            if(stepContext.Result !=null)
-            {
-                User user = (User)stepContext.Result;
-
-                if (!user.wantsToTalkToSomeone)
-                {
-                    return await stepContext.BeginDialogAsync(nameof(BreathingDialog), user, cancellationToken);
-                }
-            }
-            var promptOptions = new PromptOptions
-            {
-                Prompt = MessageFactory.Text("Handle with ai "),
-                RetryPrompt = MessageFactory.Text("The county you entered is not valid. Please try again."),
-            };
-
-            //validation to check if its breathing extercices or its handle to ai
-
-            return await stepContext.PromptAsync(nameof(TextPrompt), promptOptions, cancellationToken);
-        }
-
-     
-
+  
         private async Task<DialogTurnResult> FinalStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             //return await stepContext.EndDialogAsync(null, cancellationToken);
+            //from the breathing dialog 
 
-           
 
-            return await stepContext.EndDialogAsync(null);
+            //hand over to ai
 
+            // when iterations==1 and WantsBreathingExercises ==true  => handover to Ai
+            if (stepContext.Result !=null)
+            {
+                User user = (User)(stepContext.Result);
+                if (user.Iteration ==1 && user.WantsBreathingExercises)
+                {
+                    //handover to ui
+                    return await stepContext.BeginDialogAsync(nameof(BreathingDialog), user, cancellationToken);
+                }
+                return await stepContext.EndDialogAsync(user,cancellationToken);
+            }
+            return await stepContext.EndDialogAsync(null,cancellationToken);
         }
 
+       
         private IList<Choice> GetChoices()
         {
             var cardOptions = new List<Choice>()
@@ -388,3 +379,60 @@ namespace RedCrossChat.Dialogs
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//private async Task<DialogTurnResult> HandleCasesWithAI(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+//{
+
+//    if(stepContext.Result !=null)
+//    {
+//        User user = (User)stepContext.Result;
+
+//        if (!user.wantsToTalkToSomeone  && !user.handOverToUser)
+//        {
+//            return await stepContext.BeginDialogAsync(nameof(BreathingDialog), user, cancellationToken);
+//        }
+
+//        if (user.handOverToUser)
+//        {
+//            ///todo human hand over task
+//        }
+
+//    }
+//    var promptOptions = new PromptOptions
+//    {
+//        Prompt = MessageFactory.Text("Handle with ai "),
+//        RetryPrompt = MessageFactory.Text("The county you entered is not valid. Please try again."),
+//    };
+
+//    //validation to check if its breathing extercices or its handle to ai
+
+//    return await stepContext.PromptAsync(nameof(TextPrompt), promptOptions, cancellationToken);
+//}
