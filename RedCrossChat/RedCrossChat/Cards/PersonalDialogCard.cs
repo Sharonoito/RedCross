@@ -49,6 +49,22 @@ namespace RedCrossChat.Cards
             return heroCard;
         }
 
+        public static HeroCard GetHotlineCard()
+        {
+            var heroCard = new HeroCard
+            {
+                Title = "Hotline Numbers",
+                Subtitle = "Hotline",
+                Text = "Here's our hotline numbers should you require any assistance.",
+                Images = new List<CardImage> { new CardImage("https://sec.ch9.ms/ch9/7ff5/e07cfef0-aa3b-40bb-9baa-7c9ef8ff7ff5/buildreactionbotframework_960.jpg") },
+                Buttons = new List<CardAction> {
+                    new CardAction(ActionTypes.OpenUrl, "Get Started", value: "http://localhost:3978/api/messages")
+                },
+            };
+
+            return heroCard;
+        }
+
 
         public static HeroCard GetIntendedActivity()
         {

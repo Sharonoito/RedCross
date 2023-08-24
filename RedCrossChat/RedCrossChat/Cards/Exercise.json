@@ -2,7 +2,7 @@
   {
     "feeling": "Happy",
     "value": 1,
-    "exercise": "Affirmations can boost your mood. Repeat after me: 'I am strong, I am resilient, and I can handle challenges. I am worthy of love and support"
+    "exercise":"Let's practice gratitude. Name three things you are thankful for today. Focusing on the positive aspects of your life can improve your mood and overall mental health"
   },
   {
     "feeling": "Angry",
@@ -28,5 +28,15 @@
     "feeling": "Sad",
     "value": 6,
     "exercise": "Remember, you are not alone in your struggles. Reach out to friends, family, or a mental health professional if you need someone to talk to. Asking for help is a sign of strength\""
+  },
+  {
+    "feeling": "Stress",
+    "value": 7,
+    "exercise": "Feeling stressed? Engage in activities you enjoy, such as listening to music, reading a book, or spending time in nature. Taking breaks can help you recharge and improve your well-being"
+  },
+  {
+    "feeling": "Overwhelmed",
+    "value": 8,
+    "exercise": "Feeling overwhelmed? Let's do a quick deep breathing exercise together. Inhale deeply for a count of 4, hold for 4, and exhale slowly for a count of 6. Repeat this 3-5 times. Remember to focus on your breath and let go of any tension"
   }
 ]
