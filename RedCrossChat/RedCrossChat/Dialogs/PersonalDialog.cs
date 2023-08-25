@@ -109,6 +109,8 @@ namespace RedCrossChat.Dialogs
         private async Task<DialogTurnResult> PrivateDetailsGenderAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
 
+           await EvaluateDialog.ProcessStepAsync(stepContext, cancellationToken);
+
             if (stepContext.Values != null)
             {
                 var client=(Client)stepContext.Values[UserInfo];
@@ -130,8 +132,6 @@ namespace RedCrossChat.Dialogs
 
             // Prompt the user with the configured PromptOptions.
             return await stepContext.PromptAsync("select-gender", options, cancellationToken);
-
-
         }
 
         private async Task<DialogTurnResult> PrivateDetailsAgeBracketAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)

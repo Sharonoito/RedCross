@@ -32,6 +32,8 @@ namespace RedCrossChat.Dialogs
             return await base.OnContinueDialogAsync(innerDc, cancellationToken);
         }
 
+
+
         private async Task<DialogTurnResult> InterruptAsync(DialogContext innerDc, CancellationToken cancellationToken)
         {
             if (innerDc.Context.Activity.Type == ActivityTypes.Message)
@@ -56,5 +58,6 @@ namespace RedCrossChat.Dialogs
 
             return null;
         }
+
     }
 }

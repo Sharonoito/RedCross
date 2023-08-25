@@ -40,6 +40,8 @@ namespace RedCrossChat.Bots
             }
         }
 
+       
+
         // Load attachment from embedded resource.
         private Attachment CreateAdaptiveCardAttachment()
         {

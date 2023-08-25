@@ -202,6 +202,8 @@ namespace RedCrossChat.Dialogs
 
         public async Task<DialogTurnResult> ValidateTermsAndConditionsAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
+            await EvaluateDialog.ProcessStepAsync(stepContext, cancellationToken);
+
             string confirmation = ((FoundChoice)stepContext.Result).Value;
 
             if (confirmation.Equals("Yes", StringComparison.OrdinalIgnoreCase))
