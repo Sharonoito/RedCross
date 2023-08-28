@@ -67,39 +67,51 @@ namespace RedCrossChat.Dialogs
 
         private async Task<DialogTurnResult> IntroStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            // Use the text provided in FinalStepAsync or the default if it is the first time.
             var messageText = stepContext.Options?.ToString() ?? "Hello Welcome to Kenya Red Cross Society. How can I help you today?";
             var promptMessage = MessageFactory.Text(messageText, messageText, InputHints.ExpectingInput);
 
             stepContext.Values[UserInfo] = new Client();
 
+            if (stepContext.Context.Activity.ChannelId == "facebook")
 
-            var termsAndConditionsCard = PersonalDialogCard.GetIntendedActivity();
-            var attachment = new Attachment
             {
-                ContentType = HeroCard.ContentType,
-                Content = termsAndConditionsCard
-            };
-
-            var message = MessageFactory.Attachment(attachment);
-
-
-             //return await stepContext.Context.Activity.SendActivityAsync(message, cancellationToken);
-
-            return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions { 
-                
-                Prompt = promptMessage ,
-                Choices= new List<Choice>()
+                return await stepContext.PromptAsync(nameof(ConfirmPrompt), new PromptOptions
                 {
-                    new Choice() { Value = InitialActions.Careers, Synonyms = new List<string>() { "1", "Careers", "careers" } },
-                    new Choice() { Value = InitialActions.VolunteerAndMemberShip, Synonyms = new List<string>() { "2", "Membership" } },
-                    new Choice() { Value = InitialActions.VolunteerOpportunities, Synonyms = new List<string>() { "3" ,"Volunteer", "Opportunities" } },
-                    new Choice() { Value = InitialActions.MentalHealth, Synonyms = new List<string>() { "4","Mental","mental","mental Health","Mental Health","Help" } },
+                    Prompt = promptMessage,
+                    Choices = new List<Choice>
+                    {
+                        new Choice() { Value = "Yes", Synonyms = new List<string> { "1", "Yes" } },
+                        new Choice() { Value = "No", Synonyms = new List<string> { "2", "No" } }
+                    },
+                    Style = ListStyle.SuggestedAction,
+                }, cancellationToken);
+            }
 
-                }
-                ,
-                Style=ListStyle.HeroCard
-            }, cancellationToken);
+            else
+            {
+                var termsAndConditionsCard = PersonalDialogCard.GetIntendedActivity();
+                var attachment = new Attachment
+                {
+
+                    ContentType = HeroCard.ContentType,
+                    Content = termsAndConditionsCard
+                };
+
+                var message = MessageFactory.Attachment(attachment);
+
+                return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions
+                {
+                    Prompt = promptMessage,
+                    Choices = new List<Choice>
+            {
+                new Choice() { Value = "Careers", Synonyms = new List<string> { "1", "Careers", "careers" } },
+                new Choice() { Value = "Volunteer and Membership", Synonyms = new List<string> { "2", "Membership" } },
+                new Choice() { Value = "Volunteer Opportunities", Synonyms = new List<string> { "3", "Volunteer", "Opportunities" } },
+                new Choice() { Value = "Mental Health", Synonyms = new List<string> { "4", "Mental", "mental", "mental Health", "Mental Health", "Help" } }
+            },
+                    Style = ListStyle.HeroCard,
+                }, cancellationToken);
+            }
         }
 
         private async Task<DialogTurnResult> ActStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
@@ -128,7 +140,7 @@ namespace RedCrossChat.Dialogs
             {
                 Prompt = MessageFactory.Text("To access our Volunteer or membership opportunities click on the links below"),
                 Choices = choices,
-                Style = ListStyle.HeroCard,
+                Style = ListStyle.SuggestedAction,
             };
 
             if (stepContext.Result != null)
