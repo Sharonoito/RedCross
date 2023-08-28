@@ -35,4 +35,12 @@ namespace RedCrossChat.Objects
 
 
     }
+
+    public static class InitialActions
+    {
+        public static readonly string MentalHealth = "Mental Health";
+        public static readonly string Careers = "Careers";
+        public static readonly string VolunteerAndMemberShip = "Volunteer and Membership";
+        public static readonly string VolunteerOpportunities = "Volunteer Opportunities";
+    }
 }

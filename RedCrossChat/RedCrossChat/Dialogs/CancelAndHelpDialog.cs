@@ -49,6 +49,8 @@ namespace RedCrossChat.Dialogs
                         return new DialogTurnResult(DialogTurnStatus.Waiting);
 
                     case "cancel":
+                    case "exit":
+                    case "close":
                     case "quit":
                         var cancelMessage = MessageFactory.Text(CancelMsgText, CancelMsgText, InputHints.IgnoringInput);
                         await innerDc.Context.SendActivityAsync(cancelMessage, cancellationToken);
