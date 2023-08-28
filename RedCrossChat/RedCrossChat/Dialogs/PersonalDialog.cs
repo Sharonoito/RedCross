@@ -353,6 +353,17 @@ namespace RedCrossChat.Dialogs
             if (stepContext.Result !=null)
             {
                 User user = (User)(stepContext.Result);
+
+                if (user.WantsBreathingExercises)
+                {
+                    return await stepContext.BeginDialogAsync(nameof(BreathingDialog), user, cancellationToken);
+                }
+
+                if(user.hasTalkedToSomeone==false && user.isAwareOfFeeling == false)
+                {
+                    return await stepContext.BeginDialogAsync(nameof(BreathingDialog), user, cancellationToken);
+                }
+
                 if (user.Iteration ==1 && user.WantsBreathingExercises)
                 {
                     //handover to ui
