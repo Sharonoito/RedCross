@@ -158,6 +158,7 @@ namespace RedCrossChat.Dialogs
 
                 if (choiceValue == InitialActions.Careers && turnContext.Activity.ChannelId != "telegram")
                 {
+
                     await stepContext.Context.SendActivityAsync(CareerAttachmentMessage, cancellationToken);
 
                     return await stepContext.EndDialogAsync(null);
@@ -165,9 +166,13 @@ namespace RedCrossChat.Dialogs
 
                 if (choiceValue == InitialActions.Careers && turnContext.Activity.ChannelId == "telegram")
                 {
-                    me.DialogClosed = true;
+                    await stepContext.Context.SendActivityAsync(MessageFactory.Attachment(new Attachment
+                    {
+                        ContentType = HeroCard.ContentType,
+                        Content = PersonalDialogCard.GetKnowledgeCareerCard()
+                    }), cancellationToken);
 
-                    return await stepContext.PromptAsync(nameof(ChoicePrompt), options, cancellationToken);
+                    return await stepContext.EndDialogAsync(null);
                 }
 
             }
@@ -177,10 +182,16 @@ namespace RedCrossChat.Dialogs
             {
 
                 me.DialogClosed = true;
-                
-                return await stepContext.PromptAsync(nameof(ChoicePrompt), options, cancellationToken);
 
-             
+                await stepContext.Context.SendActivityAsync(MessageFactory.Attachment(new Attachment
+                {
+                    ContentType = HeroCard.ContentType,
+                    Content = PersonalDialogCard.GetKnowledgeCareerCard()
+                }), cancellationToken);
+
+                return await stepContext.EndDialogAsync(null);
+
+
             }
             else
             {

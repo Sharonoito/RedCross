@@ -24,7 +24,7 @@ namespace RedCrossChat.Cards
                 Title = "RedCross",
                 Subtitle = "Volunteers & MemberShip",
                 Text = "To volunteer or be involved in our activities please follow the link.",
-                Images = new List<CardImage> { new CardImage("https://sec.ch9.ms/ch9/7ff5/e07cfef0-aa3b-40bb-9baa-7c9ef8ff7ff5/buildreactionbotframework_960.jpg") },
+                Images = new List<CardImage> { new CardImage("https://www.redcross.or.ke/assets/img/redcross-logo.svg") },
                 Buttons = new List<CardAction> {
                     new CardAction(ActionTypes.OpenUrl, "Get Started", value: "https://www.redcross.or.ke/careers")
                 },
@@ -40,7 +40,7 @@ namespace RedCrossChat.Cards
                 Title = "RedCross",
                 Subtitle = "Career",
                 Text = "For career opportunities please follow this link.",
-                Images = new List<CardImage> { new CardImage("https://sec.ch9.ms/ch9/7ff5/e07cfef0-aa3b-40bb-9baa-7c9ef8ff7ff5/buildreactionbotframework_960.jpg") },
+                Images = new List<CardImage> { new CardImage("https://www.redcross.or.ke/assets/img/redcross-logo.svg") },
                 Buttons = new List<CardAction> {
                     new CardAction(ActionTypes.OpenUrl, "Get Started", value: "https://www.redcross.or.ke/careers")
                 },
