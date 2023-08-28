@@ -137,6 +137,8 @@ namespace RedCrossChat.Dialogs
                     if (turnContext.Activity.ChannelId == "telegram")
                     {
                         await stepContext.PromptAsync(nameof(ChoicePrompt), options, cancellationToken);
+
+                        return await stepContext.EndDialogAsync(null);
                     }
                     else
                     {
@@ -161,12 +163,12 @@ namespace RedCrossChat.Dialogs
                 {
                    
 
-                     var reply = MessageFactory.Text("To access our Carrer opportunities click on the link");
+                     var reply = MessageFactory.Text("To access our Careers opportunities click on the link");
                         reply.SuggestedActions = new SuggestedActions
                         {
                             Actions = new List<CardAction>
                             {
-                                new CardAction { Title = "Carrers", Type = ActionTypes.OpenUrl, Value = "https://www.redcross.or.ke/careers" }
+                                new CardAction { Title = "Careers", Type = ActionTypes.OpenUrl, Value = "https://www.redcross.or.ke/careers" }
                             }
                         };
 
@@ -182,6 +184,8 @@ namespace RedCrossChat.Dialogs
             if (turnContext.Activity.ChannelId == "telegram")
             {
                 await stepContext.PromptAsync(nameof(ChoicePrompt), options, cancellationToken);
+
+                return await stepContext.EndDialogAsync(null);
             }
             else
             {
