@@ -79,8 +79,12 @@ namespace RedCrossChat.Dialogs
             return await stepContext.PromptAsync(nameof(ChoicePrompt), prompts, cancellationToken);
         }
 
+
+        private int _exerciseIndex = 1;
+
         public async Task<DialogTurnResult> TakeUserThroughExerciseAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
+
             User user = (User)stepContext.Options;
 
             var prompts = new PromptOptions
@@ -91,60 +95,25 @@ namespace RedCrossChat.Dialogs
 
             var feelings = GetFeelingToExerciseMap();
 
-            if (user.Iteration < feelings.Count) // Use user.Iteration here
+            if (_exerciseIndex < feelings.Count)
             {
-                var currentExercise = feelings[user.Iteration];
+                var currentExercise = feelings[_exerciseIndex];
                 await stepContext.Context.SendActivityAsync(MessageFactory.Text(currentExercise.Exercise));
-                user.Iteration++;
+                _exerciseIndex++;
 
-                if (user.Iteration >= feelings.Count)
+                if (_exerciseIndex >= feelings.Count)
                 {
-                    user.Iteration = 1;
+                    _exerciseIndex = 1;
                 }
 
                 return await stepContext.PromptAsync(nameof(ChoicePrompt), prompts, cancellationToken);
             }
+
             else
             {
                 return await stepContext.EndDialogAsync(user);
             }
         }
-
-
-        //private int _exerciseIndex = 1;
-
-        //public async Task<DialogTurnResult> TakeUserThroughExerciseAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
-        //{
-
-        //    User user = (User)stepContext.Options;
-
-        //    var prompts = new PromptOptions
-        //    {
-        //        Prompt = MessageFactory.Text("Do you wish to continue?"),
-        //        Choices = new List<Choice>(_choice)
-        //    };
-
-        //    var feelings = GetFeelingToExerciseMap();
-
-        //    if (_exerciseIndex < feelings.Count)
-        //    {
-        //        var currentExercise = feelings[_exerciseIndex];
-        //        await stepContext.Context.SendActivityAsync(MessageFactory.Text(currentExercise.Exercise));
-        //        _exerciseIndex++;
-
-        //        if (_exerciseIndex >= feelings.Count)
-        //        {
-        //            _exerciseIndex = 1;
-        //        }
-
-        //        return await stepContext.PromptAsync(nameof(ChoicePrompt), prompts, cancellationToken);
-        //    }
-
-        //    else
-        //    {
-        //        return await stepContext.EndDialogAsync(user);
-        //    }
-        //}
 
         private async Task<DialogTurnResult> BreathingExcercisesAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
