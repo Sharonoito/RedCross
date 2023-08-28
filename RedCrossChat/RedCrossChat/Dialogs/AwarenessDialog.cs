@@ -193,6 +193,7 @@ namespace RedCrossChat.Dialogs
                 case "Yes":
                     return await stepContext.NextAsync(user, cancellationToken);
                 default:
+                    user.WantsBreathingExercises = true;
                     return await stepContext.EndDialogAsync(user, cancellationToken);
             }
         }
