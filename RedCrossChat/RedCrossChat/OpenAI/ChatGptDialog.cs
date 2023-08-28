@@ -8,8 +8,9 @@ namespace RedCrossChat
 {
     public static class ChatGptDialog
     {
-        private static readonly string _apiKey = "25b0a86782e343d588f6e540285c7d9e";
-        private static readonly string OpenAIEndpoint = "https://redcross-2023-connect-7abc-xyz.openai.azure.com/";
+        private static readonly string _apiKey = "6faaad33f68d445c9d8f7f32afe041bc";
+      //  private static readonly string OpenAIEndpoint = "https://redcross-2023-connect-7abc-xyz.openai.azure.com/";
+        private static readonly string OpenAIEndpoint = "https://api.openai.com/v1/chat/completions";
 
         public static async Task<string> getresponses(string prompt)
         {
@@ -20,7 +21,8 @@ namespace RedCrossChat
                 var requestData = new
                 {
                     prompt = prompt,
-                    max_tokens = 50
+                    max_tokens = 50,
+                    modelName= "gpt-35-turbo"
                 };
 
                 var json = Newtonsoft.Json.JsonConvert.SerializeObject(requestData);

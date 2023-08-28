@@ -2,6 +2,8 @@
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
+using Sentry.Protocol;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,6 +17,15 @@ namespace RedCrossChat.Dialogs
         public AiDialog(ILogger<AiDialog> logger) : base(nameof(AiDialog))
         {
             _logger = logger;
+
+            var waterFallSteps = new WaterfallStep[]
+               {
+                    IntialTaskAsync,
+                    FetchResultsAsync,
+                    FinalStepAsync
+               };
+
+            AddDialog(new WaterfallDialog(nameof(WaterfallDialog), waterFallSteps));
         }
 
         public async Task<DialogTurnResult> IntialTaskAsync(WaterfallStepContext stepContext,CancellationToken token)
@@ -33,6 +44,26 @@ namespace RedCrossChat.Dialogs
 
             var options = new PromptOptions();
 
+            try
+            {
+                var response = await ChatGptDialog.getresponses("How to fix world hunger");
+
+                await stepContext.Context.SendActivityAsync(MessageFactory.Text(response));
+
+                return await stepContext.EndDialogAsync();
+            }
+            catch (Exception ex)
+            {
+
+                await stepContext.Context.SendActivityAsync(MessageFactory.Text("Our AI servers seems to be down please try later"));
+
+
+                _logger.LogError(ex.Message);
+
+                return await stepContext.EndDialogAsync();
+            }
+
+           
             return await stepContext.PromptAsync(nameof(TextPrompt), options, token);
         }
 
