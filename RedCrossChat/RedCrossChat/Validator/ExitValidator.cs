@@ -1,6 +1,7 @@
 ﻿namespace RedCrossChat.Validator
 {
-    public class ExitValidator
+    public static class ExitValidator
     {
+
     }
 }
