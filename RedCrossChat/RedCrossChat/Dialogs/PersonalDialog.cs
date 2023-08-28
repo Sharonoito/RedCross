@@ -58,7 +58,7 @@ namespace RedCrossChat.Dialogs
 
             AddDialog(breathingDialog);
 
-            AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
+            var mainDialog = new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
 
             {
                 InitialStepAsync,
@@ -69,8 +69,12 @@ namespace RedCrossChat.Dialogs
                 LaunchAwarenessDialogAsync,
                 //HandleCasesWithAI,
                 FinalStepAsync,
-         
-            }));
+
+            });
+
+       
+
+            AddDialog(mainDialog);
 
         
             _choices = new List<Choice>()
