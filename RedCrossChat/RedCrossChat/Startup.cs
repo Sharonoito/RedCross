@@ -50,7 +50,7 @@ namespace RedCrossChat
 
             services.AddSingleton<BreathingDialog>();
 
-            services.AddSingleton<ChoiceDialog>();
+          
 
             // The MainDialog that will be run by the bot.
             services.AddSingleton<MainDialog>();
