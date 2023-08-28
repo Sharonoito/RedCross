@@ -10,5 +10,7 @@
         public string RelationShipStatus { get; set; } = "";
         public string professionlStatus { get; set; }="";
         public string User { get; set; } = null;
+
+        public bool DialogClosed { get; set; } = false;
     }
 }

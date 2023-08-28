@@ -67,11 +67,13 @@ namespace RedCrossChat.Dialogs
 
         private async Task<DialogTurnResult> IntroStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            var messageText = stepContext.Options?.ToString() ?? "Hello Welcome to Kenya Red Cross Society. How can I help you today?";
-            var promptMessage = MessageFactory.Text(messageText, messageText, InputHints.ExpectingInput);
 
             stepContext.Values[UserInfo] = new Client();
 
+            var messageText = stepContext.Options?.ToString() ?? "Hello Welcome to Kenya Red Cross Society. How can I help you today?";
+            var promptMessage = MessageFactory.Text(messageText, messageText, InputHints.ExpectingInput);
+
+          
             var termsAndConditionsCard = PersonalDialogCard.GetIntendedActivity();
             var attachment = new Attachment
             {
@@ -101,6 +103,8 @@ namespace RedCrossChat.Dialogs
         private async Task<DialogTurnResult> ActStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
 
+            Client me = (Client)stepContext.Values[UserInfo];
+
             var turnContext = stepContext.Context;
 
             var termsAndConditionsCard = PersonalDialogCard.GetKnowledgeBaseCard();
@@ -117,7 +121,6 @@ namespace RedCrossChat.Dialogs
             {
                 new Choice { Value = "Membership", Action = new CardAction { Title = "Membership", Type = ActionTypes.OpenUrl, Value = "https://www.redcross.or.ke/individualmember" } },
                 new Choice { Value = "Volunteer", Action = new CardAction { Title = "Volunteer", Type = ActionTypes.OpenUrl, Value = "https://www.redcross.or.ke/volunteer" } },
-                // Add more choices as needed : todo :
             };
 
             var options = new PromptOptions
@@ -136,9 +139,10 @@ namespace RedCrossChat.Dialogs
                 {
                     if (turnContext.Activity.ChannelId == "telegram")
                     {
-                        await stepContext.PromptAsync(nameof(ChoicePrompt), options, cancellationToken);
+                        me.DialogClosed = true;
 
-                        return await stepContext.EndDialogAsync(null);
+                        return await stepContext.PromptAsync(nameof(ChoicePrompt), options, cancellationToken);
+
                     }
                     else
                     {
@@ -161,21 +165,9 @@ namespace RedCrossChat.Dialogs
 
                 if (choiceValue == InitialActions.Careers && turnContext.Activity.ChannelId == "telegram")
                 {
-                   
+                    me.DialogClosed = true;
 
-                     var reply = MessageFactory.Text("To access our Careers opportunities click on the link");
-                        reply.SuggestedActions = new SuggestedActions
-                        {
-                            Actions = new List<CardAction>
-                            {
-                                new CardAction { Title = "Careers", Type = ActionTypes.OpenUrl, Value = "https://www.redcross.or.ke/careers" }
-                            }
-                        };
-
-                     await stepContext.Context.SendActivityAsync(reply, cancellationToken);
-
-
-                    return await stepContext.EndDialogAsync(null);
+                    return await stepContext.PromptAsync(nameof(ChoicePrompt), options, cancellationToken);
                 }
 
             }
@@ -183,9 +175,12 @@ namespace RedCrossChat.Dialogs
 
             if (turnContext.Activity.ChannelId == "telegram")
             {
-                await stepContext.PromptAsync(nameof(ChoicePrompt), options, cancellationToken);
 
-                return await stepContext.EndDialogAsync(null);
+                me.DialogClosed = true;
+                
+                return await stepContext.PromptAsync(nameof(ChoicePrompt), options, cancellationToken);
+
+             
             }
             else
             {
@@ -199,6 +194,12 @@ namespace RedCrossChat.Dialogs
 
         private async Task<DialogTurnResult> ConfirmTermsAndConditionsAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
+            Client me = (Client)stepContext.Values[UserInfo];
+
+            if (!me.DialogClosed) {
+
+              return await stepContext.EndDialogAsync(null);       
+            }
 
             var termsAndConditionsCard = PersonalDialogCard.GetKnowYouCard();
 
