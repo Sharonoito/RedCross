@@ -173,7 +173,17 @@ namespace RedCrossChat.Dialogs
 
                     //todo 
 
-                    await stepContext.Context.SendActivityAsync(CareerAttachmentMessage, cancellationToken);
+                     var reply = MessageFactory.Text("Here's a link for you:");
+                        reply.SuggestedActions = new SuggestedActions
+                        {
+                            Actions = new List<CardAction>
+                            {
+                                new CardAction { Title = "Open Link", Type = ActionTypes.OpenUrl, Value = "https://www.example.com" }
+                            }
+                        };
+
+                     await stepContext.Context.SendActivityAsync(reply, cancellationToken);
+
 
                     return await stepContext.EndDialogAsync(null);
                 }
