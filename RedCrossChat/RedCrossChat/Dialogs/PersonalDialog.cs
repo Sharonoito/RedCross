@@ -313,9 +313,11 @@ namespace RedCrossChat.Dialogs
             {
                 code = int.Parse(response);
             }
-            catch (FormatException exception)
+            catch (FormatException)
             {
-               // _logger.LogError(exception);
+                // _logger.LogError(exception);
+                //_logger.LogError(e, $"Exception caught on attempting to Delete ConversationState : {e.Message}");
+
             }
 
             foreach (var county in counties) {

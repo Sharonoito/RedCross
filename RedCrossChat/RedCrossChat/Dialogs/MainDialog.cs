@@ -159,7 +159,7 @@ namespace RedCrossChat.Dialogs
 
                 if (choiceValue == InitialActions.Careers && turnContext.Activity.ChannelId == "telegram")
                 {
-                    return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions
+                    /*await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions
                     {
                         Prompt = MessageFactory.Text("To access our career or membership opportunities click on the links below"),
                         Choices = new List<Choice>
@@ -169,9 +169,13 @@ namespace RedCrossChat.Dialogs
 
                         },
                         Style = ListStyle.HeroCard,
-                    }, cancellationToken);
+                    }, cancellationToken);*/
 
-                    // return await stepContext.EndDialogAsync(null);
+                    //todo 
+
+                    await stepContext.Context.SendActivityAsync(CareerAttachmentMessage, cancellationToken);
+
+                    return await stepContext.EndDialogAsync(null);
                 }
 
             }
