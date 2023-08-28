@@ -36,11 +36,11 @@ namespace RedCrossChat.Cards
         {
             var heroCard = new HeroCard
             {
-                Title = "RedCross",
-                Subtitle = "Careers",
+                Title = "RedCross |  Careers",
+                
                 Text = "For career opportunities please follow this link.",
                 Buttons = new List<CardAction> {
-                    new CardAction(ActionTypes.OpenUrl, "Get Started", value: "https://www.redcross.or.ke/careers")
+                    new CardAction(ActionTypes.OpenUrl, "Career", value: "https://www.redcross.or.ke/careers")
                 },
             };
 

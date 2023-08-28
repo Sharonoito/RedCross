@@ -99,8 +99,6 @@ namespace RedCrossChat.Dialogs
         private async Task<DialogTurnResult> ActStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
 
-            Client me = (Client)stepContext.Values[UserInfo];
-
             var turnContext = stepContext.Context;
 
             var knowledgeBaseCard = PersonalDialogCard.GetKnowledgeBaseCard();
@@ -109,63 +107,36 @@ namespace RedCrossChat.Dialogs
 
             var choiceValues = ((FoundChoice)stepContext.Result).Value;
 
-            var choices = new List<Choice>
-            {
-                new Choice { Value = "Membership", Action = new CardAction { Title = "Membership", Type = ActionTypes.OpenUrl, Value = "https://www.redcross.or.ke/individualmember" } },
-                new Choice { Value = "Volunteer", Action = new CardAction { Title = "Volunteer", Type = ActionTypes.OpenUrl, Value = "https://www.redcross.or.ke/volunteer" } },
-            };
-
-            var options = new PromptOptions
-            {
-                Prompt = MessageFactory.Text("To access our Volunteer or membership opportunities click on the links below"),
-                Choices = choices,
-                Style = ListStyle.SuggestedAction,
-            };
-
             var message = MessageFactory.Attachment(
                     new Attachment
                     {
                         ContentType = HeroCard.ContentType,
                         Content = knowledgeBaseCard
                     }
-                );
+            );
 
-            if (stepContext.Result != null && turnContext.Activity.ChannelId != "telegram")
+            if (stepContext.Result != null)
             {
-                
 
-
-                if (choiceValues==InitialActions.MentalHealth)
-                {
-                    return await stepContext.NextAsync(null);
-                }           
-                else if(choiceValues == InitialActions.Careers)
-                {
-                    message = MessageFactory.Attachment(
-                        new Attachment { 
-                            Content = career,
-                            ContentType = HeroCard.ContentType 
-                        }
-                    );
-
-                }
-                await stepContext.Context.SendActivityAsync(message, cancellationToken);
-
-                return await stepContext.EndDialogAsync(null);
-            }
-
-
-            if (turnContext.Activity.ChannelId == "telegram")
-            {
                 if (choiceValues == InitialActions.MentalHealth)
                 {
                     return await stepContext.NextAsync(null);
                 }
-                else
+                else if (choiceValues == InitialActions.Careers)
                 {
-                   await stepContext.Context.SendActivityAsync(message, cancellationToken);
+                    message = MessageFactory.Attachment(
+                        new Attachment
+                        {
+                            Content = career,
+                            ContentType = HeroCard.ContentType
+                        }
+                    );
+
                 }
             }
+
+            await stepContext.Context.SendActivityAsync(message, cancellationToken);
+
             return await stepContext.EndDialogAsync(null);
 
         }
