@@ -45,6 +45,8 @@ namespace RedCrossChat.Dialogs
 
             AddDialog(new TextPrompt(nameof(TextPrompt)));
             AddDialog(new ChoicePrompt(nameof(ChoicePrompt)));
+
+            //confirm propmt
          
             AddDialog(counselorDialog);
             AddDialog(personalDialog);
@@ -75,7 +77,7 @@ namespace RedCrossChat.Dialogs
             if (stepContext.Context.Activity.ChannelId == "facebook")
 
             {
-                return await stepContext.PromptAsync(nameof(ConfirmPrompt), new PromptOptions
+                return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions
                 {
                     Prompt = promptMessage,
                     Choices = new List<Choice>
@@ -100,7 +102,7 @@ namespace RedCrossChat.Dialogs
                 var message = MessageFactory.Attachment(attachment);
 
                 return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions
-                {
+                 {
                     Prompt = promptMessage,
                     Choices = new List<Choice>
             {
