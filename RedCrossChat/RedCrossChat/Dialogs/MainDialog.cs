@@ -72,46 +72,30 @@ namespace RedCrossChat.Dialogs
 
             stepContext.Values[UserInfo] = new Client();
 
-            if (stepContext.Context.Activity.ChannelId == "facebook")
-
+            var termsAndConditionsCard = PersonalDialogCard.GetIntendedActivity();
+            var attachment = new Attachment
             {
-                return await stepContext.PromptAsync(nameof(ConfirmPrompt), new PromptOptions
-                {
-                    Prompt = promptMessage,
-                    Choices = new List<Choice>
-                    {
-                        new Choice() { Value = "Yes", Synonyms = new List<string> { "1", "Yes" } },
-                        new Choice() { Value = "No", Synonyms = new List<string> { "2", "No" } }
-                    },
-                    Style = ListStyle.SuggestedAction,
-                }, cancellationToken);
-            }
 
-            else
+                ContentType = HeroCard.ContentType,
+                Content = termsAndConditionsCard
+            };
+
+            var message = MessageFactory.Attachment(attachment);
+
+            return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions
             {
-                var termsAndConditionsCard = PersonalDialogCard.GetIntendedActivity();
-                var attachment = new Attachment
-                {
+                Prompt = promptMessage,
+                Choices = new List<Choice>
+                        {
+                            new Choice() { Value = "Careers", Synonyms = new List<string> { "1", "Careers", "careers" } },
+                            new Choice() { Value = "Volunteer and Membership", Synonyms = new List<string> { "2", "Membership" } },
+                            new Choice() { Value = "Volunteer Opportunities", Synonyms = new List<string> { "3", "Volunteer", "Opportunities" } },
+                            new Choice() { Value = "Mental Health", Synonyms = new List<string> { "4", "Mental", "mental", "mental Health", "Mental Health", "Help" } }
+                        },
+                Style = stepContext.Context.Activity.ChannelId == "facebook" ? ListStyle.SuggestedAction : ListStyle.HeroCard,
+            }, cancellationToken);
 
-                    ContentType = HeroCard.ContentType,
-                    Content = termsAndConditionsCard
-                };
-
-                var message = MessageFactory.Attachment(attachment);
-
-                return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions
-                {
-                    Prompt = promptMessage,
-                    Choices = new List<Choice>
-            {
-                new Choice() { Value = "Careers", Synonyms = new List<string> { "1", "Careers", "careers" } },
-                new Choice() { Value = "Volunteer and Membership", Synonyms = new List<string> { "2", "Membership" } },
-                new Choice() { Value = "Volunteer Opportunities", Synonyms = new List<string> { "3", "Volunteer", "Opportunities" } },
-                new Choice() { Value = "Mental Health", Synonyms = new List<string> { "4", "Mental", "mental", "mental Health", "Mental Health", "Help" } }
-            },
-                    Style = ListStyle.HeroCard,
-                }, cancellationToken);
-            }
+           
         }
 
         private async Task<DialogTurnResult> ActStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
