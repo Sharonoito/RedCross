@@ -29,9 +29,7 @@ namespace RedCrossChat.Dialogs
         private readonly ILogger _logger;
         private readonly FlightBookingRecognizer _luisRecognizer;
         private readonly string UserInfo = "Clien-info";
-        // private bool personalDialogComplete = false;
-
-        // Dependency injection uses this constructor to instantiate MainDialog
+        
         public MainDialog(FlightBookingRecognizer luisRecognizer,
 
             CounselorDialog counselorDialog,
@@ -75,7 +73,6 @@ namespace RedCrossChat.Dialogs
 
             var message = MessageFactory.Attachment(new Attachment
             {
-
                 ContentType = HeroCard.ContentType,
                 Content = PersonalDialogCard.GetIntendedActivity()
             });
@@ -97,10 +94,7 @@ namespace RedCrossChat.Dialogs
         }
 
         private async Task<DialogTurnResult> ActStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
-        {
-
-            var turnContext = stepContext.Context;
-
+        { 
             var knowledgeBaseCard = PersonalDialogCard.GetKnowledgeBaseCard();
 
             var career = PersonalDialogCard.GetKnowledgeCareerCard();
@@ -133,6 +127,16 @@ namespace RedCrossChat.Dialogs
                     );
 
                 }
+            }
+            else
+            {
+                message = MessageFactory.Attachment(
+                        new Attachment
+                        {
+                            Content = career,
+                            ContentType = HeroCard.ContentType
+                        }
+                    );
             }
 
             await stepContext.Context.SendActivityAsync(message, cancellationToken);
