@@ -47,30 +47,7 @@ namespace RedCrossChat.Bots
 
 
         }
-
-        //public override async Task OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken = default(CancellationToken))
-        //{
-
-        //    if (turnContext.Activity.Type == ActivityTypes.Message)
-        //    {
-        //        var userInput = turnContext.Activity.Text.ToLower().Trim();
-
-        //        if (userInput == "exit")
-        //        {
-        //            await turnContext.SendActivityAsync("You have exited the bot. Goodbye!", cancellationToken: cancellationToken);
-        //            return;
-        //        }
-
-        //        // Continue with your regular conversation flow here...
-        //    }
-
-        //    await base.OnTurnAsync(turnContext, cancellationToken);
-
-        //    // Save any state changes that might have occured during the turn.
-        //    await ConversationState.SaveChangesAsync(turnContext, false, cancellationToken);
-        //    await UserState.SaveChangesAsync(turnContext, false, cancellationToken);
-        //}
-
+        
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
             Logger.LogInformation("Running dialog with Message Activity.");
