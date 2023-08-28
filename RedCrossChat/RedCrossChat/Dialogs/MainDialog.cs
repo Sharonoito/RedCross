@@ -83,7 +83,7 @@ namespace RedCrossChat.Dialogs
                         new Choice() { Value = "Yes", Synonyms = new List<string> { "1", "Yes" } },
                         new Choice() { Value = "No", Synonyms = new List<string> { "2", "No" } }
                     },
-                    Style = ListStyle.HeroCard,
+                    Style = ListStyle.SuggestedAction,
                 }, cancellationToken);
             }
 
