@@ -28,12 +28,12 @@ namespace RedCrossChat.Dialogs
     {
         private readonly ILogger _logger;
         private readonly FlightBookingRecognizer _luisRecognizer;
-        private readonly string UserInfo="Clien-info";
-       // private bool personalDialogComplete = false;
+        private readonly string UserInfo = "Clien-info";
+        // private bool personalDialogComplete = false;
 
         // Dependency injection uses this constructor to instantiate MainDialog
-        public MainDialog(FlightBookingRecognizer luisRecognizer, 
-            
+        public MainDialog(FlightBookingRecognizer luisRecognizer,
+
             CounselorDialog counselorDialog,
             PersonalDialog personalDialog,
             //AwarenessDialog awarenessDialog,
@@ -45,10 +45,10 @@ namespace RedCrossChat.Dialogs
 
             AddDialog(new TextPrompt(nameof(TextPrompt)));
             AddDialog(new ChoicePrompt(nameof(ChoicePrompt)));
-         
+
             AddDialog(counselorDialog);
             AddDialog(personalDialog);
-           // AddDialog(awarenessDialog);
+            // AddDialog(awarenessDialog);
 
             var waterfallSteps = new WaterfallStep[]
             {
@@ -95,12 +95,12 @@ namespace RedCrossChat.Dialogs
                 Style = stepContext.Context.Activity.ChannelId == "facebook" ? ListStyle.SuggestedAction : ListStyle.HeroCard,
             }, cancellationToken);
 
-           
+
         }
 
         private async Task<DialogTurnResult> ActStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-         
+
             var turnContext = stepContext.Context;
 
             var termsAndConditionsCard = PersonalDialogCard.GetKnowledgeBaseCard();
@@ -109,9 +109,9 @@ namespace RedCrossChat.Dialogs
 
             var choiceValues = ((FoundChoice)stepContext.Result).Value;
 
-            var VolunteerAttachmentMessage = MessageFactory.Attachment(new Attachment { Content=termsAndConditionsCard, ContentType = HeroCard.ContentType });
+            var VolunteerAttachmentMessage = MessageFactory.Attachment(new Attachment { Content = termsAndConditionsCard, ContentType = HeroCard.ContentType });
 
-            var CareerAttachmentMessage = MessageFactory.Attachment(new Attachment { Content=career, ContentType = HeroCard.ContentType });
+            var CareerAttachmentMessage = MessageFactory.Attachment(new Attachment { Content = career, ContentType = HeroCard.ContentType });
 
             var choices = new List<Choice>
             {
@@ -132,7 +132,7 @@ namespace RedCrossChat.Dialogs
 
                 var choiceValue = ((FoundChoice)stepContext.Result).Value;
 
-                if (choiceValue==null)
+                if (choiceValue == null)
                 {
                     if (turnContext.Activity.ChannelId == "telegram")
                     {
@@ -150,14 +150,14 @@ namespace RedCrossChat.Dialogs
                     return await stepContext.NextAsync(null);
                 }
 
-                if(choiceValue == InitialActions.Careers  && turnContext.Activity.ChannelId != "telegram")
+                if (choiceValue == InitialActions.Careers && turnContext.Activity.ChannelId != "telegram")
                 {
                     await stepContext.Context.SendActivityAsync(CareerAttachmentMessage, cancellationToken);
-                  
+
                     return await stepContext.EndDialogAsync(null);
                 }
 
-                if (choiceValue == InitialActions.Careers  && turnContext.Activity.ChannelId == "telegram")
+                if (choiceValue == InitialActions.Careers && turnContext.Activity.ChannelId == "telegram")
                 {
                     return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions
                     {
@@ -171,11 +171,11 @@ namespace RedCrossChat.Dialogs
                         Style = ListStyle.HeroCard,
                     }, cancellationToken);
 
-                   // return await stepContext.EndDialogAsync(null);
+                    // return await stepContext.EndDialogAsync(null);
                 }
 
             }
-           
+
 
             if (turnContext.Activity.ChannelId == "telegram")
             {
@@ -195,7 +195,7 @@ namespace RedCrossChat.Dialogs
         {
 
             var termsAndConditionsCard = PersonalDialogCard.GetKnowYouCard();
-            
+
             var attachment = new Attachment
             {
                 ContentType = HeroCard.ContentType,
@@ -249,7 +249,7 @@ namespace RedCrossChat.Dialogs
             await stepContext.Context.SendActivityAsync(MessageFactory.Text("Thank you for reaching out good bye 😀."));
 
             // The result is null or of an unexpected type, return an empty response
-            return await stepContext.EndDialogAsync(null,cancellationToken);
+            return await stepContext.EndDialogAsync(null, cancellationToken);
         }
 
 
