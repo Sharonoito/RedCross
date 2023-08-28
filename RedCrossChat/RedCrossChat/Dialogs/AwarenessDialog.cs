@@ -2,8 +2,10 @@
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Dialogs.Choices;
+using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
+using RedCrossChat.Cards;
 using RedCrossChat.Objects;
 using System;
 using System.Collections.Generic;
@@ -271,6 +273,7 @@ namespace RedCrossChat.Dialogs
 
         private async Task<DialogTurnResult> FinalStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
+
             // Evaulate if to push the user to the health ai bot
             User user = (User)stepContext.Values[UserInfo];
 
@@ -287,7 +290,28 @@ namespace RedCrossChat.Dialogs
                         // Send the message to the user about the next available agent or calling 1199.
                         var agentMessage = "Next available agent will be with you shortly or you can also call 1199 to connect with our counselor.";
                         await stepContext.Context.SendActivityAsync(MessageFactory.Text(agentMessage), cancellationToken);
-                        break;
+
+
+                        var hotline = PersonalDialogCard.GetHotlineCard();
+
+                        var attachment = new Attachment
+                        {
+                            ContentType = HeroCard.ContentType,
+                            Content =   hotline
+                        };
+
+                        var message = MessageFactory.Attachment(attachment);
+                        await stepContext.Context.SendActivityAsync(message, cancellationToken);
+
+                        var choices = new List<Choice>
+                        {
+                            new Choice() { Value = "hotline", Action = new CardAction() { Title = "hotline", Type = ActionTypes.OpenUrl, Value = "http://localhost:3978/api/messages" } }
+                        };
+
+
+                        return await stepContext.EndDialogAsync(user, cancellationToken);
+
+
                     case "no":
                         user.handOverToUser = false;
                         // Start the BreathingDialog

@@ -17,6 +17,7 @@ using RedCrossChat.CognitiveModels;
 using RedCrossChat.Objects;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -66,96 +67,131 @@ namespace RedCrossChat.Dialogs
 
         private async Task<DialogTurnResult> IntroStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            // Use the text provided in FinalStepAsync or the default if it is the first time.
             var messageText = stepContext.Options?.ToString() ?? "Hello Welcome to Kenya Red Cross Society. How can I help you today?";
             var promptMessage = MessageFactory.Text(messageText, messageText, InputHints.ExpectingInput);
 
             stepContext.Values[UserInfo] = new Client();
 
+            if (stepContext.Context.Activity.ChannelId == "facebook")
 
-            var termsAndConditionsCard = PersonalDialogCard.GetIntendedActivity();
-            var attachment = new Attachment
             {
-                ContentType = HeroCard.ContentType,
-                Content = termsAndConditionsCard
-            };
-
-            var message = MessageFactory.Attachment(attachment);
-
-
-             //return await stepContext.Context.Activity.SendActivityAsync(message, cancellationToken);
-
-            return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions { 
-                
-                Prompt = promptMessage ,
-                Choices= new List<Choice>()
+                return await stepContext.PromptAsync(nameof(ConfirmPrompt), new PromptOptions
                 {
-                    new Choice() { Value = "Careers", Synonyms = new List<string>() { "1", "Careers", "careers" } },
-                    new Choice() { Value = "Volunteer and Membership", Synonyms = new List<string>() { "2", "Membership" } },
-                    new Choice() { Value = "Volunteer Opportunities", Synonyms = new List<string>() { "3" ,"Volunteer", "Opportunities" } },
-                    new Choice() { Value = "Mental Health", Synonyms = new List<string>() { "4","Mental","mental","mental Health","Mental Health","Help" } },
+                    Prompt = promptMessage,
+                    Choices = new List<Choice>
+                    {
+                        new Choice() { Value = "Yes", Synonyms = new List<string> { "1", "Yes" } },
+                        new Choice() { Value = "No", Synonyms = new List<string> { "2", "No" } }
+                    },
+                    Style = ListStyle.SuggestedAction,
+                }, cancellationToken);
+            }
 
-                }
-                ,
-                Style=ListStyle.HeroCard
-            }, cancellationToken);
+            else
+            {
+                var termsAndConditionsCard = PersonalDialogCard.GetIntendedActivity();
+                var attachment = new Attachment
+                {
+
+                    ContentType = HeroCard.ContentType,
+                    Content = termsAndConditionsCard
+                };
+
+                var message = MessageFactory.Attachment(attachment);
+
+                return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions
+                {
+                    Prompt = promptMessage,
+                    Choices = new List<Choice>
+            {
+                new Choice() { Value = "Careers", Synonyms = new List<string> { "1", "Careers", "careers" } },
+                new Choice() { Value = "Volunteer and Membership", Synonyms = new List<string> { "2", "Membership" } },
+                new Choice() { Value = "Volunteer Opportunities", Synonyms = new List<string> { "3", "Volunteer", "Opportunities" } },
+                new Choice() { Value = "Mental Health", Synonyms = new List<string> { "4", "Mental", "mental", "mental Health", "Mental Health", "Help" } }
+            },
+                    Style = ListStyle.HeroCard,
+                }, cancellationToken);
+            }
         }
-
-        //https://www.redcross.or.ke/ASSETS/DATA-PROTECTION-POLICY.pdf
 
         private async Task<DialogTurnResult> ActStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-
+         
             var turnContext = stepContext.Context;
 
             var termsAndConditionsCard = PersonalDialogCard.GetKnowledgeBaseCard();
 
-            var attachment = new Attachment
-            {
-                ContentType = HeroCard.ContentType,
-                Content = termsAndConditionsCard
-            };
+            var career = PersonalDialogCard.GetKnowledgeCareerCard();
 
-            var message = MessageFactory.Attachment(attachment);
+            var choiceValues = ((FoundChoice)stepContext.Result).Value;
+
+            var VolunteerAttachmentMessage = MessageFactory.Attachment(new Attachment { Content=termsAndConditionsCard, ContentType = HeroCard.ContentType });
+
+            var CareerAttachmentMessage = MessageFactory.Attachment(new Attachment { Content=career, ContentType = HeroCard.ContentType });
 
             var choices = new List<Choice>
             {
                 new Choice { Value = "Membership", Action = new CardAction { Title = "Membership", Type = ActionTypes.OpenUrl, Value = "https://www.redcross.or.ke/individualmember" } },
                 new Choice { Value = "Volunteer", Action = new CardAction { Title = "Volunteer", Type = ActionTypes.OpenUrl, Value = "https://www.redcross.or.ke/volunteer" } },
-                // Add more choices as needed
+                // Add more choices as needed : todo :
             };
 
             var options = new PromptOptions
             {
                 Prompt = MessageFactory.Text("To access our Volunteer or membership opportunities click on the links below"),
                 Choices = choices,
-                Style = ListStyle.HeroCard,
+                Style = ListStyle.SuggestedAction,
             };
 
             if (stepContext.Result != null)
             {
-           
+
                 var choiceValue = ((FoundChoice)stepContext.Result).Value;
 
                 if (choiceValue==null)
                 {
-                    if(turnContext.Activity.ChannelId == "telegram")
+                    if (turnContext.Activity.ChannelId == "telegram")
                     {
                         await stepContext.PromptAsync(nameof(ChoicePrompt), options, cancellationToken);
                     }
                     else
                     {
-                        await stepContext.Context.SendActivityAsync(message, cancellationToken);
+                        await stepContext.Context.SendActivityAsync(VolunteerAttachmentMessage, cancellationToken);
                     }
 
                 }
 
-                if (choiceValue == "Mental Health")
+                if (choiceValue == InitialActions.MentalHealth)
                 {
                     return await stepContext.NextAsync(null);
                 }
-             
+
+                if(choiceValue == InitialActions.Careers  && turnContext.Activity.ChannelId != "telegram")
+                {
+                    await stepContext.Context.SendActivityAsync(CareerAttachmentMessage, cancellationToken);
+                  
+                    return await stepContext.EndDialogAsync(null);
+                }
+
+                if (choiceValue == InitialActions.Careers  && turnContext.Activity.ChannelId == "telegram")
+                {
+                    return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions
+                    {
+                        Prompt = MessageFactory.Text("To access our career or membership opportunities click on the links below"),
+                        Choices = new List<Choice>
+                        {
+                              new Choice { Value = InitialActions.Careers, Action = new CardAction { Title = "Careers", Type = ActionTypes.OpenUrl, Value = "https://www.redcross.or.ke/careers" } },
+                              new Choice { Value = InitialActions.VolunteerAndMemberShip, Action = new CardAction { Title = "Volunteer", Type = ActionTypes.OpenUrl, Value = "https://www.redcross.or.ke/volunteer" } },
+
+                        },
+                        Style = ListStyle.HeroCard,
+                    }, cancellationToken);
+
+                   // return await stepContext.EndDialogAsync(null);
+                }
+
             }
+           
 
             if (turnContext.Activity.ChannelId == "telegram")
             {
@@ -163,7 +199,7 @@ namespace RedCrossChat.Dialogs
             }
             else
             {
-                await stepContext.Context.SendActivityAsync(message, cancellationToken);
+                await stepContext.Context.SendActivityAsync(VolunteerAttachmentMessage, cancellationToken);
             }
 
             return await stepContext.EndDialogAsync(null);
