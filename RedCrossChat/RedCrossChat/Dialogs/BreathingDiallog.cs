@@ -21,8 +21,8 @@ namespace RedCrossChat.Dialogs
     {
 
         private List<Choice> _choice;
-
-        private List<BreathingTip> _breathingTips;
+        
+        //# private List<BreathingTip> _breathingTips;
 
         protected string iterations = "user-iterations";
 

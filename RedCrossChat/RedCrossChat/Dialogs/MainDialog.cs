@@ -28,12 +28,10 @@ namespace RedCrossChat.Dialogs
     {
         private readonly ILogger _logger;
         private readonly FlightBookingRecognizer _luisRecognizer;
-        private readonly string UserInfo="Clien-info";
-       // private bool personalDialogComplete = false;
+        private readonly string UserInfo = "Clien-info";
+        
+        public MainDialog(FlightBookingRecognizer luisRecognizer,
 
-        // Dependency injection uses this constructor to instantiate MainDialog
-        public MainDialog(FlightBookingRecognizer luisRecognizer, 
-            
             CounselorDialog counselorDialog,
             PersonalDialog personalDialog,
             //AwarenessDialog awarenessDialog,
@@ -46,11 +44,9 @@ namespace RedCrossChat.Dialogs
             AddDialog(new TextPrompt(nameof(TextPrompt)));
             AddDialog(new ChoicePrompt(nameof(ChoicePrompt)));
 
-            //confirm propmt
-         
             AddDialog(counselorDialog);
             AddDialog(personalDialog);
-           // AddDialog(awarenessDialog);
+            // AddDialog(awarenessDialog);
 
             var waterfallSteps = new WaterfallStep[]
             {
@@ -69,140 +65,77 @@ namespace RedCrossChat.Dialogs
 
         private async Task<DialogTurnResult> IntroStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            var messageText = stepContext.Options?.ToString() ?? "Hello Welcome to Kenya Red Cross Society. How can I help you today?";
-            var promptMessage = MessageFactory.Text(messageText, messageText, InputHints.ExpectingInput);
 
             stepContext.Values[UserInfo] = new Client();
 
-            if (stepContext.Context.Activity.ChannelId == "facebook")
+            var messageText = stepContext.Options?.ToString() ?? "Hello Welcome to Kenya Red Cross Society. How can I help you today?";
+            var promptMessage = MessageFactory.Text(messageText, messageText, InputHints.ExpectingInput);
 
+            var message = MessageFactory.Attachment(new Attachment
             {
-                return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions
+
+            return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions
+            {
+                Prompt = promptMessage,
+                Choices = new List<Choice>
                 {
-                    Prompt = promptMessage,
-                    Choices = new List<Choice>
-                    {
-                        new Choice() { Value = "Yes", Synonyms = new List<string> { "1", "Yes" } },
-                        new Choice() { Value = "No", Synonyms = new List<string> { "2", "No" } }
-                    },
-                    Style = ListStyle.SuggestedAction,
-                }, cancellationToken);
-            }
+                    new Choice() { Value = InitialActions.Careers, Synonyms = new List<string> { "1", "Careers", "careers" } },
+                    new Choice() { Value = InitialActions.VolunteerAndMemberShip, Synonyms = new List<string> { "2", "Membership" } },
+                    new Choice() { Value = InitialActions.VolunteerOpportunities, Synonyms = new List<string> { "3", "Volunteer", "Opportunities" } },
+                    new Choice() { Value = InitialActions.MentalHealth, Synonyms = new List<string> { "4", "Mental", "mental", "mental Health", "Mental Health", "Help" } }
+                },
+                Style = stepContext.Context.Activity.ChannelId == "facebook" ? ListStyle.SuggestedAction : ListStyle.HeroCard,
+            }, cancellationToken);
 
-            else
-            {
-                var termsAndConditionsCard = PersonalDialogCard.GetIntendedActivity();
-                var attachment = new Attachment
-                {
-
-                    ContentType = HeroCard.ContentType,
-                    Content = termsAndConditionsCard
-                };
-
-                var message = MessageFactory.Attachment(attachment);
-
-                return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions
-                 {
-                    Prompt = promptMessage,
-                    Choices = new List<Choice>
-            {
-                new Choice() { Value = "Careers", Synonyms = new List<string> { "1", "Careers", "careers" } },
-                new Choice() { Value = "Volunteer and Membership", Synonyms = new List<string> { "2", "Membership" } },
-                new Choice() { Value = "Volunteer Opportunities", Synonyms = new List<string> { "3", "Volunteer", "Opportunities" } },
-                new Choice() { Value = "Mental Health", Synonyms = new List<string> { "4", "Mental", "mental", "mental Health", "Mental Health", "Help" } }
-            },
-                    Style = ListStyle.HeroCard,
-                }, cancellationToken);
-            }
         }
 
         private async Task<DialogTurnResult> ActStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
-        {
-         
-            var turnContext = stepContext.Context;
-
-            var termsAndConditionsCard = PersonalDialogCard.GetKnowledgeBaseCard();
+        { 
+            var knowledgeBaseCard = PersonalDialogCard.GetKnowledgeBaseCard();
 
             var career = PersonalDialogCard.GetKnowledgeCareerCard();
 
             var choiceValues = ((FoundChoice)stepContext.Result).Value;
 
-            var VolunteerAttachmentMessage = MessageFactory.Attachment(new Attachment { Content=termsAndConditionsCard, ContentType = HeroCard.ContentType });
-
-            var CareerAttachmentMessage = MessageFactory.Attachment(new Attachment { Content=career, ContentType = HeroCard.ContentType });
-
-            var choices = new List<Choice>
-            {
-                new Choice { Value = "Membership", Action = new CardAction { Title = "Membership", Type = ActionTypes.OpenUrl, Value = "https://www.redcross.or.ke/individualmember" } },
-                new Choice { Value = "Volunteer", Action = new CardAction { Title = "Volunteer", Type = ActionTypes.OpenUrl, Value = "https://www.redcross.or.ke/volunteer" } },
-                // Add more choices as needed : todo :
-            };
-
-            var options = new PromptOptions
-            {
-                Prompt = MessageFactory.Text("To access our Volunteer or membership opportunities click on the links below"),
-                Choices = choices,
-                Style = ListStyle.SuggestedAction,
-            };
+            var message = MessageFactory.Attachment(
+                    new Attachment
+                    {
+                        ContentType = HeroCard.ContentType,
+                        Content = knowledgeBaseCard
+                    }
+            );
 
             if (stepContext.Result != null)
             {
 
-                var choiceValue = ((FoundChoice)stepContext.Result).Value;
-
-                if (choiceValue==null)
-                {
-                    if (turnContext.Activity.ChannelId == "telegram")
-                    {
-                        await stepContext.PromptAsync(nameof(ChoicePrompt), options, cancellationToken);
-                    }
-                    else
-                    {
-                        await stepContext.Context.SendActivityAsync(VolunteerAttachmentMessage, cancellationToken);
-                    }
-
-                }
-
-                if (choiceValue == InitialActions.MentalHealth)
+                if (choiceValues == InitialActions.MentalHealth)
                 {
                     return await stepContext.NextAsync(null);
                 }
-
-                if(choiceValue == InitialActions.Careers  && turnContext.Activity.ChannelId != "telegram")
+                else if (choiceValues == InitialActions.Careers)
                 {
-                    await stepContext.Context.SendActivityAsync(CareerAttachmentMessage, cancellationToken);
-                  
-                    return await stepContext.EndDialogAsync(null);
-                }
-
-                if (choiceValue == InitialActions.Careers  && turnContext.Activity.ChannelId == "telegram")
-                {
-                    return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions
-                    {
-                        Prompt = MessageFactory.Text("To access our career or membership opportunities click on the links below"),
-                        Choices = new List<Choice>
+                    message = MessageFactory.Attachment(
+                        new Attachment
                         {
-                              new Choice { Value = InitialActions.Careers, Action = new CardAction { Title = "Careers", Type = ActionTypes.OpenUrl, Value = "https://www.redcross.or.ke/careers" } },
-                              new Choice { Value = InitialActions.VolunteerAndMemberShip, Action = new CardAction { Title = "Volunteer", Type = ActionTypes.OpenUrl, Value = "https://www.redcross.or.ke/volunteer" } },
+                            Content = career,
+                            ContentType = HeroCard.ContentType
+                        }
+                    );
 
-                        },
-                        Style = ListStyle.HeroCard,
-                    }, cancellationToken);
-
-                   // return await stepContext.EndDialogAsync(null);
                 }
-
-            }
-           
-
-            if (turnContext.Activity.ChannelId == "telegram")
-            {
-                await stepContext.PromptAsync(nameof(ChoicePrompt), options, cancellationToken);
             }
             else
             {
-                await stepContext.Context.SendActivityAsync(VolunteerAttachmentMessage, cancellationToken);
+                message = MessageFactory.Attachment(
+                        new Attachment
+                        {
+                            Content = career,
+                            ContentType = HeroCard.ContentType
+                        }
+                    );
             }
+
+            await stepContext.Context.SendActivityAsync(message, cancellationToken);
 
             return await stepContext.EndDialogAsync(null);
 
@@ -211,9 +144,15 @@ namespace RedCrossChat.Dialogs
 
         private async Task<DialogTurnResult> ConfirmTermsAndConditionsAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
+            Client me = (Client)stepContext.Values[UserInfo];
+
+            if (me.DialogClosed) {
+
+              return await stepContext.EndDialogAsync(null);       
+            }
 
             var termsAndConditionsCard = PersonalDialogCard.GetKnowYouCard();
-            
+
             var attachment = new Attachment
             {
                 ContentType = HeroCard.ContentType,
@@ -229,10 +168,10 @@ namespace RedCrossChat.Dialogs
                 Prompt = MessageFactory.Text("Do you agree to the Terms and Conditions? Please select 'Yes' or 'No'."),
                 RetryPrompt = MessageFactory.Text("Please select a valid option ('Yes' or 'No')."),
                 Choices = new List<Choice>
-                        {
-                            new Choice() { Value = "Yes", Synonyms = new List<string> { "y", "Y", "YES", "YE", "ye", "yE", "1" } },
-                            new Choice() { Value = "No", Synonyms = new List<string> { "n", "N", "no" } }
-                        },
+                {
+                    new Choice() { Value = "Yes", Synonyms = new List<string> { "y", "Y", "YES", "YE", "ye", "yE", "1" } },
+                    new Choice() { Value = "No", Synonyms = new List<string> { "n", "N", "no" } }
+                },
             };
 
             return await stepContext.PromptAsync(nameof(ChoicePrompt), options, cancellationToken);
@@ -267,7 +206,7 @@ namespace RedCrossChat.Dialogs
             await stepContext.Context.SendActivityAsync(MessageFactory.Text("Thank you for reaching out good bye 😀."));
 
             // The result is null or of an unexpected type, return an empty response
-            return await stepContext.EndDialogAsync(null,cancellationToken);
+            return await stepContext.EndDialogAsync(null, cancellationToken);
         }
 
 
