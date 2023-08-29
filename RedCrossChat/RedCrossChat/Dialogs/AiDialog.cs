@@ -64,7 +64,7 @@ namespace RedCrossChat.Dialogs
             }
 
            
-            return await stepContext.PromptAsync(nameof(TextPrompt), options, token);
+           // return await stepContext.PromptAsync(nameof(TextPrompt), options, token);
         }
 
         public async Task<DialogTurnResult> FinalStepAsync(WaterfallStepContext stepContext, CancellationToken token)

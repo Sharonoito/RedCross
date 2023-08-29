@@ -159,7 +159,7 @@ namespace RedCrossChat.Dialogs
 
             if (userChoice !=null && userChoice==Validations.YES) return await stepContext.BeginDialogAsync(nameof(WaterfallDialog), user, cancellationToken);
 
-            return await stepContext.EndDialogAsync(null, cancellationToken);
+            return await stepContext.EndDialogAsync(user, cancellationToken);
 
         }
 
