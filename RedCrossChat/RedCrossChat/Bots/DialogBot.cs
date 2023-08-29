@@ -7,6 +7,7 @@ using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
+using RedCrossChat.Dialogs;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -33,16 +34,42 @@ namespace RedCrossChat.Bots
             UserState = userState;
             Dialog = dialog;
             Logger = logger;
+
         }
 
-        public override async Task OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken = default(CancellationToken))
+        public override async Task OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken = default)
         {
-            await base.OnTurnAsync(turnContext, cancellationToken);
+           await base.OnTurnAsync(turnContext, cancellationToken);
 
             // Save any state changes that might have occured during the turn.
             await ConversationState.SaveChangesAsync(turnContext, false, cancellationToken);
             await UserState.SaveChangesAsync(turnContext, false, cancellationToken);
+
+
         }
+
+        //public override async Task OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken = default(CancellationToken))
+        //{
+
+        //    if (turnContext.Activity.Type == ActivityTypes.Message)
+        //    {
+        //        var userInput = turnContext.Activity.Text.ToLower().Trim();
+
+        //        if (userInput == "exit")
+        //        {
+        //            await turnContext.SendActivityAsync("You have exited the bot. Goodbye!", cancellationToken: cancellationToken);
+        //            return;
+        //        }
+
+        //        // Continue with your regular conversation flow here...
+        //    }
+
+        //    await base.OnTurnAsync(turnContext, cancellationToken);
+
+        //    // Save any state changes that might have occured during the turn.
+        //    await ConversationState.SaveChangesAsync(turnContext, false, cancellationToken);
+        //    await UserState.SaveChangesAsync(turnContext, false, cancellationToken);
+        //}
 
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
