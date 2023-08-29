@@ -31,7 +31,10 @@ namespace RedCrossChat.Dialogs
 
         protected string iterations = "user-iterations";
 
-        public PersonalDialog(AwarenessDialog awarenessDialog,BreathingDialog breathingDialog, ILogger<PersonalDialog> logger) : base(nameof(PersonalDialog))
+        public PersonalDialog(AwarenessDialog awarenessDialog,
+            BreathingDialog breathingDialog,
+            AiDialog aiDialog,
+            ILogger<PersonalDialog> logger) : base(nameof(PersonalDialog))
         {
             _logger = logger;
             AddDialog(new ChoicePrompt(nameof(ChoicePrompt)));
@@ -58,7 +61,9 @@ namespace RedCrossChat.Dialogs
 
             AddDialog(breathingDialog);
 
-            AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
+            AddDialog(aiDialog);
+
+            var mainDialog = new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
 
             {
                 InitialStepAsync,
@@ -67,10 +72,15 @@ namespace RedCrossChat.Dialogs
                 PrivateDetailsCountryBracketAsync,
                 PrivateDetailsCountyDropdownAsync,
                 LaunchAwarenessDialogAsync,
+                HandleBreathingStepAsync,
                 //HandleCasesWithAI,
                 FinalStepAsync,
-         
-            }));
+
+            });
+
+       
+
+            AddDialog(mainDialog);
 
         
             _choices = new List<Choice>()
@@ -111,6 +121,8 @@ namespace RedCrossChat.Dialogs
         private async Task<DialogTurnResult> PrivateDetailsGenderAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
 
+           await EvaluateDialog.ProcessStepAsync(stepContext, cancellationToken);
+
             if (stepContext.Values != null)
             {
                 var client=(Client)stepContext.Values[UserInfo];
@@ -132,8 +144,6 @@ namespace RedCrossChat.Dialogs
 
             // Prompt the user with the configured PromptOptions.
             return await stepContext.PromptAsync("select-gender", options, cancellationToken);
-
-
         }
 
         private async Task<DialogTurnResult> PrivateDetailsAgeBracketAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
@@ -313,9 +323,11 @@ namespace RedCrossChat.Dialogs
             {
                 code = int.Parse(response);
             }
-            catch (FormatException exception)
+            catch (FormatException)
             {
-               // _logger.LogError(exception);
+                // _logger.LogError(exception);
+                //_logger.LogError(e, $"Exception caught on attempting to Delete ConversationState : {e.Message}");
+
             }
 
             foreach (var county in counties) {
@@ -339,28 +351,37 @@ namespace RedCrossChat.Dialogs
             return await stepContext.BeginDialogAsync(nameof(AwarenessDialog), null, cancellationToken);
 
         }
-
-  
-        private async Task<DialogTurnResult> FinalStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
-        {
-            //return await stepContext.EndDialogAsync(null, cancellationToken);
-            //from the breathing dialog 
-
-
-            //hand over to ai
-
-            // when iterations==1 and WantsBreathingExercises ==true  => handover to Ai
-            if (stepContext.Result !=null)
+        private async Task<DialogTurnResult> HandleBreathingStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken) {
+            if (stepContext.Result != null)
             {
                 User user = (User)(stepContext.Result);
-                if (user.Iteration ==1 && user.WantsBreathingExercises)
+
+                if (user.WantsBreathingExercises)
+                {
+                    return await stepContext.BeginDialogAsync(nameof(BreathingDialog), user, cancellationToken);
+                }
+
+                if (user.hasTalkedToSomeone == false && user.isAwareOfFeeling == false)
+                {
+                    return await stepContext.BeginDialogAsync(nameof(BreathingDialog), user, cancellationToken);
+                }
+
+                if (user.Iteration == 1 && user.WantsBreathingExercises)
                 {
                     //handover to ui
                     return await stepContext.BeginDialogAsync(nameof(BreathingDialog), user, cancellationToken);
                 }
-                return await stepContext.EndDialogAsync(user,cancellationToken);
+                return await stepContext.EndDialogAsync(user, cancellationToken);
             }
-            return await stepContext.EndDialogAsync(null,cancellationToken);
+
+            return await stepContext.EndDialogAsync(null, cancellationToken);
+        }
+
+        private async Task<DialogTurnResult> FinalStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        {
+            User user = (User)(stepContext.Result);
+
+            return await stepContext.BeginDialogAsync(nameof(AiDialog), user, cancellationToken);
         }
 
        
@@ -377,7 +398,17 @@ namespace RedCrossChat.Dialogs
 
             return cardOptions;
         }
+
+        private async Task<bool> ValidateAgeAsync(PromptValidatorContext<int> promptContext, CancellationToken cancellationToken)
+        {
+            //promptContext.Context.Activity.
+
+            return false;
+        }
     }
+
+
+
 }
 
 

@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿﻿
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -44,12 +45,12 @@
                                         { "Name of organisation": "NMS Ambulance", "Services offered": "Safety", "Location": "Nairobi", "Hours of\\noperation": "24hrs", "Contact": "020-2222181" },
                                         { "Name of organisation": "Kiambu Metro politan service", "Services offered": "Safety", "Location": "Kiambu", "Hours of\\noperation": "24hrs", "Contact": "0700820227" },
                                         { "Name of organisation": "Provide International Clinic Kayole", "Services offered": "Safety", "Location": "Kayole", "Hours of\\noperation": "24hrs", "Contact": "0722242072" },
-                                        { "Name of organisation": "National police service", "Services offered": "Safety(Reporting)", "Location": "Waiyaki Skypark","Hours of operation": "24hrs", "Contact": "112,999,0800 730 999" },                                     
+                                        { "Name of organisation": "National police service", "Services offered": "Safety(Reporting)", "Location": "Waiyaki Skypark","Hours of operation": "24hrs", "Contact": "112,999,0800 730 999" },
                                         { "Name of organisation": "National police service alternative contact", "Services offered": "Safety", "Location": "Sky park","Hours of operation": "24hrs", "Contact": "020 3556771"},
-                                        { "Name of organisation": "Child line Kenya", "Services offered": "Safety","Location": "Kikuyu","Hours of operation": "24hrs","Contact": "116"},                                        
-                                        { "Name of organisation": "NACADA", "Services offered": "Safety","Location": "Bishop Rd, Nairobi","Hours of operation": "8am-5pm", "Contact": "1192,020 2721997"},    
-                                        { "Name of organisation": "Fire Brigade","Services offered": "Safety", "Location": "Fire station","Hours of operation": "24hrs","Contact": "020-2222181"  },   
-                                        { "Name of organisation": "Anti – FGM Board","Services offered": "Safety","Location": "Railways HQs", "Hours of operation": "8am-5pm", "Contact": "0770442022/0722589550" },       
+                                        { "Name of organisation": "Child line Kenya", "Services offered": "Safety","Location": "Kikuyu","Hours of operation": "24hrs","Contact": "116"},
+                                        { "Name of organisation": "NACADA", "Services offered": "Safety","Location": "Bishop Rd, Nairobi","Hours of operation": "8am-5pm", "Contact": "1192,020 2721997"},
+                                        { "Name of organisation": "Fire Brigade","Services offered": "Safety", "Location": "Fire station","Hours of operation": "24hrs","Contact": "020-2222181"  },
+                                        { "Name of organisation": "Anti – FGM Board","Services offered": "Safety","Location": "Railways HQs", "Hours of operation": "8am-5pm", "Contact": "0770442022/0722589550" },
                                         { "Name of organisation": "Nairobi Women's hospital call", "Services offered": "Safety", "Location": "Hurlingham","Hours of operation": "24hrs", "Contact": "0728249826" },
                                         { "Name of organisation": "SHOFCO","Services offered": "Safety","Location": "Nairobi West", "Hours of operation": "24hrs", "Contact": "Kibera –  0703445737\\nMathare - 0799400572\\nMukuru - 0790506847"},
                                         { "Name of organisation": "Healthcare Assistance Kenya","Services offered": "Safety","Location": "Nairobi West","Hours of operation": "24hrs", "Contact": "1195" },
@@ -147,13 +148,15 @@
                                         {"Name of Organisation":"","Services offered":"","Location":"","Hours of operation":"","Contact person":""},
                                         {"Name of Organisation":"Daughters of Mumbi","Services offered":"","Location":"Gitaru Rd","Hours of operation":"","Contact person":"0726 335 435"},
                                         {"Name of Organisation":"Dandora Child Centre Space","Services offered":"","Location":"Dandora","Hours of operation":"","Contact person":"0721 676 663"},
-                                        {"Name of organisation": "National Authority for the Campaign Against Alcohol and Drug Abuse (NACADA)","Services offered": "","Location": "", "Hours of operation": "", "Contact": 1192}, 
+                                        {"Name of organisation": "National Authority for the Campaign Against Alcohol and Drug Abuse (NACADA)","Services offered": "","Location": "", "Hours of operation": "", "Contact": 1192},
                                         {"Name of organisation": "Gender Based Violence (GBV)","Services offered": "", "Location": "", "Hours of operation": "","Contact": 1195},
                                         {"Name of organisation": "Online Child  Sexual Exploitation and Abuse (OCSEA)","Services offered": "", "Location": "","Hours of operation": "", "Contact": 116 }
                                     ]`;
-                                                            
+
 
         let organizations = JSON.parse(jsonString);
+
+        console.log(organizations);
 
         document.addEventListener('DOMContentLoaded', function () {
             createTable(organizations);
@@ -188,10 +191,8 @@
             table.appendChild(tbody);
 
 
-            var tableContainer = document.getElementById('table-container');
-            tableContainer.appendChild(table);
+
         };
     </script>
 </body>
 </html>
-
