@@ -305,7 +305,7 @@ namespace RedCrossChat.Dialogs
 
                         var choices = new List<Choice>
                         {
-                            new Choice() { Value = "hotline", Action = new CardAction() { Title = "hotline", Type = ActionTypes.OpenUrl, Value = "http://localhost:3978/api/messages" } }
+                            new Choice() { Value = "hotline", Action = new CardAction() { Title = "hotline", Type = ActionTypes.OpenUrl, Value = "https://recross-chat-bot.azurewebsites.net/" } }
                         };
 
 
