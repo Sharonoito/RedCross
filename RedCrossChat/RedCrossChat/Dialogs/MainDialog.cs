@@ -71,8 +71,7 @@ namespace RedCrossChat.Dialogs
             var messageText = stepContext.Options?.ToString() ?? "Hello Welcome to Kenya Red Cross Society. How can I help you today?";
             var promptMessage = MessageFactory.Text(messageText, messageText, InputHints.ExpectingInput);
 
-            var message = MessageFactory.Attachment(new Attachment
-            {
+           
 
             return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions
             {
