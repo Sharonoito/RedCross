@@ -381,6 +381,9 @@ namespace RedCrossChat.Dialogs
         {
             User user = (User)(stepContext.Result);
 
+            if (user !=null && user.Iteration > 1)
+                return await stepContext.EndDialogAsync(user);
+
             return await stepContext.BeginDialogAsync(nameof(AiDialog), user, cancellationToken);
         }
 
