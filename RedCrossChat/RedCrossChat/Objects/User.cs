@@ -12,5 +12,7 @@
         public bool handOverToUser { get; set; } = false;
         public string SelectedFeeling { get => selectedFeeling; set => selectedFeeling=value; }
 
+        public bool WantsBreathingExercises { get; set; }
+
     }
 }

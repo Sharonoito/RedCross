@@ -32,6 +32,8 @@ namespace RedCrossChat.Dialogs
             return await base.OnContinueDialogAsync(innerDc, cancellationToken);
         }
 
+
+
         private async Task<DialogTurnResult> InterruptAsync(DialogContext innerDc, CancellationToken cancellationToken)
         {
             if (innerDc.Context.Activity.Type == ActivityTypes.Message)
@@ -47,6 +49,8 @@ namespace RedCrossChat.Dialogs
                         return new DialogTurnResult(DialogTurnStatus.Waiting);
 
                     case "cancel":
+                    case "exit":
+                    case "close":
                     case "quit":
                         var cancelMessage = MessageFactory.Text(CancelMsgText, CancelMsgText, InputHints.IgnoringInput);
                         await innerDc.Context.SendActivityAsync(cancelMessage, cancellationToken);
@@ -56,5 +60,6 @@ namespace RedCrossChat.Dialogs
 
             return null;
         }
+
     }
 }

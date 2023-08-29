@@ -50,7 +50,7 @@ namespace RedCrossChat
 
             services.AddSingleton<BreathingDialog>();
 
-            services.AddSingleton<ChoiceDialog>();
+            services.AddSingleton<AiDialog>();
 
             services.AddSingleton<ChatGpt>();
 

@@ -24,7 +24,6 @@ namespace RedCrossChat.Cards
                 Title = "RedCross",
                 Subtitle = "Volunteers & MemberShip",
                 Text = "To volunteer or be involved in our activities please follow the link.",
-                Images = new List<CardImage> { new CardImage("https://sec.ch9.ms/ch9/7ff5/e07cfef0-aa3b-40bb-9baa-7c9ef8ff7ff5/buildreactionbotframework_960.jpg") },
                 Buttons = new List<CardAction> {
                     new CardAction(ActionTypes.OpenUrl, "Get Started", value: "https://www.redcross.or.ke/careers")
                 },
@@ -32,6 +31,39 @@ namespace RedCrossChat.Cards
 
             return heroCard;
         }
+
+        public static HeroCard GetKnowledgeCareerCard()
+        {
+            var heroCard = new HeroCard
+            {
+                Title = "RedCross |  Careers",
+                
+                Text = "For career opportunities please follow this link.",
+                Buttons = new List<CardAction> {
+                    new CardAction(ActionTypes.OpenUrl, "Career", value: "https://www.redcross.or.ke/careers")
+                },
+            };
+
+            return heroCard;
+        }
+
+        public static HeroCard GetHotlineCard()
+        {
+            var heroCard = new HeroCard
+            {
+                Title = "Hotline Numbers",
+                Subtitle = "Hotline",
+                Text = "Here's our hotline numbers should you require any assistance.",
+
+                 Buttons = new List<CardAction> {
+                    new CardAction(ActionTypes.OpenUrl, "Get Started", value: "https://recross-chat-bot.azurewebsites.net/")
+
+                },
+            };
+
+            return heroCard;
+        }
+
 
         public static HeroCard GetIntendedActivity()
         {
