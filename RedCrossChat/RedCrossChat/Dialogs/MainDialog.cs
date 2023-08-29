@@ -73,9 +73,6 @@ namespace RedCrossChat.Dialogs
 
             var message = MessageFactory.Attachment(new Attachment
             {
-                ContentType = HeroCard.ContentType,
-                Content = PersonalDialogCard.GetIntendedActivity()
-            });
 
             return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions
             {
@@ -89,7 +86,6 @@ namespace RedCrossChat.Dialogs
                 },
                 Style = stepContext.Context.Activity.ChannelId == "facebook" ? ListStyle.SuggestedAction : ListStyle.HeroCard,
             }, cancellationToken);
-
 
         }
 

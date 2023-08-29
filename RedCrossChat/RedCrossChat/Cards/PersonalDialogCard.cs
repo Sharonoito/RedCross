@@ -54,8 +54,10 @@ namespace RedCrossChat.Cards
                 Title = "Hotline Numbers",
                 Subtitle = "Hotline",
                 Text = "Here's our hotline numbers should you require any assistance.",
+
                  Buttons = new List<CardAction> {
-                    new CardAction(ActionTypes.OpenUrl, "Get Started", value: "http://localhost:3978/api/messages")
+                    new CardAction(ActionTypes.OpenUrl, "Get Started", value: "https://recross-chat-bot.azurewebsites.net/")
+
                 },
             };
 
