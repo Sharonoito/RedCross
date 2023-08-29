@@ -120,6 +120,8 @@ namespace RedCrossChat.Dialogs
 
             var objectType=stepContext.Result.GetType();
 
+            User user = (User)stepContext.Options;
+
 
             if (objectType.Name == "User")
             {
@@ -131,12 +133,13 @@ namespace RedCrossChat.Dialogs
 
             if (userChoice == Validations.NO)
             {
-                return await stepContext.EndDialogAsync(null);
+                
+                return await stepContext.EndDialogAsync(user);
             }
 
             if (!string.IsNullOrEmpty(userChoice))
             {
-                var user = (User)stepContext.Options;
+               
 
                 return await TakeUserThroughExerciseAsync(stepContext, cancellationToken);
             }
