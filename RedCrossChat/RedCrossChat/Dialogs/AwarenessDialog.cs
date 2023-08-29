@@ -119,6 +119,7 @@ namespace RedCrossChat.Dialogs
                 {
                     case "Yes":
                         user.isAwareOfFeeling = true;
+
                         return await stepContext.PromptAsync(nameof(ChoicePrompt),
                             new PromptOptions()
                             {
@@ -127,6 +128,7 @@ namespace RedCrossChat.Dialogs
                             });
                     default:
                         user.isAwareOfFeeling = false;
+
                         return await stepContext.PromptAsync(nameof(ChoicePrompt),
                            new PromptOptions()
                            {
@@ -140,6 +142,7 @@ namespace RedCrossChat.Dialogs
                 // Handle the case where stepContext.Result is null or not of the correct type.
                 // For example, you can prompt the user to repeat their response or handle the case accordingly.
                 await stepContext.Context.SendActivityAsync(MessageFactory.Text("Thank you for contacting us"), cancellationToken);
+
                 return await stepContext.EndDialogAsync(new DialogTurnResult(DialogTurnStatus.Waiting), cancellationToken);
             }
         }
