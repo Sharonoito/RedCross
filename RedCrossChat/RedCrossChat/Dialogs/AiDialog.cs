@@ -46,7 +46,8 @@ namespace RedCrossChat.Dialogs
 
             try
             {
-                var response = await ChatGptDialog.getresponses("How to fix world hunger");
+                
+                var response = await ChatGptDialog.GetChatGPTResponses(stepContext.Context.Activity.Text);
 
                 await stepContext.Context.SendActivityAsync(MessageFactory.Text(response));
 

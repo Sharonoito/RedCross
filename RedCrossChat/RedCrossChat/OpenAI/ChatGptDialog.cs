@@ -55,6 +55,11 @@ namespace RedCrossChat
 
             var chatCompletionsOptions = new ChatCompletionsOptions
             {
+                MaxTokens = 400,
+                Temperature = 1f,
+                FrequencyPenalty = 0.0f,
+                PresencePenalty = 0.0f,
+                NucleusSamplingFactor = 0.95f,
                 Messages = {
                     new ChatMessage(ChatRole.System, "You are Rick from the TV show Rick & Morty. Pretend to be Rick."),
                     new ChatMessage(ChatRole.User, "Introduce yourself."),
@@ -63,21 +68,26 @@ namespace RedCrossChat
 
             while (true)
             {
-               
+                var systemPrompt = """
+                                    You are a hiking enthusiast who helps people discover fun hikes. You are upbeat and friendly. 
+                                    You ask people what type of hikes they like to take and then suggest some.
+                                    """;
 
-                var chatCompletionsResponse = await openAiClient.GetChatCompletionsAsync(
-                    "gpt-35-turbo",
-                    chatCompletionsOptions
-                );
+                ChatMessage systemMessage = new(ChatRole.System, systemPrompt);
 
-                var chatMessage = chatCompletionsResponse.Value.Choices[0].Message;
-              // Console.Write(chatMessage.Content);
+                chatCompletionsOptions.Messages.Add(systemMessage);
 
-                chatCompletionsOptions.Messages.Add(chatMessage);
 
-                
-               
-                chatCompletionsOptions.Messages.Add(new ChatMessage(ChatRole.User, prompt));
+                ChatMessage userGreetingMessage = new(ChatRole.User, prompt);
+
+                chatCompletionsOptions.Messages.Add(userGreetingMessage);
+
+
+                ChatCompletions response = await openAiClient.GetChatCompletionsAsync("redcrosss-chat-gpt", chatCompletionsOptions);
+
+                ChatMessage assistantResponse = response.Choices[0].Message;
+
+                return assistantResponse.Content;
             }
 
             return prompt;
