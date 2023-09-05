@@ -15,7 +15,7 @@ namespace RedCrossChat.Repository
             _repoContext = repoContext;
         }
 
-        public IFeelingRepo _feeling;
+        public IFeelingRepo? _feeling;
         public IFeelingRepo Feeling
         {
 
@@ -26,7 +26,7 @@ namespace RedCrossChat.Repository
             }
         }
 
-        public ICountyRepo _county;
+        public ICountyRepo? _county;
 
         public ICountyRepo County
         {
@@ -38,7 +38,7 @@ namespace RedCrossChat.Repository
             }
         }
 
-        public IAiConversationRepo _aiConversation;
+        public IAiConversationRepo? _aiConversation;
         public IAiConversationRepo AiConversation
         {
             get
@@ -49,7 +49,7 @@ namespace RedCrossChat.Repository
             }
         }
 
-        public IConversationRepo _conversation;
+        public IConversationRepo? _conversation;
         public IConversationRepo Conversation
         {
             get

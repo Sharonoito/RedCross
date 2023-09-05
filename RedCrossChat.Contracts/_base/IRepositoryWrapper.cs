@@ -2,6 +2,7 @@
 
 namespace RedCrossChat.Contracts
 {
+
     public interface IRepositoryWrapper
     {
         #region Dependencies              

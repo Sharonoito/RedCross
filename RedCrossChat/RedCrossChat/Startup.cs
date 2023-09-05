@@ -52,7 +52,7 @@ namespace RedCrossChat
                 options.UseSqlServer(_config.GetConnectionString("LocalConnection")));
 
             //Repositoty for database management
-            services.AddSingleton<IRepositoryWrapper, RepositoryWrapper>();
+            services.AddScoped<IRepositoryWrapper, RepositoryWrapper>();
 
             // Create the User state. (Used in this bot's Dialog implementation.)
             services.AddSingleton<UserState>();
