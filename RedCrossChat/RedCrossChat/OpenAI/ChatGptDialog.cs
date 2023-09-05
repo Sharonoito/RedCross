@@ -61,22 +61,13 @@ namespace RedCrossChat
                 PresencePenalty = 0.0f,
                 NucleusSamplingFactor = 0.95f,
                 Messages = {
-                    new ChatMessage(ChatRole.System, "You are Rick from the TV show Rick & Morty. Pretend to be Rick."),
+                    new ChatMessage(ChatRole.System, "You are a Counselor helping people with mental and social issues."),
                     new ChatMessage(ChatRole.User, "Introduce yourself."),
                  }
             };
 
             while (true)
             {
-                var systemPrompt = """
-                                    You are a hiking enthusiast who helps people discover fun hikes. You are upbeat and friendly. 
-                                    You ask people what type of hikes they like to take and then suggest some.
-                                    """;
-
-                ChatMessage systemMessage = new(ChatRole.System, systemPrompt);
-
-                chatCompletionsOptions.Messages.Add(systemMessage);
-
 
                 ChatMessage userGreetingMessage = new(ChatRole.User, prompt);
 
