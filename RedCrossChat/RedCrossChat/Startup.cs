@@ -18,6 +18,7 @@ using RedCrossChat.Contracts;
 
 using RedCrossChat.Dialogs;
 using RedCrossChat.Domain;
+using RedCrossChat.Extensions;
 using RedCrossChat.Repository;
 
 namespace RedCrossChat
@@ -46,7 +47,6 @@ namespace RedCrossChat
             // Create the storage we'll be using for User and Conversation state. (Memory is great for testing purposes.)
             services.AddSingleton<IStorage, MemoryStorage>();
 
-
             //Use sql Server Conversations
             services.AddDbContextPool<AppDBContext>(options =>
                 options.UseSqlServer(_config.GetConnectionString("LocalConnection")));
@@ -63,21 +63,8 @@ namespace RedCrossChat
             // Register LUIS recognizer
             services.AddSingleton<FlightBookingRecognizer>();
 
-            // Register the BookingDialog.
-            services.AddSingleton<CounselorDialog>();
-
-            services.AddSingleton<PersonalDialog>();
-
-            services.AddSingleton<AwarenessDialog>();
-
-            services.AddSingleton<BreathingDialog>();
-
-            services.AddSingleton<AiDialog>();
-
-            services.AddSingleton<ChatGpt>();
-
-            // The MainDialog that will be run by the bot.
-            services.AddSingleton<MainDialog>();
+            // Register dialogs used in the bot Project
+            services.ConfigureDialogs(services);
 
             // Create the bot as a transient. In this case the ASP Controller is expecting an IBot.
             services.AddTransient<IBot, DialogAndWelcomeBot<MainDialog>>();
