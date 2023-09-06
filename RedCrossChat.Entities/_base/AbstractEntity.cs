@@ -7,18 +7,16 @@ using System.Threading.Tasks;
 namespace RedCrossChat.Entities
 {
     [Serializable]
-    public abstract class AbstractEntity
+    public abstract class AbstractEntity: BasicEntity
     {
-        public abstract bool IsNew();
-        public abstract Guid Id { get; set; }
-        public DateTime DateCreated { get; set; }
+        
         public string CreatedById { get; set; }
 
         public DateTime? DateUpdated { get; set; }
-        public string UpdatedById { get; set; }
+        public string? UpdatedById { get; set; }
 
         public DateTime? DateDeleted { get; set; }
-        public string DeletedById { get; set; }
+        public string? DeletedById { get; set; }
 
     }
 }

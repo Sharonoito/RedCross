@@ -4,10 +4,13 @@ using Microsoft.Bot.Builder.AI.Luis;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Dialogs.Choices;
 using Microsoft.Bot.Schema;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Recognizers.Text.DateTime;
 using Newtonsoft.Json;
 using RedCrossChat.Cards;
+using RedCrossChat.Contracts;
+using RedCrossChat.Entities;
 using RedCrossChat.Objects;
 using Sentry;
 using System;
@@ -23,20 +26,24 @@ namespace RedCrossChat.Dialogs
     public class PersonalDialog : CancelAndHelpDialog
     {
 
+        private readonly IRepositoryWrapper _repository;
 
         protected readonly ILogger _logger;
+
         private List<Choice> _choices;
 
         private const string UserInfo = "Client-info";
 
         protected string iterations = "user-iterations";
 
-        public PersonalDialog(AwarenessDialog awarenessDialog,
-            BreathingDialog breathingDialog,
-            AiDialog aiDialog,
-            ILogger<PersonalDialog> logger) : base(nameof(PersonalDialog))
+        public PersonalDialog( AwarenessDialog awarenessDialog, BreathingDialog breathingDialog,AiDialog aiDialog,
+                               ILogger<PersonalDialog> logger,  IRepositoryWrapper wrapper
+            ) : base(nameof(PersonalDialog))
         {
             _logger = logger;
+
+            _repository=wrapper;
+
             AddDialog(new ChoicePrompt(nameof(ChoicePrompt)));
 
             AddDialog(new TextPrompt(nameof(TextPrompt)));
@@ -49,7 +56,7 @@ namespace RedCrossChat.Dialogs
 
             AddDialog(new ChoicePrompt("select-terms"));
 
-            AddDialog(new ChoicePrompt("select-age"));
+            AddDialog(new NumberPrompt<int>("select-age"));
 
             AddDialog(new ChoicePrompt("select-country"));
 
@@ -97,6 +104,31 @@ namespace RedCrossChat.Dialogs
         {
             stepContext.Values[UserInfo] = new Client();
 
+            Conversation conversation = new Conversation();
+
+            conversation.ChannelId = stepContext.Context.Activity.ChannelId;
+
+            conversation.ChannelName = stepContext.Context.Activity.ChannelId;
+
+            var textWriter = new StringWriter();
+
+           // var items=JsonSerializer.Serialize(textWriter,stepContext);
+
+            // var channelObject=JsonConvert.SerializeObject(stepContext);
+
+            conversation.SenderId = stepContext.Context.Activity.From.Id;
+
+            conversation.ConversationId = stepContext.Context.Activity.Conversation.Id;
+
+            conversation.Client = new Persona() { SenderId = stepContext.Context.Activity.From.Id };         
+
+            conversation.AiConversations=new List<AiConversation>();
+
+            _repository.Conversation.Create(conversation);
+
+            bool result= await _repository.SaveChangesAsync();
+
+
             var options = new PromptOptions()
             {
                 Prompt = MessageFactory.Text("How would you describe how you are feeling today?"),
@@ -121,6 +153,8 @@ namespace RedCrossChat.Dialogs
         private async Task<DialogTurnResult> PrivateDetailsGenderAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
 
+           Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
+           
            await EvaluateDialog.ProcessStepAsync(stepContext, cancellationToken);
 
             if (stepContext.Values != null)
@@ -128,9 +162,15 @@ namespace RedCrossChat.Dialogs
                 var client=(Client)stepContext.Values[UserInfo];
 
                 client.Feeling= ((FoundChoice)stepContext.Result).Value;
+
+                persona.Feeling = ((FoundChoice)stepContext.Result).Value;
+
+                _repository.Persona.Update(persona);
+
+                bool result = await _repository.SaveChangesAsync();
             }
 
-                var options = new PromptOptions()
+            var options = new PromptOptions()
             {
                 Prompt = MessageFactory.Text("What is your Gender"),
                 RetryPrompt = MessageFactory.Text("Please select a valid Gender"),
@@ -149,12 +189,24 @@ namespace RedCrossChat.Dialogs
         private async Task<DialogTurnResult> PrivateDetailsAgeBracketAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
 
-            var options = new PromptOptions()
+            Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
+
+            if (stepContext.Values != null)
             {
-                Prompt = MessageFactory.Text("What is your age group"),
+                persona.Gender = stepContext.Context.Activity.Text;
+
+                _repository.Persona.Update(persona);
+
+                await _repository.SaveChangesAsync();
+            }
+
+                var options = new PromptOptions()
+            {
+                Prompt = MessageFactory.Text("How old are you?"),
                 RetryPrompt = MessageFactory.Text("Please select a valid age-group"),
                 Choices = new List<Choice>
                 {
+
                     new Choice() { Value ="15-20",Synonyms=new List<string>{"15","16","17","19","20"}},
                     new Choice() { Value="20-30",Synonyms=new List<string>{"21","22","23","24","25","26","27","28","29","30"}},
                     new Choice() {Value="30-40",Synonyms=new List<string>{"31","32","33","34","35","36","37","38","39","40"}},
@@ -168,70 +220,19 @@ namespace RedCrossChat.Dialogs
 
         }
 
-        private static Task<bool> AgePromptValidatorAsync(PromptValidatorContext<int> promptContext, CancellationToken cancellationToken)
-        {
-            // This condition is our validation rule. You can also change the value at this point.
-            return Task.FromResult(promptContext.Recognized.Succeeded && promptContext.Recognized.Value > 0 && promptContext.Recognized.Value < 150);
-        }
-
-        private static Task<bool> ValidateAgeAsync(PromptValidatorContext<FoundChoice> promptContext, CancellationToken cancellationToke)
-        {
-
-            //return Task.FromResult(promptContext.Recognized.Succeeded);
-
-            string message = promptContext.Context.Activity.Text;
-
-            if (message == null || message.Length==0)
-            {
-                return Task.FromResult(false);
-            }
-
-            string[] bands = message.Split('-');
-
-            /**
-             * check if the text has 15-10 or its just a single text
-             *  if its a single text then assign it to a band
-             *  add a counter
-             *  if the user tries the age validador three times the bot should expire
-             */
-
-            if (bands.Length > 1)
-            {
-                return Task.FromResult(true);
-            }
-            else
-            {
-                int result = int.Parse(message);
-
-                if (result >= 15  && result <=20)
-                {
-                    return Task.FromResult(!promptContext.Recognized.Succeeded);
-                }
-                else if (result > 20 && result <= 30)
-                {
-                    return Task.FromResult(!promptContext.Recognized.Succeeded);
-                }
-                else if (result > 30 && result <= 40)
-                {
-                    return Task.FromResult(!promptContext.Recognized.Succeeded);
-                }
-                else if (result > 40)
-                {
-                    return Task.FromResult(!promptContext.Recognized.Succeeded);
-                }
-                else if (result < 15)
-                {
-                    return Task.FromResult(false);
-                }
-
-            }
-
-
-            return Task.FromResult(promptContext.Recognized.Succeeded);
-        }
-
         private async Task<DialogTurnResult> PrivateDetailsCountryBracketAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
+
+            Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
+
+            if(persona != null)
+            {
+                persona.AgeGroup= stepContext.Context.Activity.Text;
+
+                _repository.Persona.Update(persona);
+
+                await _repository.SaveChangesAsync();
+            }
 
             var options = new PromptOptions()
             {
@@ -250,52 +251,28 @@ namespace RedCrossChat.Dialogs
 
         }
 
-        public List<County> ReadJsonFile()
-        {
-            //string sampleJsonFilePath = "counties.json";
-
-            var paths = new[] { ".", "Cards", "counties.json" };
-            var adaptiveCardJson = File.ReadAllText(Path.Combine(paths));
-
-
-            using StreamReader reader = new(Path.Combine(paths));
-            var json = reader.ReadToEnd();
-            List<County> counties = JsonConvert.DeserializeObject<List<County>>(json);
-            return counties;
-        }
-
-        public static List<County> ReadCountyFromFile()
-        {
-
-            var paths = new[] { ".", "Cards", "counties.json" };
-            var adaptiveCardJson = File.ReadAllText(Path.Combine(paths));
-
-
-            using StreamReader reader = new(Path.Combine(paths));
-            var json = reader.ReadToEnd();
-            List<County> counties = JsonConvert.DeserializeObject<List<County>>(json);
-            return counties;
-        }
-
-        public List<string> GetListOfCounties()
-        {
-            List<County> counties = ReadJsonFile();
-            List<string> countyNames = counties.Select(county => county.Title).ToList();
-            return countyNames;
-        }
-
+      
         private async Task<DialogTurnResult> PrivateDetailsCountyDropdownAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             //List<string> counties = GetListOfCounties();
 
             var hint = "( hint: type in Kiambu or 022,Nairobi or 047 )";
-            var promptOptions = new PromptOptions
 
-            //var options = new PromptOptions()
+            Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
+
+            if (persona != null)
+            {
+                persona.Country = stepContext.Context.Activity.Text;
+
+                _repository.Persona.Update(persona);
+
+                await _repository.SaveChangesAsync();
+            }
+
+            var promptOptions = new PromptOptions
             {
                 Prompt = MessageFactory.Text($"Which county are you located in? \n {hint} "),
                 RetryPrompt = MessageFactory.Text($"Please input a county \n {hint} "),
-                //Choices = counties.Select(county => new Choice(county)).ToList(),
             };
 
             if (((FoundChoice)stepContext.Result).Value == "Kenya")
@@ -304,7 +281,7 @@ namespace RedCrossChat.Dialogs
             }
             else
             {
-                return await stepContext.NextAsync(null);
+                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt=MessageFactory.Text("Which Country are you from ?") }, cancellationToken); 
             }  
         }
 
@@ -401,6 +378,41 @@ namespace RedCrossChat.Dialogs
 
             return cardOptions;
         }
+
+        public List<County> ReadJsonFile()
+        {
+            //string sampleJsonFilePath = "counties.json";
+
+            var paths = new[] { ".", "Cards", "counties.json" };
+            var adaptiveCardJson = File.ReadAllText(Path.Combine(paths));
+
+
+            using StreamReader reader = new(Path.Combine(paths));
+            var json = reader.ReadToEnd();
+            List<County> counties = JsonConvert.DeserializeObject<List<County>>(json);
+            return counties;
+        }
+
+        public static List<County> ReadCountyFromFile()
+        {
+
+            var paths = new[] { ".", "Cards", "counties.json" };
+            var adaptiveCardJson = File.ReadAllText(Path.Combine(paths));
+
+
+            using StreamReader reader = new(Path.Combine(paths));
+            var json = reader.ReadToEnd();
+            List<County> counties = JsonConvert.DeserializeObject<List<County>>(json);
+            return counties;
+        }
+
+        public List<string> GetListOfCounties()
+        {
+            List<County> counties = ReadJsonFile();
+            List<string> countyNames = counties.Select(county => county.Title).ToList();
+            return countyNames;
+        }
+
 
         private async Task<bool> ValidateAgeAsync(PromptValidatorContext<int> promptContext, CancellationToken cancellationToken)
         {

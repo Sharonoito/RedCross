@@ -5,6 +5,8 @@ using System;
 using System.Threading.Tasks;
 using Azure.AI.OpenAI;
 using Azure;
+using System.Collections.Generic;
+using RedCrossChat.Entities;
 
 namespace RedCrossChat
 {
@@ -46,7 +48,7 @@ namespace RedCrossChat
         }
         
 
-        public static async Task<string> GetChatGPTResponses(string prompt)
+        public static async Task<string> GetChatGPTResponses(string prompt,List<AiConversation> aiConversations)
         {
             var openAiClient = new OpenAIClient(
                 new Uri(AzureOpenAIEndpoint),
@@ -73,7 +75,6 @@ namespace RedCrossChat
 
                 chatCompletionsOptions.Messages.Add(userGreetingMessage);
 
-
                 ChatCompletions response = await openAiClient.GetChatCompletionsAsync("redcrosss-chat-gpt", chatCompletionsOptions);
 
                 ChatMessage assistantResponse = response.Choices[0].Message;
@@ -81,7 +82,7 @@ namespace RedCrossChat
                 return assistantResponse.Content;
             }
 
-            return prompt;
+            ///return prompt;
         }
     }
 }

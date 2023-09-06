@@ -8,22 +8,22 @@ namespace RedCrossChat.Extensions
     {
        
 
-        public static void ConfigureDialogs(this IServiceCollection services)
+        public static void ConfigureDialogs(this IServiceCollection services, IServiceCollection services2)
         {
             services.AddSingleton<CounselorDialog>();
 
-            services.AddSingleton<PersonalDialog>();
+            services.AddTransient<PersonalDialog>();
 
             services.AddSingleton<AwarenessDialog>();
 
             services.AddSingleton<BreathingDialog>();
 
-            services.AddSingleton<AiDialog>();
+            services.AddTransient<AiDialog>();
 
             services.AddSingleton<ChatGpt>();
 
             // The MainDialog that will be run by the bot.
-            services.AddSingleton<MainDialog>();
+            services.AddTransient<MainDialog>();
         }
     }
 }

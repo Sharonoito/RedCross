@@ -59,5 +59,30 @@ namespace RedCrossChat.Repository
                 return _conversation;
             }
         }
+
+        public IPersonaRepo? _persona;
+
+        public IPersonaRepo Persona
+        {
+            get
+            {
+                if (_persona == null) { _persona = new PersonaRepo(_repoContext); }
+
+                return _persona;
+            }
+        }
+
+        public async Task<bool> SaveChangesAsync()
+        {
+            if (await _repoContext.SaveChangesAsync() > 0)
+                return true;
+
+            return false;
+        }
+
+        public void DetachAllEntities()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

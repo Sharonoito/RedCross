@@ -16,5 +16,8 @@ namespace RedCrossChat.Contracts
         IConversationRepo Conversation { get; }
 
         #endregion
+
+        IPersonaRepo Persona { get; }
+        Task<bool> SaveChangesAsync();
     }
 }

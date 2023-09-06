@@ -47,9 +47,11 @@ namespace RedCrossChat
             // Create the storage we'll be using for User and Conversation state. (Memory is great for testing purposes.)
             services.AddSingleton<IStorage, MemoryStorage>();
 
+            var connectionString = _config.GetConnectionString("DefaultConnection");
+
             //Use sql Server Conversations
             services.AddDbContextPool<AppDBContext>(options =>
-                options.UseSqlServer(_config.GetConnectionString("LocalConnection")));
+                options.UseSqlServer(connectionString));
 
             //Repositoty for database management
             services.AddScoped<IRepositoryWrapper, RepositoryWrapper>();

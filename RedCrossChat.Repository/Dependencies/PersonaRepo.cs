@@ -5,7 +5,7 @@ using RedCrossChat.Entities;
 
 namespace RedCrossChat.Repository
 {
-    public class PersonaRepo : RepositoryBase<Persona>, IPersona
+    public class PersonaRepo : RepositoryBase<Persona>, IPersonaRepo
     {
 
 
@@ -14,7 +14,7 @@ namespace RedCrossChat.Repository
 
         }
 
-        async Task<IEnumerable<Persona>> IPersona.GetAll()
+        async Task<IEnumerable<Persona>> IPersonaRepo.GetAll()
         =>await FindAll().ToListAsync();
     }
 }

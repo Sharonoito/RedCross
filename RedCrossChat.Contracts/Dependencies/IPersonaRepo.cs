@@ -2,7 +2,7 @@
 
 namespace RedCrossChat.Contracts
 {
-    public interface IPersona :IRepositoryBase<Persona>
+    public interface IPersonaRepo :IRepositoryBase<Persona>
     {
         Task<IEnumerable<Persona>> GetAll();
         
