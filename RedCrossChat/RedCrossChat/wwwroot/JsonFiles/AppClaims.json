@@ -1,0 +1,32 @@
+[
+	{
+		"Id": 1,
+		"Name": "Manage Roles",
+		"Description": "Manage Users - Create, Read, Update, Delete",
+		"AppModuleId": 1
+	},
+	{
+		"Id": 2,
+		"Name": "Manage Users",
+		"Description": "Manage Roles - Create, Read, Update, Delete",
+		"AppModuleId": 1
+	},
+	{
+		"Id": 3,
+		"Name": "Manage Role Claims",
+		"Description": "Map roles to claims",
+		"AppModuleId": 1
+	},
+	{
+		"Id": 4,
+		"Name": "Manage Companies",
+		"Description": "Manage Companies",
+		"AppModuleId": 2
+	},
+	{
+		"Id": 5,
+		"Name": "Manage Clients",
+		"Description": "Manage Clients",
+		"AppModuleId": 3
+	}
+]

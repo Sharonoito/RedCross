@@ -1,0 +1,17 @@
+﻿/*
+ Ajax Loader
+*/
+.ajax-loader-container {
+    color: red;
+    font-size: 17px;
+    position: fixed;
+    text-align: center;
+    top: 55px;
+    z-index: 2000;
+    right: -300px;
+    display: none;
+}
+
+body > div.ajax-loader-container > div {
+    width: 100%;
+}

@@ -1,0 +1,80 @@
+﻿.log-box,
+.reg-box {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    width: 800px;
+    height: 330px;
+    background-color: #008b8b;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    display: flex;
+}
+
+.reg-box {
+    height: 430px !important;
+}
+
+.reg-success-box {
+    width: auto !important;
+}
+
+
+.auth-card {
+    width:100%;
+}
+
+.brand-image{
+    /*margin-left:5%;*/
+    margin-top:20%;
+}
+
+.login-box-msg{
+   margin-top:3%;
+}
+
+.login-logo {
+    width: 100%;
+    /*padding: 5% 8%;*/
+    font-size: 22px;
+    color: whitesmoke;
+}
+
+#smallboxes{
+    margin-left:50%;
+}
+
+.table-striped thead {
+    background-color: red;
+}
+
+/*.login-page, .register-page {
+    background-color: #007777 !important;
+}*/
+
+.main-color {
+    color: #007777;
+}
+
+.main-color-bg {
+    background-color: #007777 !important;
+}
+
+/*.submain-color-bg {
+    background-color: #008b8b !important;
+}*/
+
+.auth-button {
+    background-color: #008b8b !important;
+    border-color: #008b8b !important;
+}
+
+
+.reg-success-logo {
+    margin-top: 17px;
+    width: 100%;
+    /*padding: 5% 8%;*/
+    font-size: 20px;
+    color: whitesmoke;
+    /*text-align: left;*/
+}
