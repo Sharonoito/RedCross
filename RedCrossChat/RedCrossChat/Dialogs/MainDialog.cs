@@ -202,7 +202,7 @@ namespace RedCrossChat.Dialogs
 
             //add ai todo
 
-            await stepContext.Context.SendActivityAsync(MessageFactory.Text("Thank you for reaching out good bye 😀."));
+            await stepContext.Context.SendActivityAsync(MessageFactory.Text("let not your struggles define your identity. Remember, there's no health without mental health. GoodBye"));
 
             // The result is null or of an unexpected type, return an empty response
             return await stepContext.EndDialogAsync(null, cancellationToken);

@@ -123,7 +123,7 @@ namespace RedCrossChat.Dialogs
                         return await stepContext.PromptAsync(nameof(ChoicePrompt),
                             new PromptOptions()
                             {
-                                Prompt = MessageFactory.Text("Have you talked to someone about it?"),
+                                Prompt = MessageFactory.Text("Have you shared with someone how you feel?"),
                                 Choices = _choices
                             });
                     default:
@@ -175,7 +175,7 @@ namespace RedCrossChat.Dialogs
             return await stepContext.PromptAsync(nameof(ChoicePrompt),
                                new PromptOptions()
                                {
-                                   Prompt = MessageFactory.Text("It is good to have a trusted person, family, friend or an expert whom you can talk to. Would you like to have a trusted expert from Kenya Red Cross to talk to?"),
+                                   Prompt = MessageFactory.Text("It's always relieving talking to someone trusted about what we are feeling. Would you want to speak to a professional therapist from Kenya Red Cross Society?"),
                                    Choices = _choices
                                });
         }
@@ -243,20 +243,15 @@ namespace RedCrossChat.Dialogs
         {
             return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions()
             {
-                Prompt = MessageFactory.Text("Is your result due to :"),
+                Prompt = MessageFactory.Text("What makes you seek our psychological support?"),
                 Choices = new List<Choice>()
                         {
-                            new Choice  { Value ="Stress",},
-                            new Choice  { Value ="Family and relationship issues",},
-                            new Choice  { Value ="Suicidal thoughts"},
-                            new Choice  { Value ="Depression"},
-                            new Choice  { Value ="Anxiety"},
-                            new Choice  { Value ="Addiction"},
-                            new Choice  { Value ="Drugs and Substance Abuse"},
-                            new Choice  { Value ="Traumatic experience"},
-                            new Choice  { Value ="Gender based violence"},
-                            new Choice  { Value ="HIV related"},
-                            new Choice  { Value ="Other"},
+                            new Choice  { Value ="Suicidal ideations",},
+                            new Choice  { Value ="Feelings of hopelessness",},
+                            new Choice  { Value ="Financial distress"},
+                            new Choice  { Value ="Childhood trauma"},
+                            new Choice  { Value ="Work related stress and burnout"},
+                           
 
                         }
             }, cancellationToken);
