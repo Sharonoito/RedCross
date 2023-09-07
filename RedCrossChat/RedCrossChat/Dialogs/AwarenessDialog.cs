@@ -35,7 +35,7 @@ namespace RedCrossChat.Dialogs
 
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), CreateWaterFallSteps()));
 
-            _choices = GetSelectChoices();
+      
 
             // The initial child Dialog to run.
             InitialDialogId = nameof(WaterfallDialog);
@@ -58,14 +58,7 @@ namespace RedCrossChat.Dialogs
             };
         }
 
-        private List<Choice> GetSelectChoices()
-        {
-            return new List<Choice>()
-                {
-                     new Choice() { Value ="Yes",Synonyms=new List<string>{"y","Y","YES","YE","ye","yE","1"}},
-                     new Choice() { Value="No",Synonyms=new List<string>{"n","N","no"} }
-                };
-        }
+      
 
         private async Task<DialogTurnResult> InitialStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
@@ -90,7 +83,7 @@ namespace RedCrossChat.Dialogs
             {
                 Prompt = MessageFactory.Text("Are you aware of what could have resulted to that feeling?"),
 
-                Choices = _choices
+                Choices = RedCrossLists.choices
 
             };
 
@@ -124,7 +117,7 @@ namespace RedCrossChat.Dialogs
                             new PromptOptions()
                             {
                                 Prompt = MessageFactory.Text("Have you shared with someone how you feel?"),
-                                Choices = _choices
+                                Choices = RedCrossLists.choices
                             });
                     default:
                         user.isAwareOfFeeling = false;
@@ -133,7 +126,7 @@ namespace RedCrossChat.Dialogs
                            new PromptOptions()
                            {
                                Prompt = MessageFactory.Text("It is important to take care of your mental well-being. Would you like to have a trusted person to talk to?"),
-                               Choices = _choices
+                               Choices = RedCrossLists.choices
                            });
                 }
             }
@@ -176,7 +169,7 @@ namespace RedCrossChat.Dialogs
                                new PromptOptions()
                                {
                                    Prompt = MessageFactory.Text("It's always relieving talking to someone trusted about what we are feeling. Would you want to speak to a professional therapist from Kenya Red Cross Society?"),
-                                   Choices = _choices
+                                   Choices = RedCrossLists.choices
                                });
         }
 
@@ -262,11 +255,7 @@ namespace RedCrossChat.Dialogs
             return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions()
             {
                 Prompt = MessageFactory.Text("Would you wish to talk to a Professional Counselor?"),
-                Choices = new List<Choice>()
-        {
-            new Choice() { Value = "agent", Synonyms = new List<string> { "Yes", "Y" } },
-            new Choice() { Value = "no", Synonyms = new List<string> { "no", "n" } },
-        }
+                Choices = RedCrossLists.choices,
             }, cancellationToken);
         }
 
@@ -280,14 +269,14 @@ namespace RedCrossChat.Dialogs
             {
                 switch (((FoundChoice)stepContext.Result).Value)
                 {
-                    case "agent":
+                    case Validations.YES:
 
                         user.wantstoTalkToAProfessional= true;
 
                         user.handOverToUser = true;
 
                         // Send the message to the user about the next available agent or calling 1199.
-                        var agentMessage = "Next available agent will be with you shortly or you can also call 1199 to connect with our counselor.";
+                        var agentMessage = "Next available Counselor will be with you shortly or you can also call 1199 to connect with one of our counselors.";
                         await stepContext.Context.SendActivityAsync(MessageFactory.Text(agentMessage), cancellationToken);
 
 
@@ -311,7 +300,7 @@ namespace RedCrossChat.Dialogs
                         return await stepContext.EndDialogAsync(user, cancellationToken);
 
 
-                    case "no":
+                    case Validations.NO:
                         user.handOverToUser = false;
                         // Start the BreathingDialog
                         return await stepContext.BeginDialogAsync(nameof(BreathingDialog), user, cancellationToken);

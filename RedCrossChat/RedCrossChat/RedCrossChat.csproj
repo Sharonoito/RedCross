@@ -18,6 +18,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Controllers\HomeController.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Include="Cards\welcomeCard.json" />
   </ItemGroup>
 
@@ -37,6 +41,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Recognizers.Text.DataTypes.TimexExpression" Version="1.4.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.16" />
     <PackageReference Include="Sentry.AspNetCore" Version="3.35.0" />
   </ItemGroup>
 

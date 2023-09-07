@@ -12,41 +12,13 @@ namespace RedCrossChat
 {
     public static class ChatGptDialog
     {
+        //connecting the chatbot to open ai
+
         private static readonly string _apiKey = "6faaad33f68d445c9d8f7f32afe041bc";
-         private static readonly string AzureOpenAIEndpoint = "https://redcross-2023-connect-7abc-xyz.openai.azure.com/";
-        private static readonly string OpenAIEndpoint = "https://api.openai.com/v1/chat/completions";
-
-        public static async Task<string> getresponses(string prompt)
-        {
-            using (var client = new HttpClient())
-            {
-                client.DefaultRequestHeaders.Add("Authorization", $"Bearer {_apiKey}");
-
-                var requestData = new
-                {
-                    prompt = prompt,
-                    max_tokens = 50,
-                    modelName= "gpt-35-turbo"
-                };
-
-                var json = Newtonsoft.Json.JsonConvert.SerializeObject(requestData);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                var response = await client.PostAsync(OpenAIEndpoint, content);
-                if (response.IsSuccessStatusCode)
-                {
-                    var responseContent = await response.Content.ReadAsStringAsync();
-                    dynamic jsonResponse = Newtonsoft.Json.JsonConvert.DeserializeObject(responseContent);
-                    string generatedText = jsonResponse.choices[0].text;
-                    return generatedText;
-                }
-                else
-                {
-                    throw new Exception($"OpenAI request failed with status code {response.StatusCode}");
-                }
-            }
-        }
         
+        private static readonly string AzureOpenAIEndpoint = "https://redcross-2023-connect-7abc-xyz.openai.azure.com/";
+        
+        private static readonly string OpenAIEndpoint = "https://api.openai.com/v1/chat/completions";
 
         public static async Task<string> GetChatGPTResponses(string prompt,List<AiConversation> aiConversations)
         {
@@ -55,6 +27,8 @@ namespace RedCrossChat
                 new AzureKeyCredential(_apiKey)
             );
 
+           
+
             var chatCompletionsOptions = new ChatCompletionsOptions
             {
                 MaxTokens = 400,
@@ -62,14 +36,22 @@ namespace RedCrossChat
                 FrequencyPenalty = 0.0f,
                 PresencePenalty = 0.0f,
                 NucleusSamplingFactor = 0.95f,
-                Messages = {
+                Messages =
+                {
                     new ChatMessage(ChatRole.System, "You are a Counselor helping people with mental and social issues."),
                     new ChatMessage(ChatRole.User, "Introduce yourself."),
-                 }
+                },
             };
 
             while (true)
             {
+
+                foreach (AiConversation conversation in aiConversations)
+                {
+                   
+                    chatCompletionsOptions.Messages.Add(new ChatMessage(ChatRole.System, conversation.Response));
+                    chatCompletionsOptions.Messages.Add(new ChatMessage(ChatRole.User, conversation.Question));
+                }
 
                 ChatMessage userGreetingMessage = new(ChatRole.User, prompt);
 

@@ -51,12 +51,12 @@ namespace RedCrossChat.Cards
         {
             var heroCard = new HeroCard
             {
-                Title = "Hotline Numbers",
-                Subtitle = "Hotline",
-                Text = "Here's our hotline numbers should you require any assistance.",
+                Title = "Hotline Numbers ",
+                Subtitle = "Referral pathways",
+                Text = "For any other advanced support feel free to check our detailed referral pathways",
 
                  Buttons = new List<CardAction> {
-                    new CardAction(ActionTypes.OpenUrl, "Get Started", value: "https://recross-chat-bot.azurewebsites.net/")
+                    new CardAction(ActionTypes.OpenUrl, "Preview", value: "https://recross-chat-bot.azurewebsites.net/")
 
                 },
             };

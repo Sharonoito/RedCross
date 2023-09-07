@@ -38,6 +38,9 @@ namespace RedCrossChat
         {
             services.AddHttpClient().AddControllers().AddNewtonsoftJson();
 
+            services.AddMvc();
+
+
             // Create the Bot Framework Authentication to be used with the Bot Adapter.
             services.AddSingleton<BotFrameworkAuthentication, ConfigurationBotFrameworkAuthentication>();
 
@@ -88,7 +91,9 @@ namespace RedCrossChat
                 .UseAuthorization()
                 .UseEndpoints(endpoints =>
                 {
-                    endpoints.MapControllers();
+                   // endpoints.MapControllers();
+
+                    endpoints.MapControllerRoute(name:"default",pattern: "{controller=Home}/{action=Index}/{id?}");
                 });
 
             // app.UseHttpsRedirection();

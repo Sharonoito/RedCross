@@ -25,6 +25,7 @@ namespace RedCrossChat.Dialogs
         private readonly IRepositoryWrapper _repository;
 
         protected readonly string _list = "conversation_list";
+
         protected readonly string _iteration = "iteration";
 
 

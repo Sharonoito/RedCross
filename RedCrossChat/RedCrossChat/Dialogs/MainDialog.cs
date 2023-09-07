@@ -71,18 +71,10 @@ namespace RedCrossChat.Dialogs
             var messageText = stepContext.Options?.ToString() ?? "Hello Welcome to Kenya Red Cross Society. How can I help you today?";
             var promptMessage = MessageFactory.Text(messageText, messageText, InputHints.ExpectingInput);
 
-           
-
             return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions
             {
                 Prompt = promptMessage,
-                Choices = new List<Choice>
-                {
-                    new Choice() { Value = InitialActions.Careers, Synonyms = new List<string> { "1", "Careers", "careers" } },
-                    new Choice() { Value = InitialActions.VolunteerAndMemberShip, Synonyms = new List<string> { "2", "Membership" } },
-                    new Choice() { Value = InitialActions.VolunteerOpportunities, Synonyms = new List<string> { "3", "Volunteer", "Opportunities" } },
-                    new Choice() { Value = InitialActions.MentalHealth, Synonyms = new List<string> { "4", "Mental", "mental", "mental Health", "Mental Health", "Help" } }
-                },
+                Choices =RedCrossLists.Actions,
                 Style = stepContext.Context.Activity.ChannelId == "facebook" ? ListStyle.SuggestedAction : ListStyle.HeroCard,
             }, cancellationToken);
 
@@ -166,11 +158,7 @@ namespace RedCrossChat.Dialogs
             {
                 Prompt = MessageFactory.Text("Do you agree to the Terms and Conditions? Please select 'Yes' or 'No'."),
                 RetryPrompt = MessageFactory.Text("Please select a valid option ('Yes' or 'No')."),
-                Choices = new List<Choice>
-                {
-                    new Choice() { Value = "Yes", Synonyms = new List<string> { "y", "Y", "YES", "YE", "ye", "yE", "1" } },
-                    new Choice() { Value = "No", Synonyms = new List<string> { "n", "N", "no" } }
-                },
+                Choices = RedCrossLists.choices,
             };
 
             return await stepContext.PromptAsync(nameof(ChoicePrompt), options, cancellationToken);

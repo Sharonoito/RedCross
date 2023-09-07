@@ -204,14 +204,7 @@ namespace RedCrossChat.Dialogs
             {
                 Prompt = MessageFactory.Text("How old are you?"),
                 RetryPrompt = MessageFactory.Text("Please select a valid age-group"),
-                Choices = new List<Choice>
-                {
-
-                    new Choice() { Value ="15-20",Synonyms=new List<string>{"15","16","17","19","20"}},
-                    new Choice() { Value="20-30",Synonyms=new List<string>{"21","22","23","24","25","26","27","28","29","30"}},
-                    new Choice() {Value="30-40",Synonyms=new List<string>{"31","32","33","34","35","36","37","38","39","40"}},
-                    new Choice() {Value="Above 40"},
-                },
+                Choices = RedCrossLists.AgeGroups,
 
             };
 
@@ -364,21 +357,6 @@ namespace RedCrossChat.Dialogs
             return await stepContext.BeginDialogAsync(nameof(AiDialog), user, cancellationToken);
         }
 
-       
-        private IList<Choice> GetChoices()
-        {
-            var cardOptions = new List<Choice>()
-            {
-                new Choice() { Value = "Careers", Synonyms = new List<string>() { "1" } },
-                new Choice() { Value = "Volunteer and Membership", Synonyms = new List<string>() { "2" } },
-                new Choice() { Value = "Volunteer Opportunities", Synonyms = new List<string>() { "3" } },
-                new Choice() { Value = "Mental Health", Synonyms = new List<string>() { "4" } },
-
-            };
-
-            return cardOptions;
-        }
-
         public List<County> ReadJsonFile()
         {
             //string sampleJsonFilePath = "counties.json";
@@ -413,13 +391,6 @@ namespace RedCrossChat.Dialogs
             return countyNames;
         }
 
-
-        private async Task<bool> ValidateAgeAsync(PromptValidatorContext<int> promptContext, CancellationToken cancellationToken)
-        {
-            //promptContext.Context.Activity.
-
-            return false;
-        }
     }
 
 
