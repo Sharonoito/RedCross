@@ -5,6 +5,7 @@
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Connector.Authentication;
@@ -18,6 +19,7 @@ using RedCrossChat.Contracts;
 
 using RedCrossChat.Dialogs;
 using RedCrossChat.Domain;
+using RedCrossChat.Entities;
 using RedCrossChat.Extensions;
 using RedCrossChat.Repository;
 
@@ -38,8 +40,35 @@ namespace RedCrossChat
         {
             services.AddHttpClient().AddControllers().AddNewtonsoftJson();
 
-            services.AddMvc();
+            
 
+           // services.AddRazorPages().AddRazorRuntimeCompilation();
+        
+            // Add custom claims to identity for ease of access
+           /* services.AddScoped<IUserClaimsPrincipalFactory<AppUser>, CustomUserClaimsPrincipalFactory>();
+
+            services.ConfigureIdentity();
+
+            // Chnage PasswordPolicy
+            services.Configure<IdentityOptions>(o =>
+            {
+                o.Password.RequireDigit = true;
+                o.Password.RequiredLength = 6;
+                o.Password.RequireUppercase = true;
+                o.Password.RequireLowercase = true;
+                o.Password.RequireNonAlphanumeric = true;
+            });
+
+            // Change Login URl
+            services.ConfigureApplicationCookie(o =>
+            {
+                //AuthenticationScheme = "CustomAuthenticationCookieMiddleware",
+                // Redirect to /Auth/Login
+                o.LoginPath = "/Auth/Login";
+                o.AccessDeniedPath = new Microsoft.AspNetCore.Http.PathString("/Error/Error");
+            });
+*/
+            services.AddMvc();
 
             // Create the Bot Framework Authentication to be used with the Bot Adapter.
             services.AddSingleton<BotFrameworkAuthentication, ConfigurationBotFrameworkAuthentication>();

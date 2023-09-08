@@ -18,7 +18,7 @@ namespace RedCrossChat
         
         private static readonly string AzureOpenAIEndpoint = "https://redcross-2023-connect-7abc-xyz.openai.azure.com/";
         
-        private static readonly string OpenAIEndpoint = "https://api.openai.com/v1/chat/completions";
+      //  private static readonly string OpenAIEndpoint = "https://api.openai.com/v1/chat/completions";
 
         public static async Task<string> GetChatGPTResponses(string prompt,List<AiConversation> aiConversations)
         {

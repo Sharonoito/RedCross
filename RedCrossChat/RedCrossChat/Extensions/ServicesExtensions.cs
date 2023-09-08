@@ -1,6 +1,11 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RedCrossChat.Dialogs;
+using RedCrossChat.Domain;
+using RedCrossChat.Entities.Auth;
+using RedCrossChat.Entities;
+using System;
 
 namespace RedCrossChat.Extensions
 {
@@ -24,6 +29,17 @@ namespace RedCrossChat.Extensions
 
             // The MainDialog that will be run by the bot.
             services.AddTransient<MainDialog>();
+        }
+
+        public static void ConfigureIdentity(this IServiceCollection services)
+        {
+            /*services.AddIdentity<AppUser, AppRole>()
+                .AddEntityFrameworkStores<AppDBContext>()
+                .AddDefaultTokenProviders();*/
+
+            // Configure password reset token to be valid for 1 hour
+            services.Configure<DataProtectionTokenProviderOptions>(
+                opt => opt.TokenLifespan = TimeSpan.FromHours(1));
         }
     }
 }

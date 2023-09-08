@@ -1,9 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using RedCrossChat.Entities;
+using RedCrossChat.Entities.Auth;
 
 namespace RedCrossChat.Domain
 {
-    public class AppDBContext: DbContext
+    public class AppDBContext : IdentityDbContext<AppUser, AppRole, string>
     {
         public AppDBContext(DbContextOptions options) : base(options)
         {
