@@ -11,6 +11,9 @@ namespace RedCrossChat.Domain
         {
 
         }
+        public DbSet<AppClaim> AppClaims { get; set; }
+
+        public DbSet<AppModule> AppModules { get; set; }
 
         public DbSet<Persona> Persona { get; set; }
 

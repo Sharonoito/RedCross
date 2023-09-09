@@ -38,18 +38,24 @@ namespace RedCrossChat
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddHttpClient().AddControllers().AddNewtonsoftJson();
+           // services.AddHttpClient().AddControllers().AddNewtonsoftJson();
 
-            
 
-           // services.AddRazorPages().AddRazorRuntimeCompilation();
-        
-            // Add custom claims to identity for ease of access
-           /* services.AddScoped<IUserClaimsPrincipalFactory<AppUser>, CustomUserClaimsPrincipalFactory>();
+            services.AddControllers().AddNewtonsoftJson(options =>
+                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+
+
+            services.AddControllers().AddNewtonsoftJson(options =>
+                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+
+            services.AddRazorPages().AddRazorRuntimeCompilation();
+
+            services.AddScoped<IUserClaimsPrincipalFactory<AppUser>, CustomUserClaimsPrincipalFactory>();
+
 
             services.ConfigureIdentity();
 
-            // Chnage PasswordPolicy
+
             services.Configure<IdentityOptions>(o =>
             {
                 o.Password.RequireDigit = true;
@@ -62,13 +68,16 @@ namespace RedCrossChat
             // Change Login URl
             services.ConfigureApplicationCookie(o =>
             {
-                //AuthenticationScheme = "CustomAuthenticationCookieMiddleware",
-                // Redirect to /Auth/Login
                 o.LoginPath = "/Auth/Login";
                 o.AccessDeniedPath = new Microsoft.AspNetCore.Http.PathString("/Error/Error");
             });
-*/
-            services.AddMvc();
+
+            services.AddMvc(options =>
+            {
+                var policy = new Microsoft.AspNetCore.Authorization.AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
+                options.Filters.Add(new Microsoft.AspNetCore.Mvc.Authorization.AuthorizeFilter(policy));
+                options.EnableEndpointRouting = true;
+            }).AddXmlSerializerFormatters();
 
             // Create the Bot Framework Authentication to be used with the Bot Adapter.
             services.AddSingleton<BotFrameworkAuthentication, ConfigurationBotFrameworkAuthentication>();
@@ -100,6 +109,8 @@ namespace RedCrossChat
             // Register dialogs used in the bot Project
             services.ConfigureDialogs(services);
 
+            services.ConfigureClaimBasedAuthorization();
+
             // Create the bot as a transient. In this case the ASP Controller is expecting an IBot.
             services.AddTransient<IBot, DialogAndWelcomeBot<MainDialog>>();
         }
@@ -112,15 +123,16 @@ namespace RedCrossChat
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseDefaultFiles()
+            app//.UseDefaultFiles()
                 .UseSentryTracing()
                 .UseStaticFiles()
                 .UseWebSockets()
                 .UseRouting()
                 .UseAuthorization()
+                .UseAuthentication()
                 .UseEndpoints(endpoints =>
                 {
-                   // endpoints.MapControllers();
+                    endpoints.MapControllers();
 
                     endpoints.MapControllerRoute(name:"default",pattern: "{controller=Home}/{action=Index}/{id?}");
                 });

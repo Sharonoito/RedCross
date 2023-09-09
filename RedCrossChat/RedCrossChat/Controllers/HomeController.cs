@@ -6,9 +6,17 @@ namespace RedCrossChat
     {
 
 
+        [HttpGet]
         public IActionResult Index()
         {
             return View();
         }
+
+        [HttpGet]
+        public IActionResult Dashboard()
+        {
+            return View();
+        }
+
     }
 }
