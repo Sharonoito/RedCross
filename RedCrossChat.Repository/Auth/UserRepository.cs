@@ -9,6 +9,11 @@ namespace RedCrossChat.Repository
     {
         public UserRepository(AppDBContext repoContext) : base(repoContext) {}
 
+        public async Task<IEnumerable<AppUser>> GetAllAsync()
+        {
+            return await FindAll().ToListAsync();
+        }
+
         public async Task<IEnumerable<AppUser>> GetAllUsersAsync() =>
             await FindAll().ToListAsync();
     }

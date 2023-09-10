@@ -1,0 +1,171 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fa fa-info-circle"></i> Manage Users</h3>
+
+                <div class="card-tools">
+                    @*<button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                    <i class="fas fa-minus"></i>
+                    </button>
+                    <button type="button" class="btn btn-tool" data-card-widget="remove" title="Remove">
+                    <i class="fas fa-times"></i>
+                    </button>*@
+                    <button type="button"
+                            class="load-modal text-right btn btn-sm btn-outline-primary float-right"
+                            data-toggle="modal"
+                            data-target="#clientModal"
+                            data-modal="clientModal"
+                            data-viewurl="true"
+                            data-action="@Url.Action("CreateUser")">
+                        <i class="fa fa-plus"></i> Add Client
+                    </button>
+                </div>
+            </div>
+
+            <div class="card-body p-0">
+                <table class="table table-striped" id="tblUsers">
+                    <thead>
+                        <tr>
+                            <th style="width: 10px">#</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Email Address</th>
+                            <th>latest Login</th>
+                            <th style="width: 40px">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                      
+                       
+                       
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="modal fade" data-keyboard="false" data-backdrop="static" id="clientModal" tabindex="-1" role="dialog" aria-labelledby="clientModal" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+            </div>
+        </div>
+    </div>
+
+</section>
+
+
+@section Styles {
+    <environment names="Development,Staging,Production">
+        <!-- DataTables -->
+        <link rel="stylesheet" href="~/lib/datatables-bs4/css/dataTables.bootstrap4.min.css">
+        <link rel="stylesheet" href="~/lib/datatables-responsive/css/responsive.bootstrap4.min.css">
+        <link rel="stylesheet" href="~/lib/datatables-buttons/css/buttons.bootstrap4.min.css">
+    </environment>
+}
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <environment names="Development,Staging,Production">
+        <!-- DataTables  & Plugins -->
+        <script src="~/lib/datatables/jquery.dataTables.min.js"></script>
+        <script src="~/lib/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+        <script src="~/lib/datatables-responsive/js/dataTables.responsive.min.js"></script>
+        <script src="~/lib/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+        <script src="~/lib/datatables-buttons/js/dataTables.buttons.min.js"></script>
+        <script src="~/lib/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
+        @*<script src="~/lib/datatables-buttons/js/buttons.html5.min.js"></script>
+    <script src="~/lib/datatables-buttons/js/buttons.print.min.js"></script>
+    <script src="~/lib/datatables-buttons/js/buttons.colVis.min.js"></script>*@
+    </environment>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            jsdtClient.getData();
+        });
+
+        var jsdtClient = {
+            table: null,
+            initializeDataTable: function () {
+                jsdtClient.table = $('#tblUsers').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    serverMethod: 'post',
+                    ajax: {
+                        url: "@Url.Action("GetUsers")",
+                        type: "POST"
+                    },
+                    columns: [
+                        { data: 'FirstName' },                 
+                        { data: 'LastName' },
+                        { data: 'Email' },
+                        { data: 'id', name: 'Id' },
+                        { data: 'id', name: 'Id' },
+                        { data: 'id', name: 'Id' },
+                    ],
+                    columnDefs: [{
+                        render: function (data, type, row) {
+                            var actionsHtml =
+                                `<div class='text-center'>
+                                                <button class='btn btn-outline-primary btn-xs load-modal'
+                                                    data-hidden='Id'
+                                                    data-id='${row.id}'
+                                                    data-toggle='modal'
+                                                    data-target='#clientModal'
+                                                    data-modal='clientModal'
+                                                    data-viewurl='true'
+                                                    data-action='@Url.Action("EditUser", "Auth")?clientId=${row.id}'
+                                                    title='Edit'>
+                                                    <i class='fa fa-pencil-alt'></i>
+                                              
+                                                <button class='delete btn btn-outline-danger btn-xs'
+                                                    data-action='@Url.Action("DeleteUser", "Auth")?clientId=${row.id}'
+                                                    data-table='tblClients'
+                                                    data-id='${row.id}'
+                                                    data-toggle='tooltip'
+                                                    title='Delete'>
+                                                    <i class='fa fa-trash'></i>
+                                                </button>
+                                            </div>`;
+
+                            return actionsHtml;
+                        },
+                        targets: -1,
+                        orderable: false
+                    }],
+                    order: [0, 'asc'],
+                    language: {
+                        processing: 'Loading records... Please wait.',
+                    },
+                    pagingType: 'full_numbers',
+                    oLanguage: {
+                        oPaginate: {
+                            sNext: '>',
+                            sPrevious: '<',
+                            sFirst: '<<',
+                            sLast: '>>'
+                        }
+                    }
+                });
+            },
+            getData: function () {
+                if (jsdtClient.table == null) {
+                    jsdtClient.initializeDataTable();
+                } else {
+                    jsdtClient.table.ajax.reload();
+                }
+            }
+        }
+
+    </script>
+}
+
+

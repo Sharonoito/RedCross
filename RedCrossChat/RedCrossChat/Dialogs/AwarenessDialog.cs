@@ -18,7 +18,7 @@ namespace RedCrossChat.Dialogs
     public class AwarenessDialog : CancelAndHelpDialog
     {
         protected readonly ILogger _logger;
-        private List<Choice> _choices;
+      
         protected readonly UserState _userState;
         private const string UserInfo = "user-info";
 

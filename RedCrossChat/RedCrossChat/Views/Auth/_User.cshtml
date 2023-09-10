@@ -1,0 +1,36 @@
+﻿@model UserVm
+
+@{
+    Layout = null;
+}
+
+<div class="modal-header">
+    <h5 class="modal-title">@ViewBag.Title</h5>
+    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+</div>
+
+@using (Html.BeginForm(actionName: "SaveUser", controllerName: "Auth", FormMethod.Post, new { @class = "modal-Crud", data_modal = "clientModal", data_callback = "", data_table = "tblClients", autocomplete = "off", @id = "frmClient" }))
+{
+    <input type="hidden" asp-for="Id">
+
+    <div class="modal-body">
+        <div class="row">
+            <div class="form-group col-lg-12">
+                <label asp-for="Name"></label>
+                <input asp-for="Name" class="form-control" autocomplete="off" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+           
+
+            
+
+        </div>
+
+    </div>
+
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary btn-outline">Save</button>
+        <button type="button" class="btn btn-danger btn-outline" data-dismiss="modal">Close</button>
+    </div>
+}

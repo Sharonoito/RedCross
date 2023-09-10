@@ -2,14 +2,19 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+
 using RedCrossChat.Contracts;
 using RedCrossChat.Entities.Auth;
 using RedCrossChat.Entities;
 using System.Threading.Tasks;
+using System;
+using System.Linq;
+using DataTables.AspNet.Core;
+using DataTables.AspNet.AspNetCore;
 
 namespace RedCrossChat.Controllers
 {
-    public class AuthController : Controller
+    public class AuthController : BaseController
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
@@ -91,6 +96,46 @@ namespace RedCrossChat.Controllers
             await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
 
             return RedirectToAction("login", "auth");
+        }
+
+        public IActionResult Users()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetUsers(IDataTablesRequest dtRequest)
+        {
+            try
+            {
+                var data = await _repository.User.GetAllAsync();
+                // Filter them
+                var filteredRows = data
+                    .AsQueryable()
+                    .FilterBy(dtRequest.Search, dtRequest.Columns);
+
+                // Sort and paginate them
+                var pagedRows = filteredRows
+                    .SortBy(dtRequest.Columns)
+                    .Skip(dtRequest.Start)
+                    .Take(dtRequest.Length);
+
+                var response = DataTablesResponse.Create(dtRequest, data.Count(),
+                    filteredRows.Count(), pagedRows);
+
+                return new DataTablesJsonResult(response);
+             //   return Ok("Success");
+
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+        }
+
+        public IActionResult CreateUser()
+        {
+            return View("_User");
         }
     }
 }
