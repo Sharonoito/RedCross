@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Recognizers.Text.DateTime;
 using Newtonsoft.Json;
+using NuGet.Protocol.Core.Types;
 using RedCrossChat.Cards;
 using RedCrossChat.Contracts;
 using RedCrossChat.Entities;
@@ -35,6 +36,7 @@ namespace RedCrossChat.Dialogs
         private const string UserInfo = "Client-info";
 
         protected string iterations = "user-iterations";
+        protected string CurrentQuestion = "CurrentQuestion";
 
         public PersonalDialog( AwarenessDialog awarenessDialog, BreathingDialog breathingDialog,AiDialog aiDialog,
                                ILogger<PersonalDialog> logger,  IRepositoryWrapper wrapper
@@ -144,16 +146,35 @@ namespace RedCrossChat.Dialogs
                 },
             };
 
+            stepContext.Values[CurrentQuestion] = "How would you describe how you are feeling today?";
+
             // Prompt the user with the configured PromptOptions.
             return await stepContext.PromptAsync("select-feeling", options, cancellationToken);
-
         }
 
+
+        private async Task<bool> AddQuestionResponse(WaterfallStepContext stepContext, IRepositoryWrapper _repository)
+        {
+
+            Conversation conversation = await _repository.Conversation.FindByCondition(x => x.ConversationId == stepContext.Context.Activity.Conversation.Id).FirstAsync();
+
+            var question = stepContext.Values[CurrentQuestion];
+
+            if (conversation != null)
+            {
+                var rawConversation = new RawConversation { ConversationId = conversation.Id, Question = question.ToString(), Message = stepContext.Context.Activity.Text };
+
+                _repository.RawConversation.Create(rawConversation);
+            }
+            return true;
+        }
 
         private async Task<DialogTurnResult> PrivateDetailsGenderAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
 
            Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
+
+           
            
            await EvaluateDialog.ProcessStepAsync(stepContext, cancellationToken);
 
@@ -161,11 +182,14 @@ namespace RedCrossChat.Dialogs
             {
                 var client=(Client)stepContext.Values[UserInfo];
 
+                
                 client.Feeling= ((FoundChoice)stepContext.Result).Value;
 
                 persona.Feeling = ((FoundChoice)stepContext.Result).Value;
 
                 _repository.Persona.Update(persona);
+
+                await AddQuestionResponse(stepContext, _repository);
 
                 bool result = await _repository.SaveChangesAsync();
             }
@@ -176,11 +200,13 @@ namespace RedCrossChat.Dialogs
                 RetryPrompt = MessageFactory.Text("Please select a valid Gender"),
                 Choices = new List<Choice>
                 {
-                    new Choice() { Value ="Male",Synonyms=new List<string>{"M","Man","MALE","y"}},
-                    new Choice() { Value="Female",Synonyms=new List<string>{"f","fE","FEMALE","female"}},
-                    new Choice() {Value="Other",Synonyms=new List<string>{"o","other"}},
+                    new Choice() { Value = Gender.Male,Synonyms=new List<string>{"M","Man","MALE","y"}},
+                    new Choice() { Value= Gender.Female,Synonyms=new List<string>{"f","fE","FEMALE","female"}},
+                    new Choice() { Value= Gender.Other,Synonyms=new List<string>{"o","other"}},
                 },
             };
+
+            stepContext.Values[CurrentQuestion] = "What is your Gender?";
 
             // Prompt the user with the configured PromptOptions.
             return await stepContext.PromptAsync("select-gender", options, cancellationToken);
@@ -193,20 +219,24 @@ namespace RedCrossChat.Dialogs
 
             if (stepContext.Values != null)
             {
-                persona.Gender = stepContext.Context.Activity.Text;
+                persona.Gender = ((FoundChoice)stepContext.Result).Value;
 
                 _repository.Persona.Update(persona);
+
+                await AddQuestionResponse(stepContext, _repository);
 
                 await _repository.SaveChangesAsync();
             }
 
                 var options = new PromptOptions()
-            {
-                Prompt = MessageFactory.Text("How old are you?"),
-                RetryPrompt = MessageFactory.Text("Please select a valid age-group"),
-                Choices = RedCrossLists.AgeGroups,
+                {
+                    Prompt = MessageFactory.Text("How old are you?"),
+                    RetryPrompt = MessageFactory.Text("Please select a valid age-group"),
+                    Choices = RedCrossLists.AgeGroups,
 
-            };
+                };
+
+            stepContext.Values[CurrentQuestion] = "How old are you?";
 
             // Prompt the user with the configured PromptOptions.
             return await stepContext.PromptAsync("select-age", options, cancellationToken);
@@ -224,6 +254,8 @@ namespace RedCrossChat.Dialogs
 
                 _repository.Persona.Update(persona);
 
+                await AddQuestionResponse(stepContext, _repository);
+
                 await _repository.SaveChangesAsync();
             }
 
@@ -238,6 +270,8 @@ namespace RedCrossChat.Dialogs
 
                 },
             };
+
+            stepContext.Values[CurrentQuestion] = "What is your Country of Origin?";
 
             // Prompt the user with the configured PromptOptions.
             return await stepContext.PromptAsync("select-country", options, cancellationToken);
@@ -259,6 +293,8 @@ namespace RedCrossChat.Dialogs
 
                 _repository.Persona.Update(persona);
 
+                await AddQuestionResponse(stepContext, _repository);
+
                 await _repository.SaveChangesAsync();
             }
 
@@ -270,10 +306,14 @@ namespace RedCrossChat.Dialogs
 
             if (((FoundChoice)stepContext.Result).Value == "Kenya")
             {
+                stepContext.Values[CurrentQuestion] = "Which county are you located in?";
+
                 return await stepContext.PromptAsync(RedCrossDialogTypes.SelectCounty, promptOptions, cancellationToken);
             }
             else
             {
+                stepContext.Values[CurrentQuestion] = "Which Country are you from ??";
+
                 return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt=MessageFactory.Text("Which Country are you from ?") }, cancellationToken); 
             }  
         }

@@ -9,8 +9,10 @@ namespace RedCrossChat.Entities
 {
     public class DBFeeling : DefaultEntity
     {
-        public string name;//this will be the one with an emoji
+        public string Name { get; set; }//this will be the one with an emoji
 
-        public string description; // this is the official name
+        public string Description { get; set; } // this is the official name
+
+        public string Synonymns { get; set; } = "";
     }
 }

@@ -11,30 +11,21 @@ using System;
 using System.Linq;
 using DataTables.AspNet.Core;
 using DataTables.AspNet.AspNetCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace RedCrossChat.Controllers
 {
-    public class AuthController : BaseController
+    public class AuthController(
+        UserManager<AppUser> userManager,
+        SignInManager<AppUser> signInManager,
+        RoleManager<AppRole> roleManager,
+        IRepositoryWrapper repository) : BaseController
     {
-        private readonly UserManager<AppUser> _userManager;
-        private readonly SignInManager<AppUser> _signInManager;
-        private readonly RoleManager<AppRole> _roleManager;
+        private readonly UserManager<AppUser> _userManager = userManager;
+        private readonly SignInManager<AppUser> _signInManager = signInManager;
+        private readonly RoleManager<AppRole> _roleManager = roleManager;
 
-        private readonly IRepositoryWrapper _repository;
-
-        public AuthController(
-            UserManager<AppUser> userManager,
-            SignInManager<AppUser> signInManager,
-            RoleManager<AppRole> roleManager,
-
-            IRepositoryWrapper repository)
-        {
-            _userManager = userManager;
-            _signInManager = signInManager;
-            _roleManager = roleManager;
-
-            _repository = repository;
-        }
+        private readonly IRepositoryWrapper _repository = repository;
 
         public IActionResult Index()
         {
@@ -110,9 +101,14 @@ namespace RedCrossChat.Controllers
             {
                 var data = await _repository.User.GetAllAsync();
                 // Filter them
+
+
+
                 var filteredRows = data
                     .AsQueryable()
                     .FilterBy(dtRequest.Search, dtRequest.Columns);
+
+                
 
                 // Sort and paginate them
                 var pagedRows = filteredRows
@@ -135,7 +131,57 @@ namespace RedCrossChat.Controllers
 
         public IActionResult CreateUser()
         {
+            ViewBag.Title = "Create User";
+
             return View("_User");
         }
+
+        public async Task<IActionResult> EditUser(Guid clientId)
+        {
+
+            await _repository.User.FindByCondition(x => x.Id == clientId.ToString()).FirstOrDefaultAsync();
+
+
+
+            return View("_User");
+        }
+
+        public async Task< IActionResult> SaveUser(UserVm user) {
+
+            if (!ModelState.IsValid)
+                return Error("Validation error!, please check your data.");
+
+            try
+            {
+                if (user.Id == Guid.Empty)  //install instance
+                {
+                    var appUser = new AppUser
+                    {
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        Email = user.Email,
+                        UserName = user.Email,
+                        NormalizedEmail = user.Email.ToUpper(),
+                        NormalizedUserName = user.Email.ToUpper()
+                    };
+
+                    var result = await _userManager.CreateAsync(appUser, "Test@!23");
+
+                    if (!result.Succeeded)
+                        return Error(result.Errors.First().Description.ToString());
+
+                    return Success(null, null);
+                }
+            }
+            catch(Exception ex)
+            {
+                return Error("Something broke");
+            }
+
+
+            return Error("No response");
+        }
+
+
     }
 }

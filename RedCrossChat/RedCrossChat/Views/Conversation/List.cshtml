@@ -1,70 +1,351 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
-<div class="modal fade" id="addNewCCModal" tabindex="-1" style="display: none;" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered1 modal-simple modal-add-new-cc">
-        <div class="modal-content p-3 p-md-5">
-            <div class="modal-body">
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                <div class="text-center mb-4">
-                    <h3>Add New Card</h3>
-                    <p>Add new card to complete payment</p>
-                </div>
-                <form id="addNewCCForm" class="row g-3 fv-plugins-bootstrap5 fv-plugins-framework" onsubmit="return false" novalidate="novalidate">
-                    <div class="col-12 fv-plugins-icon-container">
-                        <label class="form-label w-100" for="modalAddCard">Card Number</label>
-                        <div class="input-group input-group-merge has-validation">
-                            <input id="modalAddCard" name="modalAddCard" class="form-control credit-card-mask" type="text" placeholder="1356 3215 6548 7898" aria-describedby="modalAddCard2">
-                            <span class="input-group-text cursor-pointer p-1" id="modalAddCard2"><span class="card-type"></span></span>
-                        </div><div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div>
-                    </div>
-                    <div class="col-12 col-md-6">
-                        <label class="form-label" for="modalAddCardName">Name</label>
-                        <input type="text" id="modalAddCardName" class="form-control" placeholder="John Doe">
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <label class="form-label" for="modalAddCardExpiryDate">Exp. Date</label>
-                        <input type="text" id="modalAddCardExpiryDate" class="form-control expiry-date-mask" placeholder="MM/YY">
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <label class="form-label" for="modalAddCardCvv">CVV Code</label>
-                        <div class="input-group input-group-merge">
-                            <input type="text" id="modalAddCardCvv" class="form-control cvv-code-mask" maxlength="3" placeholder="654">
-                            <span class="input-group-text cursor-pointer" id="modalAddCardCvv2"><i class="bx bx-help-circle text-muted" data-bs-toggle="tooltip" data-bs-placement="top" aria-label="Card Verification Value" data-bs-original-title="Card Verification Value"></i></span>
-                        </div>
-                    </div>
-                    <div class="col-12">
-                        <label class="switch">
-                            <input type="checkbox" class="switch-input">
-                            <span class="switch-toggle-slider">
-                                <span class="switch-on"></span>
-                                <span class="switch-off"></span>
-                            </span>
-                            <span class="switch-label">Save card for future billing?</span>
-                        </label>
-                    </div>
-                    <div class="col-12 text-center">
-                        <button type="submit" class="btn btn-primary me-sm-3 me-1 mt-3">Submit</button>
-                        <button type="reset" class="btn btn-label-secondary btn-reset mt-3" data-bs-dismiss="modal" aria-label="Close">Cancel</button>
-                    </div>
-                    <input type="hidden">
-                </form>
+﻿
+<h4 class="py-3 mb-4">
+    <span class="text-muted fw-light">Conversations /</span> 
+</h4>
+<section class="content-header">
+    <div class="">
+        <div class="card">
+            
+
+            <div class="card-body p-0">
+                <table class="table table-striped" id="tblUsers">
+                    <thead>
+                        <tr>
+                            <th style="width: 10px">#</th>
+                            <th>Code</th>
+                            <th>Channel Name</th>
+                            <th>Feeling</th>
+                            <th>Country</th>
+                            <th>County</th>
+                            <th>Age</th>
+                            <th>Talked to Agent</th>
+                            <th style="width: 40px">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="modal fade" data-keyboard="false" id="clientModal" tabindex="-1" role="dialog" style="display:none" aria-labelledby="clientModal" aria-hidden="true">
+        <div class="modal-dialog ">
+            <div class="modal-content">
             </div>
         </div>
     </div>
-</div>
+
+    <div class="col-lg-4 col-md-6">
+        <small class="text-light fw-medium mb-3">Enable backdrop (default)</small>
+        <div class="mt-3">
+            <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasBackdrop" aria-controls="offcanvasBackdrop">Enable backdrop</button>
+            <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasBackdrop" aria-labelledby="offcanvasBackdropLabel">
+                <div class="offcanvas-header">
+                    <h5 id="offcanvasBackdropLabel" class="offcanvas-title">Enable backdrop</h5>
+                    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body my-auto mx-0 flex-grow-0">
+                    
+                    <div class="app-chat overflow-hidden card">
+                        <div class="row g-0">
+                            <!-- Sidebar Left -->
+                           
+                            <div class="col app-chat-history">
+                                <div class="chat-history-wrapper">
+                                    
+                                    <div class="chat-history-body ps ps--active-y">
+                                        <ul class="list-unstyled chat-history mb-0">
+                                            <li class="chat-message chat-message-right">
+                                                <div class="d-flex overflow-hidden">
+                                                    <div class="chat-message-wrapper flex-grow-1">
+                                                        <div class="chat-message-text">
+                                                            <p class="mb-0">How can we help? We're here for you! 😄</p>
+                                                        </div>
+                                                        <div class="text-end text-muted mt-1">
+                                                            <i class="bx bx-check-double text-success"></i>
+                                                            <small>10:00 AM</small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="user-avatar flex-shrink-0 ms-3">
+                                                        <div class="avatar avatar-sm">
+                                                            <img src="../../assets/img/avatars/1.png" alt="Avatar" class="rounded-circle">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="chat-message">
+                                                <div class="d-flex overflow-hidden">
+                                                    <div class="user-avatar flex-shrink-0 me-3">
+                                                        <div class="avatar avatar-sm">
+                                                            <img src="../../assets/img/avatars/2.png" alt="Avatar" class="rounded-circle">
+                                                        </div>
+                                                    </div>
+                                                    <div class="chat-message-wrapper flex-grow-1">
+                                                        <div class="chat-message-text">
+                                                            <p class="mb-0">Hey John, I am looking for the best admin template.</p>
+                                                            <p class="mb-0">Could you please help me to find it out? 🤔</p>
+                                                        </div>
+                                                        <div class="chat-message-text mt-2">
+                                                            <p class="mb-0">It should be Bootstrap 5 compatible.</p>
+                                                        </div>
+                                                        <div class="text-muted mt-1">
+                                                            <small>10:02 AM</small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="chat-message chat-message-right">
+                                                <div class="d-flex overflow-hidden">
+                                                    <div class="chat-message-wrapper flex-grow-1">
+                                                        <div class="chat-message-text">
+                                                            <p class="mb-0">Sneat has all the components you'll ever need in a app.</p>
+                                                        </div>
+                                                        <div class="text-end text-muted mt-1">
+                                                            <i class="bx bx-check-double text-success"></i>
+                                                            <small>10:03 AM</small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="user-avatar flex-shrink-0 ms-3">
+                                                        <div class="avatar avatar-sm">
+                                                            <img src="../../assets/img/avatars/1.png" alt="Avatar" class="rounded-circle">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="chat-message">
+                                                <div class="d-flex overflow-hidden">
+                                                    <div class="user-avatar flex-shrink-0 me-3">
+                                                        <div class="avatar avatar-sm">
+                                                            <img src="../../assets/img/avatars/2.png" alt="Avatar" class="rounded-circle">
+                                                        </div>
+                                                    </div>
+                                                    <div class="chat-message-wrapper flex-grow-1">
+                                                        <div class="chat-message-text">
+                                                            <p class="mb-0">Looks clean and fresh UI. 😃</p>
+                                                        </div>
+                                                        <div class="chat-message-text mt-2">
+                                                            <p class="mb-0">It's perfect for my next project.</p>
+                                                        </div>
+                                                        <div class="chat-message-text mt-2">
+                                                            <p class="mb-0">How can I purchase it?</p>
+                                                        </div>
+                                                        <div class="text-muted mt-1">
+                                                            <small>10:05 AM</small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="chat-message chat-message-right">
+                                                <div class="d-flex overflow-hidden">
+                                                    <div class="chat-message-wrapper flex-grow-1">
+                                                        <div class="chat-message-text">
+                                                            <p class="mb-0">Thanks, you can purchase it.</p>
+                                                        </div>
+                                                        <div class="text-end text-muted mt-1">
+                                                            <i class="bx bx-check-double text-success"></i>
+                                                            <small>10:06 AM</small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="user-avatar flex-shrink-0 ms-3">
+                                                        <div class="avatar avatar-sm">
+                                                            <img src="../../assets/img/avatars/1.png" alt="Avatar" class="rounded-circle">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="chat-message">
+                                                <div class="d-flex overflow-hidden">
+                                                    <div class="user-avatar flex-shrink-0 me-3">
+                                                        <div class="avatar avatar-sm">
+                                                            <img src="../../assets/img/avatars/2.png" alt="Avatar" class="rounded-circle">
+                                                        </div>
+                                                    </div>
+                                                    <div class="chat-message-wrapper flex-grow-1">
+                                                        <div class="chat-message-text">
+                                                            <p class="mb-0">I will purchase it for sure. 👍</p>
+                                                        </div>
+                                                        <div class="chat-message-text mt-2">
+                                                            <p class="mb-0">Thanks.</p>
+                                                        </div>
+                                                        <div class="text-muted mt-1">
+                                                            <small>10:08 AM</small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="chat-message chat-message-right">
+                                                <div class="d-flex overflow-hidden">
+                                                    <div class="chat-message-wrapper flex-grow-1">
+                                                        <div class="chat-message-text">
+                                                            <p class="mb-0">Great, Feel free to get in touch.</p>
+                                                        </div>
+                                                        <div class="text-end text-muted mt-1">
+                                                            <i class="bx bx-check-double text-success"></i>
+                                                            <small>10:10 AM</small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="user-avatar flex-shrink-0 ms-3">
+                                                        <div class="avatar avatar-sm">
+                                                            <img src="../../assets/img/avatars/1.png" alt="Avatar" class="rounded-circle">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="chat-message">
+                                                <div class="d-flex overflow-hidden">
+                                                    <div class="user-avatar flex-shrink-0 me-3">
+                                                        <div class="avatar avatar-sm">
+                                                            <img src="../../assets/img/avatars/2.png" alt="Avatar" class="rounded-circle">
+                                                        </div>
+                                                    </div>
+                                                    <div class="chat-message-wrapper flex-grow-1">
+                                                        <div class="chat-message-text">
+                                                            <p class="mb-0">Do you have design files for Sneat?</p>
+                                                        </div>
+                                                        <div class="text-muted mt-1">
+                                                            <small>10:15 AM</small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="chat-message chat-message-right">
+                                                <div class="d-flex overflow-hidden">
+                                                    <div class="chat-message-wrapper flex-grow-1 w-50">
+                                                        <div class="chat-message-text">
+                                                            <p class="mb-0">Yes that's correct documentation file, Design files are included with the template.</p>
+                                                        </div>
+                                                        <div class="text-end text-muted mt-1">
+                                                            <i class="bx bx-check-double"></i>
+                                                            <small>10:15 AM</small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="user-avatar flex-shrink-0 ms-3">
+                                                        <div class="avatar avatar-sm">
+                                                            <img src="../../assets/img/avatars/1.png" alt="Avatar" class="rounded-circle">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                        <div class="ps__rail-x" style="left: 0px; bottom: -486px;"><div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div></div><div class="ps__rail-y" style="top: 486px; height: 590px; right: 0px;"><div class="ps__thumb-y" tabindex="0" style="top: 267px; height: 323px;"></div></div>
+                                    </div>
+                                    <!-- Chat message form -->
+                                    
+                                </div>
+                            </div>
+                           
+
+                            <div class="app-overlay"></div>
+                        </div>
+                    </div>
 
 
-
-<div class="col-12 col-sm-6 col-lg-4 mb-4">
-    <div class="card">
-        <div class="card-body text-center">
-            <i class="mb-3 bx bx-md bx-credit-card"></i>
-            <h5>Add New Credit Card</h5>
-            <p> Quickly collect the credit card details, built in input mask and form validation support.</p>
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addNewCCModal"> Show </button>
+                </div>
+            </div>
         </div>
     </div>
-</div>
+
+</section>
+
+
+@section Styles {
+    <environment names="Development,Staging,Production">
+        <!-- DataTables -->
+        <link rel="stylesheet" href="~/lib/datatables-bs4/css/dataTables.bootstrap4.min.css">
+        <link rel="stylesheet" href="~/lib/datatables-responsive/css/responsive.bootstrap4.min.css">
+        <link rel="stylesheet" href="~/lib/datatables-buttons/css/buttons.bootstrap4.min.css">
+        <link rel="stylesheet" href="~/library/sneat/assets/vendor/css/pages/page-chat.css">
+    </environment>
+}
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <environment names="Development,Staging,Production">
+        <!-- DataTables  & Plugins -->
+        <script src="~/lib/datatables/jquery.dataTables.min.js"></script>
+        <script src="~/lib/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+        <script src="~/lib/datatables-responsive/js/dataTables.responsive.min.js"></script>
+        <script src="~/lib/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+        <script src="~/lib/datatables-buttons/js/dataTables.buttons.min.js"></script>
+        <script src="~/lib/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
+        <script src="~/library/sneat/assets/vendor/js/pages/page-chat.js"></script>
+    </environment>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            jsdtClient.getData();
+        });
+
+        var jsdtClient = {
+            table: null,
+            initializeDataTable: function () {
+                jsdtClient.table = $('#tblUsers').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    serverMethod: 'post',
+                    ajax: {
+                        url: "@Url.Action("Conversations")",
+                        type: "POST"
+                    },
+                    columns: [
+                        { data: 'channelName' },
+                        { data: 'channelName' },
+                        { data: 'channelName' },
+                        { data: 'client.ageGroup', name: 'Id' },
+                        { data: 'client.ageGroup', name: 'Id' },
+                        { data: 'client.ageGroup', name: 'Id' },
+                        { data: 'client.ageGroup', name: 'Id' },
+                        { data: 'id', name: 'Id' },
+                        { data: 'id', name: 'Id' },
+                    ],
+                    columnDefs: [{
+                        render: function (data, type, row) {
+                            var actionsHtml =
+                                `<div class='text-center'>
+                                                        <button class='btn btn-outline-primary btn-xs '
+                                                            data-hidden='Id'
+                                                            data-id='${row.id}'
+                                                            data-bs-toggle="offcanvas" data-bs-target="#offcanvasBackdrop" aria-controls="offcanvasBackdrop"
+                                                            data-action='@Url.Action("EditUser", "Auth")?clientId=${row.id}'
+                                                            title='Edit'>
+                                                            <i class='fa fa-eye'></i>
+
+                                                        
+                                                    </div>`;
+
+                            return actionsHtml;
+                        },
+                        targets: -1,
+                        orderable: false
+                    }],
+                    order: [0, 'asc'],
+                    language: {
+                        processing: 'Loading records... Please wait.',
+                    },
+                    pagingType: 'full_numbers',
+                    oLanguage: {
+                        oPaginate: {
+                            sNext: '>',
+                            sPrevious: '<',
+                            sFirst: '<<',
+                            sLast: '>>'
+                        }
+                    }
+                });
+            },
+            getData: function () {
+                if (jsdtClient.table == null) {
+                    jsdtClient.initializeDataTable();
+                } else {
+                    jsdtClient.table.ajax.reload();
+                }
+            }
+        }
+
+    </script>
+}

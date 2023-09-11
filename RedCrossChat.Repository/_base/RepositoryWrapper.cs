@@ -116,6 +116,18 @@ namespace RedCrossChat.Repository
             }
         }
 
+        public IRawConversation _rawConversation;
+
+        public IRawConversation RawConversation
+        {
+            get
+            {
+                if (_rawConversation == null) { _rawConversation = new RawConversationRepo(_repoContext); }
+
+                return _rawConversation;
+            }
+        }
+
         public async Task<bool> SaveChangesAsync()
         {
             if (await _repoContext.SaveChangesAsync() > 0)
