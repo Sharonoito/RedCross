@@ -18,32 +18,30 @@
     <ul class="menu-inner py-1">
         <!-- Dashboards -->
         <li class="menu-item active open">
-            <a href="javascript:void(0);" class="menu-link">
+            <a asp-action="Dashboard" asp-controller="Home" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-home-circle"></i>
-                <div data-i18n="Dashboards">Dashboard</div>
+                <div data-i18n="Dashboards"></div>
             </a>
         </li>
 
         <li class="menu-item">
-            <a href="app-chat.html" class="menu-link">
+            <a asp-action="List" asp-controller="Conversation" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-chat"></i>
-                <div data-i18n="Chat">Chats</div>
+                <div data-i18n="Conversations"></div>
             </a>
         </li>
 
         <li class="menu-item">
-            <a href="app-invoice-list.html" class="menu-link">
+            <a asp-action ="Index" asp-controller="Conversation" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-chat"></i>
+                <div data-i18n="Chat"></div>
+            </a>
+        </li>
+
+        <li class="menu-item">
+            <a asp-action="Users" asp-controller="Auth" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-layout"></i>
-                <div data-i18n="List">Lists</div>
-            </a>
-        </li>
-
-                
-
-        <li class="menu-item">
-            <a href="javascript:void(0);" class="menu-link">
-                <i class='menu-icon tf-icons bx bx-check-shield'></i>
-                <div data-i18n="Roles & Permissions">Roles & Permissions</div>
+                <div data-i18n="User Management"></div>
             </a>
         </li>
 

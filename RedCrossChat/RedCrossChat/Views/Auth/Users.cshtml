@@ -50,8 +50,8 @@
         </div>
     </div>
 
-    <div class="modal fade" data-keyboard="false" data-backdrop="static" id="clientModal" tabindex="-1" role="dialog" aria-labelledby="clientModal" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+    <div class="modal fade" data-keyboard="false"  id="clientModal" tabindex="-1" role="dialog" style="display:none" aria-labelledby="clientModal" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered1 modal-simple modal-add-new-cc">
             <div class="modal-content">
             </div>
         </div>
@@ -104,10 +104,10 @@
                         type: "POST"
                     },
                     columns: [
-                        { data: 'FirstName' },                 
-                        { data: 'LastName' },
-                        { data: 'Email' },
-                        { data: 'id', name: 'Id' },
+                        { data: 'firstName' },                 
+                        { data: 'firstName' },
+                        { data: 'lastName' },
+                        { data: 'email', name: 'Id' },
                         { data: 'id', name: 'Id' },
                         { data: 'id', name: 'Id' },
                     ],
