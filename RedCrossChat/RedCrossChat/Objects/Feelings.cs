@@ -57,6 +57,11 @@ namespace RedCrossChat.Objects
         public const string Other = "Other";
     }
 
+    public static class DialogConstants
+    {
+        public const string ProfileAssesor="PROFILE_001";
+    }
+
    
 
     public static class InitialActions
