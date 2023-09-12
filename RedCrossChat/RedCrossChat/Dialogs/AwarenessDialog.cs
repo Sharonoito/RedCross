@@ -69,7 +69,7 @@ namespace RedCrossChat.Dialogs
         private async Task<DialogTurnResult> InitialStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             // You can create the 'User' object here or retrieve it from somewhere else.
-            User user = new User();
+            User user = new();
 
             // Set the 'User' object in the stepContext.Values dictionary.
             stepContext.Values[UserInfo] = user;
@@ -108,14 +108,14 @@ namespace RedCrossChat.Dialogs
 
             var question = "Have you shared with someone how you feel?";
 
-            if (!stepContext.Values.TryGetValue(UserInfo, out var userValue) || !(userValue is User))
+            if (!stepContext.Values.TryGetValue(UserInfo, out var userValue) || !(userValue is User user1))
             {
                 user = new User();
                 stepContext.Values[UserInfo] = user;
             }
             else
             {
-                user = (User)userValue;
+                user = user1;
             }
 
             if (stepContext.Result != null && stepContext.Result is FoundChoice choiceResult)
@@ -141,12 +141,11 @@ namespace RedCrossChat.Dialogs
                 await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
 
 
-                return await stepContext.PromptAsync(nameof(ChoicePrompt),
-                            new PromptOptions()
+                return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions()
                             {
                                 Prompt = MessageFactory.Text(question),
                                 Choices = RedCrossLists.choices
-                            });
+                            }, cancellationToken);
             }
             else
             {
@@ -164,7 +163,7 @@ namespace RedCrossChat.Dialogs
 
             User user = (User)stepContext.Values[UserInfo];
 
-            var question = "It's always relieving talking to someone trusted about what we are feeling. Would you want to speak to a professional therapist from Kenya Red Cross Society?"
+            var question = "It's always relieving talking to someone trusted about what we are feeling. Would you want to speak to a professional therapist from Kenya Red Cross Society?";
 
             await _repository.SaveChangesAsync();
 
@@ -244,9 +243,13 @@ namespace RedCrossChat.Dialogs
         private async Task<DialogTurnResult> ProfessionalStatusAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
 
+            var question = "What is your professional status ?";
+            
+            await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
+
             return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions()
             {
-                Prompt = MessageFactory.Text("What is your professional status ?"),
+                Prompt = MessageFactory.Text(question),
                 Choices = new List<Choice>()
                         {
                             new Choice  { Value ="Student",},
@@ -263,9 +266,14 @@ namespace RedCrossChat.Dialogs
 
         public async Task<DialogTurnResult> CheckFeelingAware(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
+
+            var question = "What makes you seek our psychological support?";
+
+            await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
+
             return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions()
             {
-                Prompt = MessageFactory.Text("What makes you seek our psychological support?"),
+                Prompt = MessageFactory.Text(question),
                 Choices = new List<Choice>()
                         {
                             new Choice  { Value ="Suicidal ideations",},
@@ -281,9 +289,13 @@ namespace RedCrossChat.Dialogs
 
         private async Task<DialogTurnResult> CheckProfessionalSwitchAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
+            var question = "Would you wish to talk to a Professional Counselor?";
+
+            await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
+
             return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions()
             {
-                Prompt = MessageFactory.Text("Would you wish to talk to a Professional Counselor?"),
+                Prompt = MessageFactory.Text(question),
                 Choices = RedCrossLists.choices,
             }, cancellationToken);
         }
@@ -341,22 +353,6 @@ namespace RedCrossChat.Dialogs
 
             return await stepContext.EndDialogAsync(user);
         }
-
-
-        private IList<Choice> GetChoices()
-        {
-            var cardOptions = new List<Choice>()
-            {
-                new Choice() { Value = "Careers", Synonyms = new List<string>() { "1" } },
-                new Choice() { Value = "Volunteer and Membership", Synonyms = new List<string>() { "2" } },
-                new Choice() { Value = "Volunteer Opportunities", Synonyms = new List<string>() { "3" } },
-                new Choice() { Value = "Mental Health", Synonyms = new List<string>() { "4" } },
-
-            };
-
-            return cardOptions;
-        }
-
 
     }
 }

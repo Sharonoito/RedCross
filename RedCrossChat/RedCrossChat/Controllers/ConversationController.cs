@@ -4,12 +4,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NuGet.Protocol.Core.Types;
 using RedCrossChat.Contracts;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace RedCrossChat.Controllers
 {
-    public class ConversationController(IRepositoryWrapper repository) : Controller
+    public class ConversationController(IRepositoryWrapper repository) : BaseController
     {
         private readonly IRepositoryWrapper _repository = repository;
 
@@ -40,6 +41,14 @@ namespace RedCrossChat.Controllers
                 filteredRows.Count(), pagedRows);
 
             return new DataTablesJsonResult(response);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DetailedConversation(Guid id)
+        {
+            var rawConversations=await _repository.RawConversation.FindByCondition(x=>x.ConversationId == id).ToListAsync();
+
+            return Success("Fetched successfully", rawConversations);
         }
     }
 }

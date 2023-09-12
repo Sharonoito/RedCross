@@ -68,9 +68,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 c = [].slice.call(document.querySelectorAll("#chat-list li:not(.chat-contact-list-item-title)")),
                 r = [].slice.call(document.querySelectorAll("#contact-list li:not(.chat-contact-list-item-title)"));
             l(c, 0, e, t), l(r, 0, e, a)
-        }), p.addEventListener("submit", e => {
-            e.preventDefault(), v.value && ((e = document.createElement("div")).className = "chat-message-text mt-2", e.innerHTML = '<p class="mb-0 text-break">' + v.value + "</p>", document.querySelector("li:last-child .chat-message-wrapper").appendChild(e), v.value = "", a())
-        });
+        }),
+            p != undefined ?
+                p.addEventListener("submit", e => {
+                    e.preventDefault(), v.value && ((e = document.createElement("div")).className = "chat-message-text mt-2", e.innerHTML = '<p class="mb-0 text-break">' + v.value + "</p>", document.querySelector("li:last-child .chat-message-wrapper").appendChild(e), v.value = "", a())
+                }) : null;
+           
+            
         let e = document.querySelector(".chat-history-header [data-target='#app-chat-contacts']"),
             t = document.querySelector(".app-chat-sidebar-left .close-sidebar");
         var c, r, s;

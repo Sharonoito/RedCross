@@ -77,7 +77,7 @@ namespace RedCrossChat.Dialogs
    
         private async Task<DialogTurnResult> InitialStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            var conversation=await CreateConversationDBInstance(stepContext);
+            await CreateConversationDBInstance(stepContext);
 
             var question = "How would you describe how you are feeling today?";
 
@@ -216,7 +216,7 @@ namespace RedCrossChat.Dialogs
 
             var hint = "( hint: type in Kiambu or 022,Nairobi or 047 )";
 
-            Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
+            Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync(cancellationToken: cancellationToken);
 
 
             var question = "Which county are you located in?";
@@ -328,7 +328,7 @@ namespace RedCrossChat.Dialogs
             User user = (User)(stepContext.Result);
 
             if (user !=null && user.Iteration > 1)
-                return await stepContext.EndDialogAsync(user);
+                return await stepContext.EndDialogAsync(user, cancellationToken);
 
             return await stepContext.BeginDialogAsync(nameof(AiDialog), user, cancellationToken);
         }
@@ -338,9 +338,7 @@ namespace RedCrossChat.Dialogs
             //string sampleJsonFilePath = "counties.json";
 
             var paths = new[] { ".", "Cards", "counties.json" };
-            var adaptiveCardJson = File.ReadAllText(Path.Combine(paths));
-
-
+          
             using StreamReader reader = new(Path.Combine(paths));
             var json = reader.ReadToEnd();
             List<County> counties = JsonConvert.DeserializeObject<List<County>>(json);
@@ -351,8 +349,7 @@ namespace RedCrossChat.Dialogs
         {
 
             var paths = new[] { ".", "Cards", "counties.json" };
-            var adaptiveCardJson = File.ReadAllText(Path.Combine(paths));
-
+            
 
             using StreamReader reader = new(Path.Combine(paths));
             var json = reader.ReadToEnd();
@@ -392,19 +389,20 @@ namespace RedCrossChat.Dialogs
 
         private async Task<Conversation> CreateConversationDBInstance(WaterfallStepContext stepContext)
         {
-            Conversation conversation = new Conversation();
+            Conversation conversation = new()
+            {
+                ChannelId = stepContext.Context.Activity.ChannelId,
 
-            conversation.ChannelId = stepContext.Context.Activity.ChannelId;
+                ChannelName = stepContext.Context.Activity.ChannelId,
 
-            conversation.ChannelName = stepContext.Context.Activity.ChannelId;
+                SenderId = stepContext.Context.Activity.From.Id,
 
-            conversation.SenderId = stepContext.Context.Activity.From.Id;
+                ConversationId = stepContext.Context.Activity.Conversation.Id,
 
-            conversation.ConversationId = stepContext.Context.Activity.Conversation.Id;
+                Client = new Persona() { SenderId = stepContext.Context.Activity.From.Id },
 
-            conversation.Client = new Persona() { SenderId = stepContext.Context.Activity.From.Id };
-
-            conversation.AiConversations = new List<AiConversation>();
+                AiConversations = new List<AiConversation>()
+            };
 
             _repository.Conversation.Create(conversation);
 
