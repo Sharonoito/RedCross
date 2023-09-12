@@ -156,7 +156,8 @@ namespace RedCrossChat.Dialogs
         private async Task<bool> AddQuestionResponse(WaterfallStepContext stepContext, IRepositoryWrapper _repository)
         {
 
-            Conversation conversation = await _repository.Conversation.FindByCondition(x => x.ConversationId == stepContext.Context.Activity.Conversation.Id).FirstAsync();
+            Conversation conversation = await _repository.Conversation
+                .FindByCondition(x => x.ConversationId == stepContext.Context.Activity.Conversation.Id).FirstAsync();
 
             var question = stepContext.Values[CurrentQuestion];
 

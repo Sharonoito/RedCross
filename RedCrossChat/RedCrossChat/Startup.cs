@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Bot.Builder;
+using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Connector.Authentication;
 using Microsoft.EntityFrameworkCore;
@@ -99,6 +100,9 @@ namespace RedCrossChat
 
             // Register dialogs used in the bot Project
             services.ConfigureDialogs(services);
+
+            //Testing the dialog set manager
+            //services.AddSingleton(new DialogSet());
 
             services.ConfigureClaimBasedAuthorization();
 

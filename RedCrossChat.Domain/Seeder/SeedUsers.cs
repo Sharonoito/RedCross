@@ -64,7 +64,6 @@ namespace RedCrossChat.Domain
                         LastName = "User",
                         UserName = "admin@redcross.com",
                         Email = "admin@redcross.com",
-
                     };
                     userMgr.CreateAsync(adminUser, "Test@!23").GetAwaiter().GetResult();
 
