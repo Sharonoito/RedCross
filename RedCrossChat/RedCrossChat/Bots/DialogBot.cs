@@ -28,13 +28,22 @@ namespace RedCrossChat.Bots
         protected readonly ILogger Logger;
 #pragma warning restore SA1401 // Fields should be private
 
-        public DialogBot(ConversationState conversationState, UserState userState, T dialog, ILogger<DialogBot<T>> logger)
+        protected readonly DialogSet _dialog;
+
+        public DialogBot(
+            ConversationState conversationState, 
+            UserState userState,
+            T dialog, 
+            ILogger<DialogBot<T>> logger)
         {
             ConversationState = conversationState;
             UserState = userState;
             Dialog = dialog;
             Logger = logger;
 
+
+            //_ underscore for non bot generated variables
+           
         }
 
         public override async Task OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken = default)
@@ -51,6 +60,8 @@ namespace RedCrossChat.Bots
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
             Logger.LogInformation("Running dialog with Message Activity.");
+
+           
 
             // Run the Dialog with the new message Activity.
             await Dialog.RunAsync(turnContext, ConversationState.CreateProperty<DialogState>("DialogState"), cancellationToken);

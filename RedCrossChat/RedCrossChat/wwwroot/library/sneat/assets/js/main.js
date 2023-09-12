@@ -207,8 +207,9 @@ document.getElementById("layout-menu") && (isHorizontalLayout = document.getElem
                     (n = $.ajax({ url: assetsPath + "json/" + o, dataType: "json", async: !1 }).responseJSON),
                     a.each(function () {
                         var e = $(this);
-                        a
-                            .typeahead(
+
+                        if (a.typeahead != undefined) {
+                            a.typeahead(
                                 { hint: !1, classNames: { menu: "tt-menu navbar-search-suggestion", cursor: "active", suggestion: "suggestion d-flex justify-content-between px-3 py-2 w-100" } },
                                 {
                                     name: "pages",
@@ -274,18 +275,20 @@ document.getElementById("layout-menu") && (isHorizontalLayout = document.getElem
                                     },
                                 }
                             )
-                            .bind("typeahead:render", function () {
-                                l.addClass("show").removeClass("fade");
-                            })
-                            .bind("typeahead:select", function (e, t) {
-                                t.url && (window.location = t.url);
-                            })
-                            .bind("typeahead:close", function () {
-                                a.val(""), e.typeahead("val", ""), s.addClass("d-none"), l.addClass("fade").removeClass("show");
-                            }),
-                            a.on("keyup", function () {
-                                "" == a.val() && l.addClass("fade").removeClass("show");
-                            });
+                                .bind("typeahead:render", function () {
+                                    l.addClass("show").removeClass("fade");
+                                })
+                                .bind("typeahead:select", function (e, t) {
+                                    t.url && (window.location = t.url);
+                                })
+                                .bind("typeahead:close", function () {
+                                    a.val(""), e.typeahead("val", ""), s.addClass("d-none"), l.addClass("fade").removeClass("show");
+                                }),
+                                a.on("keyup", function () {
+                                    "" == a.val() && l.addClass("fade").removeClass("show");
+                                });
+                        }
+                      
                     }),
                     $(".navbar-search-suggestion").each(function () {
                         e = new PerfectScrollbar($(this)[0], { wheelPropagation: !1, suppressScrollX: !0 });

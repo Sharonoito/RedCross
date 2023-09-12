@@ -3,9 +3,13 @@ using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Dialogs.Choices;
 using Microsoft.Bot.Schema;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
+using NuGet.Protocol.Core.Types;
 using RedCrossChat.Cards;
+using RedCrossChat.Contracts;
+using RedCrossChat.Entities;
 using RedCrossChat.Objects;
 using System;
 using System.Collections.Generic;
@@ -18,14 +22,19 @@ namespace RedCrossChat.Dialogs
     public class AwarenessDialog : CancelAndHelpDialog
     {
         protected readonly ILogger _logger;
-        private List<Choice> _choices;
+
+        private readonly IRepositoryWrapper _repository;
+
         protected readonly UserState _userState;
+
         private const string UserInfo = "user-info";
 
-        public AwarenessDialog(ILogger<AwarenessDialog> logger) : base(nameof(AwarenessDialog))
-
-
+        protected string CurrentQuestion = "CurrentQuestion";
+        public AwarenessDialog(ILogger<AwarenessDialog> logger, IRepositoryWrapper wrapper) : base(nameof(AwarenessDialog))
         {
+
+            _repository = wrapper;
+
             AddDialog(new ChoicePrompt(nameof(ChoicePrompt)));
 
             AddDialog(new ChoicePrompt("select-choice"));
@@ -58,7 +67,24 @@ namespace RedCrossChat.Dialogs
             };
         }
 
-      
+        private async Task<bool> AddQuestionResponse(WaterfallStepContext stepContext, IRepositoryWrapper _repository)
+        {
+
+            Conversation conversation = await _repository.Conversation.
+                FindByCondition(x => x.ConversationId == stepContext.Context.Activity.Conversation.Id).FirstAsync();
+
+            var question = stepContext.Values[CurrentQuestion];
+
+            if (conversation != null)
+            {
+                var rawConversation = new RawConversation { ConversationId = conversation.Id, Question = question.ToString(), Message = stepContext.Context.Activity.Text };
+
+                _repository.RawConversation.Create(rawConversation);
+            }
+            return true;
+        }
+
+
 
         private async Task<DialogTurnResult> InitialStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
@@ -79,13 +105,17 @@ namespace RedCrossChat.Dialogs
         {
             // await stepContext.BeginDialogAsync("mental-valuation", stepContext, cancellationToken);
 
+            var question = "Are you aware of what could have resulted to that feeling?";
+
             var options = new PromptOptions()
             {
-                Prompt = MessageFactory.Text("Are you aware of what could have resulted to that feeling?"),
+                Prompt = MessageFactory.Text(question),
 
                 Choices = RedCrossLists.choices
 
             };
+
+            stepContext.Values[CurrentQuestion] = question;
 
             //return await stepContext.PromptAsync("select-choice", options, cancellationToken);
             return await stepContext.PromptAsync(nameof(ChoicePrompt), options, cancellationToken);
@@ -95,6 +125,9 @@ namespace RedCrossChat.Dialogs
         private async Task<DialogTurnResult> ProcessMentalEvaluationChoice(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             User user;
+
+
+            var question = "Have you shared with someone how you feel?";
 
             if (!stepContext.Values.TryGetValue(UserInfo, out var userValue) || !(userValue is User))
             {
@@ -108,27 +141,33 @@ namespace RedCrossChat.Dialogs
 
             if (stepContext.Result != null && stepContext.Result is FoundChoice choiceResult)
             {
+
+                await AddQuestionResponse(stepContext, _repository);
+                
+                await _repository.SaveChangesAsync();
+
                 switch (choiceResult.Value)
                 {
                     case "Yes":
                         user.isAwareOfFeeling = true;
 
-                        return await stepContext.PromptAsync(nameof(ChoicePrompt),
-                            new PromptOptions()
-                            {
-                                Prompt = MessageFactory.Text("Have you shared with someone how you feel?"),
-                                Choices = RedCrossLists.choices
-                            });
+                        break;
                     default:
                         user.isAwareOfFeeling = false;
 
-                        return await stepContext.PromptAsync(nameof(ChoicePrompt),
-                           new PromptOptions()
-                           {
-                               Prompt = MessageFactory.Text("It is important to take care of your mental well-being. Would you like to have a trusted person to talk to?"),
-                               Choices = RedCrossLists.choices
-                           });
+                         question = "It is important to take care of your mental well-being. Would you like to have a trusted person to talk to?";
+                        break;
+                        
                 }
+
+                stepContext.Values[CurrentQuestion] = question;
+
+                return await stepContext.PromptAsync(nameof(ChoicePrompt),
+                            new PromptOptions()
+                            {
+                                Prompt = MessageFactory.Text(question),
+                                Choices = RedCrossLists.choices
+                            });
             }
             else
             {
@@ -146,6 +185,9 @@ namespace RedCrossChat.Dialogs
 
             User user = (User)stepContext.Values[UserInfo];
 
+            await AddQuestionResponse(stepContext, _repository);
+
+            await _repository.SaveChangesAsync();
 
             switch (((FoundChoice)stepContext.Result).Value)
             {

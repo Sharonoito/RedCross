@@ -15,6 +15,50 @@ namespace RedCrossChat.Repository
             _repoContext = repoContext;
         }
 
+        #region Auth
+        private IUserRepository? _user;
+        public IUserRepository User
+        {
+            get
+            {
+                if (_user == null) _user = new UserRepository(_repoContext);
+                return _user;
+            }
+        }
+
+        private IRoleRepository? _role;
+        public IRoleRepository Role
+        {
+            get
+            {
+                if (_role == null) _role = new RoleRepository(_repoContext);
+                return _role;
+            }
+        }
+
+        private IAppClaimRepository? _appClaim;
+        public IAppClaimRepository AppClaim
+        {
+            get
+            {
+                if (_appClaim == null) _appClaim = new AppClaimRepository(_repoContext);
+                return _appClaim;
+            }
+        }
+
+        private IAppModuleRepository? _appModule;
+        public IAppModuleRepository AppModule
+        {
+            get
+            {
+                if (_appModule == null) _appModule = new AppModuleRepository(_repoContext);
+                return _appModule;
+            }
+        }
+
+        #endregion
+
+
         public IFeelingRepo? _feeling;
         public IFeelingRepo Feeling
         {
@@ -69,6 +113,18 @@ namespace RedCrossChat.Repository
                 if (_persona == null) { _persona = new PersonaRepo(_repoContext); }
 
                 return _persona;
+            }
+        }
+
+        public IRawConversation _rawConversation;
+
+        public IRawConversation RawConversation
+        {
+            get
+            {
+                if (_rawConversation == null) { _rawConversation = new RawConversationRepo(_repoContext); }
+
+                return _rawConversation;
             }
         }
 

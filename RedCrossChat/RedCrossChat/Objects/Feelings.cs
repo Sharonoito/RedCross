@@ -50,6 +50,13 @@ namespace RedCrossChat.Objects
         public const string NO="No";
     }
 
+    public static class Gender
+    {
+        public const string Male = "Male";
+        public const string Female = "Female";
+        public const string Other = "Other";
+    }
+
    
 
     public static class InitialActions

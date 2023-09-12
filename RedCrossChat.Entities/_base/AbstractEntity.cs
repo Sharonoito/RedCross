@@ -10,7 +10,7 @@ namespace RedCrossChat.Entities
     public abstract class AbstractEntity: BasicEntity
     {
         
-        public string CreatedById { get; set; }
+        public string? CreatedById { get; set; }
 
         public DateTime? DateUpdated { get; set; }
         public string? UpdatedById { get; set; }
