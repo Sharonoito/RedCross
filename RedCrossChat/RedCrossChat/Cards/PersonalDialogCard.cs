@@ -56,7 +56,7 @@ namespace RedCrossChat.Cards
                 Text = "For any other advanced support feel free to check our detailed referral pathways",
 
                  Buttons = new List<CardAction> {
-                    new CardAction(ActionTypes.OpenUrl, "Preview", value: "https://recross-chat-bot.azurewebsites.net/")
+                    new CardAction(ActionTypes.OpenUrl, "Preview", value: "https://referraldirectories.redcross.or.ke/")
 
                 },
             };

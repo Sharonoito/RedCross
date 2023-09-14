@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\RedCrossChat.Contracts\RedCrossChat.Contracts.csproj" />
     <ProjectReference Include="..\RedCrossChat.Entities\RedCrossChat.Entities.csproj" />
   </ItemGroup>
 

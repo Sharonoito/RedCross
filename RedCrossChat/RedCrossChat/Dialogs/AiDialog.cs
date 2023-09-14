@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using RedCrossChat.Contracts;
 using RedCrossChat.Entities;
+using RedCrossChat.Objects;
 using Sentry.Protocol;
 using System;
 using System.Collections.Generic;
@@ -28,12 +29,19 @@ namespace RedCrossChat.Dialogs
 
         protected readonly string _iteration = "iteration";
 
+        private readonly IStatePropertyAccessor<ResponseDto> _userProfileAccessor;
 
-        public AiDialog(ILogger<AiDialog> logger, IRepositoryWrapper wrapper) : base(nameof(AiDialog))
+        protected readonly UserState _userState;
+
+        public AiDialog(ILogger<AiDialog> logger, IRepositoryWrapper wrapper, UserState userState) : base(nameof(AiDialog))
         {
             _logger = logger;
 
             _repository = wrapper;
+
+            _userState = userState;
+
+            _userProfileAccessor = userState.CreateProperty<ResponseDto>(DialogConstants.ProfileAssesor);
 
             var waterFallSteps = new WaterfallStep[]
                {
@@ -45,29 +53,32 @@ namespace RedCrossChat.Dialogs
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), waterFallSteps));
         }
 
-        public async Task<DialogTurnResult> IntialTaskAsync(WaterfallStepContext stepContext,CancellationToken token)
+        public async Task<DialogTurnResult> IntialTaskAsync(WaterfallStepContext stepContext, CancellationToken token)
         {
 
             Conversation conversation = await _repository.Conversation
                     .FindByCondition(x => x.ConversationId == stepContext.Context.Activity.Conversation.Id)
-                    .Include(x=>x.AiConversations)
+                    .Include(x => x.AiConversations)
                     .FirstAsync();
 
             string question = "Ask me a question";
-            
-            if(conversation.AiConversations.Count > 0)
+
+            if (conversation.AiConversations.Count > 0)
             {
-                question=conversation.AiConversations.Last().Response;
+                question = conversation.AiConversations.Last().Response;
             }
 
-            var options=new PromptOptions();
+            var options = new PromptOptions();
 
             var promptMessage = MessageFactory.Text(question, null, InputHints.ExpectingInput);
+
+            //  await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
+
 
             return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = promptMessage }, token);
         }
 
-        public async Task<DialogTurnResult>  FetchResultsAsync(WaterfallStepContext stepContext, CancellationToken token)
+        public async Task<DialogTurnResult> FetchResultsAsync(WaterfallStepContext stepContext, CancellationToken token)
         {
             var options = new PromptOptions();
 
@@ -77,20 +88,23 @@ namespace RedCrossChat.Dialogs
 
                 Conversation conversation = await _repository.Conversation
                     .FindByCondition(x => x.ConversationId == stepContext.Context.Activity.Conversation.Id)
-                    .Include(x=>x.AiConversations)
+                    .Include(x => x.AiConversations)
                     .FirstAsync();
 
                 string question = stepContext.Context.Activity.Text;
 
-                string response = await ChatGptDialog.GetChatGPTResponses(question,conversation.AiConversations);
+                string response = await ChatGptDialog.GetChatGPTResponses(question, conversation.AiConversations);
+
+
+                await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, response, stepContext, _userProfileAccessor, _userState);
 
 
                 if (conversation != null)
                 {
 
-                    if(conversation.AiConversations.Count > 0)
+                    if (conversation.AiConversations.Count > 0)
                     {
-                        AiConversation aiConversation= conversation.AiConversations.Last();
+                        AiConversation aiConversation = conversation.AiConversations.Last();
 
                         iteration = conversation.AiConversations.Last().Iteration;
                     }
@@ -100,7 +114,7 @@ namespace RedCrossChat.Dialogs
                         Iteration = iteration + 1,
                         Question = question,
                         Response = response,
-                   
+
                         ConversationId = conversation.Id
                     });
 
@@ -123,8 +137,8 @@ namespace RedCrossChat.Dialogs
                 return await stepContext.EndDialogAsync();
             }
 
-           
-           // return await stepContext.PromptAsync(nameof(TextPrompt), options, token);
+
+            // return await stepContext.PromptAsync(nameof(TextPrompt), options, token);
         }
 
         public async Task<DialogTurnResult> FinalStepAsync(WaterfallStepContext stepContext, CancellationToken token)
@@ -135,19 +149,19 @@ namespace RedCrossChat.Dialogs
 
             int iteration = (int)stepContext.Values[_iteration];
 
-            HandleAiListUpdate(ref list, iteration, stepContext.Context.Activity.Text,"");
+            HandleAiListUpdate(ref list, iteration, stepContext.Context.Activity.Text, "");
 
             return await stepContext.BeginDialogAsync(nameof(WaterfallDialog), list, token);
         }
 
-        private void HandleAiListUpdate(ref Dictionary<int, List<string>> list, int iteration,string question,string response)
+        private void HandleAiListUpdate(ref Dictionary<int, List<string>> list, int iteration, string question, string response)
         {
             list[iteration] = new List<string> { question, response };
 
             iteration++;
         }
 
-      
+
 
     }
 }

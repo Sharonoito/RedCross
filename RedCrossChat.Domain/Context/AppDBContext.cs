@@ -24,5 +24,14 @@ namespace RedCrossChat.Domain
         public DbSet<DBFeeling> Feeling { get; set; }
 
         public DbSet<DBCounty> County { get; set; }
+
+        public DbSet<RawConversation> RawConversation { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            new DbInitializer(modelBuilder).Seed();
+        }
     }
 }

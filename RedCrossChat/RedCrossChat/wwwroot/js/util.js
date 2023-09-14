@@ -465,7 +465,7 @@ $(document).on("click", ".load-modal", function () {
         content = $element.data('content') ? $element.data('content') : ".modal-content";
 
     $("#" + modal).data("invoker", $element);
-    //console.log('modal:', modal);
+    console.log('modal:', modal);
 
     if (hiddenId) {
         $("#" + hiddenId).val(id);
@@ -478,9 +478,9 @@ $(document).on("click", ".load-modal", function () {
         dataType = "html";
     }
 
-    //console.log('dataType:', dataType);
-    //console.log('viewUrl:', viewUrl);
-    //console.log('url:', url);
+    console.log('dataType:', dataType);
+    console.log('viewUrl:', viewUrl);
+    console.log('url:', url);
 
     if (url) {
         $.ajax({

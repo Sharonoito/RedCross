@@ -21,7 +21,7 @@ namespace RedCrossChat.Contracts
         #region Conversational
         IAiConversationRepo AiConversation { get; }
         IConversationRepo Conversation { get; }
-
+        IRawConversation RawConversation { get; }
         #endregion
 
         IPersonaRepo Persona { get; }

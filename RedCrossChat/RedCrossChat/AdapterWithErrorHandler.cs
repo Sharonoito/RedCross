@@ -24,13 +24,23 @@ namespace RedCrossChat
                 logger.LogError(exception, $"[OnTurnError] unhandled error : {exception.Message}");
 
                 // Send a message to the user
+
+                
                 var errorMessageText = $"The bot encountered an error or bug. {exception.Message}";
                 var errorMessage = MessageFactory.Text(errorMessageText, errorMessageText, InputHints.ExpectingInput);
                 await turnContext.SendActivityAsync(errorMessage);
 
-                 errorMessageText = $"The bot encountered an error or bug. {exception.StackTrace}";
-                 errorMessage = MessageFactory.Text(errorMessageText, errorMessageText, InputHints.ExpectingInput);
-                await turnContext.SendActivityAsync(errorMessage);
+                if(exception.InnerException != null)
+                {
+                    errorMessageText = $"The bot encountered an error or bug. {exception.InnerException}";
+                    errorMessage = MessageFactory.Text(errorMessageText, errorMessageText, InputHints.ExpectingInput);
+                    await turnContext.SendActivityAsync(errorMessage);
+                }
+                else
+                {
+
+                }
+                 
 
                 errorMessageText = "To continue to run this bot, please fix the bot source code.";
                 errorMessage = MessageFactory.Text(errorMessageText, errorMessageText, InputHints.ExpectingInput);

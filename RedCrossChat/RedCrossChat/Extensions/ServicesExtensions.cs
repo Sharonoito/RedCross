@@ -19,9 +19,9 @@ namespace RedCrossChat.Extensions
 
             services.AddTransient<PersonalDialog>();
 
-            services.AddSingleton<AwarenessDialog>();
+            services.AddTransient<AwarenessDialog>();
 
-            services.AddSingleton<BreathingDialog>();
+            services.AddTransient<BreathingDialog>();
 
             services.AddTransient<AiDialog>();
 
