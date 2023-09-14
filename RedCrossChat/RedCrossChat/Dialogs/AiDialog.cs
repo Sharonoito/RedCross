@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using RedCrossChat.Contracts;
 using RedCrossChat.Entities;
+using RedCrossChat.Objects;
 using Sentry.Protocol;
 using System;
 using System.Collections.Generic;
@@ -28,12 +29,19 @@ namespace RedCrossChat.Dialogs
 
         protected readonly string _iteration = "iteration";
 
+        private readonly IStatePropertyAccessor<ResponseDto> _userProfileAccessor;
 
-        public AiDialog(ILogger<AiDialog> logger, IRepositoryWrapper wrapper) : base(nameof(AiDialog))
+        protected readonly UserState _userState;
+
+        public AiDialog(ILogger<AiDialog> logger, IRepositoryWrapper wrapper, UserState userState) : base(nameof(AiDialog))
         {
             _logger = logger;
 
             _repository = wrapper;
+
+            _userState = userState;
+
+            _userProfileAccessor = userState.CreateProperty<ResponseDto>(DialogConstants.ProfileAssesor);
 
             var waterFallSteps = new WaterfallStep[]
                {
@@ -64,6 +72,9 @@ namespace RedCrossChat.Dialogs
 
             var promptMessage = MessageFactory.Text(question, null, InputHints.ExpectingInput);
 
+          //  await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
+
+
             return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = promptMessage }, token);
         }
 
@@ -83,6 +94,9 @@ namespace RedCrossChat.Dialogs
                 string question = stepContext.Context.Activity.Text;
 
                 string response = await ChatGptDialog.GetChatGPTResponses(question,conversation.AiConversations);
+
+
+                await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, response, stepContext, _userProfileAccessor, _userState);
 
 
                 if (conversation != null)

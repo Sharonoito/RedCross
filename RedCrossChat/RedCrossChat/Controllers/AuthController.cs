@@ -173,7 +173,7 @@ namespace RedCrossChat.Controllers
                     return Success(null, null);
                 }
             }
-            catch(Exception ex)
+            catch(Exception)
             {
                 return Error("Something broke");
             }

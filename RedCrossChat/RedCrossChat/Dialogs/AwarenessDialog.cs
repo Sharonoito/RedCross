@@ -1,17 +1,13 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.Bot.Builder;
+﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Dialogs.Choices;
 using Microsoft.Bot.Schema;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Clients.ActiveDirectory;
-using NuGet.Protocol.Core.Types;
 using RedCrossChat.Cards;
 using RedCrossChat.Contracts;
 using RedCrossChat.Entities;
 using RedCrossChat.Objects;
-using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,15 +21,21 @@ namespace RedCrossChat.Dialogs
 
         private readonly IRepositoryWrapper _repository;
 
+        private readonly IStatePropertyAccessor<ResponseDto> _userProfileAccessor;
+
         protected readonly UserState _userState;
 
         private const string UserInfo = "user-info";
 
         protected string CurrentQuestion = "CurrentQuestion";
-        public AwarenessDialog(ILogger<AwarenessDialog> logger, IRepositoryWrapper wrapper) : base(nameof(AwarenessDialog))
+        public AwarenessDialog(ILogger<AwarenessDialog> logger, IRepositoryWrapper wrapper, UserState userState) : base(nameof(AwarenessDialog))
         {
 
             _repository = wrapper;
+
+            _userState = userState;
+
+            _userProfileAccessor = userState.CreateProperty<ResponseDto>(DialogConstants.ProfileAssesor);
 
             AddDialog(new ChoicePrompt(nameof(ChoicePrompt)));
 
@@ -41,12 +43,8 @@ namespace RedCrossChat.Dialogs
 
             AddDialog(new ChoicePrompt("select-option"));
 
-
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), CreateWaterFallSteps()));
-
-      
-
-            // The initial child Dialog to run.
+   
             InitialDialogId = nameof(WaterfallDialog);
         }
 
@@ -67,29 +65,11 @@ namespace RedCrossChat.Dialogs
             };
         }
 
-        private async Task<bool> AddQuestionResponse(WaterfallStepContext stepContext, IRepositoryWrapper _repository)
-        {
-
-            Conversation conversation = await _repository.Conversation.
-                FindByCondition(x => x.ConversationId == stepContext.Context.Activity.Conversation.Id).FirstAsync();
-
-            var question = stepContext.Values[CurrentQuestion];
-
-            if (conversation != null)
-            {
-                var rawConversation = new RawConversation { ConversationId = conversation.Id, Question = question.ToString(), Message = stepContext.Context.Activity.Text };
-
-                _repository.RawConversation.Create(rawConversation);
-            }
-            return true;
-        }
-
-
 
         private async Task<DialogTurnResult> InitialStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             // You can create the 'User' object here or retrieve it from somewhere else.
-            User user = new User();
+            User user = new();
 
             // Set the 'User' object in the stepContext.Values dictionary.
             stepContext.Values[UserInfo] = user;
@@ -114,10 +94,9 @@ namespace RedCrossChat.Dialogs
                 Choices = RedCrossLists.choices
 
             };
+            await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
 
-            stepContext.Values[CurrentQuestion] = question;
 
-            //return await stepContext.PromptAsync("select-choice", options, cancellationToken);
             return await stepContext.PromptAsync(nameof(ChoicePrompt), options, cancellationToken);
 
 
@@ -129,20 +108,19 @@ namespace RedCrossChat.Dialogs
 
             var question = "Have you shared with someone how you feel?";
 
-            if (!stepContext.Values.TryGetValue(UserInfo, out var userValue) || !(userValue is User))
+            if (!stepContext.Values.TryGetValue(UserInfo, out var userValue) || !(userValue is User user1))
             {
                 user = new User();
                 stepContext.Values[UserInfo] = user;
             }
             else
             {
-                user = (User)userValue;
+                user = user1;
             }
 
             if (stepContext.Result != null && stepContext.Result is FoundChoice choiceResult)
             {
 
-                await AddQuestionResponse(stepContext, _repository);
                 
                 await _repository.SaveChangesAsync();
 
@@ -160,14 +138,14 @@ namespace RedCrossChat.Dialogs
                         
                 }
 
-                stepContext.Values[CurrentQuestion] = question;
+                await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
 
-                return await stepContext.PromptAsync(nameof(ChoicePrompt),
-                            new PromptOptions()
+
+                return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions()
                             {
                                 Prompt = MessageFactory.Text(question),
                                 Choices = RedCrossLists.choices
-                            });
+                            }, cancellationToken);
             }
             else
             {
@@ -185,7 +163,7 @@ namespace RedCrossChat.Dialogs
 
             User user = (User)stepContext.Values[UserInfo];
 
-            await AddQuestionResponse(stepContext, _repository);
+            var question = "It's always relieving talking to someone trusted about what we are feeling. Would you want to speak to a professional therapist from Kenya Red Cross Society?";
 
             await _repository.SaveChangesAsync();
 
@@ -207,10 +185,13 @@ namespace RedCrossChat.Dialogs
 
             }
 
+            await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
+
+
             return await stepContext.PromptAsync(nameof(ChoicePrompt),
                                new PromptOptions()
                                {
-                                   Prompt = MessageFactory.Text("It's always relieving talking to someone trusted about what we are feeling. Would you want to speak to a professional therapist from Kenya Red Cross Society?"),
+                                   Prompt = MessageFactory.Text(question),
                                    Choices = RedCrossLists.choices
                                });
         }
@@ -238,6 +219,11 @@ namespace RedCrossChat.Dialogs
 
         private async Task<DialogTurnResult> RelationShipStatusAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
+
+            var question = "What is your relationship status ?";
+
+            await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
+
             return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions()
             {
                 Prompt = MessageFactory.Text("What is your relationship status ?"),
@@ -257,9 +243,13 @@ namespace RedCrossChat.Dialogs
         private async Task<DialogTurnResult> ProfessionalStatusAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
 
+            var question = "What is your professional status ?";
+            
+            await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
+
             return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions()
             {
-                Prompt = MessageFactory.Text("What is your professional status ?"),
+                Prompt = MessageFactory.Text(question),
                 Choices = new List<Choice>()
                         {
                             new Choice  { Value ="Student",},
@@ -276,9 +266,14 @@ namespace RedCrossChat.Dialogs
 
         public async Task<DialogTurnResult> CheckFeelingAware(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
+
+            var question = "What makes you seek our psychological support?";
+
+            await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
+
             return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions()
             {
-                Prompt = MessageFactory.Text("What makes you seek our psychological support?"),
+                Prompt = MessageFactory.Text(question),
                 Choices = new List<Choice>()
                         {
                             new Choice  { Value ="Suicidal ideations",},
@@ -294,9 +289,13 @@ namespace RedCrossChat.Dialogs
 
         private async Task<DialogTurnResult> CheckProfessionalSwitchAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
+            var question = "Would you wish to talk to a Professional Counselor?";
+
+            await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
+
             return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions()
             {
-                Prompt = MessageFactory.Text("Would you wish to talk to a Professional Counselor?"),
+                Prompt = MessageFactory.Text(question),
                 Choices = RedCrossLists.choices,
             }, cancellationToken);
         }
@@ -354,22 +353,6 @@ namespace RedCrossChat.Dialogs
 
             return await stepContext.EndDialogAsync(user);
         }
-
-
-        private IList<Choice> GetChoices()
-        {
-            var cardOptions = new List<Choice>()
-            {
-                new Choice() { Value = "Careers", Synonyms = new List<string>() { "1" } },
-                new Choice() { Value = "Volunteer and Membership", Synonyms = new List<string>() { "2" } },
-                new Choice() { Value = "Volunteer Opportunities", Synonyms = new List<string>() { "3" } },
-                new Choice() { Value = "Mental Health", Synonyms = new List<string>() { "4" } },
-
-            };
-
-            return cardOptions;
-        }
-
 
     }
 }
