@@ -133,7 +133,7 @@ namespace RedCrossChat.Dialogs
                     default:
                         user.isAwareOfFeeling = false;
 
-                         question = "It is important to take care of your mental well-being. Would you like to have a trusted person to talk to?";
+                         question = " It's normal for one to feel not comfortable to share with others, however remember that a problem shared is half solved. Would you like to have a trusted person to talk to?";
                         break;
                         
                 }
@@ -317,7 +317,7 @@ namespace RedCrossChat.Dialogs
                         user.handOverToUser = true;
 
                         // Send the message to the user about the next available agent or calling 1199.
-                        var agentMessage = "Next available Counselor will be with you shortly or you can also call 1199 to connect with one of our counselors.";
+                        var agentMessage = "The next available counsellor will call you shortly, you can also contact us directly by dialing 1199, request to speak to a psychologist.";
                         await stepContext.Context.SendActivityAsync(MessageFactory.Text(agentMessage), cancellationToken);
 
 
@@ -334,7 +334,7 @@ namespace RedCrossChat.Dialogs
 
                         var choices = new List<Choice>
                         {
-                            new Choice() { Value = "hotline", Action = new CardAction() { Title = "hotline", Type = ActionTypes.OpenUrl, Value = "https://recross-chat-bot.azurewebsites.net/" } }
+                            new Choice() { Value = "hotline", Action = new CardAction() { Title = "hotline", Type = ActionTypes.OpenUrl, Value = "https://referraldirectories.redcross.or.ke/" } }
                         };
 
 

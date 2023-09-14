@@ -66,9 +66,12 @@ namespace RedCrossChat.Dialogs
         private async Task<DialogTurnResult> IntroStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
 
+            var question= "Hello dear friend!! Welcome to Kenya Red Cross Society, we are offering tele-counselling services to public at no charges . How can I help you today?\r\n"
+
             stepContext.Values[UserInfo] = new Client();
 
-            var messageText = stepContext.Options?.ToString() ?? "Hello Welcome to Kenya Red Cross Society. How can I help you today?";
+            var messageText = stepContext.Options?.ToString() ?? question;
+
             var promptMessage = MessageFactory.Text(messageText, messageText, InputHints.ExpectingInput);
 
             return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions
