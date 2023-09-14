@@ -15,12 +15,14 @@ using RedCrossChat;
 using RedCrossChat.Cards;
 using RedCrossChat.CognitiveModels;
 using RedCrossChat.Objects;
+using Sentry;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Attachment = Microsoft.Bot.Schema.Attachment;
 
 namespace RedCrossChat.Dialogs
 {
@@ -34,7 +36,7 @@ namespace RedCrossChat.Dialogs
 
             CounselorDialog counselorDialog,
             PersonalDialog personalDialog,
-            //AwarenessDialog awarenessDialog,
+            AiDialog aiDialog,
             ILogger<MainDialog> logger)
             : base(nameof(MainDialog))
         {
@@ -46,6 +48,7 @@ namespace RedCrossChat.Dialogs
 
             AddDialog(counselorDialog);
             AddDialog(personalDialog);
+            AddDialog(aiDialog);
             // AddDialog(awarenessDialog);
 
             var waterfallSteps = new WaterfallStep[]
@@ -54,6 +57,8 @@ namespace RedCrossChat.Dialogs
                     ActStepAsync,
                     ConfirmTermsAndConditionsAsync,
                     ValidateTermsAndConditionsAsync,
+                   // HandleAiInteractions,
+                    RateBotAsync,
                     FinalStepAsync,
             };
 
@@ -66,23 +71,18 @@ namespace RedCrossChat.Dialogs
         private async Task<DialogTurnResult> IntroStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
 
+            var question = "Hello dear friend!! Welcome to Kenya Red Cross Society, we are offering tele-counselling services to public at no charges . How can I help you today?\r\n";
+
             stepContext.Values[UserInfo] = new Client();
 
-            var messageText = stepContext.Options?.ToString() ?? "Hello Welcome to Kenya Red Cross Society. How can I help you today?";
-            var promptMessage = MessageFactory.Text(messageText, messageText, InputHints.ExpectingInput);
+            var messageText = stepContext.Options?.ToString() ?? question;
 
-           
+            var promptMessage = MessageFactory.Text(messageText, messageText, InputHints.ExpectingInput);
 
             return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions
             {
                 Prompt = promptMessage,
-                Choices = new List<Choice>
-                {
-                    new Choice() { Value = InitialActions.Careers, Synonyms = new List<string> { "1", "Careers", "careers" } },
-                    new Choice() { Value = InitialActions.VolunteerAndMemberShip, Synonyms = new List<string> { "2", "Membership" } },
-                    new Choice() { Value = InitialActions.VolunteerOpportunities, Synonyms = new List<string> { "3", "Volunteer", "Opportunities" } },
-                    new Choice() { Value = InitialActions.MentalHealth, Synonyms = new List<string> { "4", "Mental", "mental", "mental Health", "Mental Health", "Help" } }
-                },
+                Choices =RedCrossLists.Actions,
                 Style = stepContext.Context.Activity.ChannelId == "facebook" ? ListStyle.SuggestedAction : ListStyle.HeroCard,
             }, cancellationToken);
 
@@ -166,11 +166,7 @@ namespace RedCrossChat.Dialogs
             {
                 Prompt = MessageFactory.Text("Do you agree to the Terms and Conditions? Please select 'Yes' or 'No'."),
                 RetryPrompt = MessageFactory.Text("Please select a valid option ('Yes' or 'No')."),
-                Choices = new List<Choice>
-                {
-                    new Choice() { Value = "Yes", Synonyms = new List<string> { "y", "Y", "YES", "YE", "ye", "yE", "1" } },
-                    new Choice() { Value = "No", Synonyms = new List<string> { "n", "N", "no" } }
-                },
+                Choices = RedCrossLists.choices,
             };
 
             return await stepContext.PromptAsync(nameof(ChoicePrompt), options, cancellationToken);
@@ -185,6 +181,9 @@ namespace RedCrossChat.Dialogs
             if (confirmation.Equals("Yes", StringComparison.OrdinalIgnoreCase))
             {
                 // If the user confirms with 'Yes', proceed to TermsAndConditionsAsync
+
+                await stepContext.Context.SendActivityAsync(MessageFactory.Text("To exit the bot \n type exit or cancel at any point ."));
+
                 return await stepContext.BeginDialogAsync(nameof(PersonalDialog), null, cancellationToken);
             }
             else
@@ -195,6 +194,23 @@ namespace RedCrossChat.Dialogs
             }
         }
 
+        private async Task<DialogTurnResult> HandleAiInteractions(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        {
+            return await stepContext.BeginDialogAsync(nameof(AiDialog), null, cancellationToken);
+        }
+
+        private async Task<DialogTurnResult> RateBotAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        {
+            var options = new PromptOptions()
+            {
+                Prompt = MessageFactory.Text("How would you rate your experience.with the bot?"),
+                RetryPrompt = MessageFactory.Text("Please select a valid option ('Yes' or 'No')."),
+                Choices = RedCrossLists.Ratings,
+            };
+
+            return await stepContext.PromptAsync(nameof(ChoicePrompt), options, cancellationToken);
+        }
+
 
         private async Task<DialogTurnResult> FinalStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
@@ -202,7 +218,7 @@ namespace RedCrossChat.Dialogs
 
             //add ai todo
 
-            await stepContext.Context.SendActivityAsync(MessageFactory.Text("Thank you for reaching out good bye 😀."));
+            await stepContext.Context.SendActivityAsync(MessageFactory.Text("let not your struggles define your identity. Remember, there's no health without mental health. GoodBye"));
 
             // The result is null or of an unexpected type, return an empty response
             return await stepContext.EndDialogAsync(null, cancellationToken);

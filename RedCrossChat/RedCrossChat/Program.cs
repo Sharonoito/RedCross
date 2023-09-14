@@ -4,14 +4,21 @@
 // Generated with Bot Builder V4 SDK Template for Visual Studio CoreBot v4.18.1
 
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using RedCrossChat.Domain;
+using RedCrossChat.Entities.Auth;
+using RedCrossChat.Entities;
+using System;
+using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace RedCrossChat
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static  void Main(string[] args)
         {
             CreateHostBuilder(args).Build().Run();
         }

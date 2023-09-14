@@ -1,0 +1,152 @@
+[
+  {
+    "SortKey": 1,
+    "ResidualMaturity": "3 months",
+    "LastYield": 0.08473,
+    "Chg1MYield": "+30.6 bp",
+    "Chg6MYield": "+115.6 bp",
+    "LastZCPrice": null,
+    "Chg1MZCPrice": null,
+    "Chg6MZCPrice": null
+  },
+  {
+    "SortKey": 2,
+    "ResidualMaturity": "6 months",
+    "LastYield": 0.094,
+    "Chg1MYield": "+14.7 bp",
+    "Chg6MYield": "+130.5 bp",
+    "LastZCPrice": null,
+    "Chg1MZCPrice": null,
+    "Chg6MZCPrice": null
+  },
+  {
+    "SortKey": 3,
+    "ResidualMaturity": "1 year",
+    "LastYield": 0.0992,
+    "Chg1MYield": "-6.0 bp",
+    "Chg6MYield": "+32.6 bp",
+    "LastZCPrice": 90.98,
+    "Chg1MZCPrice": 0.0005,
+    "Chg6MZCPrice": -0.003
+  },
+  {
+    "SortKey": 4,
+    "ResidualMaturity": "2 years",
+    "LastYield": 0.11597,
+    "Chg1MYield": "-20.7 bp",
+    "Chg6MYield": "+166.8 bp",
+    "LastZCPrice": 80.30,
+    "Chg1MZCPrice": 0.0037,
+    "Chg6MZCPrice": -0.0296
+  },
+  {
+    "SortKey": 5,
+    "ResidualMaturity": "3 years",
+    "LastYield": 0.12232,
+    "Chg1MYield": "-10.1 bp",
+    "Chg6MYield": "+160.7 bp",
+    "LastZCPrice": 70.74,
+    "Chg1MZCPrice": 0.0027,
+    "Chg6MZCPrice": -0.0424
+  },
+  {
+    "SortKey": 6,
+    "ResidualMaturity": "4 years",
+    "LastYield": 0.1292,
+    "Chg1MYield": "+4.0 bp",
+    "Chg6MYield": "+173.9 bp",
+    "LastZCPrice": 61.51,
+    "Chg1MZCPrice": -0.0013,
+    "Chg6MZCPrice": -0.0602
+  },
+  {
+    "SortKey": 7,
+    "ResidualMaturity": "5 years",
+    "LastYield": 0.13318,
+    "Chg1MYield": "+3.8 bp",
+    "Chg6MYield": "+142.6 bp",
+    "LastZCPrice": 53.52,
+    "Chg1MZCPrice": -0.0017,
+    "Chg6MZCPrice": -0.0614
+  },
+  {
+    "SortKey": 8,
+    "ResidualMaturity": "6 years",
+    "LastYield": 0.13518,
+    "Chg1MYield": "+2.0 bp",
+    "Chg6MYield": "+108.0 bp",
+    "LastZCPrice": 46.73,
+    "Chg1MZCPrice": -0.0011,
+    "Chg6MZCPrice": -0.0558
+  },
+  {
+    "SortKey": 9,
+    "ResidualMaturity": "7 years",
+    "LastYield": 0.13856,
+    "Chg1MYield": "+1.7 bp",
+    "Chg6MYield": "+120.0 bp",
+    "LastZCPrice": 40.32,
+    "Chg1MZCPrice": -0.001,
+    "Chg6MZCPrice": -0.0714
+  },
+  {
+    "SortKey": 10,
+    "ResidualMaturity": "8 years",
+    "LastYield": 0.14039,
+    "Chg1MYield": "+4.0 bp",
+    "Chg6MYield": "+90.5 bp",
+    "LastZCPrice": 34.96,
+    "Chg1MZCPrice": -0.0029,
+    "Chg6MZCPrice": -0.0617
+  },
+  {
+    "SortKey": 11,
+    "ResidualMaturity": "9 years",
+    "LastYield": 0.1422,
+    "Chg1MYield": "+5.7 bp",
+    "Chg6MYield": "+102.0 bp",
+    "LastZCPrice": 30.22,
+    "Chg1MZCPrice": -0.0046,
+    "Chg6MZCPrice": -0.0775
+  },
+  {
+    "SortKey": 12,
+    "ResidualMaturity": "10 years",
+    "LastYield": 0.14231,
+    "Chg1MYield": "+6.6 bp",
+    "Chg6MYield": "+96.5 bp",
+    "LastZCPrice": 26.43,
+    "Chg1MZCPrice": -0.006,
+    "Chg6MZCPrice": -0.0813
+  },
+  {
+    "SortKey": 13,
+    "ResidualMaturity": "15 years",
+    "LastYield": 0.14542,
+    "Chg1MYield": "+4.3 bp",
+    "Chg6MYield": "+89.0 bp",
+    "LastZCPrice": 13.05,
+    "Chg1MZCPrice": -0.0053,
+    "Chg6MZCPrice": -0.1104
+  },
+  {
+    "SortKey": 14,
+    "ResidualMaturity": "20 years",
+    "LastYield": 0.14636,
+    "Chg1MYield": "+4.1 bp",
+    "Chg6MYield": "+21.8 bp",
+    "LastZCPrice": 6.51,
+    "Chg1MZCPrice": -0.0076,
+    "Chg6MZCPrice": -0.037
+  },
+  {
+    "SortKey": 15,
+    "ResidualMaturity": "25 years",
+    "LastYield": 0.14665,
+    "Chg1MYield": "+4.0 bp",
+    "Chg6MYield": "+17.0 bp",
+    "LastZCPrice": 3.27,
+    "Chg1MZCPrice": -0.0091,
+    "Chg6MZCPrice": -0.0354
+  }
+]

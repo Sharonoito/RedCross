@@ -19,16 +19,18 @@ namespace RedCrossChat.Dialogs
 {
     public class BreathingDialog : CancelAndHelpDialog
     {
+        private readonly IStatePropertyAccessor<ResponseDto> _userProfileAccessor;
 
-        private List<Choice> _choice;
-        
-        //# private List<BreathingTip> _breathingTips;
+        protected readonly UserState _userState;
+
 
         protected string iterations = "user-iterations";
 
-        public BreathingDialog() : base(nameof(BreathingDialog))
+        public BreathingDialog(UserState userState) : base(nameof(BreathingDialog))
         {
+            _userState = userState;
 
+            _userProfileAccessor = userState.CreateProperty<ResponseDto>(DialogConstants.ProfileAssesor);
 
             AddDialog(new ChoicePrompt(nameof(ChoicePrompt)));
 
@@ -40,14 +42,6 @@ namespace RedCrossChat.Dialogs
                 FinalStepAsync
             };
 
-
-            _choice = new List<Choice>()
-                    {
-                        new Choice() { Value = Validations.YES, Synonyms = new List<string> { "y", "Y", "YES", "YE", "ye", "yE", "1" } },
-                        new Choice() { Value = Validations.NO, Synonyms = new List<string> { "n", "N", "no" } }
-                    };
-
-
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), waterFallSteps));
 
             InitialDialogId = nameof(WaterfallDialog);
@@ -58,8 +52,12 @@ namespace RedCrossChat.Dialogs
 
             User user = (User)stepContext.Options;
 
+            var question = "Would you like me to take you through some breathing exercises or tips on managing mental health?\r\n\r\n ";
+
             if (user.Iteration !=1)
             {
+                stepContext.Values[iterations] = user.Iteration;
+
                 return await stepContext.NextAsync(user);
             }
             else
@@ -67,13 +65,13 @@ namespace RedCrossChat.Dialogs
                 stepContext.Values[iterations] = 1;
             }
 
-           
-           
+            await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
+
+
             var prompts = new PromptOptions
             {
-                Prompt = MessageFactory.Text("Would you like me to take you through some breathing exercises or tips on managing mental health?\r\n\r\n ")
-                ,Choices
-                = _choice
+                Prompt = MessageFactory.Text(question)
+                ,Choices = RedCrossLists.choices
             };
 
             return await stepContext.PromptAsync(nameof(ChoicePrompt), prompts, cancellationToken);
@@ -85,12 +83,18 @@ namespace RedCrossChat.Dialogs
         public async Task<DialogTurnResult> TakeUserThroughExerciseAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
 
+            string stringValue = stepContext.Values[iterations].ToString();
+
+            int _exerciseIndex = Int32.Parse(stringValue);
+
             User user = (User)stepContext.Options;
+
+            var question = "Do you wish to continue ?";
 
             var prompts = new PromptOptions
             {
-                Prompt = MessageFactory.Text("Do you wish to continue?"),
-                Choices = new List<Choice>(_choice)
+                Prompt = MessageFactory.Text(question),
+                Choices = RedCrossLists.choices
             };
 
             var feelings = GetFeelingToExerciseMap();
@@ -99,12 +103,16 @@ namespace RedCrossChat.Dialogs
             {
                 var currentExercise = feelings[_exerciseIndex];
                 await stepContext.Context.SendActivityAsync(MessageFactory.Text(currentExercise.Exercise));
-                _exerciseIndex++;
+
+                stepContext.Values[iterations]=_exerciseIndex+1;
 
                 if (_exerciseIndex >= feelings.Count)
                 {
-                    _exerciseIndex = 1;
+                    stepContext.Values[iterations]  = 1;
                 }
+
+                await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, currentExercise.Exercise +" \n"+question, stepContext, _userProfileAccessor, _userState);
+
 
                 return await stepContext.PromptAsync(nameof(ChoicePrompt), prompts, cancellationToken);
             }
@@ -157,7 +165,7 @@ namespace RedCrossChat.Dialogs
 
             var user = (User)stepContext.Options;
 
-            user.Iteration = user.Iteration+ user.Iteration;
+            user.Iteration += user.Iteration;
 
 
             if (userChoice !=null && userChoice==Validations.YES) return await stepContext.BeginDialogAsync(nameof(WaterfallDialog), user, cancellationToken);
@@ -167,18 +175,17 @@ namespace RedCrossChat.Dialogs
         }
 
 
-        private Dictionary<int, BreathingTip> GetFeelingToExerciseMap()
+        private static Dictionary<int, BreathingTip> GetFeelingToExerciseMap()
         {
             var paths = new[] { ".", "Cards", "Exercise.json" };
-            var adaptiveCardJson = File.ReadAllText(Path.Combine(paths));
-
+           
 
             using StreamReader reader = new(Path.Combine(paths));
             var json = reader.ReadToEnd();
             List<BreathingTip> breathingTips = JsonConvert.DeserializeObject<List<BreathingTip>>(json);
 
 
-            Dictionary<int, BreathingTip> items =new Dictionary<int, BreathingTip>();
+            Dictionary<int, BreathingTip> items =new();
 
             foreach(var item in breathingTips) {
                 items[item.Value] = item;

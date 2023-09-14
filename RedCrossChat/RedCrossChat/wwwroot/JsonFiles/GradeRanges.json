@@ -1,0 +1,65 @@
+[
+	{
+		"SortKey": 1,
+		"MinValue": 89.9,
+		"MaxValue": 100,
+		"Grade": "A1",
+		"Margin": 0
+	},
+	{
+		"SortKey": 2,
+		"MinValue": 79.9,
+		"MaxValue": 90,
+		"Grade": "A2",
+		"Margin": 0
+	},
+	{
+		"SortKey": 3,
+		"MinValue": 64.9,
+		"MaxValue": 80,
+		"Grade": "A3",
+		"Margin": 0
+	},
+	{
+		"SortKey": 4,
+		"MinValue": 49.9,
+		"MaxValue": 65,
+		"Grade": "A4",
+		"Margin": 0
+	},
+	{
+		"SortKey": 5,
+		"MinValue": 34.9,
+		"MaxValue": 50,
+		"Grade": "A5",
+		"Margin": 0
+	},
+	{
+		"SortKey": 6,
+		"MinValue": 19.9,
+		"MaxValue": 35,
+		"Grade": "A6",
+		"Margin": 0
+	},
+	{
+		"SortKey": 7,
+		"MinValue": 14.9,
+		"MaxValue": 20,
+		"Grade": "B7",
+		"Margin": 0
+	},
+	{
+		"SortKey": 8,
+		"MinValue": 9.9,
+		"MaxValue": 15,
+		"Grade": "B8",
+		"Margin": 0
+	},
+	{
+		"SortKey": 9,
+		"MinValue": -100.1,
+		"MaxValue": 10,
+		"Grade": "B9",
+		"Margin": 0
+	}
+]

@@ -8,6 +8,7 @@ using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using RedCrossChat.Contracts;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -16,14 +17,10 @@ using System.Threading.Tasks;
 
 namespace RedCrossChat.Bots
 {
-    public class DialogAndWelcomeBot<T> : DialogBot<T>
+    public class DialogAndWelcomeBot<T>(
+        ConversationState conversationState, UserState userState, T dialog, ILogger<DialogBot<T>> logger, IRepositoryWrapper _repository) : DialogBot<T>(conversationState, userState, dialog, logger, _repository)
         where T : Dialog
     {
-        public DialogAndWelcomeBot(ConversationState conversationState, UserState userState, T dialog, ILogger<DialogBot<T>> logger)
-            : base(conversationState, userState, dialog, logger)
-        {
-        }
-
         protected override async Task OnMembersAddedAsync(IList<ChannelAccount> membersAdded, ITurnContext<IConversationUpdateActivity> turnContext, CancellationToken cancellationToken)
         {
             foreach (var member in membersAdded)

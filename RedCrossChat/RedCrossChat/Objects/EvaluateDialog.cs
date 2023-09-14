@@ -8,9 +8,7 @@ namespace RedCrossChat.Objects
     {
         public static async Task<DialogTurnResult> ProcessStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            var userInput = stepContext.Result as string;
-
-            if (userInput != null && userInput.ToLower().Trim() == "exit")
+            if (stepContext.Result is string userInput && userInput.ToLower().Trim() == "exit")
             {
                 await stepContext.Context.SendActivityAsync("You have exited the bot. Goodbye!", cancellationToken: cancellationToken);
                 return await stepContext.EndDialogAsync(cancellationToken: cancellationToken);

@@ -30,7 +30,7 @@ namespace RedCrossChat.Dialogs
         public async Task<DialogTurnResult>  IntroStepAsync(WaterfallStepContext stepContext,CancellationToken cancellationToken)
         {
 
-            var promptMessage = MessageFactory.Text("Hellow and welcome", null, InputHints.ExpectingInput);
+            var promptMessage = MessageFactory.Text("Hello and welcome", null, InputHints.ExpectingInput);
 
             return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = promptMessage }, cancellationToken);
         }
