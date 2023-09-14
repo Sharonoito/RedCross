@@ -39,7 +39,7 @@ namespace RedCrossChat
                 Messages =
                 {
                     new ChatMessage(ChatRole.System, "You are a Counselor helping people with mental and social issues."),
-                    new ChatMessage(ChatRole.User, "Introduce yourself."),
+                   // new ChatMessage(ChatRole.User, "Introduce yourself."),
                 },
             };
 

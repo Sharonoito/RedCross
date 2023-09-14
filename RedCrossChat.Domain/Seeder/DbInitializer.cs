@@ -29,6 +29,11 @@ namespace RedCrossChat.Domain
                 new DBFeeling { Name= "Expressionless ", Description= "Expressionless \U0001fae4", Synonymns="", Id = Guid.NewGuid(), DateCreated = DateTime.Now }
             );
 
+            modelBuilder.Entity<AppRole>().HasData(
+                new AppRole(Constants.SuperAdministratorId, "Super Administrator", true, DateTime.Now),
+                new AppRole(Constants.AdministratorId, "Administrator", true, DateTime.Now)
+           );
+
          
         }
     }
