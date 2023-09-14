@@ -20,10 +20,17 @@ using RedCrossChat.Repository;
 
 namespace RedCrossChat
 {
-    public class Startup(IConfiguration configuration)
+    public class Startup
     {
 
-        private readonly IConfiguration _config = configuration;
+        private readonly IConfiguration _config;
+
+        public Startup(IConfiguration configuration)
+        {
+            _config = configuration;
+        }
+
+        
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
