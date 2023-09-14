@@ -18,24 +18,29 @@ using System.Threading.Tasks;
 namespace RedCrossChat.Bots
 {
     
-    public class DialogBot<T>(
-        ConversationState conversationState,
-        UserState userState,
-        T dialog,
-        ILogger<DialogBot<T>> logger, IRepositoryWrapper repository) : ActivityHandler
+    public  class DialogBot<T> : ActivityHandler
         where T : Dialog
     {
-        protected readonly Dialog Dialog = dialog;
-        protected readonly BotState ConversationState = conversationState;
-        protected readonly BotState UserState = userState;
-        protected readonly ILogger Logger = logger;
+        protected readonly Dialog Dialog ;
+        protected readonly BotState ConversationState ;
+        protected readonly BotState UserState ;
+        protected readonly ILogger Logger ;
 
-        private readonly IRepositoryWrapper _repository=repository;
+        private readonly IRepositoryWrapper _repository;
         protected readonly DialogSet _dialog;
-        private readonly IStatePropertyAccessor<ResponseDto> _userProfileAccessor = 
+        private readonly IStatePropertyAccessor<ResponseDto> _userProfileAccessor; 
+            
+
+        public DialogBot(ConversationState conversationState, UserState userState, T dialog, ILogger<DialogBot<T>> logger, IRepositoryWrapper repository)
+        {
+            ConversationState = conversationState;
+            UserState = userState;
+            Dialog = dialog;
+            Logger = logger;
+            _repository = repository;
+            _userProfileAccessor =
             userState.CreateProperty<ResponseDto>(DialogConstants.ProfileAssesor);
-
-
+        }
 
         public override async Task OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken = default)
         {
@@ -82,7 +87,7 @@ namespace RedCrossChat.Bots
                     responseDto.Message = null;
 
                     await _userProfileAccessor.SetAsync(turnContext, responseDto, cancellationToken);
-                    await userState.SaveChangesAsync(turnContext);
+                    await UserState.SaveChangesAsync(turnContext);
                 }
             }
         }

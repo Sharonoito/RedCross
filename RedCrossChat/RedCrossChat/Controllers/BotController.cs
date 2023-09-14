@@ -12,10 +12,16 @@ namespace RedCrossChat.Controllers
    
     [Route("api/messages")]
     [ApiController]
-    public class BotController(IBotFrameworkHttpAdapter adapter, IBot bot) : ControllerBase
+    public class BotController : ControllerBase
     {
-        private readonly IBotFrameworkHttpAdapter _adapter = adapter;
-        private readonly IBot _bot = bot;
+        private readonly IBotFrameworkHttpAdapter _adapter;
+        private readonly IBot _bot;
+
+        public BotController(IBotFrameworkHttpAdapter adapter, IBot bot)
+        {
+            _adapter = adapter;
+            _bot = bot;
+        }
 
         [HttpPost]
         [HttpGet]

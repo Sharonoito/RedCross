@@ -189,16 +189,14 @@
                         render: function (data, type, row) {
                             var actionsHtml =
                                 `<div class='text-center'>
-                                                                <button class='btn btn-outline-primary btn-xs  show-detailed '
-                                                                    data-hidden='Id'
-                                                                    data-id='${row.id}'
-                                                                    data-bs-toggle="offcanvas" data-bs-target="#offcanvasBackdrop" aria-controls="offcanvasBackdrop"
-                                                                    data-action='@Url.Action("DetailedConversation")?clientId=${row.id}'
-                                                                    title='Edit'>
-                                                                    <i class='fa fa-eye'></i>
-
-
-                                                            </div>`;
+                                    <button class='btn btn-outline-primary btn-xs  show-detailed '
+                                        data-hidden='Id'
+                                        data-id='${row.id}'
+                                        data-bs-toggle="offcanvas" data-bs-target="#offcanvasBackdrop" aria-controls="offcanvasBackdrop"
+                                        data-action='@Url.Action("DetailedConversation")?clientId=${row.id}'
+                                        title='Edit'>
+                                        <i class='fa fa-eye'></i>
+                                </div>`;
 
                             return actionsHtml;
                         },

@@ -10,9 +10,15 @@ using System.Threading.Tasks;
 
 namespace RedCrossChat.Controllers
 {
-    public class ConversationController(IRepositoryWrapper repository) : BaseController
+    public class ConversationController : BaseController
     {
-        private readonly IRepositoryWrapper _repository = repository;
+        private readonly IRepositoryWrapper _repository ;
+
+
+        public ConversationController(IRepositoryWrapper repository)
+        {
+            _repository = repository;
+        }
 
         public IActionResult Index()
         {

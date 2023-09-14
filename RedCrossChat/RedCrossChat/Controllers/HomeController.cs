@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic;
+using NuGet.Protocol.Core.Types;
 using RedCrossChat.Contracts;
 
 using System.Collections.Generic;
@@ -8,9 +9,14 @@ using System.Threading.Tasks;
 
 namespace RedCrossChat
 {
-    public class HomeController (IRepositoryWrapper repository) : BaseController
+    public class HomeController  : BaseController
     {
-        private readonly IRepositoryWrapper _repository = repository;
+        private readonly IRepositoryWrapper _repository;
+
+        public HomeController(IRepositoryWrapper repository)
+        {
+            _repository = repository;
+        }
 
         [HttpGet]
         public async Task<IActionResult> Index()

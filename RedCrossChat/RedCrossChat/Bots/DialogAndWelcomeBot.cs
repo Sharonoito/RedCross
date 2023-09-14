@@ -3,12 +3,15 @@
 //
 // Generated with Bot Builder V4 SDK Template for Visual Studio CoreBot v4.18.1
 
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using NuGet.Protocol.Core.Types;
 using RedCrossChat.Contracts;
+using RedCrossChat.Dialogs;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -17,10 +20,15 @@ using System.Threading.Tasks;
 
 namespace RedCrossChat.Bots
 {
-    public class DialogAndWelcomeBot<T>(
-        ConversationState conversationState, UserState userState, T dialog, ILogger<DialogBot<T>> logger, IRepositoryWrapper _repository) : DialogBot<T>(conversationState, userState, dialog, logger, _repository)
+    public class DialogAndWelcomeBot<T> : DialogBot<T>
         where T : Dialog
     {
+        public DialogAndWelcomeBot(ConversationState conversationState, UserState userState, T dialog, ILogger<DialogBot<T>> logger,IRepositoryWrapper repository)
+            : base(conversationState, userState, dialog, logger,repository)
+        {
+
+        }
+
         protected override async Task OnMembersAddedAsync(IList<ChannelAccount> membersAdded, ITurnContext<IConversationUpdateActivity> turnContext, CancellationToken cancellationToken)
         {
             foreach (var member in membersAdded)

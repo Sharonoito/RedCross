@@ -16,17 +16,24 @@ using RedCrossChat.Objects;
 
 namespace RedCrossChat.Controllers
 {
-    public class AuthController(
-        UserManager<AppUser> userManager,
+    public class AuthController : BaseController
+    {
+        private readonly UserManager<AppUser> _userManager;
+        private readonly SignInManager<AppUser> _signInManager ;
+        private readonly RoleManager<AppRole> _roleManager ;
+
+        private readonly IRepositoryWrapper _repository ;
+
+        public AuthController(UserManager<AppUser> userManager,
         SignInManager<AppUser> signInManager,
         RoleManager<AppRole> roleManager,
-        IRepositoryWrapper repository) : BaseController
-    {
-        private readonly UserManager<AppUser> _userManager = userManager;
-        private readonly SignInManager<AppUser> _signInManager = signInManager;
-        private readonly RoleManager<AppRole> _roleManager = roleManager;
-
-        private readonly IRepositoryWrapper _repository = repository;
+        IRepositoryWrapper repository)
+        {
+            _userManager = userManager;
+            _signInManager = signInManager;
+            _roleManager = roleManager;
+            _repository = repository;
+        }
 
         public IActionResult Index()
         {
