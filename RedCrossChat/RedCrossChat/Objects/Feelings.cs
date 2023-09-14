@@ -11,6 +11,7 @@ namespace RedCrossChat.Objects
         public static readonly string Sad = "Sad 😪";
         public static readonly string FlatEffect = "Flat Effect 🫥";
         public static readonly string Expressionless = "Expressionless 🫤";
+        public static readonly string Other = "Other";
     }
 
     public static class RedCrossDialogTypes
@@ -24,6 +25,15 @@ namespace RedCrossChat.Objects
         {
             new Choice() { Value = Validations.YES, Synonyms = new List<string> { "y", "Y", "YES", "YE", "ye", "yE", "1" } },
             new Choice() { Value = Validations.NO, Synonyms = new List<string> { "n", "N", "no" } }
+        };
+
+        public static readonly List<Choice> Ratings = new()
+        {
+             new Choice() { Value = "Excellent", Synonyms = new List<string> {  "1" } },
+             new Choice() { Value = "Average", Synonyms = new List<string> {  "3" } },
+             new Choice() { Value = "Good", Synonyms = new List<string> { "2" } },
+             new Choice() { Value = "Bad", Synonyms = new List<string> {  "4" } },
+             new Choice() { Value = "Terrible", Synonyms = new List<string> {  "5" } },
         };
 
         public static readonly List<Choice> AgeGroups = new()

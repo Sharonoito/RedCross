@@ -55,10 +55,13 @@ namespace RedCrossChat.Dialogs
 
             {
                 InitialStepAsync,
-                PrivateDetailsGenderAsync,
-                PrivateDetailsAgeBracketAsync,
+                EvaluateFeelingAsync,
                 PrivateDetailsCountryBracketAsync,
                 PrivateDetailsCountyDropdownAsync,
+                PrivateDetailsAgeBracketAsync,
+                RelationShipStatusAsync,
+                ProfessionalStatusAsync,
+                PrivateDetailsGenderAsync,
                 LaunchAwarenessDialogAsync,
                 HandleBreathingStepAsync,
                 FinalStepAsync,
@@ -93,6 +96,7 @@ namespace RedCrossChat.Dialogs
                     new Choice() { Value=Feelings.FlatEffect},
                     new Choice() { Value=Feelings.Expressionless},
                     new Choice() { Value=Feelings.Sad},
+                    new Choice() {Value=Feelings.Other},
                 },
             };
 
@@ -103,43 +107,32 @@ namespace RedCrossChat.Dialogs
             // Prompt the user with the configured PromptOptions.
             return await stepContext.PromptAsync("select-feeling", options, cancellationToken);
         }
-        private async Task<DialogTurnResult> PrivateDetailsGenderAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+
+        private async Task<DialogTurnResult> EvaluateFeelingAsync(WaterfallStepContext stepContext,CancellationToken token)
         {
 
-           Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
-           
-           await EvaluateDialog.ProcessStepAsync(stepContext, cancellationToken);
+            var question = "Please Specify the feeling ";
 
-            var question = "What is your Gender";
-
-
-            if (stepContext.Values != null)
+            if(((FoundChoice)stepContext.Result).Value==Feelings.Other)
             {
+                await DialogExtensions.UpdateDialogAnswer(((FoundChoice)stepContext.Result).Value.ToString(), question, stepContext, _userProfileAccessor, _userState);
 
-                await DialogExtensions.UpdateDialogAnswer(((FoundChoice)stepContext.Result).Value.ToString(),question, stepContext, _userProfileAccessor, _userState);
-
-                persona.Feeling = ((FoundChoice)stepContext.Result).Value;
-
-                _repository.Persona.Update(persona);
-
-                bool result = await _repository.SaveChangesAsync();
+                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text(question) }, token);
             }
 
-            var options = new PromptOptions()
-            {
-                Prompt = MessageFactory.Text(question),
-                RetryPrompt = MessageFactory.Text("Please select a valid Gender"),
-                Choices = new List<Choice>
-                {
-                    new Choice() { Value = Gender.Male,Synonyms=new List<string>{"M","Man","MALE","y"}},
-                    new Choice() { Value= Gender.Female,Synonyms=new List<string>{"f","fE","FEMALE","female"}},
-                    new Choice() { Value= Gender.Other,Synonyms=new List<string>{"o","other"}},
-                },
-            };
+            Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
 
-            // Prompt the user with the configured PromptOptions.
-            return await stepContext.PromptAsync("select-gender", options, cancellationToken);
+            persona.Feeling = stepContext.Context.Activity.Text;
+
+            _repository.Persona.Update(persona);
+
+            await _repository.SaveChangesAsync();
+
+            return await stepContext.NextAsync(persona);
+
         }
+
+       
 
         private async Task<DialogTurnResult> PrivateDetailsAgeBracketAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
@@ -150,7 +143,7 @@ namespace RedCrossChat.Dialogs
 
             if (stepContext.Values != null)
             {
-                persona.Gender = ((FoundChoice)stepContext.Result).Value;
+                persona.County = stepContext.Context.Activity.Text;
 
                 _repository.Persona.Update(persona);
 
@@ -172,17 +165,91 @@ namespace RedCrossChat.Dialogs
 
         }
 
-        private async Task<DialogTurnResult> PrivateDetailsCountryBracketAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        private async Task<DialogTurnResult> RelationShipStatusAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
 
+            var question = "What is your relationship status ?";
+
+            await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
+
             Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
+
+            persona.AgeGroup = stepContext.Context.Activity.Text;
+
+            _repository.Persona.Update(persona);
+
+            bool result = await _repository.SaveChangesAsync();
+
+            return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions()
+            {
+                Prompt = MessageFactory.Text("What is your relationship status ?"),
+                Choices = new List<Choice>()
+                        {
+                            new Choice  { Value ="Single",Synonyms=new List<string>{"Single","S"}},
+                            new Choice  { Value ="Married",Synonyms=new List<string>{"married"}},
+                            new Choice  { Value ="Divorced",Synonyms=new List<string>{"divorced"}},
+                            new Choice  { Value ="In A relationship",Synonyms=new List<string>{"dating","relations","casual"}},
+                            new Choice  { Value ="Widow /Widower",Synonyms=new List<string>{"widow","widower"}},
+                            new Choice  { Value ="Complicated",Synonyms=new List<string>{"complicated","comp","it's complicated"}},
+                            new Choice  { Value ="none",Synonyms=new List<string>{"none","no"}},
+
+                        }
+            }, cancellationToken);
+        }
+
+        private async Task<DialogTurnResult> ProfessionalStatusAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        {
+
+            var question = "What is your professional status ?";
+
+            await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
+
+            Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
+
+            persona.MaritalStatus = ((FoundChoice)stepContext.Result).Value;
+
+            _repository.Persona.Update(persona);
+
+            bool result = await _repository.SaveChangesAsync();
+
+
+            return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions()
+            {
+                Prompt = MessageFactory.Text(question),
+                Choices = new List<Choice>()
+                        {
+                            new Choice  { Value ="Student",},
+                            new Choice  { Value ="Employed",},
+                            new Choice  { Value ="Entrepreneur"},
+                            new Choice  { Value ="Retired"},
+                            new Choice  { Value ="Unemployed"},
+                            new Choice  { Value ="Complicated"},
+                            new Choice  { Value ="none",Synonyms=new List<string>{"none","no"}},
+                        }
+            }, cancellationToken);
+
+        }
+
+        private async Task<DialogTurnResult> PrivateDetailsCountryBracketAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        {
+            var persona=new Persona() ;
+
+            if(stepContext.Result is Persona)
+            {
+                persona=stepContext.Result as Persona;
+            }
+            else
+            {
+                persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
+            }
+
 
 
             var question = "What is your Country of Origin";
 
             if(persona != null)
             {
-                persona.AgeGroup= stepContext.Context.Activity.Text;
+                persona.Feeling= stepContext.Context.Activity.Text;
 
                 _repository.Persona.Update(persona);
 
@@ -252,6 +319,44 @@ namespace RedCrossChat.Dialogs
             {
                 return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt=MessageFactory.Text(question) }, cancellationToken); 
             }  
+        }
+
+        private async Task<DialogTurnResult> PrivateDetailsGenderAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        {
+
+            Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
+
+            await EvaluateDialog.ProcessStepAsync(stepContext, cancellationToken);
+
+            var question = "What is your Gender";
+
+
+            if (stepContext.Values != null)
+            {
+
+                await DialogExtensions.UpdateDialogAnswer(((FoundChoice)stepContext.Result).Value.ToString(), question, stepContext, _userProfileAccessor, _userState);
+
+                persona.ProfessionalStatus = ((FoundChoice)stepContext.Result).Value;
+
+                _repository.Persona.Update(persona);
+
+                bool result = await _repository.SaveChangesAsync();
+            }
+
+            var options = new PromptOptions()
+            {
+                Prompt = MessageFactory.Text(question),
+                RetryPrompt = MessageFactory.Text("Please select a valid Gender"),
+                Choices = new List<Choice>
+                {
+                    new Choice() { Value = Gender.Male,Synonyms=new List<string>{"M","Man","MALE","y"}},
+                    new Choice() { Value= Gender.Female,Synonyms=new List<string>{"f","fE","FEMALE","female"}},
+                    new Choice() { Value= Gender.Other,Synonyms=new List<string>{"o","other"}},
+                },
+            };
+
+            // Prompt the user with the configured PromptOptions.
+            return await stepContext.PromptAsync("select-gender", options, cancellationToken);
         }
 
         private static Task<bool> ValidateCountyAsync(PromptValidatorContext<string> promptContext, CancellationToken cancellationToken)
@@ -327,8 +432,8 @@ namespace RedCrossChat.Dialogs
         {
             User user = (User)(stepContext.Result);
 
-            if (user !=null && user.Iteration > 1)
-                return await stepContext.EndDialogAsync(user, cancellationToken);
+            //if (user !=null && user.Iteration > 1)
+               // return await stepContext.EndDialogAsync(user, cancellationToken);
 
             return await stepContext.BeginDialogAsync(nameof(AiDialog), user, cancellationToken);
         }

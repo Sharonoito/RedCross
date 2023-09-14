@@ -57,8 +57,7 @@ namespace RedCrossChat.Dialogs
                 ProcessMentalEvaluationChoice,
                 HandleCaregiverChoiceAsync,
                 EvaluateDialogTurnAsync,
-                RelationShipStatusAsync,
-                ProfessionalStatusAsync,
+               
                 CheckFeelingAware,
                 CheckProfessionalSwitchAsync,
                 FinalStepAsync
@@ -217,52 +216,7 @@ namespace RedCrossChat.Dialogs
             }
         }
 
-        private async Task<DialogTurnResult> RelationShipStatusAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
-        {
-
-            var question = "What is your relationship status ?";
-
-            await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
-
-            return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions()
-            {
-                Prompt = MessageFactory.Text("What is your relationship status ?"),
-                Choices = new List<Choice>()
-                        {
-                            new Choice  { Value ="Single",Synonyms=new List<string>{"Single","S"}},
-                            new Choice  { Value ="Married",Synonyms=new List<string>{"married"}},
-                            new Choice  { Value ="Divorced",Synonyms=new List<string>{"divorced"}},
-                            new Choice  { Value ="In A relationship",Synonyms=new List<string>{"dating","relations","casual"}},
-                            new Choice  { Value ="Widow /Widower",Synonyms=new List<string>{"widow","widower"}},
-                            new Choice  { Value ="Complicated",Synonyms=new List<string>{"complicated","comp","it's complicated"}},
-
-                        }
-            }, cancellationToken);
-        }
-
-        private async Task<DialogTurnResult> ProfessionalStatusAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
-        {
-
-            var question = "What is your professional status ?";
-            
-            await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
-
-            return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions()
-            {
-                Prompt = MessageFactory.Text(question),
-                Choices = new List<Choice>()
-                        {
-                            new Choice  { Value ="Student",},
-                            new Choice  { Value ="Employed",},
-                            new Choice  { Value ="Entrepreneur"},
-                            new Choice  { Value ="Retired"},
-                            new Choice  { Value ="Unemployed"},
-                            new Choice  { Value ="Complicated"},
-
-                        }
-            }, cancellationToken);
-
-        }
+        
 
         public async Task<DialogTurnResult> CheckFeelingAware(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {

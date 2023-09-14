@@ -23,5 +23,8 @@ namespace RedCrossChat
         [Required]
         [Display(Name = "Phone Number")]
         public string PhoneNumber { get; set; }
+
+        [Display(Name = "Role")]
+        public int RoleId { get;set; }
     }
 }

@@ -15,12 +15,14 @@ using RedCrossChat;
 using RedCrossChat.Cards;
 using RedCrossChat.CognitiveModels;
 using RedCrossChat.Objects;
+using Sentry;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Attachment = Microsoft.Bot.Schema.Attachment;
 
 namespace RedCrossChat.Dialogs
 {
@@ -34,7 +36,7 @@ namespace RedCrossChat.Dialogs
 
             CounselorDialog counselorDialog,
             PersonalDialog personalDialog,
-            //AwarenessDialog awarenessDialog,
+            AiDialog aiDialog,
             ILogger<MainDialog> logger)
             : base(nameof(MainDialog))
         {
@@ -46,6 +48,7 @@ namespace RedCrossChat.Dialogs
 
             AddDialog(counselorDialog);
             AddDialog(personalDialog);
+            AddDialog(aiDialog);
             // AddDialog(awarenessDialog);
 
             var waterfallSteps = new WaterfallStep[]
@@ -54,6 +57,8 @@ namespace RedCrossChat.Dialogs
                     ActStepAsync,
                     ConfirmTermsAndConditionsAsync,
                     ValidateTermsAndConditionsAsync,
+                   // HandleAiInteractions,
+                    RateBotAsync,
                     FinalStepAsync,
             };
 
@@ -66,7 +71,7 @@ namespace RedCrossChat.Dialogs
         private async Task<DialogTurnResult> IntroStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
 
-            var question= "Hello dear friend!! Welcome to Kenya Red Cross Society, we are offering tele-counselling services to public at no charges . How can I help you today?\r\n"
+            var question = "Hello dear friend!! Welcome to Kenya Red Cross Society, we are offering tele-counselling services to public at no charges . How can I help you today?\r\n";
 
             stepContext.Values[UserInfo] = new Client();
 
@@ -176,6 +181,9 @@ namespace RedCrossChat.Dialogs
             if (confirmation.Equals("Yes", StringComparison.OrdinalIgnoreCase))
             {
                 // If the user confirms with 'Yes', proceed to TermsAndConditionsAsync
+
+                await stepContext.Context.SendActivityAsync(MessageFactory.Text("To exit the bot \n type exit or cancel at any point ."));
+
                 return await stepContext.BeginDialogAsync(nameof(PersonalDialog), null, cancellationToken);
             }
             else
@@ -184,6 +192,23 @@ namespace RedCrossChat.Dialogs
                 await stepContext.Context.SendActivityAsync(MessageFactory.Text("You need to agree to the data protection policy to proceed."));
                 return await stepContext.EndDialogAsync(null, cancellationToken);
             }
+        }
+
+        private async Task<DialogTurnResult> HandleAiInteractions(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        {
+            return await stepContext.BeginDialogAsync(nameof(AiDialog), null, cancellationToken);
+        }
+
+        private async Task<DialogTurnResult> RateBotAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        {
+            var options = new PromptOptions()
+            {
+                Prompt = MessageFactory.Text("How would you rate your experience.with the bot?"),
+                RetryPrompt = MessageFactory.Text("Please select a valid option ('Yes' or 'No')."),
+                Choices = RedCrossLists.Ratings,
+            };
+
+            return await stepContext.PromptAsync(nameof(ChoicePrompt), options, cancellationToken);
         }
 
 

@@ -12,6 +12,7 @@ using System.Linq;
 using DataTables.AspNet.Core;
 using DataTables.AspNet.AspNetCore;
 using Microsoft.EntityFrameworkCore;
+using RedCrossChat.Objects;
 
 namespace RedCrossChat.Controllers
 {
@@ -139,11 +140,17 @@ namespace RedCrossChat.Controllers
         public async Task<IActionResult> EditUser(Guid clientId)
         {
 
-            await _repository.User.FindByCondition(x => x.Id == clientId.ToString()).FirstOrDefaultAsync();
+            var user=await _repository.User.FindByCondition(x => x.Id == clientId.ToString()).FirstOrDefaultAsync();
 
+            var userVm = new UserVm
+            {
+                FirstName=user.FirstName,
+                LastName=user.LastName,
+                Email=user.Email,
+                PhoneNumber=user.PhoneNumber,
+            };
 
-
-            return View("_User");
+            return View("_User",userVm);
         }
 
         public async Task< IActionResult> SaveUser(UserVm user) {
@@ -171,6 +178,22 @@ namespace RedCrossChat.Controllers
                         return Error(result.Errors.First().Description.ToString());
 
                     return Success(null, null);
+                }
+                else
+                {
+                    var userDB = await _repository.User.FindByCondition(x => x.Id == user.Id.ToString()).FirstOrDefaultAsync();
+
+                    userDB.FirstName = user.FirstName;
+                    userDB.LastName = user.LastName;
+                    userDB.Email = user.Email;
+                    userDB.UserName = user.UserName;
+
+                    _repository.User.Update(userDB);
+
+                    var result = await _repository.SaveChangesAsync();
+
+                    if (result)
+                       return Success(null, null);
                 }
             }
             catch(Exception)
