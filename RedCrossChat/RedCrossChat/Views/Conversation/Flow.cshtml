@@ -1,0 +1,257 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+
+
+<section class="content-header">
+
+    <div class="row">
+        <div class="col-xl-6">
+            <div class="card">
+                <h5 class="card-header">Conversation Flow</h5>
+                <div class="card-body">
+                    <ul class="timeline pt-3" id="conversation-timeline">
+                       
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-6" id="question-container">
+            
+        </div>
+
+    </div>
+   
+
+    <div class="modal fade" data-keyboard="false" id="flowModal" tabindex="-1" role="dialog" style="display:none" aria-labelledby="flowModal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Styles {
+    <environment names="Development,Staging,Production">
+        <!-- DataTables -->
+        <link rel="stylesheet" href="~/lib/datatables-bs4/css/dataTables.bootstrap4.min.css">
+        <link rel="stylesheet" href="~/lib/datatables-responsive/css/responsive.bootstrap4.min.css">
+        <link rel="stylesheet" href="~/lib/datatables-buttons/css/buttons.bootstrap4.min.css">
+    </environment>
+}
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <environment names="Development,Staging,Production">
+        <!-- DataTables  & Plugins -->
+        <script src="~/lib/datatables/jquery.dataTables.min.js"></script>
+        <script src="~/lib/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+        <script src="~/lib/datatables-responsive/js/dataTables.responsive.min.js"></script>
+        <script src="~/lib/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+        <script src="~/lib/datatables-buttons/js/dataTables.buttons.min.js"></script>
+        <script src="~/lib/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
+
+    </environment>
+
+    <script type="text/javascript">
+       
+       
+
+
+
+        $(document).on('ready', GetConversationFlows());
+
+        $(document).on('click', '#AddChoice', function () {
+            $(".choices table").append(newChoiceUi(this))
+        })
+
+        $(document).on('click', '.save-choice', function () {
+
+            let parent = $($($(this).parent()).parent()).parent();
+
+            $.post("@Url.Action("SaveQuestionOption")", { value: parent.find('input.name').val(), type: parent.find('select.type').val(), questionId: $(this).data('id') }).then(response => {
+                if (response.status) {
+                    parent.remove()
+                } else {
+                    
+                }
+
+            })
+        })
+
+        $(document).on('click', '.questions', function () {
+
+            GetConversationFlow($(this).attr('id'));
+            
+        });
+
+        function GetConversationFlows() {
+            $.post("@Url.Action("GetConversationFlows")").then(response => {
+
+                $("#conversation-timeline").html('');
+
+
+                response.responseData.forEach(res => {
+                    let question = res.question;
+
+                    let optionString = '';
+
+                    console.log(res);
+                    console.log(res.options);
+
+                  //  if (res.options != undefined || res.options != null)
+                    optionString= res.options.map(option => `<button class='btn btn-outline-primary btn-xs'>${option.value}</button>`);
+                  
+                    $("#conversation-timeline").append(`<li class="timeline-item pb-4 timeline-item-primary border-left-dashed questions" id='${question.id}'>
+                                                                <span class="timeline-indicator-advanced timeline-indicator-primary">
+                                                                    <i class="bx bx-paper-plane"></i>
+                                                                </span>
+                                                                <div class="timeline-event">
+                                                                    <div class="timeline-header border-bottom mb-3">
+                                                                    <h6 class="mb-0">${question.value}</h6>
+                                                                    <span class="text-muted">${question.type == 1 ? 'Choice Prompt' : 'Others'}</span>
+                                                                    </div>
+                                                                    <div class="d-flex justify-content-between flex-wrap mb-2">
+                                                                    <div class='text-center btn-group'>
+                                                                        ${optionString}
+                                                                    </div>
+                                                                    <div>
+                                                                        <span>6:30 AM</span>
+                                                                    </div>
+                                                                    </div>
+
+                                                                </div>
+                                                                </li>`)
+                })
+
+                $("#conversation-timeline").append(` <li class="timeline-item pb-4 timeline-item-dark border-left-dashed">
+                                    <span class="timeline-indicator-advanced timeline-indicator-dark">
+                                        <i class="bx bx-bell"></i>
+                                    </span>
+                                    <div class="timeline-event">
+                                        <div class="timeline-header">
+                                            <h6 class="mb-0">2 Add Question</h6>
+
+                                        </div>
+                                        <ul class="list-group list-group-flush">
+                                            <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap border-top-0 p-0">
+
+
+
+                                                <button type="button"
+                                                        class="load-modal text-right btn btn-sm btn-outline-primary float-right"
+                                                        data-toggle="modal"
+                                                        data-viewurl="true"
+                                                        data-action="@Url.Action("CreateQuestion")" data-bs-toggle="modal" data-bs-target="#flowModal">
+                                                    <i class="fa fa-plus"></i>
+                                                </button>
+
+                                                <button type="button"
+                                                        class="load-modal text-right btn btn-sm btn-outline-primary float-right"
+                                                        data-toggle="modal"
+                                                        data-target="#flowModal"
+                                                        data-modal="flowModal"
+                                                        data-viewurl="true"
+                                                        data-action="@Url.Action("CreateQuestion")" data-bs-toggle="modal" data-bs-target="#flowModal">
+                                                    <i class="fa fa-plus"></i> Add Question
+                                                </button>
+                                            </li>
+
+                                        </ul>
+                                    </div>
+                                </li>
+
+                                <li class="timeline-end-indicator">
+                                    <i class="bx bx-check-circle"></i>
+                                </li>`)
+            })
+        }
+
+        function newChoiceUi(btn) {
+
+            let id=$(btn).data('id')
+            return `<tr> 
+            <td><input class='form-control-sm input-sm name'/></td> 
+            <td><select class='form-control-sm input-sm type'>
+               <option value='1'>Next Question</option>
+               <option value='2'>End Dialog</option>
+               <option value='3'>Go To Question</option>
+               <option value='4'>Skip Question</option>
+            
+            </select> </td> 
+            <td>
+                    <div class='text-center'>
+                        <button class='btn btn-outline-primary btn-xs save-choice' data-id='${id}'
+                            title='Edit' >
+                            <i class='fa fa-check'></i>
+
+                        <button class='delete btn btn-outline-danger btn-xs'
+                            data-toggle='tooltip'
+                            title='Delete'>
+                            <i class='fa fa-trash'></i>
+                        </button>
+                    </div>
+            </td> 
+            </tr>`
+        }
+
+
+        const GetConversationFlow = (id) => {
+            $.post("@Url.Action("GetConversationFlow")", { id: id }).then(response => {
+
+                let question = response.responseData.question;
+
+                let questionOptions = response.responseData.options;
+
+                let optionString = "";
+
+                if (questionOptions != undefined || questionOptions != null)
+                    optionString = questionOptions.map(option => `<tr>
+                                                                    <td>${option.value}</td>
+                                                                    <td></td>
+                                                                    <td></td>
+
+                                                                    </tr>`);
+                console.log(optionString)
+
+                $("#question-container").html(`<div class="card">
+                                                            <h5 class="card-header">${question.value}</h5>
+                                                            <div class="card-body">
+
+                                                               <nav class='p'>Choice Prompt</nav>
+
+                                                               <section class='list choices'>
+
+                                                                               <button type="button" class="text-right btn btn-sm btn-outline-primary float-right" data-id='${question.id}' id='AddChoice'>
+                                                                        <i class="fa fa-plus"></i> Add  Choice
+                                                                    </button>
+
+                                                                    <table >
+                                                                        <tr>
+                                                                            <th>Name</th>
+                                                                            <th>Action</th>
+                                                                            <th></th>
+                                                                        </tr>
+                                                                        <tbody>
+                                                                        ${optionString}
+                                                                        </tbody>
+
+                                                                    </table>
+
+
+                                                               </section>
+
+                                                            </div>
+                                                         </div>`)
+
+            })
+        }
+        
+    </script>
+}

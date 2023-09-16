@@ -31,6 +31,13 @@
             </a>
         </li>
 
+        <li class="menu-item @Html.IsSelected(controller: "Conversation", action: "Flow") ">
+            <a asp-action="Flow" asp-controller="Conversation" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-layout"></i>
+                <div data-i18n="Conversation Flow"></div>
+            </a>
+        </li>
+
         <li class="menu-item @Html.IsSelected(controller: "Conversation", action: "Index")">
             <a asp-action ="Index" asp-controller="Conversation" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-chat"></i>
@@ -44,6 +51,8 @@
                 <div data-i18n="User Management"></div>
             </a>
         </li>
+
+        
 
     </ul>
 </aside>

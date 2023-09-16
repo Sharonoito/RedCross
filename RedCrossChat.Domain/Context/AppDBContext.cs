@@ -17,6 +17,10 @@ namespace RedCrossChat.Domain
 
         public DbSet<Persona> Persona { get; set; }
 
+        public DbSet<Question> Question { get; set; }
+
+        public DbSet<QuestionOption> QuestionOption { get; set; }
+
         public DbSet<AiConversation> AiConversation { get; set; }
 
         public DbSet<Conversation> Conversation { get; set; }
