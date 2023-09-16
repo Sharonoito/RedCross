@@ -1,4 +1,4 @@
-﻿@model List<ReportVm>
+﻿@model ReportVm
 
 <!-- Content wrapper -->
 
@@ -7,26 +7,179 @@
 </h4>
 
 <div class="row">
-    @foreach(var report in Model)
-    {
-        <div class="col-sm-6 col-lg-3 mb-4">
-            <div class="card card-border-shadow-@report.Background h-100">
+
+    <div class="col-lg-9">
+        <div class="row">
+            <div class="card">
                 <div class="card-body">
-                    <div class="d-flex align-items-center mb-2 pb-1">
-                        <div class="avatar me-2">
-                            <span class="avatar-initial rounded bg-label-@report.Background"><i class="bx bxs-truck"></i></span>
-                        </div>
-                        <h4 class="ms-1 mb-0">@report.Value</h4>
+                    <div id="chart"> </div>
+                </div>
+            </div>
+           
+
+        </div>
+    </div>
+    <div class="col-lg-3">
+        <div class="col-12 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="card-title">
+                        <h5 class="text-nowrap mb-2">County</h5>
+
                     </div>
-                    <p class="mb-1">@report.Name</p>
-                    <p class="mb-0">
-                        <span class="fw-medium me-1">@report.Percentage</span>
-                        <small class="text-muted">@report.Description</small>
-                    </p>
+                    <div class="">
+                        <select class="form-control filters" name="county">
+                            <option value="-1">Select County</option>
+                            @foreach (var county in Model.countys)
+                            {
+                                <option value="@county.Id">@county.Name</option>
+                            }
+                        </select>
+                    </div>
                 </div>
             </div>
         </div>
-    }
-    
-    
+
+        <div class="col-12 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="card-title">
+                        <h5 class="text-nowrap mb-2">Gender</h5>
+
+                    </div>
+                    <div class="">
+                        <select class="form-control filters" name="gender">
+                            <option value="-1">__All__</option>
+                            <option value="1">Male</option>
+                            <option value="2">Female</option>
+                            <option value="3">Other</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="card-title">
+                        <h5 class="text-nowrap mb-2">Age Bands</h5>
+
+                    </div>
+                    <div class="">
+                        <select class="form-control filters" name="ageband">
+                            <option value="-1">__All__</option>
+                            <option value="18">Below 18</option>
+                            <option  >18-25</option>
+                            <option >26-35</option>
+                            <option >36-50</option>
+                            <option >55-65</option>
+                            <option value='65'>Above 65</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="card-title">
+                        <h5 class="text-nowrap mb-2">Feeling</h5>
+
+                    </div>
+                    <div class="">
+                        <select class="form-control filters" name="feeling">
+                            <option value="-1">Select Feeling</option>
+                            @foreach(var feeling in Model.feelings)
+                            {
+                                <option value="@feeling.Id">@feeling.Description</option>
+                            }
+                           
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <environment names="Development,Staging,Production">
+        <!-- DataTables  & Plugins -->
+        <script src="~/lib/datatables/jquery.dataTables.min.js"></script>
+        <script src="~/lib/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+        <script src="~/lib/datatables-responsive/js/dataTables.responsive.min.js"></script>
+        <script src="~/lib/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+        <script src="~/lib/datatables-buttons/js/dataTables.buttons.min.js"></script>
+        <script src="~/lib/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
+        <script src="~/library/sneat/assets/vendor/js/pages/page-chat.js"></script>
+
+        <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    </environment>
+
+
+    <script>
+        function capitalizeFirstLetter(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+
+        $(document).on('change', '.filters', function () {
+
+            let filters = [];
+
+            $(".filters").toArray().forEach(filter => {
+                filters[capitalizeFirstLetter($(filter).attr('name'))] = $(filter).val()
+            });
+
+            console.log(filters);
+            console.log(JSON.stringify({... filters }));
+
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("EvaluateReport","Conversation")",
+                data: {  ...filters },
+                async: false,
+                contentType: "application/json",
+                success: function (data) {
+                    resp.push(data);
+                },
+                error: function (req, status, error) {
+                    alert("error generating data.");
+                }
+            });
+
+            
+
+        });
+
+        var options = {
+            chart: {
+                type: 'bar'
+            },
+            series: [{
+                name: 'sales',
+                data: [30, 40, 45, 50, 49, 60, 70, 91, 125]
+            }],
+            xaxis: {
+                categories: [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999]
+            }
+        }
+
+        var chart = new ApexCharts(document.querySelector("#chart"), options);
+
+        chart.render();
+
+        setTimeout(() => {
+            chart.updateSeries([{
+                data: [32, 44, 31, 41, 22]
+            }])
+        },2000)
+    </script>
+}
+

@@ -21,17 +21,12 @@ namespace RedCrossChat
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var visits= await _repository.Conversation.FindAll().ToListAsync();
+         
+            var feelings=await _repository.Feeling.FindAll().ToListAsync();
 
-            var maleVisits=await _repository.Conversation.FindByCondition(x => x.Client.Gender == "Male" ).ToListAsync();
+            var county=await _repository.County.FindAll().ToListAsync();
 
-            List<ReportVm> reportVm = new List<ReportVm>()
-            {
-                new ReportVm("Total Visits","Highest on sunday",visits.Count,"10","bx bxs-truck","primary"),
-                new ReportVm("Total Male Visits","Increase From Last week",maleVisits.Count,"31","bx bxs-truck","warning"),
-            };
-
-            return View(reportVm);
+            return View(new ReportVm { feelings=feelings,countys=county });
         }
 
         [HttpGet]
@@ -39,6 +34,8 @@ namespace RedCrossChat
         {
             return View();
         }
+
+       
 
     }
 }

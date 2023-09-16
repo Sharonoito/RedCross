@@ -56,5 +56,17 @@ namespace RedCrossChat.Controllers
 
             return Success("Fetched successfully", rawConversations);
         }
+
+        
+        public async Task<IActionResult> EvaluateReport(GraphManagerVm managerVm)
+        {
+
+            var conversation = _repository.Conversation;
+
+
+            var conversations=await conversation.FindAll().ToListAsync();
+
+            return Success("Fetched SuccessFully",conversations);
+        }
     }
 }

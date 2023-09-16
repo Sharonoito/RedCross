@@ -132,7 +132,96 @@ namespace RedCrossChat.Dialogs
 
         }
 
-       
+        private async Task<DialogTurnResult> PrivateDetailsCountryBracketAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        {
+            var persona = new Persona();
+
+            if (stepContext.Result is Persona)
+            {
+                persona = stepContext.Result as Persona;
+            }
+            else
+            {
+                persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
+            }
+
+
+
+            var question = "What is your Country of Origin";
+
+            if (persona != null)
+            {
+                persona.Feeling = stepContext.Context.Activity.Text;
+
+                _repository.Persona.Update(persona);
+
+                await _repository.SaveChangesAsync();
+
+                await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
+
+            }
+
+            var options = new PromptOptions()
+            {
+                Prompt = MessageFactory.Text(question),
+                RetryPrompt = MessageFactory.Text("Please select a Choose between the two"),
+                Choices = new List<Choice>
+                {
+                    new Choice() { Value ="Kenya"},
+                    new Choice() { Value="Other"},
+
+                },
+            };
+
+            // Prompt the user with the configured PromptOptions.
+            return await stepContext.PromptAsync("select-country", options, cancellationToken);
+
+        }
+
+        private async Task<DialogTurnResult> PrivateDetailsCountyDropdownAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        {
+            //List<string> counties = GetListOfCounties();
+
+            var hint = "( hint: type in Kiambu or 022,Nairobi or 047 )";
+
+            Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync(cancellationToken: cancellationToken);
+
+
+            var question = "Which county are you located in?";
+
+            if (persona != null)
+            {
+                persona.Country = stepContext.Context.Activity.Text;
+
+                _repository.Persona.Update(persona);
+
+                await _repository.SaveChangesAsync();
+
+                if (((FoundChoice)stepContext.Result).Value != "Kenya")
+                {
+                    question = "Which Country are you from ?";
+                }
+
+                await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
+
+            }
+
+            var promptOptions = new PromptOptions
+            {
+                Prompt = MessageFactory.Text($"{question} \n {hint} "),
+                RetryPrompt = MessageFactory.Text($"Please input a county \n {hint} "),
+            };
+
+            if (((FoundChoice)stepContext.Result).Value == "Kenya")
+            {
+
+                return await stepContext.PromptAsync(RedCrossDialogTypes.SelectCounty, promptOptions, cancellationToken);
+            }
+            else
+            {
+                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text(question) }, cancellationToken);
+            }
+        }
 
         private async Task<DialogTurnResult> PrivateDetailsAgeBracketAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
@@ -230,97 +319,7 @@ namespace RedCrossChat.Dialogs
 
         }
 
-        private async Task<DialogTurnResult> PrivateDetailsCountryBracketAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
-        {
-            var persona=new Persona() ;
-
-            if(stepContext.Result is Persona)
-            {
-                persona=stepContext.Result as Persona;
-            }
-            else
-            {
-                persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
-            }
-
-
-
-            var question = "What is your Country of Origin";
-
-            if(persona != null)
-            {
-                persona.Feeling= stepContext.Context.Activity.Text;
-
-                _repository.Persona.Update(persona);
-
-                await _repository.SaveChangesAsync();
-
-                await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
-
-            }
-
-            var options = new PromptOptions()
-            {
-                Prompt = MessageFactory.Text(question),
-                RetryPrompt = MessageFactory.Text("Please select a Choose between the two"),
-                Choices = new List<Choice>
-                {
-                    new Choice() { Value ="Kenya"},
-                    new Choice() { Value="Other"},
-
-                },
-            };
-
-            // Prompt the user with the configured PromptOptions.
-            return await stepContext.PromptAsync("select-country", options, cancellationToken);
-
-        }
-
       
-        private async Task<DialogTurnResult> PrivateDetailsCountyDropdownAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
-        {
-            //List<string> counties = GetListOfCounties();
-
-            var hint = "( hint: type in Kiambu or 022,Nairobi or 047 )";
-
-            Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync(cancellationToken: cancellationToken);
-
-
-            var question = "Which county are you located in?";
-
-            if (persona != null)
-            {
-                persona.Country = stepContext.Context.Activity.Text;
-
-                _repository.Persona.Update(persona);
-
-                await _repository.SaveChangesAsync();
-
-                if (((FoundChoice)stepContext.Result).Value != "Kenya") {
-                    question = "Which Country are you from ?";
-                }
-
-                await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
-
-            }
-
-            var promptOptions = new PromptOptions
-            {
-                Prompt = MessageFactory.Text($"{question} \n {hint} "),
-                RetryPrompt = MessageFactory.Text($"Please input a county \n {hint} "),
-            };
-
-            if (((FoundChoice)stepContext.Result).Value == "Kenya")
-            {
-               
-                return await stepContext.PromptAsync(RedCrossDialogTypes.SelectCounty, promptOptions, cancellationToken);
-            }
-            else
-            {
-                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt=MessageFactory.Text(question) }, cancellationToken); 
-            }  
-        }
-
         private async Task<DialogTurnResult> PrivateDetailsGenderAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
 
@@ -393,7 +392,6 @@ namespace RedCrossChat.Dialogs
 
             return Task.FromResult(status);
         }
-
 
         //validation for mental awarenesss
         private async Task<DialogTurnResult> LaunchAwarenessDialogAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
