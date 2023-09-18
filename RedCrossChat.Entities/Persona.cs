@@ -27,7 +27,11 @@ namespace RedCrossChat.Entities
 
         public bool WantsToTalkToSomeone { get; set; } = false;
 
-        public bool WantsBreathingExcercises { get; set; } = false; 
+        public bool WantsBreathingExcercises { get; set; } = false;
+
+        public string Reason { get; set; } = "";
+
+        public bool HandedOver { get; set; } = false;
 
 
     }

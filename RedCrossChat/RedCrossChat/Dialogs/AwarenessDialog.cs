@@ -57,7 +57,6 @@ namespace RedCrossChat.Dialogs
                 ProcessMentalEvaluationChoice,
                 HandleCaregiverChoiceAsync,
                 EvaluateDialogTurnAsync,
-               
                 CheckFeelingAware,
                 CheckProfessionalSwitchAsync,
                 FinalStepAsync
@@ -130,7 +129,7 @@ namespace RedCrossChat.Dialogs
 
                 Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
 
-                persona.HasTalkedTOSomeone = true;
+                persona.IsAwareOfFeelings = stepContext.Context.Activity.Text;
 
                 _repository.Persona.Update(persona);
 
@@ -181,7 +180,7 @@ namespace RedCrossChat.Dialogs
 
             Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
 
-            persona.WantsToTalkToSomeone = true;
+            persona.HasTalkedTOSomeone = true;
 
             _repository.Persona.Update(persona);
 
@@ -227,7 +226,7 @@ namespace RedCrossChat.Dialogs
 
             if (stepContext.Result == null)
             {
-                persona.WantsBreathingExcercises = true;
+                persona.WantsToTalkToSomeone = true;
 
                 _repository.Persona.Update(persona);
 
@@ -254,6 +253,15 @@ namespace RedCrossChat.Dialogs
 
             var question = "What makes you seek our psychological support?";
 
+            Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
+
+            persona.WantsBreathingExcercises = true;
+
+            _repository.Persona.Update(persona);
+
+
+            await _repository.SaveChangesAsync();
+
 
             await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
 
@@ -277,6 +285,15 @@ namespace RedCrossChat.Dialogs
         {
             var question = "Would you wish to talk to a Professional Counselor?";
 
+            Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
+
+            persona.Reason = stepContext.Context.Activity.Text;
+
+            _repository.Persona.Update(persona);
+
+            await _repository.SaveChangesAsync();
+
+
             await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
 
             return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions()
@@ -291,6 +308,16 @@ namespace RedCrossChat.Dialogs
 
             // Evaulate if to push the user to the health ai bot
             User user = (User)stepContext.Values[UserInfo];
+
+
+            Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
+
+            persona.HandedOver = true;
+
+            _repository.Persona.Update(persona);
+
+
+            await _repository.SaveChangesAsync();
 
             if (stepContext.Result != null)
             {
