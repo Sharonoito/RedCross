@@ -70,6 +70,18 @@ namespace RedCrossChat.Domain
                     // Add role to user
                     userMgr.AddToRoleAsync(adminUser, superAdminRole.Name).GetAwaiter().GetResult();
                 }
+
+                if (!context.County.Any())
+                {
+                  //var data=await  SeedHelper.GetSeedData<DBCounty>("County.json");
+
+                  /*foreach (var item in data)
+                    {
+                        context.County.Add(new DBCounty { Name=item.Name,prefix="SM",Code=item.Code});
+
+                        context.SaveChanges();
+                    }*/
+                }
             }
 
         }

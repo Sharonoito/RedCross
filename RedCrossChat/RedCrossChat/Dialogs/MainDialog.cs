@@ -53,6 +53,7 @@ namespace RedCrossChat.Dialogs
 
             var waterfallSteps = new WaterfallStep[]
             {
+                    FirstStepAsync,
                     IntroStepAsync,
                     ActStepAsync,
                     ConfirmTermsAndConditionsAsync,
@@ -68,12 +69,49 @@ namespace RedCrossChat.Dialogs
             InitialDialogId = nameof(WaterfallDialog);
         }
 
+        private async Task<DialogTurnResult> FirstStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        {
+            stepContext.Values[UserInfo] = new Client();
+
+            var question = "Hello dear friend!! Welcome to Kenya Red Cross Society.  Hujambo rafiki? Karibu katika Shirika la Msalaba Mwekundu ambapo tunatoa ushauri kupitia kwenye simu bila malipo yoyote. ?\r\n please select a language to continue, Tafadhali chagua lugha ndio tuendelee ku wasiliana";
+
+            return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions
+            {
+                Prompt = MessageFactory.Text(question),
+                RetryPrompt = MessageFactory.Text("Please select a valid question"),
+                Choices = new List<Choice>()
+                {
+                    new Choice("English"),
+                    new Choice("Kiswahili")
+                },
+                // Style = stepContext.Context.Activity.ChannelId == "facebook" ? ListStyle.SuggestedAction : ListStyle.HeroCard,
+                Style = ListStyle.HeroCard,
+            }, cancellationToken); ;
+        }
+
         private async Task<DialogTurnResult> IntroStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
 
-            var question = "Hello dear friend!! Welcome to Kenya Red Cross Society, we are offering tele-counselling services to public at no charges . How can I help you today?\r\n";
 
-            stepContext.Values[UserInfo] = new Client();
+           
+            Client client= (Client)stepContext.Values[UserInfo];
+
+
+            var choiceValues = ((FoundChoice)stepContext.Result).Value;
+
+            if(choiceValues != null   && choiceValues == "Kiswahili")
+            {
+                client.language = !client.language;
+            }
+
+
+            var question =  client.language ? 
+                
+                
+                "Hello dear friend!! Welcome to Kenya Red Cross Society, we are offering tele-counselling services to public at no charges . How can I help you today?\r\n":
+
+                "Hujambo rafiki? Karibu katika Shirika la Msalaba Mwekundu ambapo tunatoa ushauri kupitia kwenye simu bila malipo yoyote. Je, ungependa nikusaidie vipi?";
+
 
             var messageText = stepContext.Options?.ToString() ?? question;
 
@@ -82,8 +120,9 @@ namespace RedCrossChat.Dialogs
             return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions
             {
                 Prompt = promptMessage,
-                Choices =RedCrossLists.Actions,
-                Style = stepContext.Context.Activity.ChannelId == "facebook" ? ListStyle.SuggestedAction : ListStyle.HeroCard,
+                Choices = client.language ? RedCrossLists.Actions : RedCrossLists.ActionKiswahili,
+               // Style = stepContext.Context.Activity.ChannelId == "facebook" ? ListStyle.SuggestedAction : ListStyle.HeroCard,
+                Style =  ListStyle.HeroCard,
             }, cancellationToken);
 
         }

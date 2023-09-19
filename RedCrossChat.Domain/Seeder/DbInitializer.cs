@@ -17,7 +17,7 @@ namespace RedCrossChat.Domain
             this.modelBuilder = modelBuilder;
         }
 
-        public void Seed()
+        public async void Seed()
         {
 
             modelBuilder.Entity<DBFeeling>().HasData(
@@ -34,6 +34,7 @@ namespace RedCrossChat.Domain
                 new AppRole(Constants.AdministratorId, "Administrator", true, DateTime.Now)
            );
 
+            
          
         }
     }

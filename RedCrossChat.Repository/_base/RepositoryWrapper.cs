@@ -104,6 +104,29 @@ namespace RedCrossChat.Repository
             }
         }
 
+        public IQuestion _question;
+        public IQuestion Question
+        {
+            get { 
+                
+                if(_question==null) { _question = new QuestionRepo(_repoContext);  }
+
+                return _question;
+            }
+        }
+
+        public IQuestionOption _questionOption;
+        public IQuestionOption QuestionOption
+        {
+            get
+            {
+
+                if (_questionOption == null) { _questionOption = new QuestionOptionRepo(_repoContext); }
+
+                return _questionOption;
+            }
+        }
+
         public IPersonaRepo? _persona;
 
         public IPersonaRepo Persona

@@ -18,4 +18,11 @@ namespace RedCrossChat
         public string ReturnUrl { get; set; }
 
     }
+
+    public interface SampleVm
+    {
+        public string Name { get; set; }
+
+
+    }
 }
