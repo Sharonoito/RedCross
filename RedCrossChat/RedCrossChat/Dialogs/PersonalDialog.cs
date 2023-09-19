@@ -89,6 +89,7 @@ namespace RedCrossChat.Dialogs
                 Prompt = MessageFactory.Text(question),
                 RetryPrompt = MessageFactory.Text("Please select a valid feeling"),
                 Choices = new List<Choice>
+
                 {
                     new Choice() { Value =Feelings.Happy,Synonyms=new List<string>{"happy","HAPPY","Happy"}},
                     new Choice() { Value=Feelings.Angry,Synonyms=new List<string>{"Angry","angry","ANGRY"}},
@@ -98,6 +99,8 @@ namespace RedCrossChat.Dialogs
                     new Choice() { Value=Feelings.Sad},
                     new Choice() {Value=Feelings.Other},
                 },
+                Style = ListStyle.HeroCard,
+
             };
 
 
@@ -171,6 +174,8 @@ namespace RedCrossChat.Dialogs
                     new Choice() { Value="Other"},
 
                 },
+                Style = ListStyle.HeroCard,
+
             };
 
             // Prompt the user with the configured PromptOptions.
@@ -250,6 +255,7 @@ namespace RedCrossChat.Dialogs
 
                 };
 
+
             return await stepContext.PromptAsync("select-age", options, cancellationToken);
 
         }
@@ -283,7 +289,9 @@ namespace RedCrossChat.Dialogs
                             new Choice  { Value ="Complicated",Synonyms=new List<string>{"complicated","comp","it's complicated"}},
                             new Choice  { Value ="none",Synonyms=new List<string>{"none","no"}},
 
-                        }
+                        },
+                         Style = ListStyle.HeroCard,
+
             }, cancellationToken);
         }
 
@@ -315,7 +323,9 @@ namespace RedCrossChat.Dialogs
                             new Choice  { Value ="Unemployed"},
                             new Choice  { Value ="Complicated"},
                             new Choice  { Value ="none",Synonyms=new List<string>{"none","no"}},
-                        }
+                        },
+                        Style = ListStyle.HeroCard,
+        
             }, cancellationToken);
 
         }
@@ -353,6 +363,8 @@ namespace RedCrossChat.Dialogs
                     new Choice() { Value= Gender.Female,Synonyms=new List<string>{"f","fE","FEMALE","female"}},
                     new Choice() { Value= Gender.Other,Synonyms=new List<string>{"o","other"}},
                 },
+                Style = ListStyle.HeroCard,
+
             };
 
             // Prompt the user with the configured PromptOptions.
