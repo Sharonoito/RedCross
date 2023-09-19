@@ -1,4 +1,8 @@
-﻿namespace RedCrossChat
+﻿using RedCrossChat.Entities;
+using RedCrossChat.Objects;
+using System.Collections.Generic;
+
+namespace RedCrossChat
 {
     public class ReportVm
     {
@@ -13,6 +17,12 @@
         public string Icon;
 
         public string Background;
+
+        public List<DBFeeling> feelings;
+
+        public List<DBCounty> countys;
+
+
 
         public ReportVm() { 
         

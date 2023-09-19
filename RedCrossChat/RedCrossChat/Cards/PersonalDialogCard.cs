@@ -36,7 +36,7 @@ namespace RedCrossChat.Cards
                 Subtitle = "Volunteers & MemberShip",
                 Text = "To volunteer or be involved in our activities please follow the link.",
                 Buttons = new List<CardAction> {
-                    new CardAction(ActionTypes.OpenUrl, "Get Started", value: "https://www.redcross.or.ke/careers")
+                    new CardAction(ActionTypes.OpenUrl, "Get Started", value: "https://www.redcross.or.ke/volunteer")
                 },
             };
 
