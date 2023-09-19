@@ -83,6 +83,7 @@ namespace RedCrossChat.Dialogs
         private async Task<DialogTurnResult> HandleMentalValuationAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             // await stepContext.BeginDialogAsync("mental-valuation", stepContext, cancellationToken);
+            Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
 
             var question = "Are you aware of what could have resulted to that feeling?";
 
@@ -93,8 +94,16 @@ namespace RedCrossChat.Dialogs
                 Choices = RedCrossLists.choices
 
             };
-            await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
 
+
+            persona.IsAwareOfFeelings = stepContext.Context.Activity.Text;
+
+            _repository.Persona.Update(persona);
+
+            await _repository.SaveChangesAsync();
+
+            await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
+            
 
             return await stepContext.PromptAsync(nameof(ChoicePrompt), options, cancellationToken);
 
@@ -103,7 +112,6 @@ namespace RedCrossChat.Dialogs
         private async Task<DialogTurnResult> ProcessMentalEvaluationChoice(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             User user;
-
 
             var question = "Have you shared with someone how you feel?";
 
@@ -120,7 +128,13 @@ namespace RedCrossChat.Dialogs
             if (stepContext.Result != null && stepContext.Result is FoundChoice choiceResult)
             {
 
-                
+                Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
+
+                persona.HasTalkedTOSomeone = true;
+
+                _repository.Persona.Update(persona);
+
+
                 await _repository.SaveChangesAsync();
 
                 switch (choiceResult.Value)
@@ -150,6 +164,7 @@ namespace RedCrossChat.Dialogs
             {
                 // Handle the case where stepContext.Result is null or not of the correct type.
                 // For example, you can prompt the user to repeat their response or handle the case accordingly.
+                    
                 await stepContext.Context.SendActivityAsync(MessageFactory.Text("Thank you for contacting us"), cancellationToken);
 
                 return await stepContext.EndDialogAsync(new DialogTurnResult(DialogTurnStatus.Waiting), cancellationToken);
@@ -163,6 +178,12 @@ namespace RedCrossChat.Dialogs
             User user = (User)stepContext.Values[UserInfo];
 
             var question = "It's always relieving talking to someone trusted about what we are feeling. Would you want to speak to a professional therapist from Kenya Red Cross Society?";
+
+            Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
+
+            persona.WantsToTalkToSomeone = true;
+
+            _repository.Persona.Update(persona);
 
             await _repository.SaveChangesAsync();
 
@@ -201,8 +222,18 @@ namespace RedCrossChat.Dialogs
 
             User user = (User)stepContext.Values[UserInfo];
 
+            Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
+
+
             if (stepContext.Result == null)
             {
+                persona.WantsBreathingExcercises = true;
+
+                _repository.Persona.Update(persona);
+
+                await _repository.SaveChangesAsync();
+
+
                 return await stepContext.EndDialogAsync(user, cancellationToken);
             }
 
@@ -222,6 +253,7 @@ namespace RedCrossChat.Dialogs
         {
 
             var question = "What makes you seek our psychological support?";
+
 
             await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
 
