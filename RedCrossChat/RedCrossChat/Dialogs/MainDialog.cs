@@ -129,6 +129,7 @@ namespace RedCrossChat.Dialogs
         {
             Client client = (Client)stepContext.Values[UserInfo];
 
+
             //var knowledgeBaseCard = PersonalDialogCard.GetKnowledgeBaseCard();
 
             //var career = PersonalDialogCard.GetKnowledgeCareerCard();
@@ -151,14 +152,19 @@ namespace RedCrossChat.Dialogs
                 client.language = !client.language;
             }
  
+            
 
-            var knowledgeBaseCard = PersonalDialogCard.GetKnowledgeBaseCard();
+            var mentalHealth = PersonalDialogCard.GetKnowYouCard();
+            var mentalHealth1 = PersonalDialogCard.GetKnowYouCardKiswahili();
 
-            var career = PersonalDialogCard.GetKnowledgeCareerCard();
 
-            var knowledgeBaseCard1 = PersonalDialogCard.GetKnowledgeBaseCardSwahili();
-
+            var knowledgeBaseCard = PersonalDialogCard.GetKnowledgeCareerCard();
             var career1 = PersonalDialogCard.GetKnowledgeCareerCardSwahili();
+
+            var volunteer = PersonalDialogCard.GetKnowledgeBaseCard();
+            var volunteer1 = PersonalDialogCard.GetKnowledgeBaseCardSwahili();
+
+            
 
             var message = MessageFactory.Attachment(
                     new Attachment
@@ -166,8 +172,8 @@ namespace RedCrossChat.Dialogs
                         ContentType = HeroCard.ContentType,
                         //Content = knowledgeBaseCard
                         Content = client.language
-                        ? (choiceValues == InitialActions.Careers ? career : knowledgeBaseCard)
-                        : (choiceValues == InitialActions.Careers ? career1 : knowledgeBaseCard1)
+                        ? (choiceValues == InitialActions.Careers ? volunteer : volunteer)
+                        : (choiceValues == InitialActions.Careers ? volunteer1 : volunteer1)
 
                     }
             );
@@ -175,11 +181,11 @@ namespace RedCrossChat.Dialogs
             if (stepContext.Result != null)
             {
 
-                if (choiceValues == InitialActions.MentalHealth)
+                if (choiceValues == InitialActions.MentalHealth || choiceValues == InitialActionsKiswahili.MentalHealth)
                 {
                     return await stepContext.NextAsync(null);
                 }
-                else if (choiceValues == InitialActions.Careers)
+                else if (choiceValues == InitialActions.Careers || choiceValues == InitialActionsKiswahili.Careers)
                 {
                     message = MessageFactory.Attachment(
                         new Attachment
@@ -187,15 +193,15 @@ namespace RedCrossChat.Dialogs
                             //Content = career,
                             // Content = client.language ? knowledgeBaseCard : career,
                             Content = client.language
-                            ? (choiceValues == InitialActions.Careers ? career : knowledgeBaseCard)
-                            : (choiceValues == InitialActions.Careers ? career1 : knowledgeBaseCard1),
+                            ? (choiceValues == InitialActions.Careers ? knowledgeBaseCard : knowledgeBaseCard)
+                            : (choiceValues == InitialActions.Careers ? career1 : career1),
 
 
                             ContentType = HeroCard.ContentType
 
                         }
-                    ); ;
-
+                    ); 
+                    
                 }
             }
             else
@@ -207,7 +213,7 @@ namespace RedCrossChat.Dialogs
                             //Content = client.language ? knowledgeBaseCard : career,
                             Content = client.language
                                 ? (choiceValues == InitialActions.Careers ? knowledgeBaseCard : knowledgeBaseCard)
-                                : (choiceValues == InitialActions.Careers ? knowledgeBaseCard : knowledgeBaseCard1),
+                                : (choiceValues == InitialActions.Careers ? knowledgeBaseCard : knowledgeBaseCard),
                         
                             ContentType = HeroCard.ContentType
                         }
@@ -223,6 +229,8 @@ namespace RedCrossChat.Dialogs
 
         private async Task<DialogTurnResult> ConfirmTermsAndConditionsAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
+
+
             Client me = (Client)stepContext.Values[UserInfo];
 
             if (me.DialogClosed)
@@ -232,11 +240,17 @@ namespace RedCrossChat.Dialogs
             }
 
             var termsAndConditionsCard = PersonalDialogCard.GetKnowYouCard();
+            var termsAndConditionsCardSwahili = PersonalDialogCard.GetKnowYouCardKiswahili();
+
+
 
             var attachment = new Attachment
             {
                 ContentType = HeroCard.ContentType,
-                Content = termsAndConditionsCard
+                //Content = termsAndConditionsCard
+                Content = !me.language
+                  ? termsAndConditionsCardSwahili: termsAndConditionsCard
+
             };
 
             var message = MessageFactory.Attachment(attachment);
@@ -293,38 +307,20 @@ namespace RedCrossChat.Dialogs
 
             return await stepContext.PromptAsync(nameof(ChoicePrompt), options, cancellationToken);
         }
-
-
-        //private async Task<DialogTurnResult> FinalStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
-        //{
-        //    // Check if the result is of type BookingDetails (result from PersonalDialog)
-
-        //    //add ai todo
-
-        //    await stepContext.Context.SendActivityAsync(MessageFactory.Text("let not your struggles define your identity. Remember, there's no health without mental health. GoodBye"));
-
-        //    // The result is null or of an unexpected type, return an empty response
-        //    return await stepContext.EndDialogAsync(null, cancellationToken);
-        //}
+ 
         private async Task<DialogTurnResult> FinalStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             var ratingChoice = ((FoundChoice)stepContext.Result).Value;
 
-            // Check if the user rated positively
-            if (ratingChoice.Equals("PositiveChoice"))  // Replace "PositiveChoice" with the actual positive rating choice value
+            if (ratingChoice.Equals("PositiveChoice"))  
             {
-                // Send a thank-you message for positive feedback
                 await stepContext.Context.SendActivityAsync(MessageFactory.Text("Thank you for your positive feedback! We're glad you had a great experience."));
             }
             else
             {
-                // Send a thank-you message for any feedback (positive or negative)
                 await stepContext.Context.SendActivityAsync(MessageFactory.Text("Thank you for your feedback. We value your input!"));
             }
 
-            // You can add any other final messages or actions here as needed
-
-            // The result is null or of an unexpected type, return an empty response
             return await stepContext.EndDialogAsync(null, cancellationToken);
         }
 
