@@ -32,14 +32,11 @@ namespace RedCrossChat.Dialogs
         private readonly FlightBookingRecognizer _luisRecognizer;
         private readonly string UserInfo = "Clien-info";
 
-        public WaterfallStep LanguageSelectionStepAsync { get; }
-
         public MainDialog(FlightBookingRecognizer luisRecognizer,
 
             CounselorDialog counselorDialog,
             PersonalDialog personalDialog,
             AiDialog aiDialog,
-            LanguageSelectionDialog languageSelectionDialog,
             ILogger<MainDialog> logger)
             : base(nameof(MainDialog))
         {
@@ -53,8 +50,6 @@ namespace RedCrossChat.Dialogs
             AddDialog(personalDialog);
             AddDialog(aiDialog);
             // AddDialog(awarenessDialog);
-            AddDialog(languageSelectionDialog);
-            AddDialog(new ChoicePrompt("LanguageChoicePrompt"));
 
             var waterfallSteps = new WaterfallStep[]
             {
@@ -71,8 +66,7 @@ namespace RedCrossChat.Dialogs
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), waterfallSteps));
 
             // The initial child Dialog to run.
-           InitialDialogId = nameof(WaterfallDialog);
-            //InitialDialogId = nameof(LanguageSelectionDialog);
+            InitialDialogId = nameof(WaterfallDialog);
         }
 
         private async Task<DialogTurnResult> FirstStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
@@ -98,23 +92,21 @@ namespace RedCrossChat.Dialogs
         private async Task<DialogTurnResult> IntroStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
 
-
-           
-            Client client= (Client)stepContext.Values[UserInfo];
+            Client client = (Client)stepContext.Values[UserInfo];
 
 
             var choiceValues = ((FoundChoice)stepContext.Result).Value;
 
-            if(choiceValues != null   && choiceValues == "Kiswahili")
+            if (choiceValues != null   && choiceValues == "Kiswahili")
             {
                 client.language = !client.language;
             }
 
 
-            var question =  client.language ? 
-                
-                
-                "Hello dear friend!! Welcome to Kenya Red Cross Society, we are offering tele-counselling services to public at no charges . How can I help you today?\r\n":
+            var question = client.language ?
+
+
+                "Hello dear friend!! Welcome to Kenya Red Cross Society, we are offering tele-counselling services to public at no charges . How can I help you today?\r\n" :
 
                 "Hujambo rafiki? Karibu katika Shirika la Msalaba Mwekundu ambapo tunatoa ushauri kupitia kwenye simu bila malipo yoyote. Je, ungependa nikusaidie vipi?";
 
@@ -127,25 +119,56 @@ namespace RedCrossChat.Dialogs
             {
                 Prompt = promptMessage,
                 Choices = client.language ? RedCrossLists.Actions : RedCrossLists.ActionKiswahili,
-               // Style = stepContext.Context.Activity.ChannelId == "facebook" ? ListStyle.SuggestedAction : ListStyle.HeroCard,
+                // Style = stepContext.Context.Activity.ChannelId == "facebook" ? ListStyle.SuggestedAction : ListStyle.HeroCard,
                 Style =  ListStyle.HeroCard,
             }, cancellationToken);
 
         }
 
         private async Task<DialogTurnResult> ActStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
-        { 
+        {
+            Client client = (Client)stepContext.Values[UserInfo];
+
+            //var knowledgeBaseCard = PersonalDialogCard.GetKnowledgeBaseCard();
+
+            //var career = PersonalDialogCard.GetKnowledgeCareerCard();
+
+
+            var question = client.language ?
+
+
+                "Hello dear friend!! Welcome to Kenya Red Cross Society, we are offering tele-counselling services to public at no charges . How can I help you today?\r\n" :
+
+                "Hujambo rafiki? Karibu katika Shirika la Msalaba Mwekundu ambapo tunatoa ushauri kupitia kwenye simu bila malipo yoyote. Je, ungependa nikusaidie vipi?";
+
+
+
+
+            var choiceValues = ((FoundChoice)stepContext.Result).Value;
+
+            if (choiceValues != null && choiceValues == "Kiswahili")
+            {
+                client.language = !client.language;
+            }
+ 
+
             var knowledgeBaseCard = PersonalDialogCard.GetKnowledgeBaseCard();
 
             var career = PersonalDialogCard.GetKnowledgeCareerCard();
 
-            var choiceValues = ((FoundChoice)stepContext.Result).Value;
+            var knowledgeBaseCard1 = PersonalDialogCard.GetKnowledgeBaseCardSwahili();
+
+            var career1 = PersonalDialogCard.GetKnowledgeCareerCardSwahili();
 
             var message = MessageFactory.Attachment(
                     new Attachment
                     {
                         ContentType = HeroCard.ContentType,
-                        Content = knowledgeBaseCard
+                        //Content = knowledgeBaseCard
+                        Content = client.language
+                        ? (choiceValues == InitialActions.Careers ? career : knowledgeBaseCard)
+                        : (choiceValues == InitialActions.Careers ? career1 : knowledgeBaseCard1)
+
                     }
             );
 
@@ -161,10 +184,17 @@ namespace RedCrossChat.Dialogs
                     message = MessageFactory.Attachment(
                         new Attachment
                         {
-                            Content = career,
+                            //Content = career,
+                            // Content = client.language ? knowledgeBaseCard : career,
+                            Content = client.language
+                            ? (choiceValues == InitialActions.Careers ? career : knowledgeBaseCard)
+                            : (choiceValues == InitialActions.Careers ? career1 : knowledgeBaseCard1),
+
+
                             ContentType = HeroCard.ContentType
+
                         }
-                    );
+                    ); ;
 
                 }
             }
@@ -173,7 +203,12 @@ namespace RedCrossChat.Dialogs
                 message = MessageFactory.Attachment(
                         new Attachment
                         {
-                            Content = career,
+                            //Content = career,
+                            //Content = client.language ? knowledgeBaseCard : career,
+                            Content = client.language
+                                ? (choiceValues == InitialActions.Careers ? knowledgeBaseCard : knowledgeBaseCard)
+                                : (choiceValues == InitialActions.Careers ? knowledgeBaseCard : knowledgeBaseCard1),
+                        
                             ContentType = HeroCard.ContentType
                         }
                     );
@@ -190,9 +225,10 @@ namespace RedCrossChat.Dialogs
         {
             Client me = (Client)stepContext.Values[UserInfo];
 
-            if (me.DialogClosed) {
+            if (me.DialogClosed)
+            {
 
-              return await stepContext.EndDialogAsync(null);       
+                return await stepContext.EndDialogAsync(null);
             }
 
             var termsAndConditionsCard = PersonalDialogCard.GetKnowYouCard();
@@ -212,6 +248,7 @@ namespace RedCrossChat.Dialogs
                 Prompt = MessageFactory.Text("Do you agree to the Terms and Conditions? Please select 'Yes' or 'No'."),
                 RetryPrompt = MessageFactory.Text("Please select a valid option ('Yes' or 'No')."),
                 Choices = RedCrossLists.choices,
+                Style = ListStyle.HeroCard,
             };
 
             return await stepContext.PromptAsync(nameof(ChoicePrompt), options, cancellationToken);
@@ -251,24 +288,45 @@ namespace RedCrossChat.Dialogs
                 Prompt = MessageFactory.Text("How would you rate your experience.with the bot?"),
                 RetryPrompt = MessageFactory.Text("Please select a valid option ('Yes' or 'No')."),
                 Choices = RedCrossLists.Ratings,
+                Style = ListStyle.HeroCard,
             };
 
             return await stepContext.PromptAsync(nameof(ChoicePrompt), options, cancellationToken);
         }
 
 
+        //private async Task<DialogTurnResult> FinalStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        //{
+        //    // Check if the result is of type BookingDetails (result from PersonalDialog)
+
+        //    //add ai todo
+
+        //    await stepContext.Context.SendActivityAsync(MessageFactory.Text("let not your struggles define your identity. Remember, there's no health without mental health. GoodBye"));
+
+        //    // The result is null or of an unexpected type, return an empty response
+        //    return await stepContext.EndDialogAsync(null, cancellationToken);
+        //}
         private async Task<DialogTurnResult> FinalStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            // Check if the result is of type BookingDetails (result from PersonalDialog)
+            var ratingChoice = ((FoundChoice)stepContext.Result).Value;
 
-            //add ai todo
+            // Check if the user rated positively
+            if (ratingChoice.Equals("PositiveChoice"))  // Replace "PositiveChoice" with the actual positive rating choice value
+            {
+                // Send a thank-you message for positive feedback
+                await stepContext.Context.SendActivityAsync(MessageFactory.Text("Thank you for your positive feedback! We're glad you had a great experience."));
+            }
+            else
+            {
+                // Send a thank-you message for any feedback (positive or negative)
+                await stepContext.Context.SendActivityAsync(MessageFactory.Text("Thank you for your feedback. We value your input!"));
+            }
 
-            await stepContext.Context.SendActivityAsync(MessageFactory.Text("let not your struggles define your identity. Remember, there's no health without mental health. GoodBye"));
+            // You can add any other final messages or actions here as needed
 
             // The result is null or of an unexpected type, return an empty response
             return await stepContext.EndDialogAsync(null, cancellationToken);
         }
-
 
     }
 }

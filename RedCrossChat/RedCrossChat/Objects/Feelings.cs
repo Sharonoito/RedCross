@@ -67,12 +67,14 @@ namespace RedCrossChat.Objects
 
         public static readonly List<Choice> ActionKiswahili = new()
         {
-            new Choice() { Value = InitialActions.Careers, Synonyms = new List<string> { "1", "Careers", "careers" } },
-            new Choice() { Value = InitialActions.VolunteerAndMemberShip, Synonyms = new List<string> { "2", "Membership" } },
-            new Choice() { Value = InitialActions.VolunteerOpportunities, Synonyms = new List<string> { "3", "Volunteer", "Opportunities" } },
-            new Choice() { Value = InitialActions.MentalHealth, Synonyms = new List<string> { "4", "Mental", "mental", "mental Health", "Mental Health", "Help" } }
+            new Choice() { Value = InitialActionsKiswahili.Careers, Synonyms = new List<string> { "1", "Careers", "careers" } },
+            new Choice() { Value = InitialActionsKiswahili.VolunteerAndMemberShip, Synonyms = new List<string> { "2", "Membership" } },
+            new Choice() { Value = InitialActionsKiswahili.VolunteerOpportunities, Synonyms = new List<string> { "3", "Volunteer", "Opportunities" } },
+            new Choice() { Value = InitialActionsKiswahili.MentalHealth, Synonyms = new List<string> { "4", "Mental", "mental", "mental Health", "Mental Health", "Help" } }
         };
 
+
+ 
     }
 
     public static class Validations
@@ -116,7 +118,7 @@ namespace RedCrossChat.Objects
 
     public static class InitialActions
     {
-        public static readonly string MentalHealth = "Mental Health Kiswa";
+        public static readonly string MentalHealth = "Mental Health";
         public static readonly string Careers = "Careers";
         public static readonly string VolunteerAndMemberShip = "Volunteer and Membership";
         public static readonly string VolunteerOpportunities = "Volunteer Opportunities";
@@ -124,9 +126,10 @@ namespace RedCrossChat.Objects
 
     public static class InitialActionsKiswahili
     {
-        public static readonly string MentalHealth = "Mental Health";
-        public static readonly string Careers = "Careers";
-        public static readonly string VolunteerAndMemberShip = "Volunteer and Membership";
-        public static readonly string VolunteerOpportunities = "Volunteer Opportunities";
+        public static readonly string MentalHealth = "Afya ya kiakili";
+        public static readonly string Careers = "Taaluma";
+        public static readonly string VolunteerAndMemberShip = "Kujitolea na kuwa mshirika";
+        public static readonly string VolunteerOpportunities = "Nafasi ya kujitolea";
     }
+
 }

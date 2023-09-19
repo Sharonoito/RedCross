@@ -93,6 +93,8 @@ namespace RedCrossChat.Dialogs
                 Choices = RedCrossLists.choices
 
             };
+            
+
 
 
             persona.IsAwareOfFeelings = stepContext.Context.Activity.Text;
@@ -157,7 +159,8 @@ namespace RedCrossChat.Dialogs
                             {
                                 Prompt = MessageFactory.Text(question),
                                 Choices = RedCrossLists.choices
-                            }, cancellationToken);
+                            },
+                            cancellationToken);
             }
             else
             {
@@ -277,7 +280,8 @@ namespace RedCrossChat.Dialogs
                             new Choice  { Value ="Work related stress and burnout"},
                            
 
-                        }
+                        },
+                        Style = ListStyle.HeroCard
             }, cancellationToken);
         }
 
