@@ -52,10 +52,7 @@ namespace RedCrossChat.Dialogs
             AddDialog(aiDialog);
 
             var mainDialog = new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
-
             {
-                InitialStepAsync,
-                EvaluateFeelingAsync,
                 PrivateDetailsCountryBracketAsync,
                 PrivateDetailsCountyDropdownAsync,
                 PrivateDetailsAgeBracketAsync,
@@ -78,62 +75,9 @@ namespace RedCrossChat.Dialogs
 
         
    
-        private async Task<DialogTurnResult> InitialStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
-        {
-            await CreateConversationDBInstance(stepContext);
+       
 
-            var question = "How would you describe how you are feeling today?";
-
-            var options = new PromptOptions()
-            {
-                Prompt = MessageFactory.Text(question),
-                RetryPrompt = MessageFactory.Text("Please select a valid feeling"),
-                Choices = new List<Choice>
-
-                {
-                    new Choice() { Value =Feelings.Happy,Synonyms=new List<string>{"happy","HAPPY","Happy"}},
-                    new Choice() { Value=Feelings.Angry,Synonyms=new List<string>{"Angry","angry","ANGRY"}},
-                    new Choice() { Value=Feelings.Anxious},
-                    new Choice() { Value=Feelings.FlatEffect},
-                    new Choice() { Value=Feelings.Expressionless},
-                    new Choice() { Value=Feelings.Sad},
-                    new Choice() {Value=Feelings.Other},
-                },
-                Style = ListStyle.HeroCard,
-
-            };
-
-
-            await DialogExtensions.UpdateDialogQuestion(question, stepContext, _userProfileAccessor, _userState);
-            
-
-            // Prompt the user with the configured PromptOptions.
-            return await stepContext.PromptAsync("select-feeling", options, cancellationToken);
-        }
-
-        private async Task<DialogTurnResult> EvaluateFeelingAsync(WaterfallStepContext stepContext,CancellationToken token)
-        {
-
-            var question = "Please Specify the feeling ";
-
-            if(((FoundChoice)stepContext.Result).Value==Feelings.Other)
-            {
-                await DialogExtensions.UpdateDialogAnswer(((FoundChoice)stepContext.Result).Value.ToString(), question, stepContext, _userProfileAccessor, _userState);
-
-                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text(question) }, token);
-            }
-
-            Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
-
-            persona.Feeling = stepContext.Context.Activity.Text;
-
-            _repository.Persona.Update(persona);
-
-            await _repository.SaveChangesAsync();
-
-            return await stepContext.NextAsync(persona);
-
-        }
+        
 
         private async Task<DialogTurnResult> PrivateDetailsCountryBracketAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {

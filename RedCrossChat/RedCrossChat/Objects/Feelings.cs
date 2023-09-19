@@ -74,7 +74,27 @@ namespace RedCrossChat.Objects
         };
 
 
- 
+        public static List<Choice> FeelingsKiswahili = new()
+        {
+            new Choice() { Value=FeelingsSwahili.Furaha,Synonyms=new List<string>{"happy","HAPPY","Happy"}},
+            new Choice() { Value=FeelingsSwahili.Hasira,Synonyms=new List<string>{"Angry","angry","ANGRY"}},
+            new Choice() { Value=FeelingsSwahili.Kuchanganyikiwa},
+            new Choice() { Value=FeelingsSwahili.Wasiwasi},
+            new Choice() { Value=FeelingsSwahili.Zinginezo},
+        };
+
+        public static List<Choice> FeelingsList = new()
+        {
+            new Choice() { Value=Feelings.Happy,Synonyms=new List<string>{"happy","HAPPY","Happy"}},
+            new Choice() { Value=Feelings.Angry,Synonyms=new List<string>{"Angry","angry","ANGRY"}},
+            new Choice() { Value=Feelings.Anxious},
+            new Choice() { Value=Feelings.FlatEffect},
+            new Choice() { Value=Feelings.Expressionless},
+            new Choice() { Value=Feelings.Sad},
+            new Choice() { Value=Feelings.Other},
+        };
+
+
     }
 
     public static class Validations
@@ -131,5 +151,8 @@ namespace RedCrossChat.Objects
         public static readonly string VolunteerAndMemberShip = "Kujitolea na kuwa mshirika";
         public static readonly string VolunteerOpportunities = "Nafasi ya kujitolea";
     }
+
+   
+
 
 }
