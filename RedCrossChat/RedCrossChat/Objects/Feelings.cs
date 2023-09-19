@@ -14,6 +14,18 @@ namespace RedCrossChat.Objects
         public static readonly string Other = "Other";
     }
 
+    public static class FeelingsSwahili
+    {
+        public static readonly string Furaha = " Unahisi kuwa na Furaha 😀";
+        public static readonly string Hasira = "Unahisi kuwa na Hasira 😡";
+        public static readonly string Wasiwasi = "Unahisi kuwa na Wasiwasi 🥴";
+        public static readonly string Huzuni = "Unahisi kuwa na Huzuni 😪";
+        public static readonly string Kuchanganyikiwa = "Unahisi kuwa na Kuchanganyikiwa 🫥";
+        //public static readonly string Expressionless = "Expressionless 🫤";
+        public static readonly string Zinginezo = "Zinginezo";
+    }
+
+
     public static class RedCrossDialogTypes
     {
         public static readonly string SelectCounty="Select_County";
@@ -53,11 +65,16 @@ namespace RedCrossChat.Objects
         };
     }
 
-
     public static class Validations
     {
-        public const string YES="Yes";
-        public const string NO="No";
+        public const string YES = "Yes";
+        public const string NO = "No";
+    }
+
+    public static class ValidationsSwahili
+    {
+        public const string NDIO="Ndio";
+        public const string La="la";
     }
 
     public static class Gender
@@ -66,13 +83,26 @@ namespace RedCrossChat.Objects
         public const string Female = "Female";
         public const string Other = "Other";
     }
+    public static class GenderSwahili
+    {
+        public const string Mume = "Mume";
+        public const string Mke = "Mke";
+        public const string Haijatajwa = "Haijatajwa";
+    }
 
     public static class DialogConstants
     {
         public const string ProfileAssesor="PROFILE_001";
     }
 
-   
+
+    public static class LanguageOptions
+    {
+        public const string English = "English";
+        public const string Kiswahili = "Kiswahili ";
+ 
+    }
+
 
     public static class InitialActions
     {

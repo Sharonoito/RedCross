@@ -17,6 +17,17 @@ namespace RedCrossChat.Cards
             };
         }
 
+        public static HeroCard GetKnowYouCardKiswahili()
+        {
+            return new HeroCard
+            {
+
+                Title = "Redcross Chat bot",
+                Subtitle = "Sheria na Masharti",
+                Text = "Tungependa kukufahamu zaidi ya ulivyotueleza. Ili kuendelea, tafadhali kubali sheria na masharti yafuatayo",
+                Buttons = new List<CardAction> { new CardAction(ActionTypes.OpenUrl, "Terms and Conditions", value: "https://www.redcross.or.ke/ASSETS/DATA-PROTECTION-POLICY.pdf") },
+            };
+        }
         public static HeroCard GetKnowledgeBaseCard()
         {
             var heroCard = new HeroCard
@@ -32,6 +43,20 @@ namespace RedCrossChat.Cards
             return heroCard;
         }
 
+        public static HeroCard GetKnowledgeBaseCardSwahili()
+        {
+            var heroCard = new HeroCard
+            {
+                Title = "RedCross",
+                Subtitle = "Volunteers & MemberShip",
+                Text = "To volunteer or be involved in our activities please follow the link.",
+                Buttons = new List<CardAction> {
+                    new CardAction(ActionTypes.OpenUrl, "Get Started", value: "https://www.redcross.or.ke/careers")
+                },
+            };
+
+            return heroCard;
+        }
         public static HeroCard GetKnowledgeCareerCard()
         {
             var heroCard = new HeroCard

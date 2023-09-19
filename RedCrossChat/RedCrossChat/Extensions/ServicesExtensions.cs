@@ -27,6 +27,8 @@ namespace RedCrossChat.Extensions
 
             services.AddSingleton<ChatGpt>();
 
+            services.AddTransient<LanguageSelectionDialog>();
+
             // The MainDialog that will be run by the bot.
             services.AddTransient<MainDialog>();
         }

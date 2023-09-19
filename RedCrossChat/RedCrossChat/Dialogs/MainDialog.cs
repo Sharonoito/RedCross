@@ -31,12 +31,15 @@ namespace RedCrossChat.Dialogs
         private readonly ILogger _logger;
         private readonly FlightBookingRecognizer _luisRecognizer;
         private readonly string UserInfo = "Clien-info";
-        
+
+        public WaterfallStep LanguageSelectionStepAsync { get; }
+
         public MainDialog(FlightBookingRecognizer luisRecognizer,
 
             CounselorDialog counselorDialog,
             PersonalDialog personalDialog,
             AiDialog aiDialog,
+            LanguageSelectionDialog languageSelectionDialog,
             ILogger<MainDialog> logger)
             : base(nameof(MainDialog))
         {
@@ -50,9 +53,16 @@ namespace RedCrossChat.Dialogs
             AddDialog(personalDialog);
             AddDialog(aiDialog);
             // AddDialog(awarenessDialog);
+            AddDialog(languageSelectionDialog);
+            AddDialog(new ChoicePrompt("LanguageChoicePrompt"));
 
             var waterfallSteps = new WaterfallStep[]
             {
+                 async (stepContext, cancellationToken) =>
+                            {
+                                return await stepContext.BeginDialogAsync(nameof(LanguageSelectionDialog), null, cancellationToken);
+                            },
+                    //LanguageSelectionStepAsync,
                     IntroStepAsync,
                     ActStepAsync,
                     ConfirmTermsAndConditionsAsync,
@@ -65,7 +75,8 @@ namespace RedCrossChat.Dialogs
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), waterfallSteps));
 
             // The initial child Dialog to run.
-            InitialDialogId = nameof(WaterfallDialog);
+           InitialDialogId = nameof(WaterfallDialog);
+            //InitialDialogId = nameof(LanguageSelectionDialog);
         }
 
         private async Task<DialogTurnResult> IntroStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
