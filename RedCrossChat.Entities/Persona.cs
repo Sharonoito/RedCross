@@ -5,6 +5,7 @@ namespace RedCrossChat.Entities
     public class Persona : DefaultEntity
     {
         public string SenderId { get; set; }
+
         public string Feeling { get; set; } = "";
 
         public string IsAwareOfFeelings { get; set; } = "";
