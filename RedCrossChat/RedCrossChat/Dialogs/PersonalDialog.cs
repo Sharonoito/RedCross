@@ -88,12 +88,7 @@ namespace RedCrossChat.Dialogs
             {
                 Prompt = MessageFactory.Text(question),
                 RetryPrompt = MessageFactory.Text(me.language ?  "Please select a Choose between the two" : "Tafadhali chagua Chaguo kati ya hizo mbili"),
-                Choices = new List<Choice>
-                {
-                    new Choice() { Value ="Kenya"},
-                    new Choice() { Value="Other"},
-
-                },
+                Choices = me.language? RedCrossLists.Countrys : RedCrossLists.CountryKiswahili,
                 Style = ListStyle.HeroCard,
 
             };
@@ -116,6 +111,11 @@ namespace RedCrossChat.Dialogs
 
             var questionRetry = me.language? "Please input a county" : "Tafadhali andika katika kaunti";
 
+
+            question=$"{question} \n {hint} ";
+
+            var select = ((FoundChoice)stepContext.Result).Value;
+
             if (persona != null)
             {
                 persona.Country = stepContext.Context.Activity.Text;
@@ -124,30 +124,30 @@ namespace RedCrossChat.Dialogs
 
                 await _repository.SaveChangesAsync();
 
-                if (((FoundChoice)stepContext.Result).Value != "Kenya")
-                {
-                    question = me.language? "Which Country are you from ?": "Unatoka Nchi gani ?";
-                }
-
                 await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
 
             }
 
+            var promptId = RedCrossDialogTypes.SelectCounty;
+
+           
+
+            if (select != CountryValidation.Kenya || select !=CountrySwahili.Kenya)
+            {
+                question = me.language ? "Which Country are you from ?" : "Unatoka Nchi gani ?";
+                promptId=nameof(TextPrompt);
+
+
+            }
+           // return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text(question) }, cancellationToken);
+
             var promptOptions = new PromptOptions
             {
-                Prompt = MessageFactory.Text($"{question} \n {hint} "),
+                Prompt = MessageFactory.Text(question),
                 RetryPrompt = MessageFactory.Text($"${questionRetry} \n {hint} "),
             };
 
-            if (((FoundChoice)stepContext.Result).Value == "Kenya")
-            {
-
-                return await stepContext.PromptAsync(RedCrossDialogTypes.SelectCounty, promptOptions, cancellationToken);
-            }
-            else
-            {
-                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text(question) }, cancellationToken);
-            }
+            return await stepContext.PromptAsync(RedCrossDialogTypes.SelectCounty, promptOptions, cancellationToken);
         }
 
         private async Task<DialogTurnResult> PrivateDetailsAgeBracketAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
@@ -174,8 +174,8 @@ namespace RedCrossChat.Dialogs
                 {
                     Prompt = MessageFactory.Text(question),
                     RetryPrompt = MessageFactory.Text(me.language? "Please select a valid age-group" : "Tafadhali chagua kikundi halali cha umri"),
-                    Choices = RedCrossLists.AgeGroups,
-                    Style = ListStyle.HeroCard,
+                    Choices = me.language ? RedCrossLists.AgeGroups : RedCrossLists.AgeGroupKiswahili,
+                Style = ListStyle.HeroCard,
                 };
 
 
@@ -316,6 +316,7 @@ namespace RedCrossChat.Dialogs
 
         }
         private async Task<DialogTurnResult> HandleBreathingStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken) {
+
             if (stepContext.Result != null)
             {
                 Client user = (Client)(stepContext.Result);

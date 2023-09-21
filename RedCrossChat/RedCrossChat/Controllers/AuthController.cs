@@ -144,6 +144,12 @@ namespace RedCrossChat.Controllers
             return View("_User");
         }
 
+        public IActionResult ResetPassword()
+        {
+
+            return View("_ResetPassword");
+        }
+
         public async Task<IActionResult> EditUser(Guid clientId)
         {
 

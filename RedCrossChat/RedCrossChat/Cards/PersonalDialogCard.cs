@@ -25,7 +25,7 @@ namespace RedCrossChat.Cards
                 Title = "Redcross Chat bot",
                 Subtitle = "Sheria na Masharti",
                 Text = "Tungependa kukufahamu zaidi ya ulivyotueleza. Ili kuendelea, tafadhali kubali sheria na masharti yafuatayo",
-                Buttons = new List<CardAction> { new CardAction(ActionTypes.OpenUrl, "Terms and Conditions", value: "https://www.redcross.or.ke/ASSETS/DATA-PROTECTION-POLICY.pdf") },
+                Buttons = new List<CardAction> { new CardAction(ActionTypes.OpenUrl, "Sheria na Masharti", value: "https://www.redcross.or.ke/ASSETS/DATA-PROTECTION-POLICY.pdf") },
             };
         }
         public static HeroCard GetKnowledgeBaseCard()
@@ -49,9 +49,9 @@ namespace RedCrossChat.Cards
             {
                 Title = "RedCross",
                 Subtitle = "Kujitolea na kuwa mshirika",
-                Text = "Kujitolea na kuwa mshirika please follow link.",
+                Text = "Kujitolea na kuwa mshirika tafadhali fuata kiungo hiki.",
                 Buttons = new List<CardAction> {
-                    new CardAction(ActionTypes.OpenUrl, "Get Started", value: "https://www.redcross.or.ke/careers")
+                    new CardAction(ActionTypes.OpenUrl, "Anza", value: "https://www.redcross.or.ke/careers")
                 },
             };
             return heroCard;
@@ -77,7 +77,7 @@ namespace RedCrossChat.Cards
             {
                 Title = "RedCross |  Taaluma",
 
-                Text = "Kwa taaluma please follow this link.",
+                Text = "Kwa taaluma tafadhali fuata kiungo hiki",
                 Buttons = new List<CardAction> {
                     new CardAction(ActionTypes.OpenUrl, "Taaluma", value: "https://www.redcross.or.ke/careers")
                 },
@@ -96,6 +96,23 @@ namespace RedCrossChat.Cards
 
                  Buttons = new List<CardAction> {
                     new CardAction(ActionTypes.OpenUrl, "Preview", value: "https://referraldirectories.redcross.or.ke/")
+
+                },
+            };
+
+            return heroCard;
+        }
+
+        public static HeroCard GetHotlineCardKiswahili()
+        {
+            var heroCard = new HeroCard
+            {
+                Title = "Nambari za dharura ",
+                Subtitle = "Maeneo ya rufaa",
+                Text = "Kwa msaada wa kiwango cha juu zaidi, tafadhali jisikie huru kuangalia njia zetu za rufaa zilizodhibitiwa kwa undani.",
+
+                Buttons = new List<CardAction> {
+                    new CardAction(ActionTypes.OpenUrl, "Angalia kwa hakika.", value: "https://referraldirectories.redcross.or.ke/")
 
                 },
             };
