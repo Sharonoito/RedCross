@@ -1,29 +1,15 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License.
-//
-// Generated with Bot Builder V4 SDK Template for Visual Studio CoreBot v4.18.1
-
-using Microsoft.AspNetCore.Http;
-using Microsoft.Bot.Builder;
+﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Dialogs.Choices;
 using Microsoft.Bot.Schema;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Clients.ActiveDirectory;
-using Microsoft.Recognizers.Text.DataTypes.TimexExpression;
-using NuGet.Protocol.Core.Types;
-using RedCrossChat;
 using RedCrossChat.Cards;
-using RedCrossChat.CognitiveModels;
 using RedCrossChat.Contracts;
 using RedCrossChat.Entities;
 using RedCrossChat.Objects;
-using Sentry;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Attachment = Microsoft.Bot.Schema.Attachment;
@@ -40,8 +26,8 @@ namespace RedCrossChat.Dialogs
         private readonly IRepositoryWrapper _repository;
         private readonly IStatePropertyAccessor<ResponseDto> _userProfileAccessor;
 
-        public MainDialog(FlightBookingRecognizer luisRecognizer,
-
+        public MainDialog(
+            FlightBookingRecognizer luisRecognizer,
             CounselorDialog counselorDialog,
             PersonalDialog personalDialog,
             AiDialog aiDialog,
@@ -75,6 +61,8 @@ namespace RedCrossChat.Dialogs
                     ConfirmTermsAndConditionsAsync,
                     ValidateTermsAndConditionsAsync,
                     CheckFeelingAsync,
+                    EvaluateFeelingAsync,
+                    HandleFeelingAsync,
                     RateBotAsync,
                     FinalStepAsync,
             };
@@ -242,7 +230,6 @@ namespace RedCrossChat.Dialogs
 
         }
 
-
         private async Task<DialogTurnResult> ConfirmTermsAndConditionsAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
 
@@ -275,9 +262,9 @@ namespace RedCrossChat.Dialogs
             // Prompt the user if they agree with the terms and conditions
             var options = new PromptOptions()
             {
-                Prompt = MessageFactory.Text("Do you agree to the Terms and Conditions? Please select 'Yes' or 'No'."),
-                RetryPrompt = MessageFactory.Text("Please select a valid option ('Yes' or 'No')."),
-                Choices = RedCrossLists.choices,
+                Prompt = MessageFactory.Text(me.language ?"Do you agree to the Terms and Conditions? Please select 'Yes' or 'No'.": "Je, unakubali Sheria na Masharti? Tafadhali chagua 'Ndiyo' au 'La'."),
+                RetryPrompt = MessageFactory.Text(me.language? "Please select a valid option ('Yes' or 'No').": "Tafadhali chagua chaguo sahihi ('Ndiyo' au 'La')"),
+                Choices = me.language ? RedCrossLists.choices : RedCrossLists.choicesKiswahili,
                 Style = ListStyle.HeroCard,
             };
 
@@ -288,12 +275,13 @@ namespace RedCrossChat.Dialogs
         {
             await EvaluateDialog.ProcessStepAsync(stepContext, cancellationToken);
 
+            Client me = (Client)stepContext.Values[UserInfo];
+
             string confirmation = ((FoundChoice)stepContext.Result).Value;
 
-            if (confirmation.Equals("Yes", StringComparison.OrdinalIgnoreCase))
+            if (confirmation.Equals(Validations.YES, StringComparison.OrdinalIgnoreCase) ||  confirmation.Equals(ValidationsSwahili.YES, StringComparison.OrdinalIgnoreCase))
             {
-                // If the user confirms with 'Yes', proceed to TermsAndConditionsAsync
-
+                if (me.language) 
                 await stepContext.Context.SendActivityAsync(MessageFactory.Text("To exit the bot \n type exit or cancel at any point ."));
 
                 return await stepContext.NextAsync(null);
@@ -302,7 +290,7 @@ namespace RedCrossChat.Dialogs
             else
             {
                 // If the user does not confirm, end the dialog
-                await stepContext.Context.SendActivityAsync(MessageFactory.Text("You need to agree to the data protection policy to proceed."));
+                await stepContext.Context.SendActivityAsync(MessageFactory.Text(me.language?"You need to agree to the data protection policy to proceed.": "Unahitaji kukubaliana na sera ya ulinzi wa data ili uendelee"));
                 return await stepContext.EndDialogAsync(null, cancellationToken);
             }
         }
@@ -325,11 +313,12 @@ namespace RedCrossChat.Dialogs
             };
             await DialogExtensions.UpdateDialogQuestion(question, stepContext, _userProfileAccessor, _userState);
 
-            return await stepContext.PromptAsync("select-feeling", options, cancellationToken);
+            return await stepContext.PromptAsync(nameof(ChoicePrompt), options, cancellationToken);
         }
 
         private async Task<DialogTurnResult> EvaluateFeelingAsync(WaterfallStepContext stepContext, CancellationToken token)
         {
+            Client me = (Client)stepContext.Values[UserInfo];
 
             var question = "Please Specify the feeling ";
 
@@ -342,12 +331,12 @@ namespace RedCrossChat.Dialogs
 
             Conversation conversation = await _repository.Conversation
                 .FindByCondition(x => x.ConversationId == stepContext.Context.Activity.Conversation.Id)
-                .Include(x => x.PersonaId)
+                .Include(x => x.Persona)
                 .FirstOrDefaultAsync();
             
             if (conversation.IsReturnClient)
             {
-                return await stepContext.BeginDialogAsync(nameof(AwarenessDialog), null, token);
+                return await stepContext.BeginDialogAsync(nameof(AwarenessDialog), me, token);
             }
             else
             {
@@ -359,7 +348,7 @@ namespace RedCrossChat.Dialogs
 
                 await _repository.SaveChangesAsync();
 
-                return await stepContext.BeginDialogAsync(nameof(PersonalDialog), null, token);
+                return await stepContext.BeginDialogAsync(nameof(PersonalDialog), me, token);
             }
 
         }
@@ -389,8 +378,6 @@ namespace RedCrossChat.Dialogs
             
         }
 
-
-
         private async Task<Conversation> CreateConversationDBInstance(WaterfallStepContext stepContext)
         {
            
@@ -407,7 +394,7 @@ namespace RedCrossChat.Dialogs
 
                 ConversationId = stepContext.Context.Activity.Conversation.Id,
 
-                Client = persona == null? new Persona() { SenderId = stepContext.Context.Activity.From.Id } : persona,
+                Persona = persona == null? new Persona() { SenderId = stepContext.Context.Activity.From.Id } : persona,
 
                 AiConversations = new List<AiConversation>(),
 

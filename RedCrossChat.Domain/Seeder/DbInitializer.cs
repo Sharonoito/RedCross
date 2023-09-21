@@ -17,7 +17,7 @@ namespace RedCrossChat.Domain
             this.modelBuilder = modelBuilder;
         }
 
-        public async void Seed()
+        public  void Seed()
         {
 
             modelBuilder.Entity<DBFeeling>().HasData(
