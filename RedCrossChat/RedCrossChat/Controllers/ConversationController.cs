@@ -46,7 +46,7 @@ namespace RedCrossChat.Controllers
 
         public async Task<IActionResult> Conversations(IDataTablesRequest dtRequest)
         {
-            var data= await _repository.Conversation.FindAll().Include(x=>x.Client).ToListAsync();
+            var data= await _repository.Conversation.FindAll().Include(x=>x.Persona).ToListAsync();
 
             var filteredRows = data
                  .AsQueryable()

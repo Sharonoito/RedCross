@@ -78,8 +78,7 @@ namespace RedCrossChat.Dialogs
         }
 
 
-        private int _exerciseIndex = 1;
-
+       
         public async Task<DialogTurnResult> TakeUserThroughExerciseAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
 
