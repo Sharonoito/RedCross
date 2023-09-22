@@ -84,6 +84,12 @@ namespace RedCrossChat.Controllers
 
         }
 
+        public IActionResult Profile()
+        {
+            return View();
+        }
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> LogOut()

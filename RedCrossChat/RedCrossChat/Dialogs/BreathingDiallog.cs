@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Humanizer;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Dialogs.Choices;
 using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Newtonsoft.Json;
+using NuGet.Protocol.Core.Types;
+using RedCrossChat.Entities;
 using RedCrossChat.Objects;
 using Sentry;
 using System;
@@ -55,7 +58,10 @@ namespace RedCrossChat.Dialogs
 
             stepContext.Values[UserInfo] = user;
 
-            var question = "Would you like me to take you through some breathing exercises or tips on managing mental health?\r\n\r\n ";
+            //var question = "Would you like me to take you through some breathing exercises or tips on managing mental health?\r\n\r\n ";
+
+            var question = user.language ? "Would you like me to take you through some breathing exercises or tips on managing mental health ?\r\n\r\n " : "Je ungependa ni kuelekeza kupitia mazoezi ya kupumua au vidokezo kuhusu jinsi ya kusimamia afya yako ya akili?";
+
 
             if (user.Iteration !=1)
             {
@@ -80,8 +86,6 @@ namespace RedCrossChat.Dialogs
             return await stepContext.PromptAsync(nameof(ChoicePrompt), prompts, cancellationToken);
         }
 
-
-       
         public async Task<DialogTurnResult> TakeUserThroughExerciseAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
 
@@ -91,7 +95,7 @@ namespace RedCrossChat.Dialogs
 
             Client user = (Client)stepContext.Options;
 
-            var question = "Do you wish to continue ?";
+            var question = user.language ? "Do you wish to continue ?":"Je, ungependa kuendelea?";
 
             var prompts = new PromptOptions
             {

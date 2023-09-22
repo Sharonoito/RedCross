@@ -320,7 +320,6 @@ namespace RedCrossChat.Dialogs
                             new Choice() { Value = "hotline", Action = new CardAction() { Title = "hotline", Type = ActionTypes.OpenUrl, Value = "https://referraldirectories.redcross.or.ke/" } }
                         };
 
-
                         return await stepContext.EndDialogAsync(me, cancellationToken);
 
 
