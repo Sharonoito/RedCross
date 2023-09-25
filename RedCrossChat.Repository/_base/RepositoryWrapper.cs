@@ -1,8 +1,8 @@
 ﻿using RedCrossChat.Contracts;
 using RedCrossChat.Contracts.Dependencies;
+
 using RedCrossChat.Domain;
-using RedCrossChat.Entities;
-using RedCrossChat.Repository;
+
 
 namespace RedCrossChat.Repository
 {
@@ -103,6 +103,29 @@ namespace RedCrossChat.Repository
                 return _ageBand;
             }
         }
+
+        public IMaritalState? _maritalState;
+        public IMaritalState MaritalState
+        {
+            get
+            {
+                if(_maritalState==null) _maritalState= new MaritalStateRepo(_repoContext);
+
+                return _maritalState;
+            }
+        }
+
+        public IProfession? _profession;
+        public IProfession Profession
+        {
+            get
+            {
+                if(_profession==null) _profession= new ProfessionRepo(_repoContext);
+
+                return _profession;
+            }
+        }
+
 
         public IAiConversationRepo? _aiConversation;
         public IAiConversationRepo AiConversation

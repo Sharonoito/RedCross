@@ -1,0 +1,30 @@
+[
+  {
+    "Name": "Student",
+    "Kiswahili": "Mwanafunzi/Bado Nasoma"
+  },
+  {
+    "Name": "Employed",
+    "Kiswahili": "Nafanya kazi"
+  },
+  {
+    "Name": "Entrepreneur",
+    "Kiswahili": "Mfanyabiashara"
+  },
+  {
+    "Name": "Retired",
+    "Kiswahili": "Nimestaafu"
+  },
+  {
+    "Name": "Unemployed",
+    "Kiswahili": "Mjane"
+  },
+  {
+    "Name": "Complicated",
+    "Kiswahili": "Sitaki kusema"
+  },
+  {
+    "Name": "none",
+    "Kiswahili": "Sitaki kusema"
+  }
+]

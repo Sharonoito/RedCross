@@ -1,5 +1,6 @@
 ﻿using RedCrossChat.Contracts.Dependencies;
 
+
 namespace RedCrossChat.Contracts
 {
 
@@ -18,6 +19,10 @@ namespace RedCrossChat.Contracts
 
         IGender Gender { get; }
         IAgeBand AgeBand { get; }
+
+        IProfession Profession { get; } 
+
+        IMaritalState MaritalState { get; }
 
         #endregion
 

@@ -126,6 +126,30 @@ namespace RedCrossChat.Domain
                             await context.SaveChangesAsync();
                         }
                     }
+
+                    if(!context.Profession.Any())
+                    {
+                        var data = await SeedHelper.GetSeedData<Profession>("Profession.json");
+
+                        foreach(var item in data)
+                        {
+                            context.Profession.Add(new Profession { Name = item.Name, Kiswahili = item.Kiswahili ,Synonyms=""});
+
+                            await context.SaveChangesAsync();
+                        }
+                    }
+
+                    if (!context.MaritalState.Any())
+                    {
+                        var data = await SeedHelper.GetSeedData<MaritalState>("MaritalStatus.json");
+
+                        foreach (var item in data)
+                        {
+                            context.MaritalState.Add(new MaritalState { Name = item.Name, Kiswahili = item.Kiswahili , Synonyms = "" });
+
+                            await context.SaveChangesAsync();
+                        }
+                    }
                 }
                 catch(Exception ex)
                 {

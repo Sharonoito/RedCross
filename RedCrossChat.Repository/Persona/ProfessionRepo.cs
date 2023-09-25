@@ -6,13 +6,12 @@ using RedCrossChat.Entities;
 
 namespace RedCrossChat.Repository
 {
-    public class AgeBandRepo : RepositoryBase<AgeBand>,IAgeBand
+    public class ProfessionRepo : RepositoryBase<Profession> , IProfession
     {
-        public AgeBandRepo(AppDBContext appDBContext):base(appDBContext) {
-        
-        }
+        public ProfessionRepo(AppDBContext appDBContext) : base(appDBContext) { }
 
-        public async Task<IEnumerable<AgeBand>> GetAll()
+        public async Task<IEnumerable<Profession>> GetAll()
         => await FindAll().ToListAsync();
+
     }
 }

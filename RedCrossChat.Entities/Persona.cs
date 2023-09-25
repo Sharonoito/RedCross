@@ -6,19 +6,23 @@ namespace RedCrossChat.Entities
     {
         public string SenderId { get; set; }
 
-        public Guid FeelingId { get; set; }
+        public Guid? FeelingId { get; set; }
         public DBFeeling Feeling { get; set; }
 
-        public Guid CountyId { get; set; }
+        public Guid? CountyId { get; set; }
         public DBCounty County { get; set; }
 
-        public Guid AgeBandId { get; set; }
+        public Guid? AgeBandId { get; set; }
         public AgeBand AgeBand { get; set; }
 
-        public Guid GenderId { get; set; }
+        public Guid? GenderId { get; set; }
         public Gender Gender { get; set; }
 
-        
+        public Guid? ProfessionId { get; set; }
+        public Profession Profession { get; set; }
+
+        public Guid? MaritalStateId { get; set; }
+        public MaritalState MaritalState { get; set; }
 
         public string IsAwareOfFeelings { get; set; } = "";
         

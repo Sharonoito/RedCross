@@ -116,6 +116,8 @@ namespace RedCrossChat.Dialogs
 
             var select = ((FoundChoice)stepContext.Result).Value;
 
+          
+
             if (persona != null)
             {
                 persona.Country = stepContext.Context.Activity.Text;
@@ -130,8 +132,6 @@ namespace RedCrossChat.Dialogs
 
             var promptId = RedCrossDialogTypes.SelectCounty;
 
-           
-
             if (select != CountryValidation.Kenya || select !=CountrySwahili.Kenya)
             {
                 question = me.language ? "Which Country are you from ?" : "Unatoka Nchi gani ?";
@@ -139,7 +139,6 @@ namespace RedCrossChat.Dialogs
 
 
             }
-           // return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text(question) }, cancellationToken);
 
             var promptOptions = new PromptOptions
             {
@@ -147,7 +146,7 @@ namespace RedCrossChat.Dialogs
                 RetryPrompt = MessageFactory.Text($"${questionRetry} \n {hint} "),
             };
 
-            return await stepContext.PromptAsync(RedCrossDialogTypes.SelectCounty, promptOptions, cancellationToken);
+            return await stepContext.PromptAsync(promptId, promptOptions, cancellationToken);
         }
 
         private async Task<DialogTurnResult> PrivateDetailsAgeBracketAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
@@ -155,6 +154,15 @@ namespace RedCrossChat.Dialogs
             Client me = (Client)stepContext.Values[UserInfo];
 
             Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
+
+            var ageGroups = await _repository.AgeBand.GetAll();
+
+            var choices = new List<Choice>();
+
+            foreach (var ageGroup in ageGroups)
+            {
+                choices.Add(new Choice() { Value = me.language ? ageGroup.Name : ageGroup.Kiswahili });
+            }
 
             var response = stepContext.Context.Activity.Text;
 
@@ -179,11 +187,10 @@ namespace RedCrossChat.Dialogs
 
             }
 
-            var options = new PromptOptions()
-                {
-                    Prompt = MessageFactory.Text(question),
+            var options = new PromptOptions(){
+                   Prompt = MessageFactory.Text(question),
                     RetryPrompt = MessageFactory.Text(me.language? "Please select a valid age-group" : "Tafadhali chagua kikundi halali cha umri"),
-                    Choices = me.language ? RedCrossLists.AgeGroups : RedCrossLists.AgeGroupKiswahili,
+                    Choices =choices,
                 Style = ListStyle.HeroCard,
                 };
 
@@ -202,6 +209,14 @@ namespace RedCrossChat.Dialogs
 
             await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
 
+            var status = await _repository.MaritalState.GetAll();
+
+            var choices = new List<Choice>();
+
+            foreach (var choice in status)
+            {
+                choices.Add(new Choice { Value = me.language ? choice.Name : choice.Kiswahili });
+            }
             
             var ageGroup=await _repository.AgeBand.FindByCondition(x => x.Name==response || x.Kiswahili ==response).FirstOrDefaultAsync();
 
@@ -220,7 +235,7 @@ namespace RedCrossChat.Dialogs
             return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions()
             {
                 Prompt = MessageFactory.Text(question),
-                Choices = me.language ? RedCrossLists.RelationShips : RedCrossLists.RelationShipKiwahili,
+                Choices = choices,
                 Style = ListStyle.HeroCard,
 
             }, cancellationToken);

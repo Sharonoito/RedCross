@@ -52,6 +52,8 @@ namespace RedCrossChat.Dialogs
                     FinalStepAsync
                };
 
+            AddDialog(new TextPrompt(DialogConstants.AIDialogAssesor));
+
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), waterFallSteps));
         }
 
@@ -112,7 +114,7 @@ namespace RedCrossChat.Dialogs
             //  await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
 
 
-            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = promptMessage }, token);
+            return await stepContext.PromptAsync(DialogConstants.AIDialogAssesor, new PromptOptions { Prompt = promptMessage }, token);
         }
 
         public async Task<DialogTurnResult> FetchResultsAsync(WaterfallStepContext stepContext, CancellationToken token)

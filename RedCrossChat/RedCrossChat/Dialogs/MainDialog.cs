@@ -31,6 +31,7 @@ namespace RedCrossChat.Dialogs
             CounselorDialog counselorDialog,
             PersonalDialog personalDialog,
             AiDialog aiDialog,
+            AwarenessDialog awarenessDialog,
             ILogger<MainDialog> logger, 
             IRepositoryWrapper wrapper,
             UserState userState)
@@ -51,7 +52,7 @@ namespace RedCrossChat.Dialogs
             AddDialog(counselorDialog);
             AddDialog(personalDialog);
             AddDialog(aiDialog);
-            // AddDialog(awarenessDialog);
+            AddDialog(awarenessDialog);
 
             var waterfallSteps = new WaterfallStep[]
             {
@@ -132,12 +133,6 @@ namespace RedCrossChat.Dialogs
         private async Task<DialogTurnResult> ActStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             Client client = (Client)stepContext.Values[UserInfo];
-
-
-            //var knowledgeBaseCard = PersonalDialogCard.GetKnowledgeBaseCard();
-
-            //var career = PersonalDialogCard.GetKnowledgeCareerCard();
-
 
             var question = client.language ?
 
@@ -310,7 +305,7 @@ namespace RedCrossChat.Dialogs
 
             foreach (var choice in feelings)
             {
-                choices.Add(new Choice() { Value = me.language ? choice.Name : choice.Kiswahili });
+                choices.Add(new Choice() { Value = me.language ? choice.Description : choice.Kiswahili });
             }
 
             var options = new PromptOptions()
@@ -334,9 +329,9 @@ namespace RedCrossChat.Dialogs
 
             var response = stepContext.Context.Activity.Text;
 
-            if (((FoundChoice)stepContext.Result).Value == Feelings.Other)
+            if (response.ToLower() == "other" || response.ToLower() == "zinginezo")
             {
-                await DialogExtensions.UpdateDialogAnswer(((FoundChoice)stepContext.Result).Value.ToString(), question, stepContext, _userProfileAccessor, _userState);
+                await DialogExtensions.UpdateDialogAnswer(response, question, stepContext, _userProfileAccessor, _userState);
 
                 return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text(question) }, token);
             }
@@ -345,74 +340,60 @@ namespace RedCrossChat.Dialogs
                 .FindByCondition(x => x.ConversationId == stepContext.Context.Activity.Conversation.Id)
                 .Include(x => x.Persona)
                 .FirstOrDefaultAsync();
-            
-            if (conversation.IsReturnClient)
+
+            if(conversation != null)
             {
-                return await stepContext.BeginDialogAsync(nameof(AwarenessDialog), me, token);
-            }
-            else
-            {
+                me.ConversationId = conversation.Id;
 
                 Persona persona = conversation?.Persona;
 
-                var feeling= await _repository.Feeling.FindByCondition(x => x.Description == response || x.Kiswahili == response).FirstOrDefaultAsync();
+                var feeling = await _repository.Feeling.FindByCondition(x => x.Description == response || x.Kiswahili == response).FirstOrDefaultAsync();
 
                 persona.FeelingId = feeling.Id;
 
                 _repository.Persona.Update(persona);
 
                 await _repository.SaveChangesAsync();
+               
+            }
 
+            return await stepContext.NextAsync(me);
+
+            
+
+        }
+
+        private async Task<DialogTurnResult> HandleFeelingAsync(WaterfallStepContext stepContext,CancellationToken token)
+        {
+            Client me = (Client)stepContext.Values[UserInfo];
+
+         
+            if (stepContext.Result is not Client)
+            {
+                //Save response to the question
+                
+            }
+
+            Conversation conversation = await _repository.Conversation
+                    .FindByCondition(x => x.ConversationId == stepContext.Context.Activity.Conversation.Id)
+                    .Include(x => x.Persona)
+                    .FirstOrDefaultAsync();
+
+            if (conversation.IsReturnClient)
+            {
+                return await stepContext.BeginDialogAsync(nameof(AwarenessDialog), me, token);
+            }
+            else
+            {
                 return await stepContext.BeginDialogAsync(nameof(PersonalDialog), me, token);
             }
 
         }
 
-        private async Task<DialogTurnResult> HandleFeelingAsync(WaterfallStepContext stepContext,CancellationToken cancellationToken)
+        private async Task<DialogTurnResult> HandleAiHandOver(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            //todo make the human agent hand over here 
-            return await stepContext.BeginDialogAsync(nameof(AiDialog), null, cancellationToken);
+            return await stepContext.BeginDialogAsync(nameof(AiDialog), cancellationToken);
         }
-
-        private async Task<Conversation> CreateConversationDBInstance(WaterfallStepContext stepContext)
-        {
-           
-            var persona=await  _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstOrDefaultAsync();
-
-
-            Conversation conversation = new()
-            {
-                ChannelId = stepContext.Context.Activity.ChannelId,
-
-                ChannelName = stepContext.Context.Activity.ChannelId,
-
-                SenderId = stepContext.Context.Activity.From.Id,
-
-                ConversationId = stepContext.Context.Activity.Conversation.Id,
-
-                Persona = persona == null? new Persona() { SenderId = stepContext.Context.Activity.From.Id } : persona,
-
-                AiConversations = new List<AiConversation>(),
-
-                IsReturnClient= persona != null
-            };
-
-
-            _repository.Conversation.Create(conversation);
-
-            bool result = await _repository.SaveChangesAsync();
-
-            if (result)
-            {
-
-            }
-
-            await DialogExtensions.UpdateDialogConversationId(conversation.Id, stepContext, _userProfileAccessor, _userState);
-
-            return conversation;
-        }
-
-       
 
         private async Task<DialogTurnResult> RateBotAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
@@ -426,12 +407,12 @@ namespace RedCrossChat.Dialogs
 
             return await stepContext.PromptAsync(nameof(ChoicePrompt), options, cancellationToken);
         }
- 
+
         private async Task<DialogTurnResult> FinalStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             var ratingChoice = ((FoundChoice)stepContext.Result).Value;
 
-            if (ratingChoice.Equals("PositiveChoice"))  
+            if (ratingChoice.Equals("PositiveChoice"))
             {
                 await stepContext.Context.SendActivityAsync(MessageFactory.Text("Thank you for your positive feedback! We're glad you had a great experience."));
             }
@@ -442,6 +423,60 @@ namespace RedCrossChat.Dialogs
 
             return await stepContext.EndDialogAsync(null, cancellationToken);
         }
+
+        private async Task<Conversation> CreateConversationDBInstance(WaterfallStepContext stepContext)
+        {
+           
+            var persona= await  _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstOrDefaultAsync();
+
+            Conversation conversation = new()
+            {
+                ChannelId = stepContext.Context.Activity.ChannelId,
+
+                ChannelName = stepContext.Context.Activity.ChannelId,
+
+                SenderId = stepContext.Context.Activity.From.Id,
+
+                ConversationId = stepContext.Context.Activity.Conversation.Id,
+
+                AiConversations = new List<AiConversation>(),
+
+                IsReturnClient = persona != null
+            };
+
+            if (persona != null)
+            {
+                conversation.PersonaId=persona.Id;
+            }
+            else
+            {
+                conversation.Persona = new Persona() { SenderId = stepContext.Context.Activity.From.Id };
+            }
+
+            try
+            {
+                _repository.Conversation.Create(conversation);
+
+                bool result = await _repository.SaveChangesAsync();
+
+                if (result)
+                {
+
+                }
+            }
+            catch(Exception ex)
+            {
+
+            }
+
+           
+
+            await DialogExtensions.UpdateDialogConversationId(conversation.Id, stepContext, _userProfileAccessor, _userState);
+
+            return conversation;
+        }
+
+      
 
     }
 }
