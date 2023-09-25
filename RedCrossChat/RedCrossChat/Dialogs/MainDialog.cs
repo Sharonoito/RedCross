@@ -364,13 +364,15 @@ namespace RedCrossChat.Dialogs
             else
             {
 
-                Persona persona = conversation?.Persona;
+                //Persona persona = conversation?.Persona;
 
-                persona.Feeling = stepContext.Context.Activity.Text;
+                //persona.Feeling = stepContext.Context.Activity.Text;
 
-                _repository.Persona.Update(persona);
+                //_repository.Persona.Update(persona);
 
-                await _repository.SaveChangesAsync();
+                //await _repository.SaveChangesAsync();
+
+                //handle with AI or Human too: Ambrose
 
                 return await stepContext.BeginDialogAsync(nameof(PersonalDialog), null, cancellationToken);
             }

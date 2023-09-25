@@ -62,6 +62,14 @@ namespace RedCrossChat.Objects
             new Choice() {Value="Above 40"},
         };
 
+        public static readonly List<Choice> AgeGroupKiswahili = new()
+        {
+            new Choice() { Value ="15-20",Synonyms=new List<string>{"15","16","17","19","20"}},
+            new Choice() { Value="21-30",Synonyms=new List<string>{"21","22","23","24","25","26","27","28","29","30"}},
+            new Choice() {Value="31-40",Synonyms=new List<string>{"31","32","33","34","35","36","37","38","39","40"}},
+            new Choice() {Value="zaidi ya miaka 40"},
+        };
+
         public static readonly List<Choice> Actions = new()
         {
             new Choice() { Value = InitialActions.Careers, Synonyms = new List<string> { "1", "Careers", "careers" } },
@@ -157,6 +165,18 @@ namespace RedCrossChat.Objects
             new Choice() { Value = GenderSwahili.Other,Synonyms=new List<string>{"o","other"}},
         };
 
+        public static List<Choice> Countrys = new List<Choice>
+        {
+            new Choice() { Value = CountryValidation.Kenya,Synonyms=new List<string>{"Kenya","KENYA"}},
+            new Choice() { Value=  CountryValidation.Other,Synonyms=new List<string>{"o","other"}},
+        };
+
+        public static List<Choice> CountryKiswahili = new List<Choice>
+        {
+            new Choice() { Value = CountrySwahili.Kenya,Synonyms=new List<string>{"Kenya","KENYA"}},
+            new Choice() { Value = CountrySwahili.Other,Synonyms=new List<string>{"o","other"}},
+        };
+
         public static List<Choice> Reasons = new List<Choice>()
         {
             new Choice  { Value ="Suicidal ideations",},
@@ -168,13 +188,14 @@ namespace RedCrossChat.Objects
 
         public static List<Choice> ReasonsKiswahili = new List<Choice>()
         {
-            new Choice  { Value ="Suicidal ideations",},
-            new Choice  { Value ="Feelings of hopelessness",},
-            new Choice { Value = "Financial distress" },
-            new Choice { Value = "Childhood trauma" },
-            new Choice { Value = "Work related stress and burnout" },
+            new Choice  { Value ="Mawazo ya kutaka kujitoaa uhai",},
+            new Choice  { Value ="Hisia za kukata tamaa",},
+            new Choice { Value = "Shida za kifedha" },
+            new Choice { Value = "Msongo wa utotoni wa kisaikolojia" },
+            new Choice { Value = "Msongo wa kazi na kuchoka kikazi" },
         };
 
+      
     }
 
     public static class Validations
@@ -201,6 +222,19 @@ namespace RedCrossChat.Objects
         public const string Female = "Mke";
         public const string Other = "Haijatajwa";
     }
+
+    public static class CountryValidation
+    {
+        public const string Kenya = "Kenya";
+        public const string Other = "Other";
+    }
+
+    public static class CountrySwahili
+    {
+        public const string Kenya = "Kenya";
+        public const string Other = "Nyingine";
+    }
+
 
     public static class DialogConstants
     {
