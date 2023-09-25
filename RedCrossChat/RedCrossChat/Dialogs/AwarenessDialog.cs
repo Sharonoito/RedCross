@@ -256,13 +256,14 @@ namespace RedCrossChat.Dialogs
 
             var question = me.language ? "Would you wish to talk to a Professional Counselor?" : "Je, ungependa kuongea na mshauri wa kitaalam?";
 
-            Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
+            //todo push reason to the COnversation
+            //Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
 
-            persona.Reason = stepContext.Context.Activity.Text;
+            //persona.Reason = stepContext.Context.Activity.Text;
 
-            _repository.Persona.Update(persona);
+           // _repository.Persona.Update(persona);
 
-            await _repository.SaveChangesAsync();
+            //await _repository.SaveChangesAsync();
 
             await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
 
@@ -279,13 +280,13 @@ namespace RedCrossChat.Dialogs
         {
             Client me = (Client)stepContext.Values[UserInfo];
 
-            Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
+           // Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
+           //todo push this to the Conversation
+           // persona.HandedOver = true;
 
-            persona.HandedOver = true;
+            //_repository.Persona.Update(persona);
 
-            _repository.Persona.Update(persona);
-
-            await _repository.SaveChangesAsync();
+            //await _repository.SaveChangesAsync();
 
             if (stepContext.Result != null)
             {
