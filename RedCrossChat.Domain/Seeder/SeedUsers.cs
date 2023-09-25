@@ -69,19 +69,69 @@ namespace RedCrossChat.Domain
 
                     // Add role to user
                     userMgr.AddToRoleAsync(adminUser, superAdminRole.Name).GetAwaiter().GetResult();
-                }
+                } 
 
-                if (!context.County.Any())
+                try
                 {
-                  //var data=await  SeedHelper.GetSeedData<DBCounty>("County.json");
 
-                  /*foreach (var item in data)
+                    if (!context.County.Any())
                     {
-                        context.County.Add(new DBCounty { Name=item.Name,prefix="SM",Code=item.Code});
+                        var data = await SeedHelper.GetSeedData<DBCounty>("County.json");
 
-                        context.SaveChanges();
-                    }*/
+                        foreach (var item in data)
+                        {
+                            context.County.Add(new DBCounty { Name = item.Name, prefix = "SM", Code = item.Code });
+
+                            await context.SaveChangesAsync();
+                        }
+
+                        
+                    }
+
+                    if (!context.AgeBand.Any())
+                    {
+                        var data = await SeedHelper.GetSeedData<AgeBand>("AgeBand.json");
+
+                        foreach (var item in data)
+                        {
+                             context.AgeBand.Add(new AgeBand { Name = item.Name, Kiswahili = item.Kiswahili });
+
+                             await context.SaveChangesAsync();
+                        }
+                    }
+
+                    if (!context.Gender.Any())
+                    {
+                        var data = await SeedHelper.GetSeedData<AgeBand>("Gender.json");
+
+                        foreach (var item in data)
+                        {
+
+                            context.Gender.Add(new Gender { Name = item.Name, Kiswahili = item.Kiswahili });
+
+                            await context.SaveChangesAsync();
+
+                        }
+                    }
+
+                    if (!context.Feeling.Any())
+                    {
+                        var data = await SeedHelper.GetSeedData<DBFeeling>("Feelings.json");
+
+                        foreach (var feeling in data)
+                        {
+
+                            context.Feeling.Add(new DBFeeling { Name = feeling.Name, Description=feeling.Description,Synonymns = feeling.Synonymns, Kiswahili = feeling.Kiswahili });
+
+                            await context.SaveChangesAsync();
+                        }
+                    }
                 }
+                catch(Exception ex)
+                {
+
+                }
+
             }
 
         }

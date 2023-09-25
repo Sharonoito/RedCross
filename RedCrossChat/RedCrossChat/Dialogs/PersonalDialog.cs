@@ -156,16 +156,25 @@ namespace RedCrossChat.Dialogs
 
             Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
 
+            var response = stepContext.Context.Activity.Text;
+
             var question = me.language? "How old are you?" : "Je, una miaka mingapi?";
 
             if (stepContext.Values != null)
             {
-                persona.County = stepContext.Context.Activity.Text;
+                var county = await GetCountyResponse(response);
 
-                _repository.Persona.Update(persona);
+                if(county != null)
+                {
+                    persona.CountyId = county.Id;
 
-                await _repository.SaveChangesAsync();
+                    _repository.Persona.Update(persona);
 
+                    await _repository.SaveChangesAsync();
+
+                }
+            
+                
                 await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
 
             }
@@ -189,16 +198,25 @@ namespace RedCrossChat.Dialogs
 
             var question = me.language? "What is your relationship status ?" : " Je, hali yako ya uhusiano ikoje";
 
+            var response = stepContext.Context.Activity.Text;
+
             await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
 
-            Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
+            
+            var ageGroup=await _repository.AgeBand.FindByCondition(x => x.Name==response || x.Kiswahili ==response).FirstOrDefaultAsync();
 
-            persona.AgeGroup = stepContext.Context.Activity.Text;
+            if(ageGroup != null)
+            {
+                Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
 
-            _repository.Persona.Update(persona);
+                persona.AgeBandId = ageGroup.Id;
 
-            bool result = await _repository.SaveChangesAsync();
+                _repository.Persona.Update(persona);
 
+                bool result = await _repository.SaveChangesAsync();
+
+            }
+          
             return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions()
             {
                 Prompt = MessageFactory.Text(question),
@@ -272,11 +290,11 @@ namespace RedCrossChat.Dialogs
             return await stepContext.PromptAsync("select-gender", options, cancellationToken);
         }
 
-        private static Task<bool> ValidateCountyAsync(PromptValidatorContext<string> promptContext, CancellationToken cancellationToken)
+        private  async Task<bool> ValidateCountyAsync(PromptValidatorContext<string> promptContext, CancellationToken cancellationToken)
         {
             var response = promptContext.Context.Activity.Text.Trim();
 
-            List<County> counties = ReadCountyFromFile();
+            var counties = await _repository.County.GetAll();
 
             var validatedResponse = response.ToLower();
 
@@ -296,15 +314,13 @@ namespace RedCrossChat.Dialogs
 
             foreach (var county in counties) {
 
-                if (county.Title.ToLower() == validatedResponse || county.Value == code)
-
-                    {
+                if (county.Name.ToLower() == validatedResponse || county.Code == code){
                         status = true; break;
                 }
 
             }
 
-            return Task.FromResult(status);
+            return status;
         }
 
         //validation for mental awarenesss
@@ -346,40 +362,7 @@ namespace RedCrossChat.Dialogs
         {
             Client user = (Client)(stepContext.Result);
 
-            
-
             return await stepContext.BeginDialogAsync(nameof(AiDialog), user, cancellationToken);
-        }
-
-        public List<County> ReadJsonFile()
-        {
-            //string sampleJsonFilePath = "counties.json";
-
-            var paths = new[] { ".", "Cards", "counties.json" };
-          
-            using StreamReader reader = new(Path.Combine(paths));
-            var json = reader.ReadToEnd();
-            List<County> counties = JsonConvert.DeserializeObject<List<County>>(json);
-            return counties;
-        }
-
-        public static List<County> ReadCountyFromFile()
-        {
-
-            var paths = new[] { ".", "Cards", "counties.json" };
-            
-
-            using StreamReader reader = new(Path.Combine(paths));
-            var json = reader.ReadToEnd();
-            List<County> counties = JsonConvert.DeserializeObject<List<County>>(json);
-            return counties;
-        }
-
-        public List<string> GetListOfCounties()
-        {
-            List<County> counties = ReadJsonFile();
-            List<string> countyNames = counties.Select(county => county.Title).ToList();
-            return countyNames;
         }
 
         private void AddDialogs()
@@ -436,5 +419,20 @@ namespace RedCrossChat.Dialogs
             return conversation;
         }
 
+
+        private async Task<DBCounty?> GetCountyResponse(string text)
+        {
+            try
+            {
+                int code = int.Parse(text);
+
+                return await _repository.County.FindByCondition(x => x.Code == code ).FirstOrDefaultAsync();
+            }
+            catch (FormatException)
+            {
+                return await _repository.County.FindByCondition(x=>x.Name == text).FirstOrDefaultAsync();
+            }
+            
+        }
     }
 }

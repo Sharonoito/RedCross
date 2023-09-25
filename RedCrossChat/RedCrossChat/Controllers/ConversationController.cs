@@ -77,10 +77,35 @@ namespace RedCrossChat.Controllers
 
             var conversation = _repository.Conversation;
 
-
             var conversations=await conversation.FindAll().ToListAsync();
 
-            return Success("Fetched SuccessFully",conversations);
+            var handedOver=await conversation.FindByCondition(x=>x.HandedOver==true).ToListAsync();
+
+            var items = new Dictionary<string, int>();
+
+            foreach(var item in conversations)
+            {
+                var time= $"{item.DateCreated.Year}-{item.DateCreated.Month}-{item.DateCreated.Day} ";
+
+                if (items.ContainsKey(time))
+                {
+                    items[time]++;
+                }
+                else
+                {
+                    items[time] = 1 ;
+                }
+               
+            }
+
+            var report = new DashboardReportVM
+            {
+                TotalVisits=conversations.Count,
+                HandledByAgents=handedOver.Count,
+                items=items,
+            };
+
+            return Success("Fetched SuccessFully", report);
         }
 
         public IActionResult Flow()

@@ -16,6 +16,9 @@ namespace RedCrossChat.Contracts
         IFeelingRepo Feeling { get; }
         ICountyRepo County { get; }
 
+        IGender Gender { get; }
+        IAgeBand AgeBand { get; }
+
         #endregion
 
         #region Conversational

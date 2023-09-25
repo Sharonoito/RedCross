@@ -303,11 +303,21 @@ namespace RedCrossChat.Dialogs
 
             var question = me.language?  "How would you describe how you are feeling today?" : "Je, unajihisi vipi leo?";
 
+
+            var feelings = await _repository.Feeling.GetAll();
+
+            var choices=new List<Choice>();
+
+            foreach (var choice in feelings)
+            {
+                choices.Add(new Choice() { Value = me.language ? choice.Name : choice.Kiswahili });
+            }
+
             var options = new PromptOptions()
             {
                 Prompt = MessageFactory.Text(question),
                 RetryPrompt = MessageFactory.Text(me.language? "Please select a valid feeling" : "Tafadhali fanya chaguo sahihi"),
-                Choices =  me.language ? RedCrossLists.FeelingsList : RedCrossLists.FeelingsKiswahili,
+                Choices =  choices,
                 Style = ListStyle.HeroCard,
 
             };
@@ -321,6 +331,8 @@ namespace RedCrossChat.Dialogs
             Client me = (Client)stepContext.Values[UserInfo];
 
             var question = "Please Specify the feeling ";
+
+            var response = stepContext.Context.Activity.Text;
 
             if (((FoundChoice)stepContext.Result).Value == Feelings.Other)
             {
@@ -340,9 +352,12 @@ namespace RedCrossChat.Dialogs
             }
             else
             {
+
                 Persona persona = conversation?.Persona;
 
-                persona.Feeling = stepContext.Context.Activity.Text;
+                var feeling= await _repository.Feeling.FindByCondition(x => x.Description == response || x.Kiswahili == response).FirstOrDefaultAsync();
+
+                persona.FeelingId = feeling.Id;
 
                 _repository.Persona.Update(persona);
 

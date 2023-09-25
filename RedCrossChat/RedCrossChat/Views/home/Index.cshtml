@@ -7,7 +7,7 @@
 </h4>
 
 <div class="row">
-    <div class="col-sm-6 col-lg-3 mb-4">
+    <div class="col-sm-6 col-lg-3 mb-4" id="totalVisits">
         <div class="card card-border-shadow-primary h-100">
             <div class="card-body">
                 <div class="d-flex align-items-center mb-2 pb-1">
@@ -25,7 +25,7 @@
         </div>
     </div>
 
-    <div class="col-sm-6 col-lg-3 mb-4">
+    <div class="col-sm-6 col-lg-3 mb-4" id="handedOver">
         <div class="card card-border-shadow-primary h-100">
             <div class="card-body">
                 <div class="d-flex align-items-center mb-2 pb-1">
@@ -43,7 +43,7 @@
         </div>
     </div>
 
-    <div class="col-sm-6 col-lg-3 mb-4">
+    <div class="col-sm-6 col-lg-3 mb-4" id="unCompletedVisits">
         <div class="card card-border-shadow-primary h-100">
             <div class="card-body">
                 <div class="d-flex align-items-center mb-2 pb-1">
@@ -61,7 +61,7 @@
         </div>
     </div>
 
-    <div class="col-sm-6 col-lg-3 mb-4">
+    <div class="col-sm-6 col-lg-3 mb-4" id="averageBotRating">
         <div class="card card-border-shadow-primary h-100">
             <div class="card-body">
                 <div class="d-flex align-items-center mb-2 pb-1">
@@ -107,7 +107,8 @@
                     <div class="">
                         <select class="form-control filters" name="county">
                             <option value="-1">Select Country</option>
-                           
+                            <option value="kenya">Kenya</option>
+                            <option value="Other">Other</option>
                         </select>
                     </div>
                 </div>
@@ -224,8 +225,7 @@
             return string.charAt(0).toUpperCase() + string.slice(1);
         }
 
-        $(document).on('change', '.filters', function () {
-
+        function fetchMetaData(state=0){
             let filters = [];
 
             $(".filters").toArray().forEach(filter => {
@@ -233,48 +233,70 @@
             });
 
             console.log(filters);
-            console.log(JSON.stringify({... filters }));
+            console.log(JSON.stringify({ ...filters }));
 
             $.ajax({
                 type: "POST",
                 url: "@Url.Action("EvaluateReport","Conversation")",
-                data: {  ...filters },
+                data: { ...filters },
                 async: false,
                 contentType: "application/json",
                 success: function (data) {
-                    resp.push(data);
+                   
+                   let item= data.responseData;
+
+
+                    $("#handedOver h4").html(item.handledByAgents);
+
+                    $("#totalVisits h4").html(item.totalVisits);
+
+                    $("#averageBotRating h4").html(item.averageBotRating);
+
+                    $("#unCompletedVisits h4").html(item.uncompletedVisits);
+
+                    showGraph(item.items,state);
                 },
                 error: function (req, status, error) {
                     alert("error generating data.");
                 }
             });
 
-            
-
-        });
-
-        var options = {
-            chart: {
-                type: 'bar'
-            },
-            series: [{
-                name: 'sales',
-                data: [30, 40, 45, 50, 49, 60, 70, 91, 125]
-            }],
-            xaxis: {
-                categories: [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999]
-            }
         }
 
-        var chart = new ApexCharts(document.querySelector("#chart"), options);
+        function showGraph(items,state){
+            var options = {
+                chart: {
+                    type: 'bar'
+                },
+                series: [{
+                    name: 'Visits',
+                    data: Object.values(items)
+                }],
+                xaxis: {
+                    categories: Object.keys(items)
+                }
+            }
 
-        chart.render();
+            var chart = new ApexCharts(document.querySelector("#chart"), options);
+            
+            if(state==0) chart.render();
+        }
 
-        setTimeout(() => {
+        $(document).on('change', '.filters', function () {
+            fetchMetaData(1);
+        });
+
+        $(document).ready(function(){
+            fetchMetaData();
+        });
+
+        
+
+       /* setTimeout(() => {
             chart.updateSeries([{
                 data: [32, 44, 31, 41, 22]
             }])
-        },2000)
+        },2000)*/
     </script>
 }
 

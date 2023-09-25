@@ -1,0 +1,39 @@
+[
+  {
+    "Name": "Happy",
+    "Kiswahili": "Unahisi kuwa na Furaha 😀",
+    "Description": "Happy 😀",
+    "Synonymns": "angry"
+  },
+  {
+    "Name": "Angry",
+    "Kiswahili": "Unahisi kuwa na Hasira 😡",
+    "Description": "Angry 😡",
+    "Synonymns": "angry"
+  },
+  {
+    "Name": "Anxious",
+    "Kiswahili": "Unahisi kuwa na Wasiwasi 🥴",
+    "Description": "Anxious \\U0001f974",
+    "Synonymns": ""
+
+  },
+  {
+    "Name": "Sad",
+    "Kiswahili": "Unahisi kuwa na Huzuni 😪",
+    "Description": "Sad 😪",
+    "Synonymns": " "
+  },
+  {
+    "Name": "Flat Effect",
+    "Kiswahili": "Unahisi kuwa na Kuchanganyikiwa 🫥",
+    "Description": "Flat Effect \\U0001fae5",
+    "Synonymns": ""
+  },
+  {
+    "Name": "Expressionless ",
+    "Kiswahili": "Zinginezo",
+    "Description": "Expressionless \\U0001fae4",
+    "Synonymns": ""
+  }
+]

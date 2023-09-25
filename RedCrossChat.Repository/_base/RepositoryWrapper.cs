@@ -82,6 +82,28 @@ namespace RedCrossChat.Repository
             }
         }
 
+        public IGender? _gender;
+        public IGender Gender
+        {
+            get
+            {
+                if (_gender == null)  _gender = new GenderRepo(_repoContext);
+
+                return _gender;
+            }
+        }
+
+        public IAgeBand? _ageBand;
+        public IAgeBand AgeBand
+        {
+            get
+            {
+                if (_ageBand == null) _ageBand = new AgeBandRepo(_repoContext);
+
+                return _ageBand;
+            }
+        }
+
         public IAiConversationRepo? _aiConversation;
         public IAiConversationRepo AiConversation
         {
