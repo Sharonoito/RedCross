@@ -256,14 +256,17 @@ namespace RedCrossChat.Dialogs
 
             var question = me.language ? "Would you wish to talk to a Professional Counselor?" : "Je, ungependa kuongea na mshauri wa kitaalam?";
 
-            Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
+            var conversation = await _repository.Conversation.FindByCondition(x => x.ConversationId == stepContext.Context.Activity.Conversation.Id).FirstOrDefaultAsync();
 
-            persona.Reason = stepContext.Context.Activity.Text;
+            if(conversation !=null)
+            {
+                conversation.Reason = stepContext.Context.Activity.Text;
 
-            _repository.Persona.Update(persona);
+                _repository.Conversation.Update(conversation);
 
-            await _repository.SaveChangesAsync();
-
+                await _repository.SaveChangesAsync();
+            }
+           
             await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
 
             return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions()
@@ -279,13 +282,7 @@ namespace RedCrossChat.Dialogs
         {
             Client me = (Client)stepContext.Values[UserInfo];
 
-            Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
-
-            persona.HandedOver = true;
-
-            _repository.Persona.Update(persona);
-
-            await _repository.SaveChangesAsync();
+            var conversation = await _repository.Conversation.FindByCondition(x => x.ConversationId == stepContext.Context.Activity.Conversation.Id).FirstOrDefaultAsync();
 
             if (stepContext.Result != null)
             {
@@ -297,6 +294,17 @@ namespace RedCrossChat.Dialogs
                         me.WantstoTalkToAProfessional= true;
 
                         me.HandOverToUser = true;
+
+                        /*Updating the database*/
+
+                        if (conversation != null)
+                        {
+                            conversation.HandedOver = true;
+
+                            _repository.Conversation.Update(conversation);
+
+                            await _repository.SaveChangesAsync();
+                        }
 
                         // Send the message to the user about the next available agent or calling 1199.
                         var agentMessage = me.language ? "The next available counsellor will call you shortly, you can also contact us directly by dialing 1199, request to speak to a psychologist.":

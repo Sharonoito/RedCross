@@ -18,6 +18,10 @@ namespace RedCrossChat.Entities
 
         public Guid PersonaId { get; set; }
 
+        public string Reason { get; set; } = "";
+
+        public bool HandedOver { get; set; } = false;
+
         public bool IsReturnClient { get; set; } = false;
 
         public bool ConversedWithAI { get; set; } = false;

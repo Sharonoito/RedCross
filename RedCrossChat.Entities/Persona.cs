@@ -30,10 +30,5 @@ namespace RedCrossChat.Entities
 
         public bool WantsBreathingExcercises { get; set; } = false;
 
-        public string Reason { get; set; } = "";
-
-        public bool HandedOver { get; set; } = false;
-
-
     }
 }

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
+using Microsoft.Bot.Builder.Dialogs.Choices;
 using Microsoft.Bot.Connector;
 using Microsoft.Bot.Schema;
 using Microsoft.EntityFrameworkCore;
@@ -45,12 +46,35 @@ namespace RedCrossChat.Dialogs
 
             var waterFallSteps = new WaterfallStep[]
                {
+                   FirstTransactionAsync,
                     IntialTaskAsync,
                     FetchResultsAsync,
                     FinalStepAsync
                };
 
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), waterFallSteps));
+        }
+
+        public async Task<DialogTurnResult> FirstTransactionAsync(WaterfallStepContext stepContext, CancellationToken token)
+        {
+            Conversation conversation = await _repository.Conversation
+                   .FindByCondition(x => x.ConversationId == stepContext.Context.Activity.Conversation.Id)
+                   .Include(x => x.AiConversations)
+                   .FirstAsync();
+
+            var options = new PromptOptions()
+            {
+                Prompt=MessageFactory.Text("You are now interacting with Chat Gpt , Do you wish to continue"),
+                Choices=RedCrossLists.choices,
+                Style = ListStyle.HeroCard
+            };
+
+            if (conversation.AiConversations.Count != 0)
+            {
+                return await stepContext.NextAsync(null);
+            }
+            
+            return await stepContext.PromptAsync(nameof(ChoicePrompt),options,token);
         }
 
         public async Task<DialogTurnResult> IntialTaskAsync(WaterfallStepContext stepContext, CancellationToken token)
@@ -66,6 +90,19 @@ namespace RedCrossChat.Dialogs
             if (conversation.AiConversations.Count > 0)
             {
                 question = conversation.AiConversations.Last().Response;
+            }
+            else
+            {
+
+                switch (((FoundChoice)stepContext.Result).Value)
+                {
+                    case Validations.NO:
+                    case ValidationsSwahili.NO:
+                        return await stepContext.EndDialogAsync(); 
+                }
+
+
+               // await stepContext.Context.SendActivityAsync(MessageFactory.Text("You are now interacting with Chatgpt to exit or opt out type exit or cancel"));
             }
 
             var options = new PromptOptions();
