@@ -25,6 +25,7 @@ namespace RedCrossChat.Dialogs
 
 
         protected string iterations = "user-iterations";
+        protected string UserInfo = "client-iterations";
 
         public BreathingDialog(UserState userState) : base(nameof(BreathingDialog))
         {
@@ -50,7 +51,9 @@ namespace RedCrossChat.Dialogs
         public async Task<DialogTurnResult> InitialDialogTest(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
 
-            User user = (User)stepContext.Options;
+            Client user = (Client)stepContext.Options;
+
+            stepContext.Values[UserInfo] = user;
 
             var question = "Would you like me to take you through some breathing exercises or tips on managing mental health?\r\n\r\n ";
 
@@ -78,8 +81,7 @@ namespace RedCrossChat.Dialogs
         }
 
 
-        private int _exerciseIndex = 1;
-
+       
         public async Task<DialogTurnResult> TakeUserThroughExerciseAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
 
@@ -87,7 +89,7 @@ namespace RedCrossChat.Dialogs
 
             int _exerciseIndex = Int32.Parse(stringValue);
 
-            User user = (User)stepContext.Options;
+            Client user = (Client)stepContext.Options;
 
             var question = "Do you wish to continue ?";
 
@@ -128,7 +130,7 @@ namespace RedCrossChat.Dialogs
 
             var objectType=stepContext.Result.GetType();
 
-            User user = (User)stepContext.Options;
+            Client user = (Client)stepContext.Options;
 
 
             if (objectType.Name == "User")
@@ -163,7 +165,7 @@ namespace RedCrossChat.Dialogs
         {
             var userChoice = ((FoundChoice)stepContext.Result)?.Value;
 
-            var user = (User)stepContext.Options;
+            var user = (Client)stepContext.Options;
 
             user.Iteration += user.Iteration;
 

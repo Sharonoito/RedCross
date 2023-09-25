@@ -10,7 +10,19 @@
         public string RelationShipStatus { get; set; } = "";
         public string professionlStatus { get; set; }="";
         public string User { get; set; } = null;
-
+        public bool language { get; set; } = true;    
         public bool DialogClosed { get; set; } = false;
+
+        public bool IsAwareOfFeeling { get; set; } = false;
+
+        public bool HasTalkedToSomeone { get; set; } = false;
+
+        public bool WantsBreathingExercises { get; set; } = false;
+
+        public bool WantstoTalkToAProfessional { get; set; } = false;
+
+        public bool HandOverToUser { get; set; } = false;
+
+        public int Iteration { get; set; } = 0;
     }
 }

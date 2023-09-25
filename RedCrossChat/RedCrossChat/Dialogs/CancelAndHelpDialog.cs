@@ -11,11 +11,14 @@ using System.Threading.Tasks;
 
 namespace RedCrossChat.Dialogs
 {
-    public class CancelAndHelpDialog(string id) : ComponentDialog(id)
+    public class CancelAndHelpDialog : ComponentDialog
     {
         private const string HelpMsgText = "Do you wish to talk to an agent?";
         private const string CancelMsgText = "Cancelling...";
 
+        public CancelAndHelpDialog(string id):base(id) {
+        
+        }
         protected override async Task<DialogTurnResult> OnContinueDialogAsync(DialogContext innerDc, CancellationToken cancellationToken = default)
         {
             var result = await InterruptAsync(innerDc, cancellationToken);

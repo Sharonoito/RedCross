@@ -3,21 +3,18 @@
 //
 // Generated with Bot Builder V4 SDK Template for Visual Studio CoreBot v4.18.1
 
-using Microsoft.AspNetCore.Http;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
 using RedCrossChat.Contracts;
-using RedCrossChat.Dialogs;
 using RedCrossChat.Objects;
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace RedCrossChat.Bots
 {
-    
+
     public  class DialogBot<T> : ActivityHandler
         where T : Dialog
     {

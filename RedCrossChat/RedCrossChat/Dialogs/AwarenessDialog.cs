@@ -53,11 +53,10 @@ namespace RedCrossChat.Dialogs
             return new WaterfallStep[]
             {
                 InitialStepAsync,
-                HandleMentalValuationAsync,
+                
                 ProcessMentalEvaluationChoice,
                 HandleCaregiverChoiceAsync,
                 EvaluateDialogTurnAsync,
-               
                 CheckFeelingAware,
                 CheckProfessionalSwitchAsync,
                 FinalStepAsync
@@ -67,72 +66,61 @@ namespace RedCrossChat.Dialogs
 
         private async Task<DialogTurnResult> InitialStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            // You can create the 'User' object here or retrieve it from somewhere else.
-            User user = new();
+            var me = (Client)stepContext.Options;
 
-            // Set the 'User' object in the stepContext.Values dictionary.
-            stepContext.Values[UserInfo] = user;
-
+            stepContext.Values[UserInfo] = me;
 
             // Move to the next step in the waterfall.
-            return await stepContext.NextAsync(null, cancellationToken);
-
-        }
-
-
-        private async Task<DialogTurnResult> HandleMentalValuationAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
-        {
-            // await stepContext.BeginDialogAsync("mental-valuation", stepContext, cancellationToken);
-
-            var question = "Are you aware of what could have resulted to that feeling?";
+          
+            var question = me.language ? "Are you aware of what could have resulted to that feeling?" : " Je, unafahamu kinachopelekea ujihisi katika hali ya (furaha, huzuni)? Taja";
 
             var options = new PromptOptions()
             {
                 Prompt = MessageFactory.Text(question),
 
-                Choices = RedCrossLists.choices
+                Choices = me.language ? RedCrossLists.choices : RedCrossLists.choicesKiswahili,
+                Style = ListStyle.HeroCard
+
 
             };
+
+
             await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
 
 
             return await stepContext.PromptAsync(nameof(ChoicePrompt), options, cancellationToken);
 
-
         }
+
         private async Task<DialogTurnResult> ProcessMentalEvaluationChoice(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            User user;
+            Client me = (Client)stepContext.Values[UserInfo];
 
+            var question = me.language ? "Have you shared with someone how you feel?" : " Je, umeweza kuzungumza na mtu yeyote?";
 
-            var question = "Have you shared with someone how you feel?";
-
-            if (!stepContext.Values.TryGetValue(UserInfo, out var userValue) || !(userValue is User user1))
-            {
-                user = new User();
-                stepContext.Values[UserInfo] = user;
-            }
-            else
-            {
-                user = user1;
-            }
 
             if (stepContext.Result != null && stepContext.Result is FoundChoice choiceResult)
             {
 
-                
+                Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
+
+                persona.IsAwareOfFeelings = stepContext.Context.Activity.Text;
+
+                _repository.Persona.Update(persona);
+
                 await _repository.SaveChangesAsync();
 
                 switch (choiceResult.Value)
                 {
-                    case "Yes":
-                        user.isAwareOfFeeling = true;
+                    case Validations.YES:
+                    case ValidationsSwahili.YES:
+                        me.IsAwareOfFeeling = true;
 
                         break;
                     default:
-                        user.isAwareOfFeeling = false;
-
-                         question = " It's normal for one to feel not comfortable to share with others, however remember that a problem shared is half solved. Would you like to have a trusted person to talk to?";
+                      
+                         question =me.language? " It's normal for one to feel not comfortable to share with others, however remember that a problem shared is half solved. Would you like to have a trusted person to talk to?":
+                            "Ni muhimu kutunza ustawi wako wa akili. Je, ungependa kuwa na mtu unayemwamini wa kuzungumza naye? Ni kawaida kwa mtu kujisikia kukosa raha kushiriki na wengine, hata hivyo kumbuka kuwa shida iliyoshirikiwa hutatuliwa nusu";
                         break;
                         
                 }
@@ -143,13 +131,16 @@ namespace RedCrossChat.Dialogs
                 return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions()
                             {
                                 Prompt = MessageFactory.Text(question),
-                                Choices = RedCrossLists.choices
-                            }, cancellationToken);
+                                Choices = me.language ? RedCrossLists.choices : RedCrossLists.choicesKiswahili,
+                                Style = ListStyle.HeroCard
+                },
+                            cancellationToken);
             }
             else
             {
                 // Handle the case where stepContext.Result is null or not of the correct type.
                 // For example, you can prompt the user to repeat their response or handle the case accordingly.
+                    
                 await stepContext.Context.SendActivityAsync(MessageFactory.Text("Thank you for contacting us"), cancellationToken);
 
                 return await stepContext.EndDialogAsync(new DialogTurnResult(DialogTurnStatus.Waiting), cancellationToken);
@@ -160,24 +151,29 @@ namespace RedCrossChat.Dialogs
         private async Task<DialogTurnResult> HandleCaregiverChoiceAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
 
-            User user = (User)stepContext.Values[UserInfo];
+            Client me = (Client)stepContext.Values[UserInfo];
 
-            var question = "It's always relieving talking to someone trusted about what we are feeling. Would you want to speak to a professional therapist from Kenya Red Cross Society?";
+            var question = me.language ?"It's always relieving talking to someone trusted about what we are feeling. Would you want to speak to a professional therapist from Kenya Red Cross Society?":
+                "Daima ni kutuliza kuzungumza na mtu anayeaminika kuhusu kile tunachohisi. Je, ungependa kuzungumza na mtaalamu wa tiba kutoka Chama cha Msalaba Mwekundu cha Kenya";
+
+            Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
+
+            persona.HasTalkedTOSomeone = true;
+
+            _repository.Persona.Update(persona);
 
             await _repository.SaveChangesAsync();
 
             switch (((FoundChoice)stepContext.Result).Value)
             {
                 case "Yes":
-                    user.hasTalkedToSomeone =true;
+                    me.HasTalkedToSomeone =true;
                     break;
                 default:
-                   
-                    user.hasTalkedToSomeone =false;
 
-                    if (!user.hasTalkedToSomeone && !user.isAwareOfFeeling)
+                    if (!me.HasTalkedToSomeone && !me.IsAwareOfFeeling)
                     {
-                        return await stepContext.EndDialogAsync(user);
+                        return await stepContext.EndDialogAsync(me);
                     }
                     break;
                     
@@ -191,7 +187,9 @@ namespace RedCrossChat.Dialogs
                                new PromptOptions()
                                {
                                    Prompt = MessageFactory.Text(question),
-                                   Choices = RedCrossLists.choices
+                                   Choices = me.language? RedCrossLists.choices : RedCrossLists.choicesKiswahili,
+                                   Style = ListStyle.HeroCard
+
                                });
         }
 
@@ -199,20 +197,30 @@ namespace RedCrossChat.Dialogs
         private async Task<DialogTurnResult> EvaluateDialogTurnAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
 
-            User user = (User)stepContext.Values[UserInfo];
+            Client me = (Client)stepContext.Values[UserInfo];
+
+            Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
+
 
             if (stepContext.Result == null)
             {
-                return await stepContext.EndDialogAsync(user, cancellationToken);
+                persona.WantsToTalkToSomeone = true;
+
+                _repository.Persona.Update(persona);
+
+                await _repository.SaveChangesAsync();
+
+
+                return await stepContext.EndDialogAsync(me, cancellationToken);
             }
 
             switch (((FoundChoice)stepContext.Result).Value)
             {
-                case "Yes":
-                    return await stepContext.NextAsync(user, cancellationToken);
+                case Validations.YES:case ValidationsSwahili.YES:
+                    return await stepContext.NextAsync(me, cancellationToken);
                 default:
-                    user.WantsBreathingExercises = true;
-                    return await stepContext.EndDialogAsync(user, cancellationToken);
+                    me.WantsBreathingExercises = true;
+                    return await stepContext.EndDialogAsync(me, cancellationToken);
             }
         }
 
@@ -220,58 +228,79 @@ namespace RedCrossChat.Dialogs
 
         public async Task<DialogTurnResult> CheckFeelingAware(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
+            Client me = (Client)stepContext.Values[UserInfo];
 
-            var question = "What makes you seek our psychological support?";
+            var question = me.language ? "What makes you seek our psychological support?" : "Ni nini kinakufanya utafute msaada wetu wa kisaikolojia?";
+
+            Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
+
+            persona.WantsBreathingExcercises = true;
+
+            _repository.Persona.Update(persona);
+
+            await _repository.SaveChangesAsync();
 
             await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
 
             return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions()
             {
                 Prompt = MessageFactory.Text(question),
-                Choices = new List<Choice>()
-                        {
-                            new Choice  { Value ="Suicidal ideations",},
-                            new Choice  { Value ="Feelings of hopelessness",},
-                            new Choice  { Value ="Financial distress"},
-                            new Choice  { Value ="Childhood trauma"},
-                            new Choice  { Value ="Work related stress and burnout"},
-                           
-
-                        }
+                Choices =me.language ? RedCrossLists.Reasons : RedCrossLists.ReasonsKiswahili,
+                Style = ListStyle.HeroCard
             }, cancellationToken);
         }
 
         private async Task<DialogTurnResult> CheckProfessionalSwitchAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            var question = "Would you wish to talk to a Professional Counselor?";
+            Client me = (Client)stepContext.Values[UserInfo];
+
+            var question = me.language ? "Would you wish to talk to a Professional Counselor?" : "Je, ungependa kuongea na mshauri wa kitaalam?";
+
+            Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
+
+            persona.Reason = stepContext.Context.Activity.Text;
+
+            _repository.Persona.Update(persona);
+
+            await _repository.SaveChangesAsync();
 
             await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
 
             return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions()
             {
                 Prompt = MessageFactory.Text(question),
-                Choices = RedCrossLists.choices,
+                Choices = me.language? RedCrossLists.choices : RedCrossLists.choicesKiswahili,
+                Style = ListStyle.HeroCard
+
             }, cancellationToken);
         }
 
         private async Task<DialogTurnResult> FinalStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
+            Client me = (Client)stepContext.Values[UserInfo];
 
-            // Evaulate if to push the user to the health ai bot
-            User user = (User)stepContext.Values[UserInfo];
+            Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
+
+            persona.HandedOver = true;
+
+            _repository.Persona.Update(persona);
+
+            await _repository.SaveChangesAsync();
 
             if (stepContext.Result != null)
             {
                 switch (((FoundChoice)stepContext.Result).Value)
                 {
                     case Validations.YES:
+                    case ValidationsSwahili.YES:
 
-                        user.wantstoTalkToAProfessional= true;
+                        me.WantstoTalkToAProfessional= true;
 
-                        user.handOverToUser = true;
+                        me.HandOverToUser = true;
 
                         // Send the message to the user about the next available agent or calling 1199.
-                        var agentMessage = "The next available counsellor will call you shortly, you can also contact us directly by dialing 1199, request to speak to a psychologist.";
+                        var agentMessage = me.language ? "The next available counsellor will call you shortly, you can also contact us directly by dialing 1199, request to speak to a psychologist.":
+                            "Utaweza kuzungumza na mhudumu baada ya muda mfupi ama pia unaweza piga nambari 1199 ili kuongea na mshauri. Utaweza kupigiwa na mshauri baada ya muda mfupi, ama upige simu ili kuongea na mwanasaikolojia kupitia nambari 1199";
                         await stepContext.Context.SendActivityAsync(MessageFactory.Text(agentMessage), cancellationToken);
 
 
@@ -292,20 +321,20 @@ namespace RedCrossChat.Dialogs
                         };
 
 
-                        return await stepContext.EndDialogAsync(user, cancellationToken);
+                        return await stepContext.EndDialogAsync(me, cancellationToken);
 
 
                     case Validations.NO:
-                        user.handOverToUser = false;
-                        // Start the BreathingDialog
-                        return await stepContext.BeginDialogAsync(nameof(BreathingDialog), user, cancellationToken);
+                    case ValidationsSwahili.NO:
+                       
+                        return await stepContext.BeginDialogAsync(nameof(BreathingDialog), me, cancellationToken);
                     default:
-                        user.handOverToUser = false;
+                        
                         break;
                 }
             }
 
-            return await stepContext.EndDialogAsync(user);
+            return await stepContext.EndDialogAsync(me);
         }
 
     }

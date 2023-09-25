@@ -52,10 +52,7 @@ namespace RedCrossChat.Dialogs
             AddDialog(aiDialog);
 
             var mainDialog = new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
-
             {
-                InitialStepAsync,
-                EvaluateFeelingAsync,
                 PrivateDetailsCountryBracketAsync,
                 PrivateDetailsCountyDropdownAsync,
                 PrivateDetailsAgeBracketAsync,
@@ -76,70 +73,90 @@ namespace RedCrossChat.Dialogs
             InitialDialogId = nameof(WaterfallDialog);
         }
 
-        
-   
-        private async Task<DialogTurnResult> InitialStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        private async Task<DialogTurnResult> PrivateDetailsCountryBracketAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            await CreateConversationDBInstance(stepContext);
+            var me= (Client)stepContext.Options;
 
-            var question = "How would you describe how you are feeling today?";
+            stepContext.Values[UserInfo] = me;
+
+            var persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
+
+            var question = me.language ? "What is your Country of Origin" : "Chagua nchi yako.";
+
 
             var options = new PromptOptions()
             {
                 Prompt = MessageFactory.Text(question),
-                RetryPrompt = MessageFactory.Text("Please select a valid feeling"),
-                Choices = new List<Choice>
-                {
-                    new Choice() { Value =Feelings.Happy,Synonyms=new List<string>{"happy","HAPPY","Happy"}},
-                    new Choice() { Value=Feelings.Angry,Synonyms=new List<string>{"Angry","angry","ANGRY"}},
-                    new Choice() { Value=Feelings.Anxious},
-                    new Choice() { Value=Feelings.FlatEffect},
-                    new Choice() { Value=Feelings.Expressionless},
-                    new Choice() { Value=Feelings.Sad},
-                    new Choice() {Value=Feelings.Other},
-                },
+                RetryPrompt = MessageFactory.Text(me.language ?  "Please select a Choose between the two" : "Tafadhali chagua Chaguo kati ya hizo mbili"),
+                Choices = me.language? RedCrossLists.Countrys : RedCrossLists.CountryKiswahili,
+                Style = ListStyle.HeroCard,
+
             };
 
-
-            await DialogExtensions.UpdateDialogQuestion(question, stepContext, _userProfileAccessor, _userState);
-            
-
             // Prompt the user with the configured PromptOptions.
-            return await stepContext.PromptAsync("select-feeling", options, cancellationToken);
+            return await stepContext.PromptAsync("select-country", options, cancellationToken);
+
         }
 
-        private async Task<DialogTurnResult> EvaluateFeelingAsync(WaterfallStepContext stepContext,CancellationToken token)
+        private async Task<DialogTurnResult> PrivateDetailsCountyDropdownAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
+            Client me = (Client)stepContext.Values[UserInfo];
 
-            var question = "Please Specify the feeling ";
+            var hint =me.language? "( hint: type in Kiambu or 022,Nairobi or 047 )": "( dokezo: andika Kiambu au 022, Nairobi au 047 )";
 
-            if(((FoundChoice)stepContext.Result).Value==Feelings.Other)
+            Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync(cancellationToken: cancellationToken);
+
+
+            var question = me.language? "Which county are you located in?" : "Unapatikana kaunti gani?";
+
+            var questionRetry = me.language? "Please input a county" : "Tafadhali andika katika kaunti";
+
+
+            question=$"{question} \n {hint} ";
+
+            var select = ((FoundChoice)stepContext.Result).Value;
+
+            if (persona != null)
             {
-                await DialogExtensions.UpdateDialogAnswer(((FoundChoice)stepContext.Result).Value.ToString(), question, stepContext, _userProfileAccessor, _userState);
+                persona.Country = stepContext.Context.Activity.Text;
 
-                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text(question) }, token);
+                _repository.Persona.Update(persona);
+
+                await _repository.SaveChangesAsync();
+
+                await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
+
             }
 
-            Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
+            var promptId = RedCrossDialogTypes.SelectCounty;
 
-            persona.Feeling = stepContext.Context.Activity.Text;
+           
 
-            _repository.Persona.Update(persona);
+            if (select != CountryValidation.Kenya || select !=CountrySwahili.Kenya)
+            {
+                question = me.language ? "Which Country are you from ?" : "Unatoka Nchi gani ?";
+                promptId=nameof(TextPrompt);
 
-            await _repository.SaveChangesAsync();
 
-            return await stepContext.NextAsync(persona);
+            }
+           // return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text(question) }, cancellationToken);
 
+            var promptOptions = new PromptOptions
+            {
+                Prompt = MessageFactory.Text(question),
+                RetryPrompt = MessageFactory.Text($"${questionRetry} \n {hint} "),
+            };
+
+            return await stepContext.PromptAsync(RedCrossDialogTypes.SelectCounty, promptOptions, cancellationToken);
         }
-
-       
 
         private async Task<DialogTurnResult> PrivateDetailsAgeBracketAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
+            Client me = (Client)stepContext.Values[UserInfo];
 
             Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
 
-            var question = "How old are you?";
+            var question = me.language? "How old are you?" : "Je, una miaka mingapi?";
 
             if (stepContext.Values != null)
             {
@@ -156,10 +173,11 @@ namespace RedCrossChat.Dialogs
             var options = new PromptOptions()
                 {
                     Prompt = MessageFactory.Text(question),
-                    RetryPrompt = MessageFactory.Text("Please select a valid age-group"),
-                    Choices = RedCrossLists.AgeGroups,
-
+                    RetryPrompt = MessageFactory.Text(me.language? "Please select a valid age-group" : "Tafadhali chagua kikundi halali cha umri"),
+                    Choices = me.language ? RedCrossLists.AgeGroups : RedCrossLists.AgeGroupKiswahili,
+                Style = ListStyle.HeroCard,
                 };
+
 
             return await stepContext.PromptAsync("select-age", options, cancellationToken);
 
@@ -167,8 +185,9 @@ namespace RedCrossChat.Dialogs
 
         private async Task<DialogTurnResult> RelationShipStatusAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
+            Client me = (Client)stepContext.Values[UserInfo];
 
-            var question = "What is your relationship status ?";
+            var question = me.language? "What is your relationship status ?" : " Je, hali yako ya uhusiano ikoje";
 
             await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
 
@@ -182,25 +201,18 @@ namespace RedCrossChat.Dialogs
 
             return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions()
             {
-                Prompt = MessageFactory.Text("What is your relationship status ?"),
-                Choices = new List<Choice>()
-                        {
-                            new Choice  { Value ="Single",Synonyms=new List<string>{"Single","S"}},
-                            new Choice  { Value ="Married",Synonyms=new List<string>{"married"}},
-                            new Choice  { Value ="Divorced",Synonyms=new List<string>{"divorced"}},
-                            new Choice  { Value ="In A relationship",Synonyms=new List<string>{"dating","relations","casual"}},
-                            new Choice  { Value ="Widow /Widower",Synonyms=new List<string>{"widow","widower"}},
-                            new Choice  { Value ="Complicated",Synonyms=new List<string>{"complicated","comp","it's complicated"}},
-                            new Choice  { Value ="none",Synonyms=new List<string>{"none","no"}},
+                Prompt = MessageFactory.Text(question),
+                Choices = me.language ? RedCrossLists.RelationShips : RedCrossLists.RelationShipKiwahili,
+                Style = ListStyle.HeroCard,
 
-                        }
             }, cancellationToken);
         }
 
         private async Task<DialogTurnResult> ProfessionalStatusAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
+            Client me = (Client)stepContext.Values[UserInfo];
 
-            var question = "What is your professional status ?";
+            var question = me.language? "What is your professional status ?" : "Je, unafanya kazi yoyote?";
 
             await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
 
@@ -216,119 +228,23 @@ namespace RedCrossChat.Dialogs
             return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions()
             {
                 Prompt = MessageFactory.Text(question),
-                Choices = new List<Choice>()
-                        {
-                            new Choice  { Value ="Student",},
-                            new Choice  { Value ="Employed",},
-                            new Choice  { Value ="Entrepreneur"},
-                            new Choice  { Value ="Retired"},
-                            new Choice  { Value ="Unemployed"},
-                            new Choice  { Value ="Complicated"},
-                            new Choice  { Value ="none",Synonyms=new List<string>{"none","no"}},
-                        }
+                Choices =me.language? RedCrossLists.ProfessionalOptions : RedCrossLists.ProfessionalOptionsKiswahili,
+                Style = ListStyle.HeroCard,
+        
             }, cancellationToken);
 
         }
 
-        private async Task<DialogTurnResult> PrivateDetailsCountryBracketAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
-        {
-            var persona=new Persona() ;
-
-            if(stepContext.Result is Persona)
-            {
-                persona=stepContext.Result as Persona;
-            }
-            else
-            {
-                persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
-            }
-
-
-
-            var question = "What is your Country of Origin";
-
-            if(persona != null)
-            {
-                persona.Feeling= stepContext.Context.Activity.Text;
-
-                _repository.Persona.Update(persona);
-
-                await _repository.SaveChangesAsync();
-
-                await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
-
-            }
-
-            var options = new PromptOptions()
-            {
-                Prompt = MessageFactory.Text(question),
-                RetryPrompt = MessageFactory.Text("Please select a Choose between the two"),
-                Choices = new List<Choice>
-                {
-                    new Choice() { Value ="Kenya"},
-                    new Choice() { Value="Other"},
-
-                },
-            };
-
-            // Prompt the user with the configured PromptOptions.
-            return await stepContext.PromptAsync("select-country", options, cancellationToken);
-
-        }
-
       
-        private async Task<DialogTurnResult> PrivateDetailsCountyDropdownAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
-        {
-            //List<string> counties = GetListOfCounties();
-
-            var hint = "( hint: type in Kiambu or 022,Nairobi or 047 )";
-
-            Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync(cancellationToken: cancellationToken);
-
-
-            var question = "Which county are you located in?";
-
-            if (persona != null)
-            {
-                persona.Country = stepContext.Context.Activity.Text;
-
-                _repository.Persona.Update(persona);
-
-                await _repository.SaveChangesAsync();
-
-                if (((FoundChoice)stepContext.Result).Value != "Kenya") {
-                    question = "Which Country are you from ?";
-                }
-
-                await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
-
-            }
-
-            var promptOptions = new PromptOptions
-            {
-                Prompt = MessageFactory.Text($"{question} \n {hint} "),
-                RetryPrompt = MessageFactory.Text($"Please input a county \n {hint} "),
-            };
-
-            if (((FoundChoice)stepContext.Result).Value == "Kenya")
-            {
-               
-                return await stepContext.PromptAsync(RedCrossDialogTypes.SelectCounty, promptOptions, cancellationToken);
-            }
-            else
-            {
-                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt=MessageFactory.Text(question) }, cancellationToken); 
-            }  
-        }
-
         private async Task<DialogTurnResult> PrivateDetailsGenderAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
+            Client me = (Client)stepContext.Values[UserInfo];
 
             Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
 
             await EvaluateDialog.ProcessStepAsync(stepContext, cancellationToken);
 
-            var question = "What is your Gender";
+            var question = me.language? "What is your Gender" : "Je, wewe ni wa jinsia gani? ";
 
 
             if (stepContext.Values != null)
@@ -346,13 +262,10 @@ namespace RedCrossChat.Dialogs
             var options = new PromptOptions()
             {
                 Prompt = MessageFactory.Text(question),
-                RetryPrompt = MessageFactory.Text("Please select a valid Gender"),
-                Choices = new List<Choice>
-                {
-                    new Choice() { Value = Gender.Male,Synonyms=new List<string>{"M","Man","MALE","y"}},
-                    new Choice() { Value= Gender.Female,Synonyms=new List<string>{"f","fE","FEMALE","female"}},
-                    new Choice() { Value= Gender.Other,Synonyms=new List<string>{"o","other"}},
-                },
+                RetryPrompt = MessageFactory.Text(question),
+                Choices =me.language? RedCrossLists.Genders :RedCrossLists.GenderKiswahili,
+                Style = ListStyle.HeroCard,
+
             };
 
             // Prompt the user with the configured PromptOptions.
@@ -394,30 +307,31 @@ namespace RedCrossChat.Dialogs
             return Task.FromResult(status);
         }
 
-
         //validation for mental awarenesss
         private async Task<DialogTurnResult> LaunchAwarenessDialogAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-           
-            return await stepContext.BeginDialogAsync(nameof(AwarenessDialog), null, cancellationToken);
+            Client me = (Client)stepContext.Values[UserInfo];
+
+            return await stepContext.BeginDialogAsync(nameof(AwarenessDialog), me, cancellationToken);
 
         }
         private async Task<DialogTurnResult> HandleBreathingStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken) {
+
             if (stepContext.Result != null)
             {
-                User user = (User)(stepContext.Result);
+                Client user = (Client)(stepContext.Result);
 
                 if (user.WantsBreathingExercises)
                 {
                     return await stepContext.BeginDialogAsync(nameof(BreathingDialog), user, cancellationToken);
                 }
 
-                if (user.hasTalkedToSomeone == false && user.isAwareOfFeeling == false)
+                if (user.HasTalkedToSomeone == false && user.IsAwareOfFeeling == false)
                 {
                     return await stepContext.BeginDialogAsync(nameof(BreathingDialog), user, cancellationToken);
                 }
 
-                if (user.Iteration == 1 && user.WantsBreathingExercises)
+                if (user.WantsBreathingExercises)
                 {
                     //handover to ui
                     return await stepContext.BeginDialogAsync(nameof(BreathingDialog), user, cancellationToken);
@@ -430,10 +344,9 @@ namespace RedCrossChat.Dialogs
 
         private async Task<DialogTurnResult> FinalStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            User user = (User)(stepContext.Result);
+            Client user = (Client)(stepContext.Result);
 
-            //if (user !=null && user.Iteration > 1)
-               // return await stepContext.EndDialogAsync(user, cancellationToken);
+            
 
             return await stepContext.BeginDialogAsync(nameof(AiDialog), user, cancellationToken);
         }
@@ -483,7 +396,7 @@ namespace RedCrossChat.Dialogs
 
             AddDialog(new ChoicePrompt("select-terms"));
 
-            AddDialog(new NumberPrompt<int>("select-age"));
+            AddDialog(new ChoicePrompt("select-age"));
 
             AddDialog(new ChoicePrompt("select-country"));
 
@@ -504,7 +417,7 @@ namespace RedCrossChat.Dialogs
 
                 ConversationId = stepContext.Context.Activity.Conversation.Id,
 
-                Client = new Persona() { SenderId = stepContext.Context.Activity.From.Id },
+                Persona = new Persona() { SenderId = stepContext.Context.Activity.From.Id },
 
                 AiConversations = new List<AiConversation>()
             };
