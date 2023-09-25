@@ -355,29 +355,8 @@ namespace RedCrossChat.Dialogs
 
         private async Task<DialogTurnResult> HandleFeelingAsync(WaterfallStepContext stepContext,CancellationToken cancellationToken)
         {
-            Conversation conversation = await _repository.Conversation.FindByCondition(x => x.ConversationId == stepContext.Context.Activity.Conversation.Id).FirstOrDefaultAsync();
-
-            if (conversation.IsReturnClient)
-            {
-                return await stepContext.BeginDialogAsync(nameof(AwarenessDialog), null, cancellationToken);
-            }
-            else
-            {
-
-                //Persona persona = conversation?.Persona;
-
-                //persona.Feeling = stepContext.Context.Activity.Text;
-
-                //_repository.Persona.Update(persona);
-
-                //await _repository.SaveChangesAsync();
-
-                //handle with AI or Human too: Ambrose
-
-                return await stepContext.BeginDialogAsync(nameof(PersonalDialog), null, cancellationToken);
-            }
-
-            
+            //todo make the human agent hand over here 
+            return await stepContext.BeginDialogAsync(nameof(AiDialog), null, cancellationToken);
         }
 
         private async Task<Conversation> CreateConversationDBInstance(WaterfallStepContext stepContext)
@@ -418,10 +397,7 @@ namespace RedCrossChat.Dialogs
             return conversation;
         }
 
-        private async Task<DialogTurnResult> HandleAiInteractions(WaterfallStepContext stepContext, CancellationToken cancellationToken)
-        {
-            return await stepContext.BeginDialogAsync(nameof(AiDialog), null, cancellationToken);
-        }
+       
 
         private async Task<DialogTurnResult> RateBotAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
