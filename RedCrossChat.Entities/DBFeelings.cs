@@ -13,6 +13,8 @@ namespace RedCrossChat.Entities
 
         public string Description { get; set; } // this is the official name
 
+        public string Kiswahili { get;set; }
+
         public string Synonymns { get; set; } = "";
     }
 }

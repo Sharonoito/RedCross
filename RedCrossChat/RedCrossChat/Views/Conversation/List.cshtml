@@ -175,14 +175,12 @@
                         type: "POST"
                     },
                     columns: [
-                        //{ data: 'channelName' },
+                       
                         { data: 'channelName' },
                         { data: 'channelName' },
-                        { data: 'client.feeling', name: 'Id' },
-                        { data: 'client.country', name: 'Id' },
-                        //{ data: 'client.county', name: 'Id' },
-                        { data: 'client.ageGroup', name: 'Id' },
-                        //{ data: 'id', name: 'Id' },
+                        { data: 'persona', name: 'Id',render:function(item,_,data){ return data.persona.feeling !=null ? data.persona.feeling.name : ''; } },
+                        { data: 'country', name: 'Id' },
+                        { data: 'persona', name: 'Id', render: function (item, _, data) { return data.persona.ageBand != null ? data.persona.ageBand.name : ''; } },
                         { data: 'id', name: 'Id' },
                     ],
                     columnDefs: [{

@@ -46,7 +46,13 @@ namespace RedCrossChat.Controllers
 
         public async Task<IActionResult> Conversations(IDataTablesRequest dtRequest)
         {
-            var data= await _repository.Conversation.FindAll().Include(x=>x.Persona).ToListAsync();
+            var data= await _repository.Conversation.FindAll()
+                .Include(x=>x.Persona).ThenInclude(x=>x.Feeling)
+                .Include(x=>x.Persona).ThenInclude(x=>x.AgeBand)
+                .Include(x=>x.Persona).ThenInclude(x=>x.County)
+                .Include(x=>x.Persona).ThenInclude(x=>x.Profession)
+                .Include(x=>x.Persona).ThenInclude(x=>x.MaritalState)
+                .ToListAsync();
 
             var filteredRows = data
                  .AsQueryable()
@@ -71,16 +77,104 @@ namespace RedCrossChat.Controllers
             return Success("Fetched successfully", rawConversations);
         }
 
-        
-        public async Task<IActionResult> EvaluateReport(GraphManagerVm managerVm)
+        [HttpPost]
+        public async Task<IActionResult> EvaluateReport(IFormCollection formData)
         {
 
             var conversation = _repository.Conversation;
 
 
-            var conversations=await conversation.FindAll().ToListAsync();
+            string feeling = formData["Feeling"];
 
-            return Success("Fetched SuccessFully",conversations);
+            string age = formData["AgeBand"];
+
+            string gender = formData["Gender"];
+
+            string county = formData["County"];
+
+           // string county = formData["County"];
+
+            
+
+            IQueryable<Conversation> conversationObject=conversation.FindAll();
+
+            
+            if(feeling !="-1" && age !="-1" && county !="-1") {
+
+                conversationObject = conversation.FindByCondition(x => x.Persona.FeelingId == Guid.Parse(feeling) && 
+                
+                x.Persona.AgeBandId==Guid.Parse(age) && x.Persona.CountyId==Guid.Parse(county));
+
+            }else if(feeling != "-1" && age != "-1")
+            {
+                conversationObject = conversation.FindByCondition(x => 
+                x.Persona.FeelingId == Guid.Parse(feeling) &&
+                x.Persona.AgeBandId == Guid.Parse(age) );
+
+            }else if(feeling != "-1"  && county != "-1")
+            {
+                conversationObject = conversation.FindByCondition(x =>
+                x.Persona.FeelingId == Guid.Parse(feeling) &&
+                x.Persona.CountyId == Guid.Parse(county));
+
+            }else if( age != "-1" && county != "-1")
+            {
+                conversationObject = conversation.FindByCondition(x =>
+                   x.Persona.AgeBandId == Guid.Parse(age) &&
+                   x.Persona.CountyId == Guid.Parse(county));
+            }
+            else
+            {
+                if (feeling != "-1")
+                {
+                    conversationObject = conversation.FindByCondition(x => x.Persona.FeelingId == Guid.Parse(feeling));
+
+                }
+
+                if (age != "-1")
+                {
+                    conversationObject = conversation.FindByCondition(x => x.Persona.AgeBandId == Guid.Parse(age));
+                }
+
+                if (county != "-1")
+                {
+                    conversationObject = conversation.FindByCondition(x => x.Persona.CountyId == Guid.Parse(county));
+                }
+            }
+
+
+            List<Conversation> conversations= await conversationObject.Include(x => x.Persona)
+                    .ThenInclude(x => x.Profession).Include(x => x.Persona)
+                    .ThenInclude(x => x.AgeBand).Include(x => x.Persona).ThenInclude(x => x.Feeling).Include(x => x.Persona).ThenInclude(x => x.MaritalState).ToListAsync();
+ 
+
+            var handedOver=await conversation.FindByCondition(x=>x.HandedOver==true).ToListAsync();
+
+            var items = new Dictionary<string, int>();
+
+            foreach(var item in conversations)
+            {
+                var time= $"{item.DateCreated.Year}-{item.DateCreated.Month}-{item.DateCreated.Day} ";
+
+                if (items.ContainsKey(time))
+                {
+                    items[time]++;
+                }
+                else
+                {
+                    items[time] = 1 ;
+                }
+               
+            }
+
+            var report = new DashboardReportVM
+            {
+                TotalVisits=conversations.Count,
+                HandledByAgents=handedOver.Count,
+                items=items,
+            };
+
+            return Success("Fetched SuccessFully", report);
         }
 
         public IActionResult Flow()
