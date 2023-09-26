@@ -57,7 +57,7 @@ namespace RedCrossChat.Dialogs
 
             var question = "Would you like me to take you through some breathing exercises or tips on managing mental health?\r\n\r\n ";
 
-            if (user.Iteration !=1)
+            if (user.Iteration !=0)
             {
                 stepContext.Values[iterations] = user.Iteration;
 
