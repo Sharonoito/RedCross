@@ -84,12 +84,13 @@ namespace RedCrossChat.Dialogs
        
         public async Task<DialogTurnResult> TakeUserThroughExerciseAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
+            Client user = (Client)stepContext.Options;
 
             string stringValue = stepContext.Values[iterations].ToString();
 
-            int _exerciseIndex = Int32.Parse(stringValue);
+            int _exerciseIndex = user.Iteration;
 
-            Client user = (Client)stepContext.Options;
+            if(_exerciseIndex ==0) _exerciseIndex++;
 
             var question = "Do you wish to continue ?";
 
@@ -108,9 +109,15 @@ namespace RedCrossChat.Dialogs
 
                 stepContext.Values[iterations]=_exerciseIndex+1;
 
+                user.Iteration=user.Iteration+1;
+
                 if (_exerciseIndex >= feelings.Count)
                 {
-                    stepContext.Values[iterations]  = 1;
+                    stepContext.Values[iterations]  = _exerciseIndex;
+                }
+                else
+                {
+                    stepContext.Values[iterations] = _exerciseIndex++;
                 }
 
                 await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, currentExercise.Exercise +" \n"+question, stepContext, _userProfileAccessor, _userState);
@@ -133,7 +140,7 @@ namespace RedCrossChat.Dialogs
             Client user = (Client)stepContext.Options;
 
 
-            if (objectType.Name == "User")
+            if (objectType.Name == "User" || stepContext.Result is Client)
             {
 
                return await TakeUserThroughExerciseAsync(stepContext, cancellationToken);

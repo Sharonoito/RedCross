@@ -367,7 +367,7 @@ namespace RedCrossChat.Dialogs
                     //handover to ui
                     return await stepContext.BeginDialogAsync(nameof(BreathingDialog), user, cancellationToken);
                 }
-                return await stepContext.EndDialogAsync(user, cancellationToken);
+                
             }
 
             return await stepContext.EndDialogAsync(null, cancellationToken);
@@ -377,7 +377,9 @@ namespace RedCrossChat.Dialogs
         {
             Client user = (Client)(stepContext.Result);
 
-            return await stepContext.BeginDialogAsync(nameof(AiDialog), user, cancellationToken);
+            return await stepContext.EndDialogAsync(user);
+
+            // return await stepContext.BeginDialogAsync(nameof(AiDialog), user, cancellationToken);
         }
 
         private void AddDialogs()

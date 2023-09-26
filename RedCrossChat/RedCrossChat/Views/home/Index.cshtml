@@ -17,10 +17,10 @@
                     <h4 class="ms-1 mb-0">42</h4>
                 </div>
                 <p class="mb-1">Total Visits</p>
-                <p class="mb-0">
+               @* <p class="mb-0">
                     <span class="fw-medium me-1">+18.2%</span>
                     <small class="text-muted">than last week</small>
-                </p>
+                </p>*@
             </div>
         </div>
     </div>
@@ -35,10 +35,10 @@
                     <h4 class="ms-1 mb-0">11</h4>
                 </div>
                 <p class="mb-1">Handled By agents</p>
-                <p class="mb-0">
+               @* <p class="mb-0">
                     <span class="fw-medium me-1">+18.2%</span>
                     <small class="text-muted">than last week</small>
-                </p>
+                </p>*@
             </div>
         </div>
     </div>
@@ -53,10 +53,10 @@
                     <h4 class="ms-1 mb-0">10</h4>
                 </div>
                 <p class="mb-1">Uncompleted Visits</p>
-                <p class="mb-0">
+              @*  <p class="mb-0">
                     <span class="fw-medium me-1">+18.2%</span>
                     <small class="text-muted">than last week</small>
-                </p>
+                </p>*@
             </div>
         </div>
     </div>
@@ -71,10 +71,10 @@
                     <h4 class="ms-1 mb-0">1</h4>
                 </div>
                 <p class="mb-1">Average Bot Rating</p>
-                <p class="mb-0">
+                @*<p class="mb-0">
                     <span class="fw-medium me-1">+18.2%</span>
                     <small class="text-muted">than last week</small>
-                </p>
+                </p>*@
             </div>
         </div>
     </div>
@@ -97,7 +97,7 @@
     </div>
     <div class="col-lg-3">
 
-        <div class="col-12 mb-4">
+       @* <div class="col-12 mb-4">
             <div class="card">
                 <div class="card-body">
                     <div class="card-title">
@@ -114,7 +114,7 @@
                 </div>
             </div>
         </div>
-
+*@
 
         <div class="col-12 mb-4">
             <div class="card">
@@ -146,9 +146,11 @@
                     <div class="">
                         <select class="form-control filters" name="gender">
                             <option value="-1">__All__</option>
-                            <option value="1">Male</option>
-                            <option value="2">Female</option>
-                            <option value="3">Other</option>
+                            @foreach(var gender in Model.Genders)
+                            {
+                                <option value="@gender.Id">@gender.Name</option>
+                            }
+                           
                         </select>
                     </div>
                 </div>
@@ -165,12 +167,10 @@
                     <div class="">
                         <select class="form-control filters" name="ageband">
                             <option value="-1">__All__</option>
-                            <option value="18">Below 18</option>
-                            <option  >18-25</option>
-                            <option >26-35</option>
-                            <option >36-50</option>
-                            <option >55-65</option>
-                            <option value='65'>Above 65</option>
+                            @foreach (var ageBand in Model.Agebands)
+                            {
+                                <option value="@ageBand.Id">@ageBand.Name</option>
+                            }
                         </select>
                     </div>
                 </div>
@@ -221,6 +221,23 @@
 
 
     <script>
+
+        var options = {
+            chart: {
+                type: 'bar'
+            },
+            series: [{
+                name: 'Visits',
+                data: []
+            }],
+            xaxis: {
+                categories: []
+            }
+        };
+
+        const chart = new ApexCharts(document.querySelector("#chart"), options);
+
+
         function capitalizeFirstLetter(string) {
             return string.charAt(0).toUpperCase() + string.slice(1);
         }
@@ -235,51 +252,47 @@
             console.log(filters);
             console.log(JSON.stringify({ ...filters }));
 
-            $.ajax({
-                type: "POST",
-                url: "@Url.Action("EvaluateReport","Conversation")",
-                data: { ...filters },
-                async: false,
-                contentType: "application/json",
-                success: function (data) {
-                   
-                   let item= data.responseData;
+            $.post("@Url.Action("EvaluateReport","Conversation")",{name:"Ambrose Mwangi",...filters}).then(data=>{
+                let item = data.responseData;
 
 
-                    $("#handedOver h4").html(item.handledByAgents);
+                $("#handedOver h4").html(item.handledByAgents);
 
-                    $("#totalVisits h4").html(item.totalVisits);
+                $("#totalVisits h4").html(item.totalVisits);
 
-                    $("#averageBotRating h4").html(item.averageBotRating);
+                $("#averageBotRating h4").html(item.averageBotRating);
 
-                    $("#unCompletedVisits h4").html(item.uncompletedVisits);
+                $("#unCompletedVisits h4").html(item.uncompletedVisits);
 
-                    showGraph(item.items,state);
-                },
-                error: function (req, status, error) {
-                    alert("error generating data.");
-                }
-            });
+                showGraph(item.items, state);
+            })
+
+            
 
         }
 
         function showGraph(items,state){
-            var options = {
-                chart: {
-                    type: 'bar'
-                },
-                series: [{
-                    name: 'Visits',
+           
+            
+            if(state==0){
+
+                options.xaxis.categories=Object.keys(items);
+
+                options.series=[{
+                    name:"Visits",
                     data: Object.values(items)
-                }],
-                xaxis: {
-                    categories: Object.keys(items)
-                }
+                }];
+
+                console.log(options);
+
+                chart.render();
             }
 
-            var chart = new ApexCharts(document.querySelector("#chart"), options);
-            
-            if(state==0) chart.render();
+            if(state==1){
+                chart.updateSeries([{
+                    data: Object.values(items)
+                }])
+            }
         }
 
         $(document).on('change', '.filters', function () {
@@ -293,9 +306,7 @@
         
 
        /* setTimeout(() => {
-            chart.updateSeries([{
-                data: [32, 44, 31, 41, 22]
-            }])
+           
         },2000)*/
     </script>
 }

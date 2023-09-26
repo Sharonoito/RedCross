@@ -64,6 +64,7 @@ namespace RedCrossChat.Dialogs
                     CheckFeelingAsync,
                     EvaluateFeelingAsync,
                     HandleFeelingAsync,
+                    HandleAiHandOver,
                     RateBotAsync,
                     FinalStepAsync,
             };
@@ -392,7 +393,9 @@ namespace RedCrossChat.Dialogs
 
         private async Task<DialogTurnResult> HandleAiHandOver(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            return await stepContext.BeginDialogAsync(nameof(AiDialog), cancellationToken);
+            Client me = (Client)stepContext.Values[UserInfo];
+
+            return await stepContext.BeginDialogAsync(nameof(AiDialog),me,cancellationToken);
         }
 
         private async Task<DialogTurnResult> RateBotAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
