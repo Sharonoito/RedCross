@@ -70,7 +70,7 @@ namespace RedCrossChat.Dialogs
 
             var options = new PromptOptions()
             {
-                Prompt=MessageFactory.Text("You are now interacting with an Generative AI-powered bot"),
+                Prompt=MessageFactory.Text("You are now interacting with an Generative AI-powered bot, do you wish to continue?"),
                 Choices=RedCrossLists.choices,
                 Style = ListStyle.HeroCard
             };
