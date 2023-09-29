@@ -14,4 +14,8 @@
     <ProjectReference Include="..\RedCrossChat.Entities\RedCrossChat.Entities.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Config\" />
+  </ItemGroup>
+
 </Project>

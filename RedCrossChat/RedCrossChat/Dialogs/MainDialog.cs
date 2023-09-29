@@ -355,8 +355,10 @@ namespace RedCrossChat.Dialogs
 
         private async Task<DialogTurnResult> HandleFeelingAsync(WaterfallStepContext stepContext,CancellationToken cancellationToken)
         {
+            Client me = (Client)stepContext.Values[UserInfo];
+
             //todo make the human agent hand over here 
-            return await stepContext.BeginDialogAsync(nameof(AiDialog), null, cancellationToken);
+            return await stepContext.BeginDialogAsync(nameof(AiDialog), me, cancellationToken);
         }
 
         private async Task<Conversation> CreateConversationDBInstance(WaterfallStepContext stepContext)

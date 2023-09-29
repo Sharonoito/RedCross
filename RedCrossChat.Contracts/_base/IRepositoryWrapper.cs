@@ -1,6 +1,4 @@
-﻿using RedCrossChat.Contracts.Dependencies;
-
-namespace RedCrossChat.Contracts
+﻿namespace RedCrossChat.Contracts
 {
 
     public interface IRepositoryWrapper
