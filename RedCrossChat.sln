@@ -10,13 +10,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedCrossChat.Entities", "RedCrossChat.Entities\RedCrossChat.Entities.csproj", "{0CD5682E-5825-4F76-863A-88F173983835}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RedCrossChat.Entities", "RedCrossChat.Entities\RedCrossChat.Entities.csproj", "{0CD5682E-5825-4F76-863A-88F173983835}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedCrossChat.Repository", "RedCrossChat.Repository\RedCrossChat.Repository.csproj", "{E26BC3A5-9E1A-485A-BDDB-D8F325B015F8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RedCrossChat.Repository", "RedCrossChat.Repository\RedCrossChat.Repository.csproj", "{E26BC3A5-9E1A-485A-BDDB-D8F325B015F8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedCrossChat.Contracts", "RedCrossChat.Contracts\RedCrossChat.Contracts.csproj", "{29BFFBC5-28E2-44FB-AD5E-D522EBAE6E9E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RedCrossChat.Contracts", "RedCrossChat.Contracts\RedCrossChat.Contracts.csproj", "{29BFFBC5-28E2-44FB-AD5E-D522EBAE6E9E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedCrossChat.Domain", "RedCrossChat.Domain\RedCrossChat.Domain.csproj", "{8912C285-65A7-4D6F-ABBF-42DCECEE4566}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RedCrossChat.Domain", "RedCrossChat.Domain\RedCrossChat.Domain.csproj", "{8912C285-65A7-4D6F-ABBF-42DCECEE4566}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

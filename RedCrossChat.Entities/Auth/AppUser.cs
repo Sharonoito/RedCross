@@ -29,5 +29,7 @@ namespace RedCrossChat.Entities
                 return "";
             }
         }
+
+        public bool IsDeactivated { get; set; }
     }
 }

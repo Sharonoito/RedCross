@@ -1,42 +1,42 @@
 [
   {
-    "feeling": "Happy",
+    "feeling": "Furaha",
     "value": 1,
-    "exercise":"Let's practice gratitude. Name three things you are thankful for today. Focusing on the positive aspects of your life can improve your mood and overall mental health"
+    "exercise": "Tujifunze shukrani. Taja vitu vitatu unavyoshukuru leo. Kuzingatia upande mzuri wa maisha yako kunaweza kuboresha hali yako na afya ya akili kwa ujumla."
   },
   {
-    "feeling": "Angry",
+    "feeling": "Hasira",
     "value": 2,
-    "exercise": "Remember, it's okay to have bad days. Be kind to yourself like you would to a friend Treat yourself with self-compassion and remember that you are not alone in this journey"
+    "exercise": "Kumbuka, ni sawa kuwa na siku mbaya. Kuwa mpole kwako kama unavyokuwa kwa rafiki. Jitendee kwa huruma na kumbuka kuwa hujawahi pekee katika safari hii."
   },
   {
-    "feeling": "Anxious",
+    "feeling": "Wasiwasi",
     "value": 3,
-    "exercise": "If anxiety is taking over, try this grounding technique: Name 5 things you can see, 4 things you can touch 3 things you can hear, 2 things you can smell, and 1 thing you can taste. This can help you stay present and reduce stress"
+    "exercise": "Ikiwa wasiwasi unachukua nafasi yako, jaribu hii mbinu ya kuzingatia: Taja vitu 5 unavyoona, vitu 4 unavyoweza kugusa, vitu 3 unavyoweza kusikia, vitu 2 unavyoweza kunusa, na kitu 1 unachoweza kuhisi kwa ladha. Hii inaweza kukusaidia kuwa hapa na kupunguza msongo."
   },
   {
-    "feeling": "FlatEffect",
+    "feeling": "Bila Hisia",
     "value": 4,
-    "exercise": "Affirmations can boost your mood. Repeat after me: 'I am strong, I am resilient, and I can handle challenges. I am worthy of love and support"
+    "exercise": "Maneno ya kujithibitisha yanaweza kuinua hali yako. Rudia baada yangu: 'Mimi ni mwenye nguvu, mimi ni imara, na naweza kushughulikia changamoto. Nina thamani ya upendo na msaada.'"
   },
   {
-    "feeling": "Expressionless",
+    "feeling": "Bila Hisia ya Kujieleza",
     "value": 5,
-    "exercise": "Take a moment to practice mindfulness. Close your eyes and focus on your breath, letting go of any distractions. Notice the sensations in your body and thoughts in your mind without judgment. Bring yourself back to the present moment"
+    "exercise": "Chukua muda wa kufanya mazoezi ya uzingativu. Funga macho na zingatia pumzi yako, acha vitu vyovyote visivyofaa. Sikia hisia mwilini mwako na mawazo akilini bila hukumu. Rudisha mwenyewe kwa wakati wa sasa."
   },
   {
-    "feeling": "Sad",
+    "feeling": "Huzuni",
     "value": 6,
-    "exercise": "Remember, you are not alone in your struggles. Reach out to friends, family, or a mental health professional if you need someone to talk to. Asking for help is a sign of strength\""
+    "exercise": "Kumbuka, hujawahi pekee katika changamoto zako. Wasiliana na marafiki, familia, au mtaalam wa afya ya akili ikiwa unahitaji mtu wa kuzungumza naye. Kuomba msaada ni ishara ya nguvu."
   },
   {
-    "feeling": "Stress",
+    "feeling": "Msongo wa Mawazo",
     "value": 7,
-    "exercise": "Feeling stressed? Engage in activities you enjoy, such as listening to music, reading a book, or spending time in nature. Taking breaks can help you recharge and improve your well-being"
+    "exercise": "Unahisi msongo wa mawazo? Jishughulishe na shughuli unazozipenda, kama kusikiliza muziki, kusoma kitabu, au kutumia muda katika asili. Kuchukua mapumziko kunaweza kusaidia kujipyaisha na kuboresha ustawi wako."
   },
   {
-    "feeling": "Overwhelmed",
+    "feeling": "Kuwa Na Shinikizo Kubwa",
     "value": 8,
-    "exercise": "Feeling overwhelmed? Let's do a quick deep breathing exercise together. Inhale deeply for a count of 4, hold for 4, and exhale slowly for a count of 6. Repeat this 3-5 times. Remember to focus on your breath and let go of any tension"
+    "exercise": "Unahisi kushindwa na mambo? Tuunge mkono kwa mazoezi ya kupumua kwa kina haraka. Vuta pumzi kwa kina kwa kuhesabu 4, shikilia kwa 4, na toa polepole kwa kuhesabu 6. Rudia hii mara 3-5. Kumbuka kuzingatia pumzi yako na kuachilia msongo."
   }
 ]

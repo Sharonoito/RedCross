@@ -8,6 +8,7 @@ using Microsoft.Bot.Schema;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
+using RedCrossChat.Cards;
 using RedCrossChat.Contracts;
 using RedCrossChat.Entities;
 using RedCrossChat.Objects;
@@ -29,6 +30,8 @@ namespace RedCrossChat.Dialogs
         protected readonly string _list = "conversation_list";
 
         protected readonly string _iteration = "iteration";
+
+        private const string UserInfo = "Client-info";
 
         private readonly IStatePropertyAccessor<ResponseDto> _userProfileAccessor;
 
@@ -63,6 +66,11 @@ namespace RedCrossChat.Dialogs
 
         public async Task<DialogTurnResult> FirstTransactionAsync(WaterfallStepContext stepContext, CancellationToken token)
         {
+            Client me = (Client)stepContext.Options;
+
+
+            var question = me.language ? "You are now interacting with Chat Gpt , Do you wish to continue" : "Sasa unashirikiana na Chat Gpt, Je, unataka kuendelea?";
+
             Conversation conversation = await _repository.Conversation
                    .FindByCondition(x => x.ConversationId == stepContext.Context.Activity.Conversation.Id)
                    .Include(x => x.AiConversations)
@@ -79,19 +87,22 @@ namespace RedCrossChat.Dialogs
             {
                 return await stepContext.NextAsync(null);
             }
-            
-            return await stepContext.PromptAsync(nameof(ChoicePrompt),options,token);
+
+            return await stepContext.PromptAsync(nameof(ChoicePrompt), options, token);
         }
+
+
 
         public async Task<DialogTurnResult> IntialTaskAsync(WaterfallStepContext stepContext, CancellationToken token)
         {
+            Client me = (Client)stepContext.Options;
 
             Conversation conversation = await _repository.Conversation
                     .FindByCondition(x => x.ConversationId == stepContext.Context.Activity.Conversation.Id)
                     .Include(x => x.AiConversations)
                     .FirstAsync();
 
-            string question = "Ask me a question";
+            string question = me.language ? "Ask me a question":"Niulize swali";
 
             if (conversation.AiConversations.Count > 0)
             {

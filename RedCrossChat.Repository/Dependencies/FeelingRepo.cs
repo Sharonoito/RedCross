@@ -1,17 +1,37 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using RedCrossChat.Contracts.Dependencies;
+using RedCrossChat.Contracts;
 using RedCrossChat.Domain;
 using RedCrossChat.Entities;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+
+
 namespace RedCrossChat.Repository
 {
     public class FeelingRepo : RepositoryBase<DBFeeling>, IFeelingRepo
     {
-        public FeelingRepo(AppDBContext repoContext) : base(repoContext)
-        {
 
+        public FeelingRepo(AppDBContext repoContext) : base(repoContext) { }
+
+        public Task<IEnumerable<DBFeeling>> GetAll()
+        {
+            throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<DBFeeling>> GetAll()
-        => await FindAll().ToListAsync();
+        public async Task<IEnumerable<DBFeeling>> GetAllAsync()
+        {
+            return await FindAll().ToListAsync();
+        }
+
+
+
     }
 }
+
+
+
+
+
+
+
+
+
