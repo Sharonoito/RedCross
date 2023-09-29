@@ -17,6 +17,14 @@ namespace RedCrossChat.Domain
 
         public DbSet<Persona> Persona { get; set; }
 
+        public DbSet<Gender> Gender { get; set; }
+
+        public DbSet<AgeBand> AgeBand { get; set; }
+
+        public DbSet<MaritalState> MaritalState { get; set; }
+
+        public DbSet<Profession> Profession { get; set; }   
+
         public DbSet<Question> Question { get; set; }
 
         public DbSet<QuestionOption> QuestionOption { get; set; }

@@ -1,0 +1,30 @@
+[
+  {
+    "Name": "Below 15",
+    "Kiswahili": "Chini Ya miaka 15"
+  },
+  {
+    "Name": "15-20",
+    "Kiswahili": "15-20"
+  },
+  {
+    "Name": "21-30",
+    "Kiswahili": "21-30"
+  },
+  {
+    "Name": "31-40",
+    "Kiswahili": "31-40"
+  },
+  {
+    "Name": "41-50",
+    "Kiswahili": "41-50"
+  },
+  {
+    "Name": "51-60",
+    "Kiswahili": "51-60"
+  },
+  {
+    "Name": "Above 60",
+    "Kiswahili": "Juu ya miaka 60"
+  }
+]

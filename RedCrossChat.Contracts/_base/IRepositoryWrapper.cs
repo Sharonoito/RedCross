@@ -1,4 +1,7 @@
-﻿namespace RedCrossChat.Contracts
+﻿
+
+
+namespace RedCrossChat.Contracts
 {
 
     public interface IRepositoryWrapper
@@ -13,6 +16,13 @@
         #region Dependencies              
         IFeelingRepo Feeling { get; }
         ICountyRepo County { get; }
+
+        IGender Gender { get; }
+        IAgeBand AgeBand { get; }
+
+        IProfession Profession { get; } 
+
+        IMaritalState MaritalState { get; }
 
         #endregion
 

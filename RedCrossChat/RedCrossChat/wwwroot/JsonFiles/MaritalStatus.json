@@ -1,0 +1,30 @@
+[
+  {
+    "Name": "Single",
+    "Kiswahili": "Sijaoa/olewa"
+  },
+  {
+    "Name": "Married",
+    "Kiswahili": "Nimeoa/olewa"
+  },
+  {
+    "Name": "Divorced",
+    "Kiswahili": "Nimetaliki"
+  },
+  {
+    "Name": "In A relationship",
+    "Kiswahili": "Niko kwenye mahusiano"
+  },
+  {
+    "Name": "Widow / Widower",
+    "Kiswahili": "Mjane"
+  },
+  {
+    "Name": "Complicated",
+    "Kiswahili": "Haieleweki"
+  },
+  {
+    "Name": "Complicated",
+    "Kiswahili": "Sitaki kusema"
+  }
+]

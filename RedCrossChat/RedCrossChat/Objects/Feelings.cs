@@ -3,28 +3,6 @@ using System.Collections.Generic;
 
 namespace RedCrossChat.Objects
 {
-    public static class Feelings
-    {
-        public static readonly string Happy = "Happy 😀";
-        public static readonly string Angry = "Angry 😡";
-        public static readonly string Anxious = "Anxious 🥴";
-        public static readonly string Sad = "Sad 😪";
-        public static readonly string FlatEffect = "Flat Effect 🫥";
-        public static readonly string Expressionless = "Expressionless 🫤";
-        public static readonly string Other = "Other";
-    }
-
-    public static class FeelingsSwahili
-    {
-        public static readonly string Furaha = " Unahisi kuwa na Furaha 😀";
-        public static readonly string Hasira = "Unahisi kuwa na Hasira 😡";
-        public static readonly string Wasiwasi = "Unahisi kuwa na Wasiwasi 🥴";
-        public static readonly string Huzuni = "Unahisi kuwa na Huzuni 😪";
-        public static readonly string Kuchanganyikiwa = "Unahisi kuwa na Kuchanganyikiwa 🫥";
-        //public static readonly string Expressionless = "Expressionless 🫤";
-        public static readonly string Zinginezo = "Zinginezo";
-    }
-
 
     public static class RedCrossDialogTypes
     {
@@ -54,23 +32,6 @@ namespace RedCrossChat.Objects
              new Choice() { Value = "Terrible", Synonyms = new List<string> {  "5" } },
         };
 
-        public static readonly List<Choice> AgeGroups = new()
-        {
-            new Choice() { Value ="Below 15",Synonyms=new List<string>{"1","2","3","4","5","6","7","8","9","10","11","12","13","14"}},
-            new Choice() { Value ="15-20",Synonyms=new List<string>{"15","16","17","19","20"}},
-            new Choice() { Value="21-30",Synonyms=new List<string>{"21","22","23","24","25","26","27","28","29","30"}},
-            new Choice() {Value="31-40",Synonyms=new List<string>{"31","32","33","34","35","36","37","38","39","40"}},
-            new Choice() {Value="Above 40"},
-        };
-
-        public static readonly List<Choice> AgeGroupKiswahili = new()
-        {
-            new Choice() { Value ="Chini ya miaka 15",Synonyms=new List<string>{"1","2","3","4","5","6","7","8","9","10","11","12"}},
-            new Choice() { Value ="15-20",Synonyms=new List<string>{"15","16","17","19","20"}},
-            new Choice() { Value="21-30",Synonyms=new List<string>{"21","22","23","24","25","26","27","28","29","30"}},
-            new Choice() {Value="31-40",Synonyms=new List<string>{"31","32","33","34","35","36","37","38","39","40"}},
-            new Choice() {Value="zaidi ya miaka 40"},
-        };
 
         public static readonly List<Choice> Actions = new()
         {
@@ -90,25 +51,7 @@ namespace RedCrossChat.Objects
         };
 
 
-        public static List<Choice> FeelingsKiswahili = new()
-        {
-            new Choice() { Value=FeelingsSwahili.Furaha,Synonyms=new List<string>{"happy","HAPPY","Happy"}},
-            new Choice() { Value=FeelingsSwahili.Hasira,Synonyms=new List<string>{"Angry","angry","ANGRY"}},
-            new Choice() { Value=FeelingsSwahili.Kuchanganyikiwa},
-            new Choice() { Value=FeelingsSwahili.Wasiwasi},
-            new Choice() { Value=FeelingsSwahili.Zinginezo},
-        };
-
-        public static List<Choice> FeelingsList = new()
-        {
-            new Choice() { Value=Feelings.Happy,Synonyms=new List<string>{"happy","HAPPY","Happy"}},
-            new Choice() { Value=Feelings.Angry,Synonyms=new List<string>{"Angry","angry","ANGRY"}},
-            new Choice() { Value=Feelings.Anxious},
-            new Choice() { Value=Feelings.FlatEffect},
-            new Choice() { Value=Feelings.Expressionless},
-            new Choice() { Value=Feelings.Sad},
-            new Choice() { Value=Feelings.Other},
-        };
+       
 
         public static List<Choice> RelationShips = new()
         {
@@ -241,6 +184,7 @@ namespace RedCrossChat.Objects
     public static class DialogConstants
     {
         public const string ProfileAssesor="PROFILE_001";
+        public const string AIDialogAssesor = "AI_DIALOG";
     }
 
 

@@ -1,6 +1,7 @@
 ﻿using RedCrossChat.Entities;
 using RedCrossChat.Objects;
 using System.Collections.Generic;
+using Gender = RedCrossChat.Entities.Gender;
 
 namespace RedCrossChat
 {
@@ -22,7 +23,9 @@ namespace RedCrossChat
 
         public List<DBCounty> countys;
 
+        public List<Gender> Genders;
 
+        public List<AgeBand> Agebands;
 
         public ReportVm() { 
         

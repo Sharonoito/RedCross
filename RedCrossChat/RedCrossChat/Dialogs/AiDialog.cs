@@ -49,16 +49,19 @@ namespace RedCrossChat.Dialogs
 
             var waterFallSteps = new WaterfallStep[]
                {
-                   FirstTransactionAsync,
+                    FirstTransactionAsync,
                     IntialTaskAsync,
                     FetchResultsAsync,
                     FinalStepAsync
                };
 
+            AddDialog(new TextPrompt("AI_PROMPT"));
+
+            AddDialog(new ChoicePrompt(nameof(ChoicePrompt)));
+
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), waterFallSteps));
 
-
-
+            InitialDialogId = nameof(WaterfallDialog);  //note : without this line of code the system will raise an Exception
         }
 
         public async Task<DialogTurnResult> FirstTransactionAsync(WaterfallStepContext stepContext, CancellationToken token)
@@ -75,8 +78,8 @@ namespace RedCrossChat.Dialogs
 
             var options = new PromptOptions()
             {
-                Prompt=MessageFactory.Text(question),
-                Choices= me.language ? RedCrossLists.choices : RedCrossLists.choicesKiswahili,
+                Prompt=MessageFactory.Text("You are now interacting with an Generative AI-powered bot, do you wish to continue?"),
+                Choices=RedCrossLists.choices,
                 Style = ListStyle.HeroCard
             };
 
@@ -126,7 +129,7 @@ namespace RedCrossChat.Dialogs
             //  await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
 
 
-            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = promptMessage }, token);
+            return await stepContext.PromptAsync("AI_PROMPT", new PromptOptions { Prompt = promptMessage }, token);
         }
 
         public async Task<DialogTurnResult> FetchResultsAsync(WaterfallStepContext stepContext, CancellationToken token)

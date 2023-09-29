@@ -1,7 +1,10 @@
-﻿namespace RedCrossChat.Objects
+﻿using System;
+
+namespace RedCrossChat.Objects
 {
     public class Client
     {
+        public Guid ConversationId { get; set; }
         public string Feeling { get; set; } = "";
         public string AgeGroup { get; set; } = "";
         public string Country { get; set; } = "";

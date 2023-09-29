@@ -93,7 +93,7 @@ namespace RedCrossChat.Controllers
             if (!ModelState.IsValid)
                 return Error("Validation error!, please check your data.");
 
-            Feeling
+       
             try
             {
                 if (feeling.Id == Guid.Empty) 
