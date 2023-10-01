@@ -1,5 +1,5 @@
 ﻿using RedCrossChat.Contracts;
-using RedCrossChat.Contracts.Dependencies;
+
 using RedCrossChat.Domain;
 using RedCrossChat.Entities;
 using RedCrossChat.Repository;

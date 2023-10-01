@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using RedCrossChat.Contracts.Dependencies;
+using RedCrossChat.Contracts;
 using RedCrossChat.Domain;
 using RedCrossChat.Entities;
 namespace RedCrossChat.Repository

@@ -12,7 +12,6 @@ using System.Linq;
 using DataTables.AspNet.Core;
 using DataTables.AspNet.AspNetCore;
 using Microsoft.EntityFrameworkCore;
-using RedCrossChat.Objects;
 
 namespace RedCrossChat.Controllers
 {
