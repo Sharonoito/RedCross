@@ -69,7 +69,7 @@ namespace RedCrossChat.Dialogs
             Client me = (Client)stepContext.Options;
 
 
-            var question = me.language ? "You are now interacting with Chat Gpt , Do you wish to continue" : "Sasa unashirikiana na Chat Gpt, Je, unataka kuendelea?";
+            var question = me.language ? "You are now interacting with an Generative AI-powered bot, do you wish to continue?" : "Sasa unaingiliana na kijibu kiitwacho Generative AI-powered, ungependa kuendelea?";
 
             Conversation conversation = await _repository.Conversation
                    .FindByCondition(x => x.ConversationId == stepContext.Context.Activity.Conversation.Id)
@@ -78,8 +78,8 @@ namespace RedCrossChat.Dialogs
 
             var options = new PromptOptions()
             {
-                Prompt=MessageFactory.Text("You are now interacting with an Generative AI-powered bot, do you wish to continue?"),
-                Choices=RedCrossLists.choices,
+                Prompt=MessageFactory.Text(question),
+                Choices= me.language ? RedCrossLists.choices : RedCrossLists.choicesKiswahili,
                 Style = ListStyle.HeroCard
             };
 
@@ -136,6 +136,8 @@ namespace RedCrossChat.Dialogs
         {
             var options = new PromptOptions();
 
+            Client me = (Client)stepContext.Options;
+
             try
             {
                 int iteration = 0;
@@ -147,7 +149,7 @@ namespace RedCrossChat.Dialogs
 
                 string question = stepContext.Context.Activity.Text;
 
-                string response = await ChatGptDialog.GetChatGPTResponses(question, conversation.AiConversations);
+                string response = await ChatGptDialog.GetChatGPTResponses(question, conversation.AiConversations,me.language);
 
 
                 await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, response, stepContext, _userProfileAccessor, _userState);

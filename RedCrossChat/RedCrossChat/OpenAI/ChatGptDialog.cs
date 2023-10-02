@@ -20,7 +20,7 @@ namespace RedCrossChat
         
       //  private static readonly string OpenAIEndpoint = "https://api.openai.com/v1/chat/completions";
 
-        public static async Task<string> GetChatGPTResponses(string prompt,List<AiConversation> aiConversations)
+        public static async Task<string> GetChatGPTResponses(string prompt,List<AiConversation> aiConversations,bool language=true)
         {
             var openAiClient = new OpenAIClient(
                 new Uri(AzureOpenAIEndpoint),
@@ -38,7 +38,7 @@ namespace RedCrossChat
                 NucleusSamplingFactor = 0.95f,
                 Messages =
                 {
-                    new ChatMessage(ChatRole.System, "You are a Counselor helping people with mental and social issues."),
+                    new ChatMessage(ChatRole.System, "You are a Counselor helping people with mental and social issues."+( !language ? "respond in swahili" : "")),
                    // new ChatMessage(ChatRole.User, "Introduce yourself."),x
                 },
             };

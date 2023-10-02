@@ -12,9 +12,9 @@ namespace RedCrossChat.Repository
 
         public FeelingRepo(AppDBContext repoContext) : base(repoContext) { }
 
-        public Task<IEnumerable<DBFeeling>> GetAll()
+        public async Task<IEnumerable<DBFeeling>> GetAll()
         {
-            throw new NotImplementedException();
+            return await FindAll().ToListAsync();
         }
 
         public async Task<IEnumerable<DBFeeling>> GetAllAsync()
