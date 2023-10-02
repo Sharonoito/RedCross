@@ -94,7 +94,7 @@ namespace RedCrossChat.Domain
 
                         foreach (var item in data)
                         {
-                             context.AgeBand.Add(new AgeBand { Name = item.Name, Kiswahili = item.Kiswahili });
+                             context.AgeBand.Add(new AgeBand { Name = item.Name, Kiswahili = item.Kiswahili,Highest=item.Highest,Lowest=item.Lowest });
 
                              await context.SaveChangesAsync();
                         }

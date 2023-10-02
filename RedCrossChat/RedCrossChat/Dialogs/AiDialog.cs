@@ -85,7 +85,7 @@ namespace RedCrossChat.Dialogs
 
             if (conversation.AiConversations.Count != 0)
             {
-                return await stepContext.NextAsync(null);
+                return await stepContext.NextAsync(me);
             }
 
             return await stepContext.PromptAsync(nameof(ChoicePrompt), options, token);
@@ -180,7 +180,7 @@ namespace RedCrossChat.Dialogs
 
                 //await stepContext.Context.SendActivityAsync(MessageFactory.Text(response));
 
-                return await stepContext.BeginDialogAsync(nameof(WaterfallDialog), null, token);
+                return await stepContext.BeginDialogAsync(nameof(WaterfallDialog), me, token);
             }
             catch (Exception ex)
             {

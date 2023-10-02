@@ -188,11 +188,11 @@ namespace RedCrossChat.Dialogs
             }
 
             var options = new PromptOptions(){
-                   Prompt = MessageFactory.Text(question),
-                    RetryPrompt = MessageFactory.Text(me.language? "Please select a valid age-group" : "Tafadhali chagua kikundi halali cha umri"),
-                    Choices =choices,
+                Prompt = MessageFactory.Text(question),
+                RetryPrompt = MessageFactory.Text(me.language? "Please select a valid age-group or type a valid age" : "Tafadhali chagua kikundi halali cha umri au andika umri sahihi"),
+                Choices =choices,
                 Style = ListStyle.HeroCard,
-                };
+            };
 
 
             return await stepContext.PromptAsync("select-age", options, cancellationToken);
@@ -257,11 +257,20 @@ namespace RedCrossChat.Dialogs
 
             bool result = await _repository.SaveChangesAsync();
 
+            var dboProf = await _repository.Profession.GetAll();
+
+            var professions = new List<Choice>();
+
+            foreach (var choice in dboProf)
+            {
+                professions.Add(new Choice { Value = me.language ? choice.Name : choice.Kiswahili });
+            }
+
 
             return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions()
             {
                 Prompt = MessageFactory.Text(question),
-                Choices =me.language? RedCrossLists.ProfessionalOptions : RedCrossLists.ProfessionalOptionsKiswahili,
+                Choices = professions,
                 Style = ListStyle.HeroCard,
         
             }, cancellationToken);
@@ -292,17 +301,55 @@ namespace RedCrossChat.Dialogs
                 bool result = await _repository.SaveChangesAsync();
             }
 
+            var DboGenders = await _repository.Gender.GetAll();
+
+            var genders = new List<Choice> { };
+
+            foreach (var choice in DboGenders)
+            {
+                genders.Add(new Choice { Value = me.language ? choice.Name : choice.Kiswahili });
+            }
+
             var options = new PromptOptions()
             {
                 Prompt = MessageFactory.Text(question),
                 RetryPrompt = MessageFactory.Text(question),
-                Choices =me.language? RedCrossLists.Genders :RedCrossLists.GenderKiswahili,
+                Choices = genders,
                 Style = ListStyle.HeroCard,
 
             };
 
             // Prompt the user with the configured PromptOptions.
             return await stepContext.PromptAsync("select-gender", options, cancellationToken);
+        }
+
+        private async Task<bool> ValidateAgeAsync(PromptValidatorContext<FoundChoice> promptContext, CancellationToken cancellationToken)
+        {
+
+           // promptContext.Context.Activity.Text
+            var age=await _repository.AgeBand.FindByCondition(x=>x.Name== promptContext.Context.Activity.Text).FirstOrDefaultAsync();
+
+            if (age == null)
+            {
+                try
+                {
+                   int ageText= Int32.Parse(promptContext.Context.Activity.Text);
+
+
+                }
+                catch (FormatException)
+                {
+                    return false;
+                }
+
+            }
+            else
+            {
+                return true;
+            }
+
+
+            return true;
         }
 
         private  async Task<bool> ValidateCountyAsync(PromptValidatorContext<string> promptContext, CancellationToken cancellationToken)
@@ -396,7 +443,7 @@ namespace RedCrossChat.Dialogs
 
             AddDialog(new ChoicePrompt("select-terms"));
 
-            AddDialog(new ChoicePrompt("select-age"));
+            AddDialog(new ChoicePrompt("select-age", ValidateAgeAsync));
 
             AddDialog(new ChoicePrompt("select-country"));
 
@@ -437,7 +484,7 @@ namespace RedCrossChat.Dialogs
         }
 
 
-        private async Task<DBCounty?> GetCountyResponse(string text)
+        private async Task<DBCounty> GetCountyResponse(string text)
         {
             try
             {

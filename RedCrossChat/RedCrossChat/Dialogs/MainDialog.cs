@@ -464,7 +464,7 @@ namespace RedCrossChat.Dialogs
 
                 }
             }
-            catch(Exception ex)
+            catch(Exception)
             {
 
             }
