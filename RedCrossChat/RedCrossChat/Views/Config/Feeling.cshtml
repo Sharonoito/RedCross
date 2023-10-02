@@ -114,7 +114,7 @@
         var jsdtClient = {
             table: null,
             initializeDataTable: function () {
-                jsdtClient.table = $('tblFeelings').DataTable({
+                jsdtClient.table = $('#tblFeelings').DataTable({
                     processing: true,
                     serverSide: true,
                     serverMethod: 'post',
@@ -123,9 +123,10 @@
                         type: "POST"
                     },
                     columns: [
-                        { data: 'Name' },
-                        { data: 'Description' },
-                        { data: 'Synonymns' },
+                        { data: 'name' },
+                        { data: 'description' },
+                        { data: 'synonymns' },
+                        { data: 'id', name: 'Id' },
                
                     ],
                     columnDefs: [{
