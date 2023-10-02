@@ -14,12 +14,14 @@
     <div class="row fv-plugins-icon-container">
         <div class="col-md-12">
             <ul class="nav nav-pills flex-column flex-md-row mb-3">
-                <li class="nav-item"><a class="nav-link active" href="javascript:void(0);"><i class="bx bx-user me-1"></i> Feelings</a></li>
-                <li class="nav-item"><a class=" nav-link" @Html.IsSelected(controller: "Conversation", action: "List")><a asp-action="List" style="text-decoration: none; color: inherit;" asp-controller="Config"><i class="bx bx-grid-alt me-1"></i>Professional Status</a></li>
+                <li class="nav-item"><a class="nav-link active" href="javascript:void(0);"><i class="bx bx-user me-1"></i> Professional Status</a></li>
+@*                <li class="nav-item"><a class="nav-link" @Html.IsSelected(controller:"Config",action :"List" )><i class="bx bx-detail me-1"></i> Professional Status</a></li>
+*@                <li class="nav-item @Html.IsSelected(controller: "Conversation", action: "List")"><a asp-action="List" style="text-decoration: none; color: inherit;" asp-controller="Config"><i class="bx bx-grid-alt me-1"></i>Professional Status</a></li>
+@*
                 <li class="nav-item"><a class="nav-link" href="pages-account-settings-notifications.html"><i class="bx bx-bell me-1"></i> Age Band</a></li>
                 <li class="nav-item"><a class="nav-link" href="pages-account-settings-connections.html"><i class="bx bx-link-alt me-1"></i> Marital Status</a></li>
                 <li class="nav-item"><a class="nav-link" href="pages-account-settings-connections.html"><i class="bx bx-link-alt me-1"></i> Gender</a></li>
-                <li class="nav-item"><a class="nav-link" href="pages-account-settings-connections.html"><i class="bx bx-link-alt me-1"></i> Breathing Exercise</a></li>
+                <li class="nav-item"><a class="nav-link" href="pages-account-settings-connections.html"><i class="bx bx-link-alt me-1"></i> Breathing Exercise</a></li>*@
 
             </ul>
 
@@ -34,7 +36,7 @@
     <div class="container-fluid">
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title"><i class="fa fa-info-circle"></i> Manage Feelings</h3>
+                <h3 class="card-title"><i class="fa fa-info-circle"></i> Manage Professional Status</h3>
 
                 <div class="card-tools">
 
@@ -44,8 +46,8 @@
                             data-target="#clientModal"
                             data-modal="clientModal"
                             data-viewurl="true"
-                            data-action="@Url.Action("CreateFeeling")" data-bs-toggle="modal" data-bs-target="#clientModal">
-                        <i class="fa fa-plus"></i> Add Feeling
+                            data-action="@Url.Action("CreateProfessionalStatus")" data-bs-toggle="modal" data-bs-target="#clientModal">
+                        <i class="fa fa-plus"></i> Add Professional Status
                     </button>
 
                 </div>
@@ -113,12 +115,12 @@
         var jsdtClient = {
             table: null,
             initializeDataTable: function () {
-                jsdtClient.table = $('#tblFeelings').DataTable({
+                jsdtClient.table = $('#tblProfessionalStatus').DataTable({
                     processing: true,
                     serverSide: true,
                     serverMethod: 'post',
                     ajax: {
-                        url: "@Url.Action("GetFeelings")",
+                        url: "@Url.Action("GetProfessionalStatus")",
                         type: "POST"
                     },
                     columns: [
