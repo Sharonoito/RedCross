@@ -79,7 +79,7 @@ namespace RedCrossChat.Dialogs
         {
             stepContext.Values[UserInfo] = new Client();
 
-            var question = "";
+            var question = "To start Select language , Kuanza Chagua lugha";
 
             return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions
             {
