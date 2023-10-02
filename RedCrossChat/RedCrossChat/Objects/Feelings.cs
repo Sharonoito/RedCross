@@ -23,6 +23,11 @@ namespace RedCrossChat.Objects
             new Choice() { Value = ValidationsSwahili.NO, Synonyms = new List<string> { "n", "N", "no" } }
         };
 
+        public static List<Choice> GetRating(bool language)
+        {
+            return language ? Ratings : KiswahiliRating;
+        }
+
         public static readonly List<Choice> Ratings = new()
         {
              new Choice() { Value = "Excellent", Synonyms = new List<string> {  "1" } },
@@ -32,6 +37,15 @@ namespace RedCrossChat.Objects
              new Choice() { Value = "Terrible", Synonyms = new List<string> {  "5" } },
         };
 
+
+        public static readonly List<Choice> KiswahiliRating = new()
+        {
+             new Choice() { Value = "Bora kabisa", Synonyms = new List<string> {  "1" } },
+             new Choice() { Value = "Wastani", Synonyms = new List<string> {  "3" } },
+             new Choice() { Value = "Sawa", Synonyms = new List<string> { "2" } },
+             new Choice() { Value = "Mbaya", Synonyms = new List<string> {  "4" } },
+             new Choice() { Value = "Mbaya Kabisa", Synonyms = new List<string> {  "5" } },
+        };
 
         public static readonly List<Choice> Actions = new()
         {

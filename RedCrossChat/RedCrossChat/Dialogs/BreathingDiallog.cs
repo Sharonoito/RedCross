@@ -39,6 +39,7 @@ namespace RedCrossChat.Dialogs
             var waterFallSteps = new WaterfallStep[]
             {
                 InitialDialogTest,
+                TakeUserThroughExerciseAsync ,
                 BreathingExcercisesAsync,
                 FinalStepAsync
             };
@@ -55,7 +56,8 @@ namespace RedCrossChat.Dialogs
 
             stepContext.Values[UserInfo] = user;
 
-            var question = "Would you like me to take you through some breathing exercises or tips on managing mental health?\r\n\r\n ";
+            var question = user.language? "Would you like me to take you through some breathing exercises or tips on managing mental health? ":
+                "Je, ungependa nikupitishe baadhi ya mazoezi ya kupumua au vidokezo kuhusu kudhibiti afya ya akili?";
 
             if (user.Iteration !=0)
             {
@@ -65,6 +67,7 @@ namespace RedCrossChat.Dialogs
             }
             else
             {
+                user.Iteration++;
                 stepContext.Values[iterations] = 1;
             }
 
@@ -74,14 +77,16 @@ namespace RedCrossChat.Dialogs
             var prompts = new PromptOptions
             {
                 Prompt = MessageFactory.Text(question)
-                ,Choices = RedCrossLists.choices
+                ,
+                Choices = user.language ? RedCrossLists.choices : RedCrossLists.choicesKiswahili,
+                Style = ListStyle.HeroCard
             };
 
             return await stepContext.PromptAsync(nameof(ChoicePrompt), prompts, cancellationToken);
         }
 
 
-       
+
         public async Task<DialogTurnResult> TakeUserThroughExerciseAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             Client user = (Client)stepContext.Options;
@@ -90,14 +95,15 @@ namespace RedCrossChat.Dialogs
 
             int _exerciseIndex = user.Iteration;
 
-            if(_exerciseIndex ==0) _exerciseIndex++;
+            if (_exerciseIndex ==0) _exerciseIndex++;
 
-            var question = "Do you wish to continue ?";
+            var question = user.language? "Do you wish to continue ?": "Je, ungependa kuendelea?";
 
             var prompts = new PromptOptions
             {
                 Prompt = MessageFactory.Text(question),
-                Choices = RedCrossLists.choices
+                Choices = user.language? RedCrossLists.choices : RedCrossLists.choicesKiswahili,
+                Style = ListStyle.HeroCard
             };
 
             var feelings = GetFeelingToExerciseMap();
@@ -105,7 +111,7 @@ namespace RedCrossChat.Dialogs
             if (_exerciseIndex < feelings.Count)
             {
                 var currentExercise = feelings[_exerciseIndex];
-                await stepContext.Context.SendActivityAsync(MessageFactory.Text(currentExercise.Exercise));
+                await stepContext.Context.SendActivityAsync(MessageFactory.Text(user.language? currentExercise.Exercise : currentExercise.Kiswahili));
 
                 stepContext.Values[iterations]=_exerciseIndex+1;
 
@@ -135,34 +141,37 @@ namespace RedCrossChat.Dialogs
         private async Task<DialogTurnResult> BreathingExcercisesAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
 
-            var objectType=stepContext.Result.GetType();
+            var objectType = stepContext.Result.GetType();
 
             Client user = (Client)stepContext.Options;
 
-
-            if (objectType.Name == "User" || stepContext.Result is Client)
+            if(user.Iteration == 0)
             {
-
-               return await TakeUserThroughExerciseAsync(stepContext, cancellationToken);
+                user.Iteration = 1;
             }
+            
+
+            //if (objectType.Name == "User" || stepContext.Result is Client)
+            //{
+
+            //    return await TakeUserThroughExerciseAsync(stepContext, cancellationToken);
+            //}
 
             var userChoice = ((FoundChoice)stepContext.Result)?.Value;
 
             if (userChoice == Validations.NO)
             {
-                
+
                 return await stepContext.EndDialogAsync(user);
-            }
-
-            if (!string.IsNullOrEmpty(userChoice))
+            }else if (userChoice == Validations.YES  || userChoice == ValidationsSwahili.YES)
             {
-               
+               return await stepContext.BeginDialogAsync(nameof(WaterfallDialog), user, cancellationToken);
 
-                return await TakeUserThroughExerciseAsync(stepContext, cancellationToken);
+               // return await TakeUserThroughExerciseAsync(stepContext, cancellationToken);
             }
             else
             {
-               return await stepContext.EndDialogAsync(null);
+                return await stepContext.EndDialogAsync(null);
             }
 
         }
@@ -187,16 +196,17 @@ namespace RedCrossChat.Dialogs
         private static Dictionary<int, BreathingTip> GetFeelingToExerciseMap()
         {
             var paths = new[] { ".", "Cards", "Exercise.json" };
-           
+
 
             using StreamReader reader = new(Path.Combine(paths));
             var json = reader.ReadToEnd();
             List<BreathingTip> breathingTips = JsonConvert.DeserializeObject<List<BreathingTip>>(json);
 
 
-            Dictionary<int, BreathingTip> items =new();
+            Dictionary<int, BreathingTip> items = new();
 
-            foreach(var item in breathingTips) {
+            foreach (var item in breathingTips)
+            {
                 items[item.Value] = item;
             }
 

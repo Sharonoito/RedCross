@@ -1,4 +1,4 @@
-﻿using RedCrossChat.Contracts.Dependencies;
+﻿
 
 
 namespace RedCrossChat.Contracts

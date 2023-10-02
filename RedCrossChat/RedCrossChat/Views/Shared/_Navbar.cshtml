@@ -215,6 +215,14 @@
                         <li>
                             <div class="dropdown-divider"></div>
                         </li>
+
+                        <li class="dropdown-item @Html.IsSelected(controller: "Auth", action: "Profile")">
+                            <a asp-action="Profile" asp-controller="Auth" style="text-decoration: none; color: inherit; cursor: pointer;">
+                                <i class="bx bx-user me-2"></i>
+                                <span class="align-middle">My Profile</span>
+                            </a>
+                        </li>
+
                         <li>
                             <a class="dropdown-item load-modal"
                                id="EditUser"
@@ -228,22 +236,6 @@
                                data-action='@Url.Action("ResetPassword", "Auth")'>
                                
                                 <i class="bx bx-user me-2"></i>
-                                <span class="align-middle">My Profile</span>
-                            </a>
-                        </li>
-
-
-                        <li>
-                            <a class="dropdown-item"
-                               id="EditUser"
-                               data-hidden='Id'
-                               data-id='${row.id}'
-                               data-viewurl="true"
-                               data-toggle='modal'
-                               data-target='#clientModal'
-                               data-bs-toggle="modal" data-bs-target="#clientModal"
-                               data-action='@Url.Action("EditUser", "Auth")?clientId=${row.id}'>
-                                <i class="bx bx-cog me-2"></i>
                                 <span class="align-middle">Settings</span>
                             </a>
                         </li>

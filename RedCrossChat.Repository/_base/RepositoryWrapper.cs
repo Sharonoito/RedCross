@@ -1,7 +1,8 @@
 ﻿using RedCrossChat.Contracts;
-using RedCrossChat.Contracts.Dependencies;
+
 
 using RedCrossChat.Domain;
+
 
 
 namespace RedCrossChat.Repository
@@ -195,6 +196,8 @@ namespace RedCrossChat.Repository
                 return _rawConversation;
             }
         }
+
+      
 
         public async Task<bool> SaveChangesAsync()
         {

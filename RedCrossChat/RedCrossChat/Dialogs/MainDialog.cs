@@ -81,9 +81,11 @@ namespace RedCrossChat.Dialogs
         {
             stepContext.Values[UserInfo] = new Client();
 
+            var question = "To start Select language , Kuanza Chagua lugha";
+
             return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions
             {
-                Prompt = MessageFactory.Text(""),
+                Prompt = MessageFactory.Text(question),
                 RetryPrompt = MessageFactory.Text("Please select a langugae , Tafadhali Chagua Lugha"),
                 Choices = new List<Choice>()
                 {
@@ -153,7 +155,7 @@ namespace RedCrossChat.Dialogs
             
 
             var mentalHealth = PersonalDialogCard.GetKnowYouCard();
-            var mentalHealth1 = PersonalDialogCard.GetKnowYouCardKiswahili();
+  
 
 
             var knowledgeBaseCard = PersonalDialogCard.GetKnowledgeCareerCard();
@@ -236,17 +238,14 @@ namespace RedCrossChat.Dialogs
                 return await stepContext.EndDialogAsync(null);
             }
 
-            var termsAndConditionsCard = PersonalDialogCard.GetKnowYouCard();
-            var termsAndConditionsCardSwahili = PersonalDialogCard.GetKnowYouCardKiswahili();
-
-
+            var termsAndConditionsCard = PersonalDialogCard.GetKnowYouCard(me.language);
+            
 
             var attachment = new Attachment
             {
                 ContentType = HeroCard.ContentType,
-                //Content = termsAndConditionsCard
-                Content = !me.language
-                  ? termsAndConditionsCardSwahili: termsAndConditionsCard
+                
+                Content =  termsAndConditionsCard
 
             };
 
@@ -324,7 +323,7 @@ namespace RedCrossChat.Dialogs
         {
             Client me = (Client)stepContext.Values[UserInfo];
 
-            var question = "Please Specify the feeling ";
+            var question =me.language? "Please Specify the feeling "  : "Tafadhali Bainisha hisia";
 
             var response = stepContext.Context.Activity.Text;
 
@@ -398,11 +397,16 @@ namespace RedCrossChat.Dialogs
 
         private async Task<DialogTurnResult> RateBotAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
+            Client me = (Client)stepContext.Values[UserInfo];
+
+
+            //todo recognize repeat clients
+
             var options = new PromptOptions()
             {
-                Prompt = MessageFactory.Text("How would you rate your experience.with the bot?"),
-                RetryPrompt = MessageFactory.Text("Please select a valid option ('Yes' or 'No')."),
-                Choices = RedCrossLists.Ratings,
+                Prompt = MessageFactory.Text(me.language ? "How would you rate your experience.with the bot?": "Je, unaweza kukadiria vipi uzoefu wako ? "),
+                RetryPrompt = MessageFactory.Text(me.language ?  "Please select a valid option ('Yes' or 'No')." : "Tafadhali fanya chaguo sahihi"),
+                Choices = RedCrossLists.GetRating(me.language),
                 Style = ListStyle.HeroCard,
             };
 
@@ -413,14 +417,9 @@ namespace RedCrossChat.Dialogs
         {
             var ratingChoice = ((FoundChoice)stepContext.Result).Value;
 
-            if (ratingChoice.Equals("PositiveChoice"))
-            {
-                await stepContext.Context.SendActivityAsync(MessageFactory.Text("Thank you for your positive feedback! We're glad you had a great experience."));
-            }
-            else
-            {
-                await stepContext.Context.SendActivityAsync(MessageFactory.Text("Thank you for your feedback. We value your input!"));
-            }
+            Client me = (Client)stepContext.Values[UserInfo];
+
+            await stepContext.Context.SendActivityAsync(MessageFactory.Text(me.language ? "Thank you for your feedback. We value your input!": " Asante kwa maoni yako. Tunathamini mchango wako"));
 
             return await stepContext.EndDialogAsync(null, cancellationToken);
         }

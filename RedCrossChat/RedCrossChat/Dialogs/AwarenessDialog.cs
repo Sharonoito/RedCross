@@ -1,9 +1,12 @@
-﻿using Microsoft.Bot.Builder;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Dialogs.Choices;
 using Microsoft.Bot.Schema;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Clients.ActiveDirectory;
+using NuGet.Protocol.Core.Types;
 using RedCrossChat.Cards;
 using RedCrossChat.Contracts;
 using RedCrossChat.Entities;
@@ -254,6 +257,7 @@ namespace RedCrossChat.Dialogs
         {
             Client me = (Client)stepContext.Values[UserInfo];
 
+
             var question = me.language ? "Would you wish to talk to a Professional Counselor?" : "Je, ungependa kuongea na mshauri wa kitaalam?";
 
             var conversation = await _repository.Conversation.FindByCondition(x => x.ConversationId == stepContext.Context.Activity.Conversation.Id).FirstOrDefaultAsync();
@@ -313,12 +317,16 @@ namespace RedCrossChat.Dialogs
 
 
                         var hotline = PersonalDialogCard.GetHotlineCard();
+                        var hotlineSwahili = PersonalDialogCard.GetHotlineCardKiswahili();
+
 
                         var attachment = new Attachment
                         {
                             ContentType = HeroCard.ContentType,
-                            Content =   hotline
+                 
+                            Content = !me.language ? hotlineSwahili : hotline,
                         };
+
 
                         var message = MessageFactory.Attachment(attachment);
                         await stepContext.Context.SendActivityAsync(message, cancellationToken);
@@ -327,7 +335,6 @@ namespace RedCrossChat.Dialogs
                         {
                             new Choice() { Value = "hotline", Action = new CardAction() { Title = "hotline", Type = ActionTypes.OpenUrl, Value = "https://referraldirectories.redcross.or.ke/" } }
                         };
-
 
                         return await stepContext.EndDialogAsync(me, cancellationToken);
 
@@ -345,7 +352,10 @@ namespace RedCrossChat.Dialogs
             return await stepContext.EndDialogAsync(me);
         }
 
-    }
+
 }
+}
+
+
 
 
