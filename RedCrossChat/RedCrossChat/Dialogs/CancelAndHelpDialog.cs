@@ -8,6 +8,7 @@ using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Schema;
 using System.Threading;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace RedCrossChat.Dialogs
 {
@@ -32,11 +33,17 @@ namespace RedCrossChat.Dialogs
 
 
 
+
+
         private static async Task<DialogTurnResult> InterruptAsync(DialogContext innerDc, CancellationToken cancellationToken)
         {
-            if (innerDc.Context.Activity.Type == ActivityTypes.Message)
+            //if (innerDc.Context.Activity.Type == ActivityTypes.Message)
+
+            var text=innerDc.Context.Activity.Text.ToLowerInvariant();
+
+            if (!string.IsNullOrEmpty(text) && (text.ToLower() == "help" || text.ToLower() == "cancel"))
             {
-                var text = innerDc.Context.Activity.Text.ToLowerInvariant();
+               // var text = innerDc.Context.Activity.Text.ToLowerInvariant();
 
                 switch (text)
                 {

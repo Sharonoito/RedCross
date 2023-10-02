@@ -75,6 +75,8 @@ namespace RedCrossChat.Dialogs
             InitialDialogId = nameof(WaterfallDialog);
         }
 
+       
+
         private async Task<DialogTurnResult> FirstStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             stepContext.Values[UserInfo] = new Client();
@@ -84,7 +86,7 @@ namespace RedCrossChat.Dialogs
             return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions
             {
                 Prompt = MessageFactory.Text(question),
-                RetryPrompt = MessageFactory.Text("Please select a valid question"),
+                RetryPrompt = MessageFactory.Text("Please select a langugae , Tafadhali Chagua Lugha"),
                 Choices = new List<Choice>()
                 {
                     new Choice("English"),
@@ -92,26 +94,24 @@ namespace RedCrossChat.Dialogs
                 },
                 // Style = stepContext.Context.Activity.ChannelId == "facebook" ? ListStyle.SuggestedAction : ListStyle.HeroCard,
                 Style = ListStyle.HeroCard,
-            }, cancellationToken); ;
+            }, cancellationToken);
+
+
         }
 
         private async Task<DialogTurnResult> IntroStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-
             Client client = (Client)stepContext.Values[UserInfo];
-
 
             var choiceValues = ((FoundChoice)stepContext.Result).Value;
 
-            if (choiceValues != null   && choiceValues == "Kiswahili")
+            if (choiceValues != null && choiceValues == "Kiswahili")
             {
                 client.language = !client.language;
             }
 
-
+         
             var question = client.language ?
-
-
                 "Hello dear friend!! Welcome to Kenya Red Cross Society, we are offering tele-counselling services to public at no charges . How can I help you today?\r\n" :
 
                 "Hujambo rafiki? Karibu katika Shirika la Msalaba Mwekundu ambapo tunatoa ushauri kupitia kwenye simu bila malipo yoyote. Je, ungependa nikusaidie vipi?";
