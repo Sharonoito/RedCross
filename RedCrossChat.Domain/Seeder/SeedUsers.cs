@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-
+using RedCrossChat;
 using RedCrossChat.Entities;
 using RedCrossChat.Entities.Auth;
 using System.Security.Claims;
@@ -69,91 +69,82 @@ namespace RedCrossChat.Domain
 
                     // Add role to user
                     userMgr.AddToRoleAsync(adminUser, superAdminRole.Name).GetAwaiter().GetResult();
-                } 
-
-                try
+                }
+                if (!context.County.Any())
                 {
+                    var data = await SeedHelper.GetSeedData<DBCounty>("County.json");
 
-                    if (!context.County.Any())
+                    foreach (var item in data)
                     {
-                        var data = await SeedHelper.GetSeedData<DBCounty>("County.json");
+                        context.County.Add(new DBCounty { Name = item.Name, prefix = "SM", Code = item.Code });
 
-                        foreach (var item in data)
-                        {
-                            context.County.Add(new DBCounty { Name = item.Name, prefix = "SM", Code = item.Code });
-
-                            await context.SaveChangesAsync();
-                        }
-
-                        
+                        await context.SaveChangesAsync();
                     }
 
-                    if (!context.AgeBand.Any())
+
+                }
+
+                if (!context.AgeBand.Any())
+                {
+                    var data = await SeedHelper.GetSeedData<AgeBand>("AgeBand.json");
+
+                    foreach (var item in data)
                     {
-                        var data = await SeedHelper.GetSeedData<AgeBand>("AgeBand.json");
+                        context.AgeBand.Add(new AgeBand { Name = item.Name, Kiswahili = item.Kiswahili, Highest = item.Highest, Lowest = item.Lowest });
 
-                        foreach (var item in data)
-                        {
-                             context.AgeBand.Add(new AgeBand { Name = item.Name, Kiswahili = item.Kiswahili,Highest=item.Highest,Lowest=item.Lowest });
-
-                             await context.SaveChangesAsync();
-                        }
-                    }
-
-                    if (!context.Gender.Any())
-                    {
-                        var data = await SeedHelper.GetSeedData<AgeBand>("Gender.json");
-
-                        foreach (var item in data)
-                        {
-
-                            context.Gender.Add(new Gender { Name = item.Name, Kiswahili = item.Kiswahili });
-
-                            await context.SaveChangesAsync();
-
-                        }
-                    }
-
-                    if (!context.Feeling.Any())
-                    {
-                        var data = await SeedHelper.GetSeedData<DBFeeling>("Feelings.json");
-
-                        foreach (var feeling in data)
-                        {
-
-                            context.Feeling.Add(new DBFeeling { Name = feeling.Name, Description=feeling.Description,Synonymns = feeling.Synonymns, Kiswahili = feeling.Kiswahili });
-
-                            await context.SaveChangesAsync();
-                        }
-                    }
-
-                    if(!context.Profession.Any())
-                    {
-                        var data = await SeedHelper.GetSeedData<Profession>("Profession.json");
-
-                        foreach(var item in data)
-                        {
-                            context.Profession.Add(new Profession { Name = item.Name, Kiswahili = item.Kiswahili ,Synonyms=""});
-
-                            await context.SaveChangesAsync();
-                        }
-                    }
-
-                    if (!context.MaritalState.Any())
-                    {
-                        var data = await SeedHelper.GetSeedData<MaritalState>("MaritalStatus.json");
-
-                        foreach (var item in data)
-                        {
-                            context.MaritalState.Add(new MaritalState { Name = item.Name, Kiswahili = item.Kiswahili , Synonyms = "" });
-
-                            await context.SaveChangesAsync();
-                        }
+                        await context.SaveChangesAsync();
                     }
                 }
-                catch(Exception ex)
-                {
 
+                if (!context.Gender.Any())
+                {
+                    var data = await SeedHelper.GetSeedData<AgeBand>("Gender.json");
+
+                    foreach (var item in data)
+                    {
+
+                        context.Gender.Add(new Gender { Name = item.Name, Kiswahili = item.Kiswahili });
+
+                        await context.SaveChangesAsync();
+
+                    }
+                }
+
+                if (!context.Feeling.Any())
+                {
+                    var data = await SeedHelper.GetSeedData<DBFeeling>("Feelings.json");
+
+                    foreach (var feeling in data)
+                    {
+
+                        context.Feeling.Add(new DBFeeling { Name = feeling.Name, Description = feeling.Description, Synonymns = feeling.Synonymns, Kiswahili = feeling.Kiswahili });
+
+                        await context.SaveChangesAsync();
+                    }
+                }
+
+                if (!context.Profession.Any())
+                {
+                    var data = await SeedHelper.GetSeedData<Profession>("Profession.json");
+
+                    foreach (var item in data)
+                    {
+                        context.Profession.Add(new Profession { Name = item.Name, Kiswahili = item.Kiswahili, Synonyms = "" });
+
+                        await context.SaveChangesAsync();
+                    }
+                }
+
+                if (!context.MaritalState.Any())
+                {
+                    var data = await SeedHelper.GetSeedData<MaritalState>("MaritalStatus.json");
+
+                    foreach (var item in data)
+                    {
+                        context.MaritalState.Add(new MaritalState { Name = item.Name, Kiswahili = item.Kiswahili, Synonyms = "" });
+
+                        await context.SaveChangesAsync();
+                    }
                 }
 
             }

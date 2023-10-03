@@ -19,9 +19,32 @@ namespace RedCrossChat.Dialogs
 
         public async Task<DialogTurnResult> InitialAction(WaterfallStepContext stepContext,CancellationToken token)
         {
+            
+            var conversation=await repository.Conversation.FindByCondition(x=>x.ConversationId == stepContext.Context.Activity.Conversation.Id).FirstOrDefaultAsync();
+
+
+            if (!conversation.RequestedHandedOver)
+            {
+                repository.HandOverRequest.Create(new Entities.HandOverRequest
+                {
+                    Title="User 0001 : Requested Hand Over",
+                    ConversationId=conversation.Id,
+                    isActive=true,
+                });
+
+                conversation.RequestedHandedOver = true;
+
+                repository.Conversation.Update(conversation);
+
+                await repository.SaveChangesAsync();
+
+            }
+
             //this one checks if the dialog is in checking state
 
             //Check if the is a Notification That has been Posted 
+
+
 
             bool skip = true;
 

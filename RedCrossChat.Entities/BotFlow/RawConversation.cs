@@ -12,6 +12,10 @@ namespace RedCrossChat.Entities
 
         public bool IsReply { get; set; }=false;
 
+        public bool IsHandOverMessage { get; set; }=false;
+
+        public bool HasReply { get; set; } =false;
+
         public Guid ConversationId { get; set; }
 
         public DateTime ResponseTimeStamp { get; set; }

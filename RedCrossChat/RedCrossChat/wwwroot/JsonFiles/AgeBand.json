@@ -2,44 +2,44 @@
   {
     "Name": "Below 15",
     "Kiswahili": "Chini Ya miaka 15",
-    "Highest": "15",
-    "Lowest": "0"
+    "Highest": 15,
+    "Lowest": 0
   },
   {
     "Name": "15-20",
     "Kiswahili": "15-20",
-    "Highest": "20",
-    "Lowest": "15"
+    "Highest": 20,
+    "Lowest": 15
   },
   {
     "Name": "21-30",
     "Kiswahili": "21-30",
-    "Highest": "30",
-    "Lowest": "21"
+    "Highest": 30,
+    "Lowest": 21
   },
   {
     "Name": "31-40",
     "Kiswahili": "31-40",
-    "Highest": "40",
-    "Lowest": "31"
+    "Highest": 40,
+    "Lowest": 31
   },
   {
     "Name": "41-50",
     "Kiswahili": "41-50",
-    "Highest": "50",
-    "Lowest": "41"
+    "Highest": 50,
+    "Lowest": 41
   },
   {
     "Name": "51-60",
     "Kiswahili": "51-60",
-    "Highest": "60",
-    "Lowest": "51"
+    "Highest": 60,
+    "Lowest": 51
   },
   {
     "Name": "Above 60",
     "Kiswahili": "Juu ya miaka 60",
-    "Highest": "0",
-    "Lowest": "60"
+    "Highest": 0,
+    "Lowest": 60
 
   }
 ]

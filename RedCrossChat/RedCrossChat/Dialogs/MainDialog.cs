@@ -327,7 +327,7 @@ namespace RedCrossChat.Dialogs
 
             var response = stepContext.Context.Activity.Text;
 
-            if (response.ToLower() == "other" || response.ToLower() == "zinginezo")
+            if (response.ToLower().Trim() == "other" || response.ToLower() == "zinginezo")
             {
                 await DialogExtensions.UpdateDialogAnswer(response, question, stepContext, _userProfileAccessor, _userState);
 
@@ -339,7 +339,9 @@ namespace RedCrossChat.Dialogs
                 .Include(x => x.Persona)
                 .FirstOrDefaultAsync();
 
-            if(conversation != null)
+           // var item = response.ToLower().Trim() == "other";
+
+            if (conversation != null)
             {
                 me.ConversationId = conversation.Id;
 
