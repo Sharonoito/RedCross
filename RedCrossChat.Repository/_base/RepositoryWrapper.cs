@@ -128,6 +128,7 @@ namespace RedCrossChat.Repository
         }
 
 
+
         public IAiConversationRepo? _aiConversation;
         public IAiConversationRepo AiConversation
         {
@@ -197,6 +198,21 @@ namespace RedCrossChat.Repository
             }
         }
 
+        public IHandOverRequest _handOverRequest;
+
+        public IHandOverRequest HandOverRequest
+        {
+            get
+            {
+                if (_handOverRequest == null)
+                {
+                    _handOverRequest = new HandOverRepo(_repoContext);
+
+                }
+
+                return _handOverRequest;    
+            }
+        }
       
 
         public async Task<bool> SaveChangesAsync()

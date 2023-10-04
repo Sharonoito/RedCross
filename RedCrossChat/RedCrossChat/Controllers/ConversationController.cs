@@ -249,6 +249,20 @@ namespace RedCrossChat.Controllers
             return Success("Question", new QuestionResponseVm { question = question });
         }
 
+        public async Task<IActionResult> CheckHandOverRequests()
+        { 
+            var conversations=await _repository.HandOverRequest.FindByCondition(x=>x.HasBeenReceived==false).ToListAsync();
+
+            //first in First out
+
+            if (conversations.Count > 0)
+            {
+                return Success("fetched successfully", conversations);
+            }
+
+            return Error("No requests");
+        }
+
         public async Task<IActionResult> SaveQuestionOption(IFormCollection formData)
         {
 
@@ -268,6 +282,33 @@ namespace RedCrossChat.Controllers
             }
 
             return Ok("Uploaded");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateHandOverRequest(Guid id)
+        {
+
+            if(id != Guid.Empty)
+            {
+                var request=await _repository.HandOverRequest.FindByCondition(x=>x.Id==id).FirstOrDefaultAsync();
+
+                if (request != null)
+                {
+                    request.HasBeenReceived = true;
+
+                    _repository.HandOverRequest.Update(request);
+
+                    var status=  await _repository.SaveChangesAsync();
+
+
+                    if(status) 
+                    return Success("Updated Successfully");
+                }
+
+            }
+
+            return Error("Invalid Guid");
+
         }
     }
 }

@@ -28,6 +28,8 @@ namespace RedCrossChat.Extensions
 
             services.AddTransient<BreathingDialog>();
 
+            services.AddTransient<HumanHandOverDialog>();
+
             services.AddTransient<AiDialog>();
 
             services.AddSingleton<ChatGpt>();

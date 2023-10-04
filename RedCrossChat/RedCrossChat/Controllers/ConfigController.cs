@@ -42,7 +42,7 @@ namespace RedCrossChat.Controllers
         { 
             return View();
         }
-
+        #region Feeling
         public IActionResult Feeling()
         {
             return View();
@@ -87,6 +87,63 @@ namespace RedCrossChat.Controllers
             return View("_Feeling");
         }
 
+        public async Task<IActionResult> EditFeeling(Guid clientId)
+        
+        {
+            try
+            {
+                var feelingEntity = _repository.Feeling.FindByCondition(x => x.Id == clientId).FirstOrDefault();
+                if (feelingEntity == null)
+                {
+                    return NotFound(); 
+                }
+
+                var feelingViewModel = new FeelingVm
+                {
+                    Id = feelingEntity.Id,
+                    Name = feelingEntity.Name,
+                    Description = feelingEntity.Description,
+                    Kiswahili=feelingEntity.Kiswahili,
+                    Synonyms = feelingEntity.Synonymns
+                };
+
+                ViewBag.Title = "Edit Feeling";
+                return View("_Feeling", feelingViewModel);
+            }
+            catch (Exception ex)
+            {
+                return Error("Something broke" + ex.Message);
+            }
+        }
+
+
+        //[HttpPost]
+        public async Task<IActionResult> DeleteFeeling(Guid id)
+        {
+            try
+            {
+                var feelingEntity = await _repository.Feeling.FindByCondition(x => x.Id == id).FirstOrDefaultAsync();
+                if (feelingEntity == null)
+                {
+                    return NotFound();
+                }
+
+                _repository.Feeling.Delete(feelingEntity);
+                var result = await _repository.SaveChangesAsync();
+
+                if (!result)
+                {
+                    return Error("Error deleting Feeling");
+                }
+
+                return Success("Feeling deleted successfully");
+            }
+            catch (Exception ex)
+            {
+                return Error("Something broke" + ex.Message);
+            }
+        }
+
         [HttpPost]
         public async Task<IActionResult>SaveFeeling(FeelingVm feeling)
         {
@@ -102,7 +159,7 @@ namespace RedCrossChat.Controllers
                     {
                         Name = feeling.Name,
                         Description = feeling.Description,
-                        Kiswahili="TODO",
+                        Kiswahili=feeling.Kiswahili,
                         Synonymns = feeling.Synonyms
                     };
 
@@ -144,6 +201,314 @@ namespace RedCrossChat.Controllers
             return Success("Feeling Saved successfully");
         }
 
+#endregion
+
+        #region Professional
+        public IActionResult Profession()
+        {
+            return View();
+        }
+
+        public IActionResult CreateProfession()
+        {
+            ViewBag.Title = "Create Profession";
+
+            return View("_Profession");
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> GetProfession(IDataTablesRequest dtRequest)
+        {
+
+            try
+            {
+                var data = await _repository.Profession.GetAllAsync();
+
+                var filteredRows = data
+                    .AsQueryable()
+                    .FilterBy(dtRequest.Search, dtRequest.Columns);
+
+                var pagedRows = filteredRows
+                    .SortBy(dtRequest.Columns)
+                    .Skip(dtRequest.Start)
+                    .Take(dtRequest.Length);
+
+
+                var response = DataTablesResponse.Create(dtRequest, data.Count(),
+                    filteredRows.Count(), pagedRows);
+
+                return new DataTablesJsonResult(response);
+
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveProfession(ProfessionVm profession)
+        {
+            if (!ModelState.IsValid)
+                return Error("Validation error!, please check your data.");
+
+
+            try
+            {
+                if (profession.Id == Guid.Empty)
+                {
+                    var professionEntity = new Profession
+                    {
+                        Name = profession.Name,
+                        Kiswahili = profession.Kiswahili,
+                        Synonyms = profession.Synonyms
+                    };
+
+                    _repository.Profession.Create(professionEntity);
+
+
+                    var result = await _repository.SaveChangesAsync();
+
+                    if (!result)
+                        return Error("Error Creating Proffession!");
+                }
+                else
+                {
+                    var professionDB = await _repository.Profession.FindByCondition(x => x.Id == profession.Id).FirstOrDefaultAsync();
+
+                    if (professionDB == null)
+                    {
+                        return Error("Profession not found");
+                    }
+
+
+                    professionDB.Name = profession.Name;
+                    professionDB.Kiswahili = profession.Kiswahili;
+                    professionDB.Synonyms = profession.Synonyms;
+
+                    _repository.Profession.Update(professionDB);
+
+                    var result = await _repository.SaveChangesAsync();
+
+                    if (!result)
+                        // return Success(null, null);
+                        return Error("Error updating profession");
+                }
+            }
+            catch (Exception ex)
+            {
+                return Error("Something broke" + ex.Message);
+            }
+            return Success("Profession Saved successfully");
+        }
+
+        public async Task<IActionResult> DeleteProfession(Guid id)
+        {
+            try
+            {
+                var professionEntity = await _repository.Profession.FindByCondition(x => x.Id == id).FirstOrDefaultAsync();
+                if (professionEntity == null)
+                {
+                    return NotFound();
+                }
+
+                _repository.Profession.Delete(professionEntity);
+                var result = await _repository.SaveChangesAsync();
+
+                if (!result)
+                {
+                    return Error("Error deleting Profession");
+                }
+
+                return Success("Profession deleted successfully");
+            }
+            catch (Exception ex)
+            {
+                return Error("Something broke" + ex.Message);
+            }
+        }
+
+        #endregion
+
+        #region AgeBand
+        public IActionResult AgeBand()
+        {
+            return View();
+        }
+
+        public IActionResult CreateAgeBand()
+        {
+            ViewBag.Title = "Create AgeBand";
+
+            return View("_AgeBand");
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> GetAgeBand(IDataTablesRequest dtRequest)
+        {
+
+            try
+            {
+                var data = await _repository.AgeBand.GetAllAsync();
+
+                var filteredRows = data
+                    .AsQueryable()
+                    .FilterBy(dtRequest.Search, dtRequest.Columns);
+
+                var pagedRows = filteredRows
+                    .SortBy(dtRequest.Columns)
+                    .Skip(dtRequest.Start)
+                    .Take(dtRequest.Length);
+
+
+                var response = DataTablesResponse.Create(dtRequest, data.Count(),
+                    filteredRows.Count(), pagedRows);
+
+                return new DataTablesJsonResult(response);
+
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveAgeBand(AgeBandVm ageBand)
+        {
+            if (!ModelState.IsValid)
+                return Error("Validation error!, please check your data.");
+
+
+            try
+            {
+                if (ageBand.Id == Guid.Empty)
+                {
+                    var ageBandEntity = new AgeBand
+                    {
+                        Name = ageBand.Name,
+                        Kiswahili = ageBand.Kiswahili,
+                        Synonyms = ageBand.Synonyms
+                    };
+
+                    _repository.AgeBand.Create(ageBandEntity);
+
+
+                    var result = await _repository.SaveChangesAsync();
+
+                    if (!result)
+                        return Error("Error Creating AgeBand!");
+                }
+                else
+                {
+                    var ageBandDB = await _repository.AgeBand.FindByCondition(x => x.Id == ageBand.Id).FirstOrDefaultAsync();
+
+                    if (ageBandDB == null)
+                    {
+                        return Error("AgeBand not found");
+                    }
+
+
+                    ageBand.Name = ageBand.Name;
+                    ageBand.Kiswahili = ageBand.Kiswahili;
+                    ageBand.Synonyms = ageBand.Synonyms;
+
+                    _repository.AgeBand.Update(ageBandDB);
+
+                    var result = await _repository.SaveChangesAsync();
+
+                    if (!result)
+                        return Success(null, null);
+                    return Error("Error updating ageBand");
+                }
+            }
+            catch (Exception ex)
+            {
+                return Error("Something broke" + ex.Message);
+            }
+            return Success("AgeBand Saved successfully");
+        }
+
+        public async Task<IActionResult> DeleteAgeBand(Guid id)
+        {
+            try
+            {
+                var ageBandEntity = await _repository.AgeBand.FindByCondition(x => x.Id == id).FirstOrDefaultAsync();
+                if (ageBandEntity == null)
+                {
+                    return NotFound();
+                }
+
+                _repository.AgeBand.Delete(ageBandEntity);
+                var result = await _repository.SaveChangesAsync();
+
+                if (!result)
+                {
+                    return Error("Error deleting AgeBand");
+                }
+
+                return Success("AgeBand deleted successfully");
+            }
+            catch (Exception ex)
+            {
+                return Error("Something broke" + ex.Message);
+            }
+        }
+
+        #endregion
+
+        #region MaritalState
+        public IActionResult MaritalState()
+        {
+            return View();
+        }
+
+        public IActionResult CreateMaritalState()
+        {
+            ViewBag.Title = "Create MaritalState";
+
+            return View("_MaritalState");
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> GetMaritalState(IDataTablesRequest dtRequest)
+        {
+
+            try
+            {
+                var data = await _repository.AgeBand.GetAllAsync();
+
+                var filteredRows = data
+                    .AsQueryable()
+                    .FilterBy(dtRequest.Search, dtRequest.Columns);
+
+                var pagedRows = filteredRows
+                    .SortBy(dtRequest.Columns)
+                    .Skip(dtRequest.Start)
+                    .Take(dtRequest.Length);
+
+
+                var response = DataTablesResponse.Create(dtRequest, data.Count(),
+                    filteredRows.Count(), pagedRows);
+
+                return new DataTablesJsonResult(response);
+
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+
+            }
+        }
+
+
+
+        #endregion
 
     }
 }

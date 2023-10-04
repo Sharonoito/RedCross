@@ -1,19 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.Bot.Builder;
+﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Dialogs.Choices;
-using Microsoft.Identity.Client;
-using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Newtonsoft.Json;
 using RedCrossChat.Objects;
-using Sentry;
-using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using User = RedCrossChat.Objects.User;
 
 namespace RedCrossChat.Dialogs
 {
@@ -38,7 +31,7 @@ namespace RedCrossChat.Dialogs
 
             var waterFallSteps = new WaterfallStep[]
             {
-                InitialDialogTest,
+                InitialDialogTest, 
                 TakeUserThroughExerciseAsync ,
                 BreathingExcercisesAsync,
                 FinalStepAsync
@@ -91,6 +84,16 @@ namespace RedCrossChat.Dialogs
         {
             Client user = (Client)stepContext.Options;
 
+            if(stepContext.Result.GetType() == typeof(FoundChoice))
+            {
+                if (!WantsToContinue(stepContext))
+                {
+                    return await stepContext.EndDialogAsync(user);
+                }
+            }
+
+           
+
             string stringValue = stepContext.Values[iterations].ToString();
 
             int _exerciseIndex = user.Iteration;
@@ -138,6 +141,28 @@ namespace RedCrossChat.Dialogs
             }
         }
 
+        private bool WantsToContinue(WaterfallStepContext stepContext)
+        {
+            var userChoice = ((FoundChoice)stepContext.Result)?.Value;
+
+            if (userChoice ==null)
+            {
+                return false;
+            }
+
+            if (userChoice == Validations.NO || userChoice == ValidationsSwahili.NO)
+            {
+                return false;
+            }
+            else if (userChoice == Validations.YES || userChoice == ValidationsSwahili.YES)
+            {
+                return true;
+                
+            }
+            return false;
+
+        }
+
         private async Task<DialogTurnResult> BreathingExcercisesAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
 
@@ -151,27 +176,15 @@ namespace RedCrossChat.Dialogs
             }
             
 
-            //if (objectType.Name == "User" || stepContext.Result is Client)
-            //{
-
-            //    return await TakeUserThroughExerciseAsync(stepContext, cancellationToken);
-            //}
-
             var userChoice = ((FoundChoice)stepContext.Result)?.Value;
 
-            if (userChoice == Validations.NO)
+            if (WantsToContinue(stepContext))
             {
-
-                return await stepContext.EndDialogAsync(user);
-            }else if (userChoice == Validations.YES  || userChoice == ValidationsSwahili.YES)
+                return await stepContext.BeginDialogAsync(nameof(WaterfallDialog), user, cancellationToken);
+               
+            }else 
             {
-               return await stepContext.BeginDialogAsync(nameof(WaterfallDialog), user, cancellationToken);
-
-               // return await TakeUserThroughExerciseAsync(stepContext, cancellationToken);
-            }
-            else
-            {
-                return await stepContext.EndDialogAsync(null);
+                return await stepContext.NextAsync(user);
             }
 
         }
@@ -179,14 +192,14 @@ namespace RedCrossChat.Dialogs
 
         private async Task<DialogTurnResult> FinalStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            var userChoice = ((FoundChoice)stepContext.Result)?.Value;
+            //var userChoice = ((FoundChoice)stepContext.Result)?.Value;
 
             var user = (Client)stepContext.Options;
 
-            user.Iteration += user.Iteration;
+            //user.Iteration += user.Iteration;
 
 
-            if (userChoice !=null && userChoice==Validations.YES) return await stepContext.BeginDialogAsync(nameof(WaterfallDialog), user, cancellationToken);
+            //if (userChoice !=null && userChoice==Validations.YES) return await stepContext.BeginDialogAsync(nameof(WaterfallDialog), user, cancellationToken);
 
             return await stepContext.EndDialogAsync(user, cancellationToken);
 
