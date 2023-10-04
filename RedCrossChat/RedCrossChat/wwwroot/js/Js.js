@@ -35,7 +35,7 @@ function ShowHandOverRequest(request) {
 
 setInterval(function () {
 
-    CheckForHumanHandOverRequests();
+  //  CheckForHumanHandOverRequests();
 
     counter++;
 

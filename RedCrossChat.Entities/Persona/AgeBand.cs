@@ -18,6 +18,7 @@ namespace RedCrossChat.Entities
 
         public int Highest { get; set; }=0;
 
+
         public bool IsActive { get; set; }=true;
     }
 }

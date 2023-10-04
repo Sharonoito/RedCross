@@ -14971,7 +14971,7 @@ html:not(.layout-menu-fixed) .menu-inner-shadow {
 .menu-item {
   align-items: flex-start;
   justify-content: flex-start;
-}
+  color:#ff3e1d;
 .menu-item.menu-item-animating {
   transition: height 0.3s ease-in-out;
 }
@@ -15003,11 +15003,12 @@ html:not(.layout-menu-fixed) .menu-inner-shadow {
 }
 
 .menu-link {
-  position: relative;
-  display: flex;
-  align-items: center;
-  flex: 0 1 auto;
-  margin: 0;
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex: 0 1 auto;
+    margin: 0;
+    color: #ff3e1d;
 }
 .menu-item.disabled .menu-link {
   cursor: not-allowed !important;
@@ -15340,7 +15341,8 @@ html:not(.layout-menu-fixed) .menu-inner-shadow {
 }
 .layout-navbar[class*=bg-]:not(.bg-navbar-theme) .nav-item .input-group-text,
 .layout-navbar[class*=bg-]:not(.bg-navbar-theme) .nav-item .dropdown-toggle {
-  color: #fff;
+    /*color: #fff;*/
+    color: #ED1C24;
 }
 @media (max-width: 1199.98px) {
   .layout-navbar .navbar-nav .nav-item.dropdown .dropdown-menu {
@@ -15400,6 +15402,7 @@ html:not(.layout-menu-fixed) .menu-inner-shadow {
     top: 0;
     bottom: 0;
     left: 0;
+    color:#ff3e1d;
     margin-right: 0 !important;
     margin-left: 0 !important;
   }
