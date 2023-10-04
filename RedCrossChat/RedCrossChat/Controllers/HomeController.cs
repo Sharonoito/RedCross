@@ -26,12 +26,12 @@ namespace RedCrossChat
 
             var county=await _repository.County.FindAll().ToListAsync();
 
-            var ageBands = await _repository.AgeBand.FindAll().ToListAsync();
+            //var ageBands = await _repository.AgeBand.FindAll().ToListAsync();
 
             var genders=await _repository.Gender.FindAll().ToListAsync();
 
 
-            return View(new ReportVm { feelings=feelings,countys=county,Agebands=ageBands,Genders=genders });
+            return View(new ReportVm { feelings=feelings,countys=county,Genders=genders });
         }
 
         [HttpGet]

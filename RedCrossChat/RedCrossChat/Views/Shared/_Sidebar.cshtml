@@ -1,11 +1,34 @@
 ﻿@{
 }
+@*<style>
+  .custom-sidebar 
+  {
+     background-color: #ED1C24;
+     /*background-color: white;*/
+  }
 
-<aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
+  .custom-sidebar .menu-icon 
+  {
+     color: white;
+            
+  }
+
+  .custom-sidebar .menu-link {
+     /*color: #ED1C24;*/
+     color: white;
+            
+  }
+
+</style>*@
+
+<aside id="layout-menu" class="layout-menu menu-vertical menu bg-navbar-theme">
     <div class="app-brand demo">
         <a href="index.html" class="app-brand-link">
             <span class="app-brand-logo demo"></span>
-            <span class="app-brand-text demo menu-text fw-bolder ms-2">Kenya Red Cross</span>
+            <span class="app-brand-text demo menu-text fw-bolder ms-2">
+            <img src="~/img/KRCLOGO.png" alt="Kenya Red Cross Logo" class="brand-image"
+                >
+            </span>
         </a>
 
         <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto">

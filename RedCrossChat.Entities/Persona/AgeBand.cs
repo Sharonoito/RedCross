@@ -12,6 +12,8 @@ namespace RedCrossChat.Entities
 
         public string Kiswahili { get; set; }
 
+        public string Synonyms { get; set; }
+
         public bool IsActive { get; set; }=true;
     }
 }

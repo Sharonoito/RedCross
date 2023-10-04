@@ -13,5 +13,16 @@ namespace RedCrossChat.Repository
         public async Task<IEnumerable<Profession>> GetAll()
         => await FindAll().ToListAsync();
 
+        public async Task<IEnumerable<Profession>>GetAllAsync()
+        {
+            return await FindAll().ToListAsync();
+        }
+
     }
 }
+
+
+
+
+
+

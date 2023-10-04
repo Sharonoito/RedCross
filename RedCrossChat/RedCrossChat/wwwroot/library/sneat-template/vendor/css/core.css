@@ -15340,7 +15340,8 @@ html:not(.layout-menu-fixed) .menu-inner-shadow {
 }
 .layout-navbar[class*=bg-]:not(.bg-navbar-theme) .nav-item .input-group-text,
 .layout-navbar[class*=bg-]:not(.bg-navbar-theme) .nav-item .dropdown-toggle {
-  color: #fff;
+    /*color: #fff;*/
+    color: #ED1C24;
 }
 @media (max-width: 1199.98px) {
   .layout-navbar .navbar-nav .nav-item.dropdown .dropdown-menu {

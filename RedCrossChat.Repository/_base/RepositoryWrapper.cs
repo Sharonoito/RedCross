@@ -128,6 +128,7 @@ namespace RedCrossChat.Repository
         }
 
 
+
         public IAiConversationRepo? _aiConversation;
         public IAiConversationRepo AiConversation
         {

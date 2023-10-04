@@ -1,0 +1,52 @@
+﻿@using RedCrossChat.ViewModel;
+
+@model ProfessionVm
+
+@{
+    Layout = null;
+}
+
+<div class="modal-header">
+    <h5 class="modal-title">@ViewBag.Title</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+@using (Html.BeginForm(actionName: "SaveProfession", controllerName: "Config", FormMethod.Post, new { @class = "modal-Crud", data_modal = "clientModal", data_callback = "", data_table = "tblClients", autocomplete = "off", @id = "frmClient" }))
+{
+   
+    
+
+    <div class="modal-body">
+        <div class="row">
+            
+
+            <div class="form-group col-lg-12 mb-2">
+                <label asp-for="Name"></label>
+                <input asp-for="Name" class="form-control" autocomplete="off" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="form-group col-lg-12 mb-2">
+                <label asp-for="Kiswahili"></label>
+                <input asp-for="Kiswahili" class="form-control" autocomplete="off" />
+                <span asp-validation-for="Kiswahili" class="text-danger"></span>
+            </div>
+
+            <div class="form-group col-lg-12 mb-2">
+                <label asp-for="Synonyms"></label>
+                <input asp-for="Synonyms" class="form-control" autocomplete="off" />
+                <span asp-validation-for="Synonyms" class="text-danger"></span>
+            </div>
+
+          
+        </div>
+
+    </div>
+
+    <div class="modal-footer">
+       
+            <button type="submit" class="btn btn-primary me-sm-3 me-1 mt-3">Submit</button>
+            <button type="reset" class="btn btn-label-secondary btn-reset mt-3" data-bs-dismiss="modal" aria-label="Close">Cancel</button>
+        
+    </div>
+}
