@@ -5,6 +5,7 @@ using NuGet.Protocol.Core.Types;
 using RedCrossChat.Contracts;
 
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace RedCrossChat
@@ -26,7 +27,12 @@ namespace RedCrossChat
 
             var county=await _repository.County.FindAll().ToListAsync();
 
-            return View(new ReportVm { feelings=feelings,countys=county });
+            var ageBands = await _repository.AgeBand.GetAll();
+
+            var genders=await _repository.Gender.FindAll().ToListAsync();
+
+
+            return View(new ReportVm { feelings=feelings,countys=county,Genders=genders,Agebands=ageBands.ToList() });
         }
 
         [HttpGet]

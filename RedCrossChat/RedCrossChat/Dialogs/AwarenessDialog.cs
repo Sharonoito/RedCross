@@ -1,9 +1,12 @@
-﻿using Microsoft.Bot.Builder;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Dialogs.Choices;
 using Microsoft.Bot.Schema;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Clients.ActiveDirectory;
+using NuGet.Protocol.Core.Types;
 using RedCrossChat.Cards;
 using RedCrossChat.Contracts;
 using RedCrossChat.Entities;
@@ -28,7 +31,12 @@ namespace RedCrossChat.Dialogs
         private const string UserInfo = "user-info";
 
         protected string CurrentQuestion = "CurrentQuestion";
-        public AwarenessDialog(ILogger<AwarenessDialog> logger, IRepositoryWrapper wrapper, UserState userState) : base(nameof(AwarenessDialog))
+
+        public AwarenessDialog(
+            ILogger<AwarenessDialog> logger, 
+            IRepositoryWrapper wrapper, UserState userState,
+            HumanHandOverDialog humanHandOverDialog
+            ) : base(nameof(AwarenessDialog))
         {
 
             _repository = wrapper;
@@ -44,6 +52,8 @@ namespace RedCrossChat.Dialogs
             AddDialog(new ChoicePrompt("select-option"));
 
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), CreateWaterFallSteps()));
+
+            AddDialog(humanHandOverDialog);
    
             InitialDialogId = nameof(WaterfallDialog);
         }
@@ -254,16 +264,20 @@ namespace RedCrossChat.Dialogs
         {
             Client me = (Client)stepContext.Values[UserInfo];
 
+
             var question = me.language ? "Would you wish to talk to a Professional Counselor?" : "Je, ungependa kuongea na mshauri wa kitaalam?";
 
-            Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
+            var conversation = await _repository.Conversation.FindByCondition(x => x.ConversationId == stepContext.Context.Activity.Conversation.Id).FirstOrDefaultAsync();
 
-            persona.Reason = stepContext.Context.Activity.Text;
+            if(conversation !=null)
+            {
+                conversation.Reason = stepContext.Context.Activity.Text;
 
-            _repository.Persona.Update(persona);
+                _repository.Conversation.Update(conversation);
 
-            await _repository.SaveChangesAsync();
-
+                await _repository.SaveChangesAsync();
+            }
+           
             await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
 
             return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions()
@@ -279,13 +293,7 @@ namespace RedCrossChat.Dialogs
         {
             Client me = (Client)stepContext.Values[UserInfo];
 
-            Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
-
-            persona.HandedOver = true;
-
-            _repository.Persona.Update(persona);
-
-            await _repository.SaveChangesAsync();
+            var conversation = await _repository.Conversation.FindByCondition(x => x.ConversationId == stepContext.Context.Activity.Conversation.Id).FirstOrDefaultAsync();
 
             if (stepContext.Result != null)
             {
@@ -298,6 +306,17 @@ namespace RedCrossChat.Dialogs
 
                         me.HandOverToUser = true;
 
+                        /*Updating the database*/
+
+                        if (conversation != null)
+                        {
+                            conversation.HandedOver = true;
+
+                            _repository.Conversation.Update(conversation);
+
+                            await _repository.SaveChangesAsync();
+                        }
+
                         // Send the message to the user about the next available agent or calling 1199.
                         var agentMessage = me.language ? "The next available counsellor will call you shortly, you can also contact us directly by dialing 1199, request to speak to a psychologist.":
                             "Utaweza kuzungumza na mhudumu baada ya muda mfupi ama pia unaweza piga nambari 1199 ili kuongea na mshauri. Utaweza kupigiwa na mshauri baada ya muda mfupi, ama upige simu ili kuongea na mwanasaikolojia kupitia nambari 1199";
@@ -305,12 +324,16 @@ namespace RedCrossChat.Dialogs
 
 
                         var hotline = PersonalDialogCard.GetHotlineCard();
+                        var hotlineSwahili = PersonalDialogCard.GetHotlineCardKiswahili();
+
 
                         var attachment = new Attachment
                         {
                             ContentType = HeroCard.ContentType,
-                            Content =   hotline
+                 
+                            Content = !me.language ? hotlineSwahili : hotline,
                         };
+
 
                         var message = MessageFactory.Attachment(attachment);
                         await stepContext.Context.SendActivityAsync(message, cancellationToken);
@@ -320,6 +343,7 @@ namespace RedCrossChat.Dialogs
                             new Choice() { Value = "hotline", Action = new CardAction() { Title = "hotline", Type = ActionTypes.OpenUrl, Value = "https://referraldirectories.redcross.or.ke/" } }
                         };
 
+                       // return await stepContext.BeginDialogAsync(nameof(HumanHandOverDialog), me, cancellationToken);
 
                         return await stepContext.EndDialogAsync(me, cancellationToken);
 
@@ -337,7 +361,10 @@ namespace RedCrossChat.Dialogs
             return await stepContext.EndDialogAsync(me);
         }
 
-    }
+
 }
+}
+
+
 
 

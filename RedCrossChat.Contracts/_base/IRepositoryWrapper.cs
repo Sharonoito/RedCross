@@ -1,4 +1,5 @@
-﻿using RedCrossChat.Contracts.Dependencies;
+﻿
+
 
 namespace RedCrossChat.Contracts
 {
@@ -16,6 +17,13 @@ namespace RedCrossChat.Contracts
         IFeelingRepo Feeling { get; }
         ICountyRepo County { get; }
 
+        IGender Gender { get; }
+        IAgeBand AgeBand { get; }
+
+        IProfession Profession { get; } 
+
+        IMaritalState MaritalState { get; }
+
         #endregion
 
         #region Conversational
@@ -26,6 +34,8 @@ namespace RedCrossChat.Contracts
         IQuestion Question { get; }
 
         IQuestionOption QuestionOption { get; }
+
+         IHandOverRequest HandOverRequest { get; }
         #endregion
 
         IPersonaRepo Persona { get; }

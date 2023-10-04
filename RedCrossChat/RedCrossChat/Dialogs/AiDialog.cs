@@ -2,11 +2,13 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
+using Microsoft.Bot.Builder.Dialogs.Choices;
 using Microsoft.Bot.Connector;
 using Microsoft.Bot.Schema;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
+using RedCrossChat.Cards;
 using RedCrossChat.Contracts;
 using RedCrossChat.Entities;
 using RedCrossChat.Objects;
@@ -29,6 +31,8 @@ namespace RedCrossChat.Dialogs
 
         protected readonly string _iteration = "iteration";
 
+        private const string UserInfo = "Client-info";
+
         private readonly IStatePropertyAccessor<ResponseDto> _userProfileAccessor;
 
         protected readonly UserState _userState;
@@ -45,27 +49,77 @@ namespace RedCrossChat.Dialogs
 
             var waterFallSteps = new WaterfallStep[]
                {
+                    FirstTransactionAsync,
                     IntialTaskAsync,
                     FetchResultsAsync,
                     FinalStepAsync
                };
 
+            AddDialog(new TextPrompt("AI_PROMPT"));
+
+            AddDialog(new ChoicePrompt(nameof(ChoicePrompt)));
+
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), waterFallSteps));
+
+            InitialDialogId = nameof(WaterfallDialog);  //note : without this line of code the system will raise an Exception
         }
+
+        public async Task<DialogTurnResult> FirstTransactionAsync(WaterfallStepContext stepContext, CancellationToken token)
+        {
+            Client me = (Client)stepContext.Options;
+
+
+            var question = me.language ? "You are now interacting with an Generative AI-powered bot, do you wish to continue?" : "Sasa unaingiliana na kijibu kiitwacho Generative AI-powered, ungependa kuendelea?";
+
+            Conversation conversation = await _repository.Conversation
+                   .FindByCondition(x => x.ConversationId == stepContext.Context.Activity.Conversation.Id)
+                   .Include(x => x.AiConversations)
+                   .FirstAsync();
+
+            var options = new PromptOptions()
+            {
+                Prompt=MessageFactory.Text(question),
+                Choices= me.language ? RedCrossLists.choices : RedCrossLists.choicesKiswahili,
+                Style = ListStyle.HeroCard
+            };
+
+            if (conversation.AiConversations.Count != 0)
+            {
+                return await stepContext.NextAsync(me);
+            }
+
+            return await stepContext.PromptAsync(nameof(ChoicePrompt), options, token);
+        }
+
+
 
         public async Task<DialogTurnResult> IntialTaskAsync(WaterfallStepContext stepContext, CancellationToken token)
         {
+            Client me = (Client)stepContext.Options;
 
             Conversation conversation = await _repository.Conversation
                     .FindByCondition(x => x.ConversationId == stepContext.Context.Activity.Conversation.Id)
                     .Include(x => x.AiConversations)
                     .FirstAsync();
 
-            string question = "Ask me a question";
+            string question = me.language ? "Ask me a question":"Niulize swali";
 
             if (conversation.AiConversations.Count > 0)
             {
                 question = conversation.AiConversations.Last().Response;
+            }
+            else
+            {
+
+                switch (((FoundChoice)stepContext.Result).Value)
+                {
+                    case Validations.NO:
+                    case ValidationsSwahili.NO:
+                        return await stepContext.EndDialogAsync(); 
+                }
+
+
+               // await stepContext.Context.SendActivityAsync(MessageFactory.Text("You are now interacting with Chatgpt to exit or opt out type exit or cancel"));
             }
 
             var options = new PromptOptions();
@@ -75,12 +129,14 @@ namespace RedCrossChat.Dialogs
             //  await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
 
 
-            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = promptMessage }, token);
+            return await stepContext.PromptAsync("AI_PROMPT", new PromptOptions { Prompt = promptMessage }, token);
         }
 
         public async Task<DialogTurnResult> FetchResultsAsync(WaterfallStepContext stepContext, CancellationToken token)
         {
             var options = new PromptOptions();
+
+            Client me = (Client)stepContext.Options;
 
             try
             {
@@ -93,7 +149,7 @@ namespace RedCrossChat.Dialogs
 
                 string question = stepContext.Context.Activity.Text;
 
-                string response = await ChatGptDialog.GetChatGPTResponses(question, conversation.AiConversations);
+                string response = await ChatGptDialog.GetChatGPTResponses(question, conversation.AiConversations,me.language);
 
 
                 await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, response, stepContext, _userProfileAccessor, _userState);
@@ -124,7 +180,7 @@ namespace RedCrossChat.Dialogs
 
                 //await stepContext.Context.SendActivityAsync(MessageFactory.Text(response));
 
-                return await stepContext.BeginDialogAsync(nameof(WaterfallDialog), null, token);
+                return await stepContext.BeginDialogAsync(nameof(WaterfallDialog), me, token);
             }
             catch (Exception ex)
             {

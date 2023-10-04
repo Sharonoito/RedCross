@@ -31,6 +31,7 @@ namespace RedCrossChat.Dialogs
             CounselorDialog counselorDialog,
             PersonalDialog personalDialog,
             AiDialog aiDialog,
+            AwarenessDialog awarenessDialog,
             ILogger<MainDialog> logger, 
             IRepositoryWrapper wrapper,
             UserState userState)
@@ -51,7 +52,7 @@ namespace RedCrossChat.Dialogs
             AddDialog(counselorDialog);
             AddDialog(personalDialog);
             AddDialog(aiDialog);
-            // AddDialog(awarenessDialog);
+            AddDialog(awarenessDialog);
 
             var waterfallSteps = new WaterfallStep[]
             {
@@ -63,6 +64,7 @@ namespace RedCrossChat.Dialogs
                     CheckFeelingAsync,
                     EvaluateFeelingAsync,
                     HandleFeelingAsync,
+                    HandleAiHandOver,
                     RateBotAsync,
                     FinalStepAsync,
             };
@@ -73,16 +75,18 @@ namespace RedCrossChat.Dialogs
             InitialDialogId = nameof(WaterfallDialog);
         }
 
+       
+
         private async Task<DialogTurnResult> FirstStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             stepContext.Values[UserInfo] = new Client();
 
-            var question = "Hello dear friend!! Welcome to Kenya Red Cross Society.  Hujambo rafiki? Karibu katika Shirika la Msalaba Mwekundu ambapo tunatoa ushauri kupitia kwenye simu bila malipo yoyote. ?\r\n please select a language to continue, Tafadhali chagua lugha ndio tuendelee ku wasiliana";
+            var question = "To start Select language , Kuanza Chagua lugha";
 
             return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions
             {
                 Prompt = MessageFactory.Text(question),
-                RetryPrompt = MessageFactory.Text("Please select a valid question"),
+                RetryPrompt = MessageFactory.Text("Please select a langugae , Tafadhali Chagua Lugha"),
                 Choices = new List<Choice>()
                 {
                     new Choice("English"),
@@ -90,26 +94,24 @@ namespace RedCrossChat.Dialogs
                 },
                 // Style = stepContext.Context.Activity.ChannelId == "facebook" ? ListStyle.SuggestedAction : ListStyle.HeroCard,
                 Style = ListStyle.HeroCard,
-            }, cancellationToken); ;
+            }, cancellationToken);
+
+
         }
 
         private async Task<DialogTurnResult> IntroStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-
             Client client = (Client)stepContext.Values[UserInfo];
-
 
             var choiceValues = ((FoundChoice)stepContext.Result).Value;
 
-            if (choiceValues != null   && choiceValues == "Kiswahili")
+            if (choiceValues != null && choiceValues == "Kiswahili")
             {
                 client.language = !client.language;
             }
 
-
+         
             var question = client.language ?
-
-
                 "Hello dear friend!! Welcome to Kenya Red Cross Society, we are offering tele-counselling services to public at no charges . How can I help you today?\r\n" :
 
                 "Hujambo rafiki? Karibu katika Shirika la Msalaba Mwekundu ambapo tunatoa ushauri kupitia kwenye simu bila malipo yoyote. Je, ungependa nikusaidie vipi?";
@@ -133,12 +135,6 @@ namespace RedCrossChat.Dialogs
         {
             Client client = (Client)stepContext.Values[UserInfo];
 
-
-            //var knowledgeBaseCard = PersonalDialogCard.GetKnowledgeBaseCard();
-
-            //var career = PersonalDialogCard.GetKnowledgeCareerCard();
-
-
             var question = client.language ?
 
 
@@ -159,7 +155,7 @@ namespace RedCrossChat.Dialogs
             
 
             var mentalHealth = PersonalDialogCard.GetKnowYouCard();
-            var mentalHealth1 = PersonalDialogCard.GetKnowYouCardKiswahili();
+  
 
 
             var knowledgeBaseCard = PersonalDialogCard.GetKnowledgeCareerCard();
@@ -242,17 +238,14 @@ namespace RedCrossChat.Dialogs
                 return await stepContext.EndDialogAsync(null);
             }
 
-            var termsAndConditionsCard = PersonalDialogCard.GetKnowYouCard();
-            var termsAndConditionsCardSwahili = PersonalDialogCard.GetKnowYouCardKiswahili();
-
-
+            var termsAndConditionsCard = PersonalDialogCard.GetKnowYouCard(me.language);
+            
 
             var attachment = new Attachment
             {
                 ContentType = HeroCard.ContentType,
-                //Content = termsAndConditionsCard
-                Content = !me.language
-                  ? termsAndConditionsCardSwahili: termsAndConditionsCard
+                
+                Content =  termsAndConditionsCard
 
             };
 
@@ -303,11 +296,21 @@ namespace RedCrossChat.Dialogs
 
             var question = me.language?  "How would you describe how you are feeling today?" : "Je, unajihisi vipi leo?";
 
+
+            var feelings = await _repository.Feeling.GetAll();
+
+            var choices=new List<Choice>();
+
+            foreach (var choice in feelings)
+            {
+                choices.Add(new Choice() { Value = me.language ? choice.Description : choice.Kiswahili });
+            }
+
             var options = new PromptOptions()
             {
                 Prompt = MessageFactory.Text(question),
                 RetryPrompt = MessageFactory.Text(me.language? "Please select a valid feeling" : "Tafadhali fanya chaguo sahihi"),
-                Choices =  me.language ? RedCrossLists.FeelingsList : RedCrossLists.FeelingsKiswahili,
+                Choices =  choices,
                 Style = ListStyle.HeroCard,
 
             };
@@ -320,11 +323,13 @@ namespace RedCrossChat.Dialogs
         {
             Client me = (Client)stepContext.Values[UserInfo];
 
-            var question = "Please Specify the feeling ";
+            var question =me.language? "Please Specify the feeling "  : "Tafadhali Bainisha hisia";
 
-            if (((FoundChoice)stepContext.Result).Value == Feelings.Other)
+            var response = stepContext.Context.Activity.Text;
+
+            if (response.ToLower().Trim() == "other" || response.ToLower() == "zinginezo")
             {
-                await DialogExtensions.UpdateDialogAnswer(((FoundChoice)stepContext.Result).Value.ToString(), question, stepContext, _userProfileAccessor, _userState);
+                await DialogExtensions.UpdateDialogAnswer(response, question, stepContext, _userProfileAccessor, _userState);
 
                 return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text(question) }, token);
             }
@@ -333,58 +338,98 @@ namespace RedCrossChat.Dialogs
                 .FindByCondition(x => x.ConversationId == stepContext.Context.Activity.Conversation.Id)
                 .Include(x => x.Persona)
                 .FirstOrDefaultAsync();
+
+           // var item = response.ToLower().Trim() == "other";
+
+            if (conversation != null)
+            {
+                me.ConversationId = conversation.Id;
+
+                Persona persona = conversation?.Persona;
+
+                var feeling = await _repository.Feeling.FindByCondition(x => x.Description == response || x.Kiswahili == response).FirstOrDefaultAsync();
+
+                persona.FeelingId = feeling.Id;
+
+                _repository.Persona.Update(persona);
+
+                await _repository.SaveChangesAsync();
+               
+            }
+
+            return await stepContext.NextAsync(me);
+
             
+
+        }
+
+        private async Task<DialogTurnResult> HandleFeelingAsync(WaterfallStepContext stepContext,CancellationToken token)
+        {
+            Client me = (Client)stepContext.Values[UserInfo];
+
+         
+            if (stepContext.Result is not Client)
+            {
+                //Save response to the question
+                
+            }
+
+            Conversation conversation = await _repository.Conversation
+                    .FindByCondition(x => x.ConversationId == stepContext.Context.Activity.Conversation.Id)
+                    .Include(x => x.Persona)
+                    .FirstOrDefaultAsync();
+
             if (conversation.IsReturnClient)
             {
                 return await stepContext.BeginDialogAsync(nameof(AwarenessDialog), me, token);
             }
             else
             {
-                Persona persona = conversation?.Persona;
-
-                persona.Feeling = stepContext.Context.Activity.Text;
-
-                _repository.Persona.Update(persona);
-
-                await _repository.SaveChangesAsync();
-
                 return await stepContext.BeginDialogAsync(nameof(PersonalDialog), me, token);
             }
 
         }
 
-        private async Task<DialogTurnResult> HandleFeelingAsync(WaterfallStepContext stepContext,CancellationToken cancellationToken)
+        private async Task<DialogTurnResult> HandleAiHandOver(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            Conversation conversation = await _repository.Conversation.FindByCondition(x => x.ConversationId == stepContext.Context.Activity.Conversation.Id).FirstOrDefaultAsync();
+            Client me = (Client)stepContext.Values[UserInfo];
 
-            if (conversation.IsReturnClient)
+            return await stepContext.BeginDialogAsync(nameof(AiDialog),me,cancellationToken);
+        }
+
+        private async Task<DialogTurnResult> RateBotAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        {
+            Client me = (Client)stepContext.Values[UserInfo];
+
+
+            //todo recognize repeat clients
+
+            var options = new PromptOptions()
             {
-                return await stepContext.BeginDialogAsync(nameof(AwarenessDialog), null, cancellationToken);
-            }
-            else
-            {
+                Prompt = MessageFactory.Text(me.language ? "How would you rate your experience.with the bot?": "Je, unaweza kukadiria vipi uzoefu wako ? "),
+                RetryPrompt = MessageFactory.Text(me.language ?  "Please select a valid option ('Yes' or 'No')." : "Tafadhali fanya chaguo sahihi"),
+                Choices = RedCrossLists.GetRating(me.language),
+                Style = ListStyle.HeroCard,
+            };
 
-                //Persona persona = conversation?.Persona;
+            return await stepContext.PromptAsync(nameof(ChoicePrompt), options, cancellationToken);
+        }
 
-                //persona.Feeling = stepContext.Context.Activity.Text;
+        private async Task<DialogTurnResult> FinalStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        {
+            var ratingChoice = ((FoundChoice)stepContext.Result).Value;
 
-                //_repository.Persona.Update(persona);
+            Client me = (Client)stepContext.Values[UserInfo];
 
-                //await _repository.SaveChangesAsync();
+            await stepContext.Context.SendActivityAsync(MessageFactory.Text(me.language ? "Thank you for your feedback. We value your input!": " Asante kwa maoni yako. Tunathamini mchango wako"));
 
-                //handle with AI or Human too: Ambrose
-
-                return await stepContext.BeginDialogAsync(nameof(PersonalDialog), null, cancellationToken);
-            }
-
-            
+            return await stepContext.EndDialogAsync(null, cancellationToken);
         }
 
         private async Task<Conversation> CreateConversationDBInstance(WaterfallStepContext stepContext)
         {
            
-            var persona=await  _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstOrDefaultAsync();
-
+            var persona= await  _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstOrDefaultAsync();
 
             Conversation conversation = new()
             {
@@ -396,61 +441,44 @@ namespace RedCrossChat.Dialogs
 
                 ConversationId = stepContext.Context.Activity.Conversation.Id,
 
-                Persona = persona == null? new Persona() { SenderId = stepContext.Context.Activity.From.Id } : persona,
-
                 AiConversations = new List<AiConversation>(),
 
-                IsReturnClient= persona != null
+                IsReturnClient = persona != null
             };
 
+            if (persona != null)
+            {
+                conversation.PersonaId=persona.Id;
+            }
+            else
+            {
+                conversation.Persona = new Persona() { SenderId = stepContext.Context.Activity.From.Id };
+            }
 
-            _repository.Conversation.Create(conversation);
+            try
+            {
+                _repository.Conversation.Create(conversation);
 
-            bool result = await _repository.SaveChangesAsync();
+                bool result = await _repository.SaveChangesAsync();
 
-            if (result)
+                if (result)
+                {
+
+                }
+            }
+            catch(Exception)
             {
 
             }
+
+           
 
             await DialogExtensions.UpdateDialogConversationId(conversation.Id, stepContext, _userProfileAccessor, _userState);
 
             return conversation;
         }
 
-        private async Task<DialogTurnResult> HandleAiInteractions(WaterfallStepContext stepContext, CancellationToken cancellationToken)
-        {
-            return await stepContext.BeginDialogAsync(nameof(AiDialog), null, cancellationToken);
-        }
-
-        private async Task<DialogTurnResult> RateBotAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
-        {
-            var options = new PromptOptions()
-            {
-                Prompt = MessageFactory.Text("How would you rate your experience.with the bot?"),
-                RetryPrompt = MessageFactory.Text("Please select a valid option ('Yes' or 'No')."),
-                Choices = RedCrossLists.Ratings,
-                Style = ListStyle.HeroCard,
-            };
-
-            return await stepContext.PromptAsync(nameof(ChoicePrompt), options, cancellationToken);
-        }
- 
-        private async Task<DialogTurnResult> FinalStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
-        {
-            var ratingChoice = ((FoundChoice)stepContext.Result).Value;
-
-            if (ratingChoice.Equals("PositiveChoice"))  
-            {
-                await stepContext.Context.SendActivityAsync(MessageFactory.Text("Thank you for your positive feedback! We're glad you had a great experience."));
-            }
-            else
-            {
-                await stepContext.Context.SendActivityAsync(MessageFactory.Text("Thank you for your feedback. We value your input!"));
-            }
-
-            return await stepContext.EndDialogAsync(null, cancellationToken);
-        }
+      
 
     }
 }

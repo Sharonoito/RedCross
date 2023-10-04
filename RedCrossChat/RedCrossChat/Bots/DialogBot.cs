@@ -52,6 +52,7 @@ namespace RedCrossChat.Bots
         
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
+            //Microsoft.Bot.Configuration.BotConfiguration.
            
             var responseDto = await GetUserProfile(turnContext, cancellationToken);
 

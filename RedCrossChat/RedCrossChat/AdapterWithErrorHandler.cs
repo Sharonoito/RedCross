@@ -25,12 +25,12 @@ namespace RedCrossChat
 
                 // Send a message to the user
 
-                
+
                 var errorMessageText = $"The bot encountered an error or bug. {exception.Message}";
                 var errorMessage = MessageFactory.Text(errorMessageText, errorMessageText, InputHints.ExpectingInput);
                 await turnContext.SendActivityAsync(errorMessage);
 
-                if(exception.InnerException != null)
+                if (exception.InnerException != null)
                 {
                     errorMessageText = $"The bot encountered an error or bug. {exception.InnerException}";
                     errorMessage = MessageFactory.Text(errorMessageText, errorMessageText, InputHints.ExpectingInput);
@@ -40,7 +40,7 @@ namespace RedCrossChat
                 {
 
                 }
-                 
+
 
                 errorMessageText = "To continue to run this bot, please fix the bot source code.";
                 errorMessage = MessageFactory.Text(errorMessageText, errorMessageText, InputHints.ExpectingInput);
@@ -64,6 +64,7 @@ namespace RedCrossChat
                 // Send a trace activity, which will be displayed in the Bot Framework Emulator
                 await turnContext.TraceActivityAsync("OnTurnError Trace", exception.Message, "https://www.botframework.com/schemas/error", "TurnError");
             };
+            
         }
     }
 }

@@ -6,5 +6,7 @@
         public string Exercise;
 
         public int Value;
+
+        public string Kiswahili;
     }
 }

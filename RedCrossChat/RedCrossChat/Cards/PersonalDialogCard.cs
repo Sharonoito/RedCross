@@ -5,29 +5,19 @@ namespace RedCrossChat.Cards
 {
     public class PersonalDialogCard
     {
-        public static HeroCard GetKnowYouCard()
+        public static HeroCard GetKnowYouCard(bool language=true)
         {
             return new HeroCard
             {
 
                 Title = "Redcross Chat bot",
-                Subtitle = "Terms and Conditions",
-                Text = "We would like to know more about you ? Please accept terms and conditions below to continue.",
-                Buttons = new List<CardAction> { new CardAction(ActionTypes.OpenUrl, "Terms and Conditions", value: "https://www.redcross.or.ke/ASSETS/DATA-PROTECTION-POLICY.pdf") },
+                Subtitle = language? "Terms and Conditions" : "Sheria na Masharti",
+                Text = language ? "We would like to know more about you ? Please accept terms and conditions below to continue.": "Tungependa kukufahamu zaidi ya ulivyotueleza. Ili kuendelea, tafadhali kubali sheria na masharti yafuatayo",
+                Buttons = new List<CardAction> { new CardAction(ActionTypes.OpenUrl,language? "Terms and Conditions" : "Sheria na Masharti", value: "https://www.redcross.or.ke/ASSETS/DATA-PROTECTION-POLICY.pdf") },
             };
         }
 
-        public static HeroCard GetKnowYouCardKiswahili()
-        {
-            return new HeroCard
-            {
-
-                Title = "Redcross Chat bot",
-                Subtitle = "Sheria na Masharti",
-                Text = "Tungependa kukufahamu zaidi ya ulivyotueleza. Ili kuendelea, tafadhali kubali sheria na masharti yafuatayo",
-                Buttons = new List<CardAction> { new CardAction(ActionTypes.OpenUrl, "Sheria na Masharti", value: "https://www.redcross.or.ke/ASSETS/DATA-PROTECTION-POLICY.pdf") },
-            };
-        }
+        
         public static HeroCard GetKnowledgeBaseCard()
         {
             var heroCard = new HeroCard
