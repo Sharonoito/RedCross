@@ -11,6 +11,7 @@ using Microsoft.Bot.Builder;
 using Microsoft.Bot.Connector.Authentication;
 using RedCrossChat.Contracts;
 using RedCrossChat.Repository;
+using Microsoft.Bot.Builder.Dialogs;
 
 namespace RedCrossChat.Extensions
 {
@@ -83,6 +84,8 @@ namespace RedCrossChat.Extensions
 
             // Register LUIS recognizer
             services.AddSingleton<FlightBookingRecognizer>();
+
+          //  services.AddScoped<DialogSet>();
         }
 
         public static void ConfigureServicesMvcAndAuthentication(this IServiceCollection services)

@@ -41,7 +41,7 @@ namespace RedCrossChat.Dialogs
 
             var text=innerDc.Context.Activity.Text.ToLowerInvariant();
 
-            if (!string.IsNullOrEmpty(text) && (text.ToLower() == "help" || text.ToLower() == "cancel"))
+            if (!string.IsNullOrEmpty(text) && (text.ToLower() == "help" || text.ToLower() == "cancel" || text.ToLower() == "exit" || text.ToLower()== "quit")     )
             {
                // var text = innerDc.Context.Activity.Text.ToLowerInvariant();
 

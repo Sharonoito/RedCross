@@ -81,12 +81,12 @@ namespace RedCrossChat.Dialogs
         {
             stepContext.Values[UserInfo] = new Client();
 
-            var question = "To start Select language , Kuanza Chagua lugha";
+            var question = "To start Select language, Kuanza Chagua lugha";
 
             return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions
             {
                 Prompt = MessageFactory.Text(question),
-                RetryPrompt = MessageFactory.Text("Please select a langugae , Tafadhali Chagua Lugha"),
+                RetryPrompt = MessageFactory.Text("Please select a language, Tafadhali Chagua Lugha"),
                 Choices = new List<Choice>()
                 {
                     new Choice("English"),
@@ -275,7 +275,7 @@ namespace RedCrossChat.Dialogs
             if (confirmation.Equals(Validations.YES, StringComparison.OrdinalIgnoreCase) ||  confirmation.Equals(ValidationsSwahili.YES, StringComparison.OrdinalIgnoreCase))
             {
                 if (me.language) 
-                await stepContext.Context.SendActivityAsync(MessageFactory.Text("To exit the bot \n type exit or cancel at any point ."));
+                await stepContext.Context.SendActivityAsync(MessageFactory.Text("To exit the bot type exit or cancel at any point ."));
 
                 return await stepContext.NextAsync(null);
   

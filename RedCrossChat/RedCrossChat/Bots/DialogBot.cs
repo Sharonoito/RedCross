@@ -19,14 +19,17 @@ namespace RedCrossChat.Bots
         where T : Dialog
     {
         protected readonly Dialog Dialog ;
+
+        protected readonly DialogSet dialogSet;
         protected readonly BotState ConversationState ;
         protected readonly BotState UserState ;
         protected readonly ILogger Logger ;
 
         private readonly IRepositoryWrapper _repository;
         protected readonly DialogSet _dialog;
-        private readonly IStatePropertyAccessor<ResponseDto> _userProfileAccessor; 
-            
+        private readonly IStatePropertyAccessor<ResponseDto> _userProfileAccessor;
+
+        //calling the dialog context's cancel all dialogs
 
         public DialogBot(ConversationState conversationState, UserState userState, T dialog, ILogger<DialogBot<T>> logger, IRepositoryWrapper repository)
         {
@@ -35,13 +38,16 @@ namespace RedCrossChat.Bots
             Dialog = dialog;
             Logger = logger;
             _repository = repository;
-            _userProfileAccessor =
-            userState.CreateProperty<ResponseDto>(DialogConstants.ProfileAssesor);
+            _userProfileAccessor = userState.CreateProperty<ResponseDto>(DialogConstants.ProfileAssesor);
+
+            this.dialogSet = new DialogSet(conversationState.CreateProperty<DialogState>("DialogState"));
         }
 
         public override async Task OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken = default)
         {
            await base.OnTurnAsync(turnContext, cancellationToken);
+
+          
 
             // Save any state changes that might have occured during the turn.
             await ConversationState.SaveChangesAsync(turnContext, false, cancellationToken);
@@ -49,11 +55,38 @@ namespace RedCrossChat.Bots
 
 
         }
-        
+
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
             //Microsoft.Bot.Configuration.BotConfiguration.
-           
+
+            if (turnContext.Activity.Type == ActivityTypes.Message)
+            {
+                var userInput = turnContext.Activity.Text.ToLowerInvariant();
+
+                if (userInput == "exit"  || userInput == "cancel"  || userInput == "toka" || userInput == "end")
+                {
+                    // Cancel all active dialogs
+                    /*
+                                        var endOfConversationActivity = Activity.CreateEndOfConversationActivity();
+                                        await turnContext.SendActivityAsync(endOfConversationActivity, cancellationToken);
+                                        await Dialog.EndDialogAsync(turnContext, null, DialogReason.EndCalled, cancellationToken);
+                                        // Optionally, you can send a message to confirm the exit
+                                        await turnContext.SendActivityAsync("You have exited the conversation. Type anything to start a new conversation.");*/
+
+                    var dialogContext = await dialogSet.CreateContextAsync(turnContext, cancellationToken);
+
+                    // Cancel all active dialogs
+                    await dialogContext.CancelAllDialogsAsync(cancellationToken);
+
+                    // Optionally, you can send a message to confirm the exit
+                    await turnContext.SendActivityAsync("You have exited the conversation. Type anything to start a new conversation. \r\nUmetoka kwenye mazungumzo. Andika chochote ili kuanzisha mazungumzo mapya");
+
+
+                    return;
+                }
+            }
+
             var responseDto = await GetUserProfile(turnContext, cancellationToken);
 
             // Run the Dialog with the new message Activity.
