@@ -60,31 +60,21 @@ namespace RedCrossChat.Bots
         {
             //Microsoft.Bot.Configuration.BotConfiguration.
 
-            if (turnContext.Activity.Type == ActivityTypes.Message)
+            var userInput = turnContext.Activity.Text.ToLowerInvariant();
+
+            if (userInput == "exit" || userInput == "cancel" || userInput == "toka" || userInput == "end")
             {
-                var userInput = turnContext.Activity.Text.ToLowerInvariant();
+              
+                var dialogContext = await dialogSet.CreateContextAsync(turnContext, cancellationToken);
 
-                if (userInput == "exit"  || userInput == "cancel"  || userInput == "toka" || userInput == "end")
-                {
-                    // Cancel all active dialogs
-                    /*
-                                        var endOfConversationActivity = Activity.CreateEndOfConversationActivity();
-                                        await turnContext.SendActivityAsync(endOfConversationActivity, cancellationToken);
-                                        await Dialog.EndDialogAsync(turnContext, null, DialogReason.EndCalled, cancellationToken);
-                                        // Optionally, you can send a message to confirm the exit
-                                        await turnContext.SendActivityAsync("You have exited the conversation. Type anything to start a new conversation.");*/
+                // Cancel all active dialogs
+                await dialogContext.CancelAllDialogsAsync(cancellationToken);
 
-                    var dialogContext = await dialogSet.CreateContextAsync(turnContext, cancellationToken);
-
-                    // Cancel all active dialogs
-                    await dialogContext.CancelAllDialogsAsync(cancellationToken);
-
-                    // Optionally, you can send a message to confirm the exit
-                    await turnContext.SendActivityAsync("You have exited the conversation. Type anything to start a new conversation. \r\nUmetoka kwenye mazungumzo. Andika chochote ili kuanzisha mazungumzo mapya");
+                // Optionally, you can send a message to confirm the exit
+                await turnContext.SendActivityAsync("You have exited the conversation. Type anything to start a new conversation. \r\nUmetoka kwenye mazungumzo. Andika chochote ili kuanzisha mazungumzo mapya");
 
 
-                    return;
-                }
+                return;
             }
 
             var responseDto = await GetUserProfile(turnContext, cancellationToken);
