@@ -103,6 +103,7 @@ namespace RedCrossChat.Controllers
                     Id = feelingEntity.Id,
                     Name = feelingEntity.Name,
                     Description = feelingEntity.Description,
+                    Kiswahili=feelingEntity.Kiswahili,
                     Synonyms = feelingEntity.Synonymns
                 };
 
@@ -158,7 +159,7 @@ namespace RedCrossChat.Controllers
                     {
                         Name = feeling.Name,
                         Description = feeling.Description,
-                        Kiswahili="TODO",
+                        Kiswahili=feeling.Kiswahili,
                         Synonymns = feeling.Synonyms
                     };
 

@@ -33,6 +33,8 @@ namespace RedCrossChat.Domain
 
         public DbSet<Conversation> Conversation { get; set; }
 
+        public DbSet<HandOverRequest> HandOverRequest { get; set; }
+
         public DbSet<DBFeeling> Feeling { get; set; }
 
         public DbSet<DBCounty> County { get; set; }

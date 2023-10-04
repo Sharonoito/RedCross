@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
 
 namespace RedCrossChat.Entities
 {
@@ -15,6 +11,10 @@ namespace RedCrossChat.Entities
         public Conversation? Conversation { get; set; }
 
         public bool IsReply { get; set; }=false;
+
+        public bool IsHandOverMessage { get; set; }=false;
+
+        public bool HasReply { get; set; } =false;
 
         public Guid ConversationId { get; set; }
 

@@ -31,7 +31,12 @@ namespace RedCrossChat.Dialogs
         private const string UserInfo = "user-info";
 
         protected string CurrentQuestion = "CurrentQuestion";
-        public AwarenessDialog(ILogger<AwarenessDialog> logger, IRepositoryWrapper wrapper, UserState userState) : base(nameof(AwarenessDialog))
+
+        public AwarenessDialog(
+            ILogger<AwarenessDialog> logger, 
+            IRepositoryWrapper wrapper, UserState userState,
+            HumanHandOverDialog humanHandOverDialog
+            ) : base(nameof(AwarenessDialog))
         {
 
             _repository = wrapper;
@@ -47,6 +52,8 @@ namespace RedCrossChat.Dialogs
             AddDialog(new ChoicePrompt("select-option"));
 
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), CreateWaterFallSteps()));
+
+            AddDialog(humanHandOverDialog);
    
             InitialDialogId = nameof(WaterfallDialog);
         }
@@ -335,6 +342,8 @@ namespace RedCrossChat.Dialogs
                         {
                             new Choice() { Value = "hotline", Action = new CardAction() { Title = "hotline", Type = ActionTypes.OpenUrl, Value = "https://referraldirectories.redcross.or.ke/" } }
                         };
+
+                       // return await stepContext.BeginDialogAsync(nameof(HumanHandOverDialog), me, cancellationToken);
 
                         return await stepContext.EndDialogAsync(me, cancellationToken);
 

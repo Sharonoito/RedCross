@@ -63,67 +63,6 @@ namespace RedCrossChat.Objects
             new Choice() { Value = InitialActionsKiswahili.VolunteerOpportunities, Synonyms = new List<string> { "3", "Volunteer", "Opportunities" } },
             new Choice() { Value = InitialActionsKiswahili.MentalHealth, Synonyms = new List<string> { "4", "Mental", "mental", "mental Health", "Mental Health", "Help" } }
         };
-
-
-       
-
-        public static List<Choice> RelationShips = new()
-        {
-            new Choice  { Value ="Single",Synonyms=new List<string>{"Single","S"}},
-            new Choice  { Value ="Married",Synonyms=new List<string>{"married"}},
-            new Choice  { Value ="Divorced",Synonyms=new List<string>{"divorced"}},
-            new Choice  { Value ="In A relationship",Synonyms=new List<string>{"dating","relations","casual"}},
-            new Choice  { Value ="Widow /Widower",Synonyms=new List<string>{"widow","widower"}},
-            new Choice  { Value ="Complicated",Synonyms=new List<string>{"complicated","comp","it's complicated"}},
-            new Choice  { Value ="none",Synonyms=new List<string>{"none","no"}},
-        };
-        //Single, Married, Divorced, In a relationship, Widow / Widower, Complicated , Nimeoa/olewa, Nimetaliki, Niko kwenye mahusiano, Mjane
-        public static List<Choice> RelationShipKiwahili = new()
-        {
-            new Choice  { Value ="Sijaoa/olewa",Synonyms=new List<string>{"Single","S"}},
-            new Choice  { Value ="Nimeoa/olewa",Synonyms=new List<string>{"married"}},
-            new Choice  { Value ="Nimetaliki",Synonyms=new List<string>{"divorced"}},
-            new Choice  { Value ="Niko kwenye mahusiano",Synonyms=new List<string>{"dating","relations","casual"}},
-            new Choice  { Value ="Mjane",Synonyms=new List<string>{"widow","widower"}},
-            new Choice  { Value ="Sitaki kusema",Synonyms=new List<string>{"none","no"}},
-        };
-
-        public static List<Choice> ProfessionalOptions = new ()
-        {
-            new Choice  { Value ="Student",},
-            new Choice  { Value ="Employed",},
-            new Choice  { Value ="Entrepreneur"},
-            new Choice  { Value ="Retired"},
-            new Choice  { Value ="Unemployed"},
-            new Choice  { Value ="Complicated"},
-            new Choice  { Value ="none",Synonyms=new List<string>{"none","no"}},
-        };
-        //Student, Employed, Unemployed, Entrepreneur, Retired Mwanafunzi/Bado Nasoma, Nafanya kazi, Sina kazi, Mfanyabiashara, Nimestaafu
-
-        public static List<Choice> ProfessionalOptionsKiswahili = new()
-        {
-            new Choice  { Value ="Mwanafunzi/Bado Nasoma",},
-            new Choice  { Value ="Nafanya kazi",},
-            new Choice  { Value ="Sina kazi"},
-            new Choice  { Value ="Mfanyabiashara"},
-            new Choice  { Value ="Nimestaafu"},
-            new Choice  { Value ="Sitaki kusema",Synonyms=new List<string>{"none","no"}},
-        };
-
-        public static List<Choice> Genders = new List<Choice>
-        {
-            new Choice() { Value = Gender.Male,Synonyms=new List<string>{"M","Man","MALE","y"}},
-            new Choice() { Value= Gender.Female,Synonyms=new List<string>{"f","fE","FEMALE","female"}},
-            new Choice() { Value= Gender.Other,Synonyms=new List<string>{"o","other"}},
-        };
-
-        public static List<Choice> GenderKiswahili = new List<Choice>
-        {
-            new Choice() { Value = GenderSwahili.Male,Synonyms=new List<string>{"M","Man","MALE","y"}},
-            new Choice() { Value = GenderSwahili.Female,Synonyms=new List<string>{"f","fE","FEMALE","female"}},
-            new Choice() { Value = GenderSwahili.Other,Synonyms=new List<string>{"o","other"}},
-        };
-
         public static List<Choice> Countrys = new List<Choice>
         {
             new Choice() { Value = CountryValidation.Kenya,Synonyms=new List<string>{"Kenya","KENYA"}},

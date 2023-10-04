@@ -16,5 +16,8 @@ namespace RedCrossChat.ViewModel
         [Display(Name = "Synonyms")]
         public string Synonyms { get; set; }
 
+        [Display(Name = "Swahili")]
+        public string Kiswahili { get; set; }
+
     }
 }

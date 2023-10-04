@@ -17,9 +17,7 @@ namespace RedCrossChat
         private static readonly string _apiKey = "6faaad33f68d445c9d8f7f32afe041bc";
         
         private static readonly string AzureOpenAIEndpoint = "https://redcross-2023-connect-7abc-xyz.openai.azure.com/";
-        
-      //  private static readonly string OpenAIEndpoint = "https://api.openai.com/v1/chat/completions";
-
+       
         public static async Task<string> GetChatGPTResponses(string prompt,List<AiConversation> aiConversations,bool language=true)
         {
             var openAiClient = new OpenAIClient(
@@ -39,7 +37,7 @@ namespace RedCrossChat
                 Messages =
                 {
                     new ChatMessage(ChatRole.System, "You are a Counselor helping people with mental and social issues."+( !language ? "respond in swahili" : "")),
-                   // new ChatMessage(ChatRole.User, "Introduce yourself."),x
+                  
                 },
             };
 
@@ -64,7 +62,7 @@ namespace RedCrossChat
                 return assistantResponse.Content;
             }
 
-            ///return prompt;
+            
         }
     }
 }

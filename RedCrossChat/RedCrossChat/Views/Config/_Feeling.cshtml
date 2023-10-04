@@ -11,10 +11,10 @@
     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 </div>
 
-@using (Html.BeginForm(actionName: "SaveFeeling", controllerName: "Config", FormMethod.Post, new { @class = "modal-Crud", data_modal = "clientModal", data_callback = "", data_table = "tblClients", autocomplete = "off", @id = "frmClient" }))
+@using (Html.BeginForm(actionName: "SaveFeeling", controllerName: "Config", FormMethod.Post, new { @class = "modal-Crud", data_modal = "clientModal", data_callback = "", data_table = "tblFeelings", autocomplete = "off", @id = "frmClient" }))
 {
-   
-    
+
+    <input type="hidden" asp-for="Id">
 
     <div class="modal-body">
         <div class="row">
@@ -30,6 +30,12 @@
                 <label asp-for="Description"></label>
                 <input asp-for="Description" class="form-control" autocomplete="off" />
                 <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+            <div class="form-group col-lg-12 mb-2">
+                <label asp-for="Kiswahili"></label>
+                <input asp-for="Kiswahili" class="form-control" autocomplete="off" />
+                <span asp-validation-for="Kiswahili" class="text-danger"></span>
             </div>
 
             <div class="form-group col-lg-12 mb-2">

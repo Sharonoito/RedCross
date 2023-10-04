@@ -34,6 +34,8 @@ namespace RedCrossChat.Contracts
         IQuestion Question { get; }
 
         IQuestionOption QuestionOption { get; }
+
+         IHandOverRequest HandOverRequest { get; }
         #endregion
 
         IPersonaRepo Persona { get; }

@@ -5,8 +5,8 @@
     <div class="app-brand demo">
         <a href="index.html" class="app-brand-link">
             <span class="app-brand-logo demo"></span>
-            <span class="app-brand-text demo menu-text fw-bolder ms-2">
-                <img src="~/img/KRCLOGO.png" alt="Kenya Red Cross Logo" class="brand-image" style="object-fit:contain">
+            <span class="app-brand-text demo menu-text fw-bolder ms-2" >
+                <img src="~/img/KRCLOGO.png" alt="Kenya Red Cross Logo" class="brand-image" style="object-fit:contain;width: 60%">
             </span>
         </a>
 
@@ -19,41 +19,41 @@
 
     <ul class="menu-inner py-1">
         <!-- Dashboards -->
-        <li class="menu-item @Html.IsSelected(controller: "Home", action: "Dashboard") ">
-            <a href="/" class="menu-link">
+        <li class="menu-item   @Html.IsSelected(controller: "Home", action: "Dashboard") ">
+            <a href="/" class="menu-link  bg-danger text-white">
                 <i class="menu-icon tf-icons bx bx-home-circle"></i>
                 <div data-i18n="Dashboards"></div>
             </a>
         </li>
 
         <li class="menu-item @Html.IsSelected(controller: "Conversation", action: "List")">
-            <a asp-action="List" asp-controller="Conversation" class="menu-link ">
-                <i class="menu-icon tf-icons bx bx-chat"></i>
+            <a asp-action="List" asp-controller="Conversation" class="menu-link bg-danger text-white">
+                <i class="menu-icon tf-icons bx bx-chat text-white"></i>
                 <div data-i18n="Conversations"></div>
             </a>
         </li>
 
         <li class="menu-item" style="">
-            <a href="javascript:void(0);" class="menu-link menu-toggle">
+            <a href="javascript:void(0);" class="menu-link menu-toggle bg-danger text-white">
                 <i class="menu-icon tf-icons bx bx-book-open"></i>
                 <div class="text-truncate" data-i18n="Config"></div>
             </a>
             <ul class="menu-sub">
                 <li class="menu-item @Html.IsSelected(controller: "Config", action: "Feeling") ">
-                    <a asp-action="Feeling" asp-controller="Config" class="menu-link">
+                    <a asp-action="Feeling" asp-controller="Config" class="menu-link bg-danger text-white">
                         <i class="menu-icon tf-icons bx bx-layout"></i>
                         <div data-i18n="Feelings"></div>
                     </a>
                 </li>
 
                 <li class="menu-item @Html.IsSelected(controller: "Conversation", action: "Flow") ">
-                    <a asp-action="Flow" asp-controller="Conversation" class="menu-link">
+                    <a asp-action="Flow" asp-controller="Conversation" class="menu-link bg-danger text-white">
                         <i class="menu-icon tf-icons bx bx-layout"></i>
                         <div data-i18n="Conversation Flow"></div>
                     </a>
                 </li>
                 <li class="menu-item @Html.IsSelected(controller: "Conversation", action: "Languages") ">
-                    <a asp-action="Languages" asp-controller="Conversation" class="menu-link">
+                    <a asp-action="Languages" asp-controller="Conversation" class="menu-link bg-danger text-white">
                         <i class="menu-icon tf-icons bx bx-layout"></i>
                         <div data-i18n="Languages"></div>
                     </a>
