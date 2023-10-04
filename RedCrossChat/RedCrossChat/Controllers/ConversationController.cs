@@ -249,6 +249,20 @@ namespace RedCrossChat.Controllers
             return Success("Question", new QuestionResponseVm { question = question });
         }
 
+        public async Task<IActionResult> CheckHandOverRequests()
+        { 
+            var conversations=await _repository.HandOverRequest.FindByCondition(x=>x.HasBeenReceived==false).ToListAsync();
+
+            //first in First out
+
+            if (conversations.Count > 0)
+            {
+                return Success("fetched successfully", conversations);
+            }
+
+            return Error("No requests");
+        }
+
         public async Task<IActionResult> SaveQuestionOption(IFormCollection formData)
         {
 

@@ -15,6 +15,14 @@ namespace RedCrossChat.Dialogs
 
             repository = _repository;
 
+
+            AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
+            {
+                InitialAction,
+
+            }));
+
+            InitialDialogId = nameof(WaterfallDialog);
         }
 
         public async Task<DialogTurnResult> InitialAction(WaterfallStepContext stepContext,CancellationToken token)
@@ -34,7 +42,7 @@ namespace RedCrossChat.Dialogs
 
                 conversation.RequestedHandedOver = true;
 
-                repository.Conversation.Update(conversation);
+                //repository.Conversation.Update(conversation);
 
                 await repository.SaveChangesAsync();
 
