@@ -8,6 +8,7 @@ using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
 using RedCrossChat.Contracts;
+using RedCrossChat.Dialogs;
 using RedCrossChat.Objects;
 using System.Threading;
 using System.Threading.Tasks;
@@ -41,6 +42,8 @@ namespace RedCrossChat.Bots
             _userProfileAccessor = userState.CreateProperty<ResponseDto>(DialogConstants.ProfileAssesor);
 
             this.dialogSet = new DialogSet(conversationState.CreateProperty<DialogState>("DialogState"));
+
+            
         }
 
         public override async Task OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken = default)
@@ -60,20 +63,10 @@ namespace RedCrossChat.Bots
         {
             //Microsoft.Bot.Configuration.BotConfiguration.
 
-            if (turnContext.Activity.Type == ActivityTypes.Message)
-            {
-                var userInput = turnContext.Activity.Text.ToLowerInvariant();
+           var userInput = turnContext.Activity.Text.ToLowerInvariant();
 
-                if (userInput == "exit"  || userInput == "cancel"  || userInput == "toka" || userInput == "end")
+               /* if (userInput == "exit"  || userInput == "cancel"  || userInput == "toka" || userInput == "end")
                 {
-                    // Cancel all active dialogs
-                    /*
-                                        var endOfConversationActivity = Activity.CreateEndOfConversationActivity();
-                                        await turnContext.SendActivityAsync(endOfConversationActivity, cancellationToken);
-                                        await Dialog.EndDialogAsync(turnContext, null, DialogReason.EndCalled, cancellationToken);
-                                        // Optionally, you can send a message to confirm the exit
-                                        await turnContext.SendActivityAsync("You have exited the conversation. Type anything to start a new conversation.");*/
-
                     var dialogContext = await dialogSet.CreateContextAsync(turnContext, cancellationToken);
 
                     // Cancel all active dialogs
@@ -83,9 +76,19 @@ namespace RedCrossChat.Bots
                     await turnContext.SendActivityAsync("You have exited the conversation. Type anything to start a new conversation. \r\nUmetoka kwenye mazungumzo. Andika chochote ili kuanzisha mazungumzo mapya");
 
 
-                    return;
-                }
-            }
+                    var dialogResult = await dialogContext.BeginDialogAsync(nameof(AiDialog));
+
+                    // Handle the dialog result as needed
+                    if (dialogResult.Status == DialogTurnStatus.Complete)
+                    {
+                        // The dialog has ended with a result
+                        var result = dialogResult.Result;
+
+                        // Handle the result
+                    }
+
+                return;
+                }*/
 
             var responseDto = await GetUserProfile(turnContext, cancellationToken);
 

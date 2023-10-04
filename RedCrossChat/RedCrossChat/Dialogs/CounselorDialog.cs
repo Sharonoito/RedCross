@@ -2,6 +2,7 @@
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Schema;
 using Microsoft.Identity.Client;
+using RedCrossChat.Contracts;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -10,7 +11,7 @@ namespace RedCrossChat.Dialogs
     public class CounselorDialog  :CancelAndHelpDialog
     {
 
-        public CounselorDialog():base(nameof(CounselorDialog)) {
+        public CounselorDialog(BaseDialog baseDialog, IRepositoryWrapper wrapper) :base(nameof(CounselorDialog), baseDialog, wrapper) {
 
             AddDialog(new TextPrompt(nameof(TextPrompt)));
 

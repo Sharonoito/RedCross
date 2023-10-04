@@ -2,6 +2,7 @@
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Dialogs.Choices;
 using Newtonsoft.Json;
+using RedCrossChat.Contracts;
 using RedCrossChat.Objects;
 using System.Collections.Generic;
 using System.IO;
@@ -20,7 +21,7 @@ namespace RedCrossChat.Dialogs
         protected string iterations = "user-iterations";
         protected string UserInfo = "client-iterations";
 
-        public BreathingDialog(UserState userState) : base(nameof(BreathingDialog))
+        public BreathingDialog(UserState userState, BaseDialog baseDialog, IRepositoryWrapper wrapper) : base(nameof(BreathingDialog), baseDialog,wrapper)
         {
             _userState = userState;
 
