@@ -1,18 +1,12 @@
-﻿using Azure;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Bot.Builder;
+﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Dialogs.Choices;
-using Microsoft.Bot.Connector;
 using Microsoft.Bot.Schema;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Clients.ActiveDirectory;
-using RedCrossChat.Cards;
 using RedCrossChat.Contracts;
 using RedCrossChat.Entities;
 using RedCrossChat.Objects;
-using Sentry.Protocol;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,7 +31,7 @@ namespace RedCrossChat.Dialogs
 
         protected readonly UserState _userState;
 
-        public AiDialog(ILogger<AiDialog> logger, IRepositoryWrapper wrapper, UserState userState) : base(nameof(AiDialog))
+        public AiDialog(ILogger<AiDialog> logger, IRepositoryWrapper wrapper, UserState userState, BaseDialog baseDialog) : base(nameof(AiDialog), baseDialog,wrapper)
         {
             _logger = logger;
 

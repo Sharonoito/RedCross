@@ -16,11 +16,11 @@ using Attachment = Microsoft.Bot.Schema.Attachment;
 
 namespace RedCrossChat.Dialogs
 {
-    public class MainDialog : ComponentDialog
+    public class MainDialog : CancelAndHelpDialog
     {
         private readonly ILogger _logger;
         private readonly FlightBookingRecognizer _luisRecognizer;
-        private readonly string UserInfo = "Clien-info";
+        private readonly string UserInfo = "Client-info";
 
         private readonly UserState _userState;
         private readonly IRepositoryWrapper _repository;
@@ -34,8 +34,8 @@ namespace RedCrossChat.Dialogs
             AwarenessDialog awarenessDialog,
             ILogger<MainDialog> logger, 
             IRepositoryWrapper wrapper,
-            UserState userState)
-            : base(nameof(MainDialog))
+            UserState userState, BaseDialog baseDialog)
+            : base(nameof(MainDialog), baseDialog, wrapper)
         {
             _luisRecognizer = luisRecognizer;
             _logger = logger;
@@ -65,7 +65,6 @@ namespace RedCrossChat.Dialogs
                     EvaluateFeelingAsync,
                     HandleFeelingAsync,
                     HandleAiHandOver,
-                    RateBotAsync,
                     FinalStepAsync,
             };
 
@@ -75,18 +74,20 @@ namespace RedCrossChat.Dialogs
             InitialDialogId = nameof(WaterfallDialog);
         }
 
-       
+
+        //stepContext.Context.Activity.Conversation.Id  2bf7bf00-62c5-11ee-a514-cbe89faff2c0|livechat
+
 
         private async Task<DialogTurnResult> FirstStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             stepContext.Values[UserInfo] = new Client();
 
-            var question = "To start Select language , Kuanza Chagua lugha";
+            var question = "To start Select language, Kuanza Chagua lugha";
 
             return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions
             {
                 Prompt = MessageFactory.Text(question),
-                RetryPrompt = MessageFactory.Text("Please select a langugae , Tafadhali Chagua Lugha"),
+                RetryPrompt = MessageFactory.Text("Please select a language, Tafadhali Chagua Lugha"),
                 Choices = new List<Choice>()
                 {
                     new Choice("English"),
@@ -110,7 +111,8 @@ namespace RedCrossChat.Dialogs
                 client.language = !client.language;
             }
 
-         
+            await CreateConversationDBInstance(stepContext);
+
             var question = client.language ?
                 "Hello dear friend!! Welcome to Kenya Red Cross Society, we are offering tele-counselling services to public at no charges . How can I help you today?\r\n" :
 
@@ -275,7 +277,7 @@ namespace RedCrossChat.Dialogs
             if (confirmation.Equals(Validations.YES, StringComparison.OrdinalIgnoreCase) ||  confirmation.Equals(ValidationsSwahili.YES, StringComparison.OrdinalIgnoreCase))
             {
                 if (me.language) 
-                await stepContext.Context.SendActivityAsync(MessageFactory.Text("To exit the bot \n type exit or cancel at any point ."));
+                await stepContext.Context.SendActivityAsync(MessageFactory.Text("To exit the bot type exit or cancel at any point ."));
 
                 return await stepContext.NextAsync(null);
   
@@ -292,7 +294,7 @@ namespace RedCrossChat.Dialogs
         {
             Client me = (Client)stepContext.Values[UserInfo];
 
-            await CreateConversationDBInstance(stepContext);
+            
 
             var question = me.language?  "How would you describe how you are feeling today?" : "Je, unajihisi vipi leo?";
 
@@ -399,10 +401,7 @@ namespace RedCrossChat.Dialogs
 
         private async Task<DialogTurnResult> RateBotAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            Client me = (Client)stepContext.Values[UserInfo];
-
-
-            //todo recognize repeat clients
+            Client me = (Client)stepContext.Values[UserInfo];  
 
             var options = new PromptOptions()
             {
@@ -417,42 +416,65 @@ namespace RedCrossChat.Dialogs
 
         private async Task<DialogTurnResult> FinalStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            var ratingChoice = ((FoundChoice)stepContext.Result).Value;
-
-            Client me = (Client)stepContext.Values[UserInfo];
-
-            await stepContext.Context.SendActivityAsync(MessageFactory.Text(me.language ? "Thank you for your feedback. We value your input!": " Asante kwa maoni yako. Tunathamini mchango wako"));
-
+           
             return await stepContext.EndDialogAsync(null, cancellationToken);
         }
 
         private async Task<Conversation> CreateConversationDBInstance(WaterfallStepContext stepContext)
         {
-           
+            Client me = (Client)stepContext.Values[UserInfo];
+
             var persona= await  _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstOrDefaultAsync();
 
-            Conversation conversation = new()
-            {
-                ChannelId = stepContext.Context.Activity.ChannelId,
 
-                ChannelName = stepContext.Context.Activity.ChannelId,
-
-                SenderId = stepContext.Context.Activity.From.Id,
-
-                ConversationId = stepContext.Context.Activity.Conversation.Id,
-
-                AiConversations = new List<AiConversation>(),
-
-                IsReturnClient = persona != null
-            };
+            Conversation conversation;
 
             if (persona != null)
             {
-                conversation.PersonaId=persona.Id;
+                 conversation = new()
+                {
+                    ChannelId = stepContext.Context.Activity.ChannelId,
+
+                    ChannelName = stepContext.Context.Activity.ChannelId,
+
+                    SenderId = stepContext.Context.Activity.From.Id,
+
+                    ConversationId = stepContext.Context.Activity.Conversation.Id,
+
+                    AiConversations = new List<AiConversation>(),
+
+                    IsReturnClient = true,
+
+                    Language = me.language,
+
+                    PersonaId = persona.Id,
+                };
+
+                _repository.Conversation.Create(conversation);
+
             }
             else
             {
-                conversation.Persona = new Persona() { SenderId = stepContext.Context.Activity.From.Id };
+                 conversation = new()
+                {
+                    ChannelId = stepContext.Context.Activity.ChannelId,
+
+                    ChannelName = stepContext.Context.Activity.ChannelId,
+
+                    SenderId = stepContext.Context.Activity.From.Id,
+
+                    ConversationId = stepContext.Context.Activity.Conversation.Id,
+
+                    AiConversations = new List<AiConversation>(),
+
+                    IsReturnClient = false,
+
+                    Language = me.language,
+
+                    Persona = new Persona() { SenderId = stepContext.Context.Activity.From.Id }
+                };
+
+               
             }
 
             try

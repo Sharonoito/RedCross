@@ -35,8 +35,9 @@ namespace RedCrossChat.Dialogs
         public AwarenessDialog(
             ILogger<AwarenessDialog> logger, 
             IRepositoryWrapper wrapper, UserState userState,
-            HumanHandOverDialog humanHandOverDialog
-            ) : base(nameof(AwarenessDialog))
+            HumanHandOverDialog humanHandOverDialog,
+            BaseDialog baseDialog
+            ) : base(nameof(AwarenessDialog), baseDialog,wrapper)
         {
 
             _repository = wrapper;
