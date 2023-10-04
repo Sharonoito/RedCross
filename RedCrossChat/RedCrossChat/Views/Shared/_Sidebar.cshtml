@@ -1,25 +1,89 @@
 ﻿@{
 }
-@*<style>
-  .custom-sidebar 
-  {
-     background-color: #ED1C24;
-     /*background-color: white;*/
-  }
 
-  .custom-sidebar .menu-icon 
-  {
-     color: white;
-            
-  }
+<aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
+    <div class="app-brand demo">
+        <a href="index.html" class="app-brand-link">
+            <span class="app-brand-logo demo"></span>
+            <span class="app-brand-text demo menu-text fw-bolder ms-2">
+                <img src="~/img/KRCLOGO.png" alt="Kenya Red Cross Logo" class="brand-image" style="object-fit:cover">
+            </span>
+        </a>
 
-  .custom-sidebar .menu-link {
-     /*color: #ED1C24;*/
-     color: white;
-            
-  }
+        <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto">
+            <i class="bx bx-chevron-left bx-sm align-middle"></i>
+        </a>
+    </div>
 
-</style>*@
+    <div class="menu-inner-shadow"></div>
+
+    <ul class="menu-inner py-1">
+        <!-- Dashboards -->
+        <li class="menu-item @Html.IsSelected(controller: "Home", action: "Dashboard") ">
+            <a href="/" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-home-circle"></i>
+                <div data-i18n="Dashboards"></div>
+            </a>
+        </li>
+
+        <li class="menu-item @Html.IsSelected(controller: "Conversation", action: "List")">
+            <a asp-action="List" asp-controller="Conversation" class="menu-link ">
+                <i class="menu-icon tf-icons bx bx-chat"></i>
+                <div data-i18n="Conversations"></div>
+            </a>
+        </li>
+
+        <li class="menu-item" style="">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="menu-icon tf-icons bx bx-book-open"></i>
+                <div class="text-truncate" data-i18n="Config"></div>
+            </a>
+            <ul class="menu-sub">
+                <li class="menu-item @Html.IsSelected(controller: "Config", action: "Feeling") ">
+                    <a asp-action="Feeling" asp-controller="Config" class="menu-link">
+                        <i class="menu-icon tf-icons bx bx-layout"></i>
+                        <div data-i18n="Feelings"></div>
+                    </a>
+                </li>
+
+                <li class="menu-item @Html.IsSelected(controller: "Conversation", action: "Flow") ">
+                    <a asp-action="Flow" asp-controller="Conversation" class="menu-link">
+                        <i class="menu-icon tf-icons bx bx-layout"></i>
+                        <div data-i18n="Conversation Flow"></div>
+                    </a>
+                </li>
+                <li class="menu-item @Html.IsSelected(controller: "Conversation", action: "Languages") ">
+                    <a asp-action="Languages" asp-controller="Conversation" class="menu-link">
+                        <i class="menu-icon tf-icons bx bx-layout"></i>
+                        <div data-i18n="Languages"></div>
+                    </a>
+                </li>
+
+            </ul>
+        </li>
+
+
+
+        <li class="menu-item @Html.IsSelected(controller: "Conversation", action: "Index")">
+            <a asp-action="Index" asp-controller="Conversation" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-chat"></i>
+                <div data-i18n="Chat"></div>
+            </a>
+        </li>
+
+        <li class="menu-item @Html.IsSelected(controller: "Auth", action: "Users") ">
+            <a asp-action="Users" asp-controller="Auth" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-layout"></i>
+                <div data-i18n="User Management"></div>
+            </a>
+        </li>
+
+
+
+    </ul>
+</aside>
+@*@{
+}
 
 <aside id="layout-menu" class="layout-menu menu-vertical menu bg-navbar-theme">
     <div class="app-brand demo">
@@ -103,3 +167,4 @@
 
     </ul>
 </aside>
+*@
