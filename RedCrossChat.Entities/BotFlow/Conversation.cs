@@ -31,5 +31,7 @@ namespace RedCrossChat.Entities
         public bool IsReturnClient { get; set; } = false;
 
         public bool ConversedWithAI { get; set; } = false;
+
+        public bool Language {  get; set; } = true;
     }
 }

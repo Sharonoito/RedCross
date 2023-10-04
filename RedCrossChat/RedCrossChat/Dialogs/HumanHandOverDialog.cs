@@ -12,7 +12,7 @@ namespace RedCrossChat.Dialogs
     {
         private IRepositoryWrapper repository;
 
-        public HumanHandOverDialog(IRepositoryWrapper _repository):base(nameof(HumanHandOverDialog)) { 
+        public HumanHandOverDialog(IRepositoryWrapper _repository, BaseDialog baseDialog):base(nameof(HumanHandOverDialog), baseDialog,_repository) { 
 
             repository = _repository;
 
