@@ -1,7 +1,7 @@
 ﻿
 let counter = 1;
 
-function ShowHandOverRequest() {
+function ShowHandOverRequest(request) {
 
     Swal.fire({
         title: "Human Hand Over",
@@ -19,14 +19,16 @@ function ShowHandOverRequest() {
         },
         buttonsStyling: !1
     }).then(function (t) {
-        t.value && Swal.fire({
-            icon: "success",
-            title: "Deleted!",
-            text: "Your file has been deleted.",
-            customClass: {
-                confirmButton: "btn btn-success"
-            }
-        })
+
+        console.log("Swal", t.value);
+
+        if (t.value) {
+            $.post("/Conversation/UpdateHandOverRequest/?id=" + request.id).then(response => {
+
+                console.log("Conversation",response)
+                window.location ="/Conversation/"
+            })
+        }
     })
 
 }
@@ -39,11 +41,22 @@ setInterval(function () {
 
 }, 2000);
 
+let isShowing = false;
+
 
 function CheckForHumanHandOverRequests() {
 
     $.post("/Conversation/CheckHandOverRequests/").then(response => {
-        console.log("high_response",response)
+        if (response.responseData.length > 0) {
+
+            let request = response.responseData[response.responseData.length - 1];
+
+            if (!isShowing) {
+                ShowHandOverRequest(request);
+
+                isShowing = !isShowing; 
+            }
+        }
     })
 
 }

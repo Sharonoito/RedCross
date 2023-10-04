@@ -1,4 +1,5 @@
-﻿using Microsoft.Bot.Builder.Dialogs;
+﻿using Microsoft.Bot.Builder;
+using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.EntityFrameworkCore;
 using RedCrossChat.Contracts;
 using System.Linq;
@@ -56,22 +57,36 @@ namespace RedCrossChat.Dialogs
 
             bool skip = true;
 
+            int iterations = 0;
+
             while (skip)
             {
                 //Check if there is a response for the last database call
 
-               var conv=await repository.RawConversation.FindByCondition(x => x.Conversation.ConversationId =="").LastOrDefaultAsync();
+                var request=await repository.HandOverRequest.FindByCondition(x=>x.ConversationId==conversation.Id).FirstOrDefaultAsync();
 
-                if (conv != null  && conv.IsReply)
+                if (request.HasBeenReceived)
                 {
-                    skip = false;
+                    var conv = await repository.RawConversation.FindByCondition(x => x.Conversation.Id == conversation.Id).ToListAsync();
 
-                    return await stepContext.NextAsync(null);
+                    var lastConv = conv.Last();
+
+                    if (lastConv != null && lastConv.HasReply)
+                    {
+                        skip = false;
+
+                        return await stepContext.NextAsync(null);
+                    }
                 }
-                else
+                await Task.Delay(2000); // Delay for 2 seconds (2000 milliseconds)
+
+                if(iterations % 5 == 0)
                 {
-                    await Task.Delay(2000); // Delay for 2 seconds (2000 milliseconds)
+                    await stepContext.Context.SendActivityAsync(MessageFactory.Text("An agent will be getting in touch with you shortly"), token);
                 }
+
+
+                iterations++;
             }
 
             return await stepContext.EndDialogAsync(null);
