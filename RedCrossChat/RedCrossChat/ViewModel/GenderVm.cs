@@ -3,20 +3,15 @@ using System;
 
 namespace RedCrossChat.ViewModel
 {
-    public class AgeBandVm
+    public class GenderVm
     {
         public Guid Id { get; set; }
+
+        [Display(Name = "Name")]
         public string Name { get; set; }
 
+        [Display(Name = "Swahili")]
         public string Kiswahili { get; set; }
-
-        public string Synonyms { get; set; } = "";
-
-        public string Lowest { get; set; } = "";
-
-        public string Highest { get; set; } = "";
-
-        public bool IsActive { get; set; } = true;
     }
 }
 

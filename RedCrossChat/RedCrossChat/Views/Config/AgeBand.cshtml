@@ -14,19 +14,37 @@
     <div class="row fv-plugins-icon-container">
         <div class="col-md-12">
             <ul class="nav nav-pills flex-column flex-md-row mb-3">
-                <li class="nav-item"><a class="nav-link active" href="javascript:void(0);" style="background-color: #ED1C24;"><i class="bx bx-user me-1"></i> Feelings</a></li>
-                <li class="nav-item"><a class="nav-link" @Html.IsSelected(controller: "Config", action: "Profession")><a asp-action="Profession" style="text-decoration: none; color: inherit;" asp-controller="Config"><i class="bx bx-grid-alt me-1"></i>Professional Status</a></li>
-                <li class="nav-item"><a class="nav-link" @Html.IsSelected(controller: "Config", action: "AgeBand")><a asp-action="AgeBand" style="text-decoration: none; color: inherit;" asp-controller="Config"><i class="bx bx-bell me-1"></i> Age Band</a></li>
-                <li class="nav-item"><a class="nav-link" href="pages-account-settings-connections.html"><i class="bx bx-link-alt me-1"></i> Marital Status</a></li>
-                <li class="nav-item"><a class="nav-link" href="pages-account-settings-connections.html"><i class="bx bx-link-alt me-1"></i> Gender</a></li>
-                <li class="nav-item"><a class="nav-link" href="pages-account-settings-connections.html"><i class="bx bx-link-alt me-1"></i> Breathing Exercise</a></li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="javascript:void(0);" style="background-color: #ED1C24;">
+                        <i class="bx bx-user me-1"></i> Feelings
+                    </a>
+                </li>
 
+                <li class="nav-item @(Html.IsSelected(controller: "Config", action: "Profession") == "active" ? "active" : "")">
+                    <a asp-action="Profession" asp-controller="Config" class="nav-link">
+                        <i class="bx bx-grid-alt me-1"></i> Professional Status
+                    </a>
+                </li>
 
-@*
-                <li class="nav-item @Html.IsSelected(controller: "Conversation", action: "List")"><a asp-action="List" style="text-decoration: none; color: inherit;" asp-controller="Conversation"><i class="bx bx-grid-alt me-1"></i>Conversations</a></li>
-                <li class="nav-item @Html.IsSelected(controller: " Auth", action: "Users" )"><a asp-action="Users" style="text-decoration: none; color: inherit;" asp-controller="Auth"><i class="bx bx-group me-1 "></i>Users</a></li>
-            *@
+                <li class="nav-item @(Html.IsSelected(controller: "Config", action: "AgeBand") == "active" ? "active" : "")">
+                    <a asp-action="AgeBand" asp-controller="Config" class="nav-link">
+                        <i class="bx bx-bell me-1"></i> Age Band
+                    </a>
+                </li>
+
+                <li class="nav-item @(Html.IsSelected(controller: "Config", action: "MaritalState") == "active" ? "active" : "")">
+                    <a asp-action="MaritalState" asp-controller="Config" class="nav-link">
+                        <i class="bx bx-bell me-1"></i> Marital Status
+                    </a>
+                </li>
+
+                <li class="nav-item @(Html.IsSelected(controller: "Config", action: "Gender") == "active" ? "active" : "")">
+                    <a asp-action="Gender" asp-controller="Config" class="nav-link">
+                        <i class="bx bx-bell me-1"></i> Gender
+                    </a>
+                </li>
             </ul>
+
 
         </div>
     </div>
@@ -60,8 +78,10 @@
                     <thead>
                         <tr>
                             <th>Name</th>
-                            <th>Description</th>
-                            <th>Synonymns</th>
+                            <th>Kiswahili</th>
+                            <th>Highest</th>
+                            <th>Lowest</th>
+                            <th>Synonyms</th>
                             <th style="width: 40px">Actions</th>
                         </tr>
                     </thead>
@@ -126,8 +146,10 @@
                     },
                     columns: [
                         { data: 'name' },
-                        { data: 'description' },
-                        { data: 'synonymns' },
+                        { data: 'kiswahili' },
+                        { data: 'highest' },
+                        { data: 'lowest' },
+                        { data: 'synonyms' },
                         { data: 'id', name: 'Id' },
                
                     ],

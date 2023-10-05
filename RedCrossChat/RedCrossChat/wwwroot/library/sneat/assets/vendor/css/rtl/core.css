@@ -19540,7 +19540,8 @@ html:not(.layout-menu-fixed) .menu-inner-shadow {
 
 .menu-item {
     align-items: flex-start;
-    justify-content: flex-start
+    justify-content: flex-start;
+
 }
 
 .menu-item.menu-item-animating {
