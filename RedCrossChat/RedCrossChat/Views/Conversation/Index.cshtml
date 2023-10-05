@@ -1,8 +1,6 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿
 @{
-
+  
 }
 
 
@@ -96,22 +94,11 @@
                     <li class="chat-contact-list-item chat-contact-list-item-title">
                         <h5 class="text-primary mb-0">Chats</h5>
                     </li>
-                    <li class="chat-contact-list-item chat-list-item-0 d-none">
+                    <li class="chat-contact-list-item chat-list-item-0 d-none" id="no-chats">
                         <h6 class="text-muted mb-0">No Chats Found</h6>
                     </li>
                   
-                    <li class="chat-contact-list-item active">
-                        <a class="d-flex align-items-center">
-                            <div class="flex-shrink-0 avatar avatar-busy">
-                                <span class="avatar-initial rounded-circle bg-label-success">CM</span>
-                            </div>
-                            <div class="chat-contact-info flex-grow-1 ms-3">
-                                <h6 class="chat-contact-name text-truncate m-0">Calvin Moore</h6>
-                                <p class="chat-contact-status text-truncate mb-0 text-muted">If it takes long you can mail inbox user</p>
-                            </div>
-                            <small class="text-muted mb-auto">1 Day</small>
-                        </a>
-                    </li>
+                    
                 </ul>
                 
                
@@ -124,15 +111,8 @@
             <div class="chat-history-wrapper">
                 <div class="chat-history-header border-bottom">
                     <div class="d-flex justify-content-between align-items-center">
-                        <div class="d-flex overflow-hidden align-items-center">
-                            <i class="bx bx-menu bx-sm cursor-pointer d-lg-none d-block me-2" data-bs-toggle="sidebar" data-overlay="" data-target="#app-chat-contacts"></i>
-                            <div class="flex-shrink-0 avatar">
-                                <img src="../../assets/img/avatars/2.png" alt="Avatar" class="rounded-circle" data-bs-toggle="sidebar" data-overlay="" data-target="#app-chat-sidebar-right">
-                            </div>
-                            <div class="chat-contact-info flex-grow-1 ms-3">
-                                <h6 class="m-0">Felecia Rower</h6>
-                                <small class="user-status text-muted">NextJS developer</small>
-                            </div>
+                        <div class="d-flex overflow-hidden align-items-center" id='chat-contact-info'>
+                            
                         </div>
                         <div class="d-flex align-items-center">
                             <i class="bx bx-phone-call cursor-pointer d-sm-block d-none me-3 fs-4"></i>
@@ -154,57 +134,25 @@
                     </div>
                 </div>
                 <div class="chat-history-body ps ps--active-y d-flex">
-                    <ul class="list-unstyled chat-history mb-0 mt-auto w-100" id="ConvList">
-                        <li class="chat-message chat-message-right">
-                            <div class="d-flex overflow-hidden">
-                                <div class="chat-message-wrapper flex-grow-1">
-                                    <div class="chat-message-text">
-                                        <p class="mb-0">How can we help? We're here for you! 😄</p>
-                                    </div>
-                                    <div class="text-end text-muted mt-1">
-                                        <i class="bx bx-check-double text-success"></i>
-                                        <small>10:00 AM</small>
-                                    </div>
-                                </div>
-                                <div class="user-avatar flex-shrink-0 ms-3">
-                                    <div class="avatar avatar-sm">
-                                        <span class="avatar-initial rounded-circle bg-label-success">CM</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
+                    <ul class="list-unstyled chat-history mb-0 w-100" id="ConvList">
                         
-                        <li class="chat-message chat-message-right">
-                            <div class="d-flex overflow-hidden">
-                                <div class="chat-message-wrapper flex-grow-1">
-                                    <div class="chat-message-text">
-                                        <p class="mb-0">Sneat has all the components you'll ever need in a app.</p>
-                                    </div>
-                                    <div class="text-end text-muted mt-1">
-                                        <i class="bx bx-check-double text-success"></i>
-                                        <small>10:03 AM</small>
-                                    </div>
-                                </div>
-                                <div class="user-avatar flex-shrink-0 ms-3">
-                                    <div class="avatar avatar-sm">
-                                        <img src="../../assets/img/avatars/1.png" alt="Avatar" class="rounded-circle">
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
+                        
+                        
                     </ul>
-                    <div class="ps__rail-x" style="left: 0px; bottom: -486px;"><div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div></div><div class="ps__rail-y" style="top: 486px; height: 590px; right: 0px;"><div class="ps__thumb-y" tabindex="0" style="top: 267px; height: 323px;"></div></div>
+                    <div class="ps__rail-x" style="left: 0px; bottom: 0px;">
+                        <div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div>
+                    </div>
+                    <div class="ps__rail-y" style="top: 250px; height: 250px; right: 0px;">
+                        <div class="ps__thumb-y" tabindex="0" style="top: 250px; height: 250px;">
+                        </div>
+                    </div>
                 </div>
                 <!-- Chat message form -->
                 <div class="chat-history-footer">
-                    <form class="form-send-message d-flex justify-content-between align-items-center ">
+                    <form class="fsend-message d-flex justify-content-between align-items-center ">
                         <input class="form-control message-input border-0 me-3 shadow-none" placeholder="Type your message here...">
                         <div class="message-actions d-flex align-items-center">
-                            <i class="speech-to-text bx bx-microphone bx-sm cursor-pointer"></i>
-                            <label for="attach-doc" class="form-label mb-0">
-                                <i class="bx bx-paperclip bx-sm cursor-pointer mx-3"></i>
-                                <input type="file" id="attach-doc" hidden="">
-                            </label>
+                            
                             <button class="btn btn-primary d-flex send-msg-btn">
                                 <i class="bx bx-paper-plane me-md-1 me-0"></i>
                                 <span class="align-middle d-md-inline-block d-none">Send</span>

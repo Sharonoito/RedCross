@@ -10,6 +10,7 @@ let interval = 2500;
 let iteration = 0;
 
 
+
 const GetMyConversations=()=>{
     $.post("/Conversation/GetMyConversations").then(response => {
 
@@ -21,9 +22,13 @@ const GetMyConversations=()=>{
 
                 conversartions = data;
 
+                $('#no-chats').fadeIn()
+
             } else {
                 console.log("update the UI")
-                // update the interface 
+                // update the interface
+
+                
                 UpdateUI(data);
             }
         }
@@ -49,15 +54,14 @@ const UpdateUI=(data)=>{
 
             AppendToSidebar(conversartions[i]);
         }
-    } else {
+    } else if (data != undefined){
 
         //check for internal changes in the array -> conversations
-       
-        if (data != undefined)
+        for (let i = 0; i < data.length; i++) {
+            AppendToSidebar(data[i])
+        }
 
-            for (let i = 0; i < data.length; i++) {
-                AppendToSidebar(data[i])
-            }
+        conversartions = data;
 
         if (iteration % 5 == 0) {
             interval * 10;
@@ -68,27 +72,29 @@ const UpdateUI=(data)=>{
 
 }
 
-const AppendToSidebar = conv => {
+const AppendToSidebar = ({ persona, id, dateCreated,reason }) => {
     //this is to append the conversation ton the side bar
 
-    console.log("Append",conv)
+  
 
     $("#chat-list").append(`
-                      <li class="chat-contact-list-item active">
+                      <li class="chat-contact-list-item " data-id='${id}'>
                         <a class="d-flex align-items-center">
                             <div class="flex-shrink-0 avatar avatar-busy">
-                                <span class="avatar-initial rounded-circle bg-label-success">CM</span>
+                                ${username(persona.chatID)}
                             </div>
                             <div class="chat-contact-info flex-grow-1 ms-3">
-                                <h6 class="chat-contact-name text-truncate m-0">${conv.persona.chatID}</h6>
-                                <p class="chat-contact-status text-truncate mb-0 text-muted">${conv.reason}</p>
+                                <h6 class="chat-contact-name text-truncate m-0">${persona.chatID}</h6>
+                                <p class="chat-contact-status text-truncate mb-0 text-muted">${reason}</p>
                             </div>
-                            <small class="text-muted mb-auto moment-date" data-date='${conv.dateCreated}'></small>
+                            <small class="text-muted mb-auto moment-date" data-date='${dateCreated}'></small>
                         </a>
                     </li>`);
 
     CalculateDates();
 }
+
+const username = str => `<span class="avatar-initial rounded-circle bg-label-success">${str.charAt(0)}${str.charAt(str.length - 1) }</span>`
 
 function CalculateDates() {
 
@@ -103,36 +109,38 @@ function CalculateDates() {
 
     $(".moment-date").toArray().forEach(e => {
 
+        
         var now = moment(new Date()); //todays date
 
         var end = moment($(e).data('date')); // another date
 
-        now.diff(end,'hours')
+        if ($(e).data('format') != undefined) {
 
-        var duration = moment.duration(now.diff(end));
-        var days = duration.asHours();
+            $(e).html(end.format($(e).data('format')));
+
+            return;
+        }
 
         if (now.diff(end, 'minutes') <= 59) {
 
-            $(e).html(now.diff(end, 'minutes')+" Minutes")
+            $(e).html(now.diff(end, 'minutes') + (" Minutes" + now.diff(end, 'minutes') !=1? 's':''))
             return;
         }
         if (now.diff(end, 'hours') <=24 ) {
 
-            $(e).html(now.diff(end, 'hours') + " hours")
+            $(e).html(now.diff(end, 'hours') + (" hour" + now.diff(end, 'days') !=1 ? "s":''))
 
             return
         }
 
         if (now.diff(end, 'days') <= 7) {
 
-            $(e).html(now.diff(end, 'days') + " days")
+            $(e).html(now.diff(end, 'days') + (" day" + now.diff(end, 'days') !=1 ? 's':''))
 
             return
         }
 
-        console.log('hours', now.diff(end, 'hours'))
-        console.log('minutes', now.diff(end, 'minutes'))
+       
 
         /**console.log(a.diff(b, 'minutes')) // 44700
 console.log(a.diff(b, 'hours')) // 745
@@ -140,6 +148,89 @@ console.log(a.diff(b, 'days')) // 31
 console.log(a.diff(b, 'weeks')) // 4 */
     })
 }
+
+function UpdateChatActiveConversation() {
+    if (activeConversation == undefined)
+        return;
+
+    const { id, reason, persona, rawConversations } = activeConversation;                
+
+    $("#chat-contact-info").html(`<i class="bx bx-menu bx-sm cursor-pointer d-lg-none d-block me-2" data-bs-toggle="sidebar" data-overlay="" data-target="#app-chat-contacts"></i>
+                            <div class="flex-shrink-0 avatar">
+                                ${username(persona.chatID)}
+                            </div>
+                            <div class="chat-contact-info flex-grow-1 ms-3" >
+                                <h6 class="m-0">${persona.chatID}</h6>
+                                <small class="user-status text-muted">${reason}</small>
+                            </div>`);
+
+
+    $("#ConvList").html('');
+
+    for (let i = 0; i < rawConversations.length; i++) {
+
+        const conv = rawConversations[i];
+
+        $("#ConvList").append(message(conv, true)).append(message(conv));
+
+        CalculateDates()
+    }
+}
+
+const message = (conv, isReply = false) => `<li class="chat-message ${isReply ? 'chat-message-right' :' '} ">
+                            <div class="d-flex overflow-hidden">
+                                <div class="chat-message-wrapper flex-grow-1">
+                                    <div class="chat-message-text">
+                                        <p class="mb-0">${isReply ? conv.question : conv.message}</p>
+                                    </div>
+                                    <div class="text-end text-muted mt-1">
+                                        <i class="bx bx-check-double text-success"></i>
+                                        <small class='moment-date' data-format='h:mm' data-date='${isReply ? conv.questionTimeStamp : conv.responseTimeStamp}'></small>
+                                    </div>
+                                </div>
+                                <div class="user-avatar flex-shrink-0 ms-3">
+                                    <div class="avatar avatar-sm">
+                                        <span class="avatar-initial rounded-circle bg-label-success">${!isReply ? 'CM' : 'BOT'}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>`;
+
+
+$(document).on('click', '.chat-contact-list-item', function () {
+
+    let current = this;
+
+    $('.chat-contact-list-item').toArray().forEach(chat => {
+        $(chat).removeClass('active');
+    });
+
+
+    for (let i = 0; i < conversartions.length; i++) {
+
+        if ($(current).data('id') == conversartions[i].id) {
+            activeConversation = conversartions[i];
+
+            console.log('Found', activeConversation)
+        }
+    }
+
+    UpdateChatActiveConversation();
+
+    $(current).addClass('active');
+});
+
+$(document).on('submit', '.fsend-message', function (e) {
+
+    e.preventDefault();
+
+    $(e).find("input")
+
+    $("#ConvList").append(message({ question: " HellowThere", questionTimeStamp:"" } , true))
+
+});
+
+
 
 $(document).ready(function () {
 

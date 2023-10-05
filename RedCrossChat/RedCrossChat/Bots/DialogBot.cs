@@ -61,38 +61,10 @@ namespace RedCrossChat.Bots
 
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
-            //Microsoft.Bot.Configuration.BotConfiguration.
-
-           var userInput = turnContext.Activity.Text.ToLowerInvariant();
-
-               /* if (userInput == "exit"  || userInput == "cancel"  || userInput == "toka" || userInput == "end")
-                {
-                    var dialogContext = await dialogSet.CreateContextAsync(turnContext, cancellationToken);
-
-                    // Cancel all active dialogs
-                    await dialogContext.CancelAllDialogsAsync(cancellationToken);
-
-                    // Optionally, you can send a message to confirm the exit
-                    await turnContext.SendActivityAsync("You have exited the conversation. Type anything to start a new conversation. \r\nUmetoka kwenye mazungumzo. Andika chochote ili kuanzisha mazungumzo mapya");
-
-
-                    var dialogResult = await dialogContext.BeginDialogAsync(nameof(AiDialog));
-
-                    // Handle the dialog result as needed
-                    if (dialogResult.Status == DialogTurnStatus.Complete)
-                    {
-                        // The dialog has ended with a result
-                        var result = dialogResult.Result;
-
-                        // Handle the result
-                    }
-
-                return;
-                }*/
+            var userInput = turnContext.Activity.Text.ToLowerInvariant();
 
             var responseDto = await GetUserProfile(turnContext, cancellationToken);
 
-            // Run the Dialog with the new message Activity.
             await Dialog.RunAsync(turnContext, ConversationState.CreateProperty<DialogState>("DialogState"), cancellationToken);
 
             await SaveResponse(turnContext, responseDto, cancellationToken);
@@ -111,7 +83,9 @@ namespace RedCrossChat.Bots
             if (!string.IsNullOrEmpty(responseDto.Question) && !string.IsNullOrEmpty(responseDto.Message))
             {
                 _repository.RawConversation.Create(new Entities.RawConversation
-                { Question = responseDto.Question, ConversationId = responseDto.ConversationId, Message = turnContext.Activity.Text });
+                { Question = responseDto.Question, 
+                    ConversationId = responseDto.ConversationId,
+                    Message = turnContext.Activity.Text,QuestionTimeStamp=responseDto.QuestionTimeStamp,ResponseTimeStamp=responseDto.ResponseTimeStamp });
 
                 bool response=await _repository.SaveChangesAsync();
 
