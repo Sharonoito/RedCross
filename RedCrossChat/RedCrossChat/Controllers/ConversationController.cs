@@ -293,22 +293,90 @@ namespace RedCrossChat.Controllers
                 var request=await _repository.HandOverRequest.FindByCondition(x=>x.Id==id).FirstOrDefaultAsync();
 
                 if (request != null)
-                {
-                    request.HasBeenReceived = true;
+                {                  
+                    var conversation=  await _repository.Conversation.
+                        FindByCondition(x=>x.Id==request.ConversationId).Include(x=>x.Persona).FirstOrDefaultAsync();
 
-                    _repository.HandOverRequest.Update(request);
+                    if(conversation.AppUserId != null)
+                    {
+                        return Error("This Client is already being supported");
+                    }
+                    else
+                    {
+                        request.HasBeenReceived = true;
 
-                    var status=  await _repository.SaveChangesAsync();
+                        request.ResolvedAt = DateTime.Now;
 
+                        conversation.AppUserId = Guid.Parse(User.FindFirst("UserId").Value);
 
-                    if(status) 
-                    return Success("Updated Successfully");
+                        if(conversation.Persona.ChatID == null)
+                        {  
+                            conversation.Persona.ChatID = await GetUserCode();
+
+                            _repository.Persona.Update(conversation.Persona);
+                        }
+                         
+
+                        _repository.Conversation.Update(conversation);
+
+                        _repository.HandOverRequest.Update(request);
+
+                        var status = await _repository.SaveChangesAsync();
+
+                        if (status)
+                            return Success("Updated Successfully");
+                    }  
                 }
 
             }
 
             return Error("Invalid Guid");
 
+        }
+
+
+        public async Task<string> GetUserCode()
+        {
+
+            var lastest = await _repository.Persona.FindAll().ToListAsync();
+
+            var date_created=lastest.Last().DateCreated;
+
+            var conversations=await _repository.Conversation.FindAll().ToListAsync();
+
+            decimal count = decimal.Parse(conversations.Count.ToString());
+
+            decimal counter = count/ 10000;
+
+            
+
+            string[] item = counter.ToString().Split('.');
+
+            if (counter > 1)
+            {
+                double power = 10000 * Math.Pow(10, item[0].Length);
+
+                counter = count / decimal.Parse(power.ToString());
+
+                item=counter.ToString().Split(".");
+            }
+
+
+            string code = $"{date_created.Year}{date_created.Month}{date_created.Day}{item[1]}" ;
+
+            return code;
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetMyConversations()
+        {
+            var conversations=await _repository.Conversation.
+                FindByCondition(x=>x.AppUserId== Guid.Parse(User.FindFirst("UserId").Value)).
+                Include(x=>x.Persona).
+                Include(x=>x.RawConversations).
+                ToListAsync();
+
+            return Success("Items fetched Successfully", conversations);
         }
     }
 }

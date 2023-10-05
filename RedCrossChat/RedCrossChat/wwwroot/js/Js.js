@@ -26,7 +26,8 @@ function ShowHandOverRequest(request) {
             $.post("/Conversation/UpdateHandOverRequest/?id=" + request.id).then(response => {
 
                 console.log("Conversation",response)
-                window.location ="/Conversation/"
+
+                window.location = "/Conversation/"
             })
         }
     })
@@ -35,7 +36,7 @@ function ShowHandOverRequest(request) {
 
 setInterval(function () {
 
-  //  CheckForHumanHandOverRequests();
+    CheckForHumanHandOverRequests();
 
     counter++;
 
@@ -47,6 +48,8 @@ let isShowing = false;
 function CheckForHumanHandOverRequests() {
 
     $.post("/Conversation/CheckHandOverRequests/").then(response => {
+
+        if (response.success)
         if (response.responseData.length > 0) {
 
             let request = response.responseData[response.responseData.length - 1];

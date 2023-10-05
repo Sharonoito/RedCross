@@ -24,6 +24,8 @@ namespace RedCrossChat.Entities
         public Guid? MaritalStateId { get; set; }
         public MaritalState MaritalState { get; set; }
 
+        public string? ChatID { get; set; }
+
         public string IsAwareOfFeelings { get; set; } = "";
         
         public string Country { get; set; } = "";
