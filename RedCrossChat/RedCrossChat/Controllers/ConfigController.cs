@@ -145,7 +145,7 @@ namespace RedCrossChat.Controllers
         [HttpPost]
         public async Task<IActionResult>SaveFeeling(FeelingVm feeling)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid && ModelState.ErrorCount >1)
                 return Error("Validation error!, please check your data.");
 
        
@@ -248,7 +248,7 @@ namespace RedCrossChat.Controllers
         [HttpPost]
         public async Task<IActionResult> SaveProfession(ProfessionVm profession)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid  && ModelState.ErrorCount >1)
                 return Error("Validation error!, please check your data.");
 
 
@@ -419,6 +419,8 @@ namespace RedCrossChat.Controllers
                     Id = agebandEntity.Id,
                     Name = agebandEntity.Name,
                     Kiswahili=agebandEntity.Kiswahili,
+                    //Highest = agebandEntity.Highest,
+                    //Lowest = agebandEntity.Lowest,
                     Synonyms = agebandEntity.Synonyms
                 };
 
@@ -431,20 +433,17 @@ namespace RedCrossChat.Controllers
             }
         }
 
-
-
         [HttpPost]
         public async Task<IActionResult> SaveAgeBand(AgeBandVm ageBand)
-
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid && ModelState.ErrorCount > 1)
                 return Error("Validation error!, please check your data.");
-
 
             try
             {
                 if (ageBand.Id == Guid.Empty)
                 {
+                    // Creating a new AgeBand
                     var ageBandEntity = new AgeBand
                     {
                         Name = ageBand.Name,
@@ -454,7 +453,6 @@ namespace RedCrossChat.Controllers
 
                     _repository.AgeBand.Create(ageBandEntity);
 
-
                     var result = await _repository.SaveChangesAsync();
 
                     if (!result)
@@ -462,6 +460,7 @@ namespace RedCrossChat.Controllers
                 }
                 else
                 {
+                    // Retrieving the existing AgeBand from the database
                     var ageBandDB = await _repository.AgeBand.FindByCondition(x => x.Id == ageBand.Id).FirstOrDefaultAsync();
 
                     if (ageBandDB == null)
@@ -469,18 +468,17 @@ namespace RedCrossChat.Controllers
                         return Error("AgeBand not found");
                     }
 
+                    // Updating properties of ageBandDB with values from ageBand
+                    ageBandDB.Name = ageBand.Name;
+                    ageBandDB.Kiswahili = ageBand.Kiswahili;
+                    ageBandDB.Synonyms = ageBand.Synonyms;
 
-                    ageBand.Name = ageBand.Name;
-                    ageBand.Kiswahili = ageBand.Kiswahili;
-                    ageBand.Synonyms = ageBand.Synonyms;
-
+                    // Mark the entity as modified and save changes to the database
                     _repository.AgeBand.Update(ageBandDB);
-
                     var result = await _repository.SaveChangesAsync();
 
                     if (!result)
-                        return Success(null, null);
-                    return Error("Error updating ageBand");
+                        return Error("Error updating ageBand");
                 }
             }
             catch (Exception ex)
@@ -489,6 +487,64 @@ namespace RedCrossChat.Controllers
             }
             return Success("AgeBand Saved successfully");
         }
+
+
+        //[HttpPost]
+        //public async Task<IActionResult> SaveAgeBand(AgeBandVm ageBand)
+
+        //{
+        //    if (!ModelState.IsValid && ModelState.ErrorCount > 1)
+        //        return Error("Validation error!, please check your data.");
+
+
+        //    try
+        //    {
+        //        if (ageBand.Id == Guid.Empty)
+        //        {
+        //            var ageBandEntity = new AgeBand
+        //            {
+        //                Name = ageBand.Name,
+        //                Kiswahili = ageBand.Kiswahili,
+        //                Synonyms = ageBand.Synonyms
+        //            };
+
+        //            _repository.AgeBand.Create(ageBandEntity);
+
+
+        //            var result = await _repository.SaveChangesAsync();
+
+        //            if (!result)
+        //                return Error("Error Creating AgeBand!");
+        //        }
+        //        else
+        //        {
+        //            var ageBandDB = await _repository.AgeBand.FindByCondition(x => x.Id == ageBand.Id).FirstOrDefaultAsync();
+
+        //            if (ageBandDB == null)
+        //            {
+        //                return Error("AgeBand not found");
+        //            }
+
+
+        //            ageBand.Name = ageBand.Name;
+        //            ageBand.Kiswahili = ageBand.Kiswahili;
+        //            ageBand.Synonyms = ageBand.Synonyms;
+
+        //            _repository.AgeBand.Update(ageBandDB);
+
+        //            var result = await _repository.SaveChangesAsync();
+
+        //            if (!result)
+        //                return Success(null, null);
+        //            return Error("Error updating ageBand");
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Error("Something broke" + ex.Message);
+        //    }
+        //    return Success("AgeBand Saved successfully");
+        //}
 
         public async Task<IActionResult> DeleteAgeBand(Guid id)
         {
@@ -597,7 +653,7 @@ namespace RedCrossChat.Controllers
         public async Task<IActionResult> SaveMaritalState(MaritalStateVm maritalState)
 
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid && ModelState.ErrorCount > 1)
                 return Error("Validation error!, please check your data.");
 
 
@@ -649,6 +705,32 @@ namespace RedCrossChat.Controllers
                 return Error("Something broke" + ex.Message);
             }
             return Success("Marital State Saved successfully");
+        }
+
+        public async Task<IActionResult> DeleteMaritalState(Guid id)
+        {
+            try
+            {
+                var maritalStateEntity = await _repository.MaritalState.FindByCondition(x => x.Id == id).FirstOrDefaultAsync();
+                if (maritalStateEntity == null)
+                {
+                    return NotFound();
+                }
+
+                _repository.MaritalState.Delete(maritalStateEntity);
+                var result = await _repository.SaveChangesAsync();
+
+                if (!result)
+                {
+                    return Error("Error deleting Marital state");
+                }
+
+                return Success("Marital state deleted successfully");
+            }
+            catch (Exception ex)
+            {
+                return Error("Something broke" + ex.Message);
+            }
         }
 
 
@@ -757,7 +839,7 @@ namespace RedCrossChat.Controllers
         [HttpPost]
         public async Task<IActionResult> SaveGender(GenderVm gender)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid && ModelState.ErrorCount > 1)
                 return Error("Validation error!, please check your data.");
 
 
@@ -813,8 +895,167 @@ namespace RedCrossChat.Controllers
 
         #endregion
 
+        #region AppUserTeam
+        public IActionResult AppUserTeam() 
+        { 
+            return View();
+        }
 
+        #endregion
+
+
+        #region Team
+        public IActionResult Team()
+        { 
+            return View();
+        }
+
+        public IActionResult CreateTeam()
+        {
+            ViewBag.Title = "Create Team";
+
+            return View("_Team");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetTeam(IDataTablesRequest dtRequest)
+        {
+
+            try
+            {
+                var data = await _repository.Team.GetAllAsync();
+
+                var filteredRows = data
+                    .AsQueryable()
+                    .FilterBy(dtRequest.Search, dtRequest.Columns);
+
+                var pagedRows = filteredRows
+                    .SortBy(dtRequest.Columns)
+                    .Skip(dtRequest.Start)
+                    .Take(dtRequest.Length);
+
+
+                var response = DataTablesResponse.Create(dtRequest, data.Count(),
+                    filteredRows.Count(), pagedRows);
+
+                return new DataTablesJsonResult(response);
+
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveTeam(TeamVm team)
+        {
+            if (!ModelState.IsValid  && ModelState.ErrorCount >1)
+                return Error("Validation error!, please check your data.");
+
+
+            try
+            {
+                if (team.Id == Guid.Empty)
+                {
+                    var teamEntity = new Team
+                    {
+                        Name = team.Name,
+                        NotificationType = team.NotificationType,
+                    };
+
+                    _repository.Team.Create(teamEntity);
+
+
+                    var result = await _repository.SaveChangesAsync();
+
+                    if (!result)
+                        return Error("Error Creating Team!");
+                }
+                else
+                {
+                    var teamDB = await _repository.Team.FindByCondition(x => x.Id == team.Id).FirstOrDefaultAsync();
+
+                    if (teamDB == null)
+                    {
+                        return Error("Team not found");
+                    }
+
+
+                    team.Name = team.Name;
+                    team.NotificationType= team.NotificationType;
+
+                    _repository.Team.Update(teamDB);
+
+                    var result = await _repository.SaveChangesAsync();
+
+                    if (!result)
+                        // return Success(null, null);
+                        return Error("Error updating team");
+                }
+            }
+            catch (Exception ex)
+            {
+                return Error("Something broke" + ex.Message);
+            }
+            return Success("Team Saved successfully");
+        }
+
+        public async Task<IActionResult> EditTeam(Guid clientId)
+
+        {
+            try
+            {
+                var teamEntity = _repository.Team.FindByCondition(x => x.Id == clientId).FirstOrDefault();
+                if (teamEntity  == null)
+                {
+                    return NotFound();
+                }
+
+                var teamViewModel = new TeamVm
+                {
+                    Id = teamEntity.Id,
+                    Name = teamEntity.Name,
+                    NotificationType = teamEntity.NotificationType,
+                };
+
+                ViewBag.Title = "Edit Team";
+                return View("_Team", teamViewModel);
+            }
+            catch (Exception ex)
+            {
+                return Error("Something broke" + ex.Message);
+            }
+        }
+
+        public async Task<IActionResult> DeleteTeam(Guid id)
+        {
+            try
+            {
+                var teamEntity = await _repository.Team.FindByCondition(x => x.Id == id).FirstOrDefaultAsync();
+                if (teamEntity == null)
+                {
+                    return NotFound();
+                }
+
+                _repository.Team.Delete(teamEntity);
+                var result = await _repository.SaveChangesAsync();
+
+                if (!result)
+                {
+                    return Error("Error deleting team");
+                }
+
+                return Success("Team deleted successfully");
+            }
+            catch (Exception ex)
+            {
+                return Error("Something broke" + ex.Message);
+            }
+        }
+
+
+        #endregion
     }
 }
-
-

@@ -1,7 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System;
+﻿using System;
 
-namespace RedCrossChat.ViewModel
+namespace RedCrossChat
 {
     public class AgeBandVm
     {
@@ -19,9 +18,3 @@ namespace RedCrossChat.ViewModel
         public bool IsActive { get; set; } = true;
     }
 }
-
-
-
-
-
-

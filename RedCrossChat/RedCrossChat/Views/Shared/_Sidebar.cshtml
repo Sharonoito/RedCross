@@ -21,8 +21,6 @@
         <!-- Dashboards -->
         <li class="menu-item   @Html.IsSelected(controller: "Home", action: "Dashboard") ">
             <a href="/" class="menu-link text-danger">
-             @*<a href="/" class="menu-link  bg-danger text-white">*@
-
                 <i class="menu-icon tf-icons bx bx-home-circle"></i>
                 <div data-i18n="Dashboards"></div>
             </a>
@@ -48,6 +46,12 @@
                     </a>
                 </li>
 
+                <li class="menu-item @Html.IsSelected(controller: "Config", action: "Team") ">
+                    <a asp-action="Team" asp-controller="Config" class="menu-link  text-danger">
+                        <i class="menu-icon tf-icons bx bx-layout"></i>
+                        <div data-i18n="Team"></div>
+                    </a>
+                </li>
 @*                <li class="menu-item @Html.IsSelected(controller: "Conversation", action: "Flow") ">
                     <a asp-action="Flow" asp-controller="Conversation" class="menu-link text-danger">
                         <i class="menu-icon tf-icons bx bx-layout"></i>

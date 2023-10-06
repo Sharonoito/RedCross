@@ -1,6 +1,5 @@
 ﻿
 
-
 namespace RedCrossChat.Contracts
 {
 
@@ -33,12 +32,15 @@ namespace RedCrossChat.Contracts
 
         IQuestion Question { get; }
 
+        ITeam Team { get; }
+
         IQuestionOption QuestionOption { get; }
 
          IHandOverRequest HandOverRequest { get; }
         #endregion
 
         IPersonaRepo Persona { get; }
+
         Task<bool> SaveChangesAsync();
     }
 }

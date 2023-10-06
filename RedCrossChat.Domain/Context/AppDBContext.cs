@@ -41,6 +41,12 @@ namespace RedCrossChat.Domain
 
         public DbSet<RawConversation> RawConversation { get; set; }
 
+        public DbSet<Team> Team { get; set; }
+
+        public DbSet<AppUserTeam> AppUserTeam { get; set; }
+
+
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
