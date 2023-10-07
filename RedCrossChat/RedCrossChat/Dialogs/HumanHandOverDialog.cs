@@ -1,7 +1,11 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
+using Microsoft.Bot.Schema;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using RedCrossChat.Contracts;
+using RedCrossChat.Entities;
+using RedCrossChat.Objects;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,19 +24,24 @@ namespace RedCrossChat.Dialogs
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
             {
                 InitialAction,
-
+                EvaluateClientQuestion,
             }));
 
             InitialDialogId = nameof(WaterfallDialog);
         }
 
+       
+
         public async Task<DialogTurnResult> InitialAction(WaterfallStepContext stepContext,CancellationToken token)
         {
-            
-            var conversation=await repository.Conversation.FindByCondition(x=>x.ConversationId == stepContext.Context.Activity.Conversation.Id).FirstOrDefaultAsync();
+            //Client me = (Client)stepContext.Values[UserInfo];
+            Client me= (Client)stepContext.Options;
 
+            me.HandOverToUser = me.Iteration != 0;
 
-            if (!conversation.RequestedHandedOver)
+            var conversation=await GetActiveConversation(stepContext);
+
+            if (!me.HandOverToUser)
             {
                 repository.HandOverRequest.Create(new Entities.HandOverRequest
                 {
@@ -49,11 +58,7 @@ namespace RedCrossChat.Dialogs
 
             }
 
-            //this one checks if the dialog is in checking state
-
-            //Check if the is a Notification That has been Posted 
-
-
+          
 
             bool skip = true;
 
@@ -75,12 +80,19 @@ namespace RedCrossChat.Dialogs
                     {
                         skip = false;
 
-                        return await stepContext.NextAsync(null);
+                        me.HandOverToUser = true;
+
+                        me.ActiveRawConversation = lastConv.Id;
+
+                        var promptMessage = MessageFactory.Text(lastConv.Question, null, InputHints.ExpectingInput);
+
+                        return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = promptMessage }, token);
                     }
                 }
-                await Task.Delay(2000); // Delay for 2 seconds (2000 milliseconds)
 
-                if(iterations % 5 == 0)
+                await Task.Delay(request.HasBeenReceived ? 1000  : 10000); // Delay for 2 seconds (2000 milliseconds)
+
+                if(iterations % 5 == 0 && !me.HandOverToUser)
                 {
                     await stepContext.Context.SendActivityAsync(MessageFactory.Text("An agent will be getting in touch with you shortly"), token);
                 }
@@ -92,5 +104,39 @@ namespace RedCrossChat.Dialogs
             return await stepContext.EndDialogAsync(null);
         }
 
+
+        public async Task<DialogTurnResult> EvaluateClientQuestion(WaterfallStepContext stepContext,CancellationToken token)
+        {
+            //save the response 
+
+            Client me = (Client)stepContext.Options;
+
+            me.LastResponse= stepContext.Result.ToString();
+
+            me.Iteration++;
+
+            var lastConv= await repository.RawConversation.FindByCondition(x=>x.Id==me.ActiveRawConversation).FirstOrDefaultAsync();
+
+            if(lastConv != null && lastConv.HasReply)
+            {
+                lastConv.Message=me.LastResponse.ToString();
+
+                lastConv.IsReply = true;
+
+                lastConv.HasReply= false;
+
+                repository.RawConversation.Update(lastConv);
+
+                bool result=await repository.SaveChangesAsync();
+            }
+
+
+            return await stepContext.BeginDialogAsync(nameof(WaterfallDialog), me, token);
+        }
+
+        public async Task<Conversation> GetActiveConversation(WaterfallStepContext stepContext)
+        {
+            return await repository.Conversation.FindByCondition(x => x.ConversationId == stepContext.Context.Activity.Conversation.Id).FirstOrDefaultAsync();
+        }
     }
 }

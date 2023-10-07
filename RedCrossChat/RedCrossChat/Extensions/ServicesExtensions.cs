@@ -33,8 +33,6 @@ namespace RedCrossChat.Extensions
 
             services.AddTransient<AiDialog>();
 
-            services.AddSingleton<ChatGpt>();
-
             // The MainDialog that will be run by the bot.
             services.AddTransient<MainDialog>();
 

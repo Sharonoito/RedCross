@@ -21,5 +21,9 @@ namespace RedCrossChat.Entities
         public DateTime ResponseTimeStamp { get; set; }
 
         public DateTime QuestionTimeStamp { get; set; }
+
+        public AppUser? AppUser { get; set; }
+
+        public Guid? AppUserId { get; set; }
     }
 }

@@ -373,10 +373,50 @@ namespace RedCrossChat.Controllers
             var conversations=await _repository.Conversation.
                 FindByCondition(x=>x.AppUserId== Guid.Parse(User.FindFirst("UserId").Value)).
                 Include(x=>x.Persona).
-                Include(x=>x.RawConversations).
+                Include(x=>x.RawConversations).OrderByDescending(x=>x.DateCreated).
                 ToListAsync();
 
             return Success("Items fetched Successfully", conversations);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateResponse(RawConversationVm rawConversation)
+        {
+
+
+            var conv=new RawConversation
+            {
+                ConversationId = rawConversation.ConversationId,
+
+                Question = rawConversation.Question,
+
+                HasReply =true,
+
+                QuestionTimeStamp=DateTime.Now,
+
+                IsHandOverMessage=true,
+
+                CreatedById = User.FindFirst("UserId").Value
+            };
+
+            _repository.RawConversation.Create(conv);
+
+            bool status= await _repository.SaveChangesAsync();
+
+            if (status)
+                return Success("Client Notified Successfully");
+            
+            
+            return Error("There was an error updating this");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetRawConversations(Guid id)
+        {
+
+            var conv=await _repository.RawConversation.FindByCondition(x=>x.ConversationId==id).ToListAsync();
+
+            return Success("success", conv);
         }
     }
 }

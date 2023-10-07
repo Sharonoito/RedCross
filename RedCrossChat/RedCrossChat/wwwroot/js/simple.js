@@ -9,6 +9,8 @@ let interval = 2500;
 
 let iteration = 0;
 
+let backgrounds = ['primary', 'secondary', 'primary', 'danger', 'info', 'success', 'dark','primary','info','success']
+
 
 
 const GetMyConversations=()=>{
@@ -39,19 +41,8 @@ const GetMyConversations=()=>{
 
 const UpdateUI=(data)=>{
 
-    console.log("Updating the UI");
-
     if (conversartions.length > currentLength) {
-
-
-       
-
-        console.log("The Ui is being Updated", currentLength)
-        console.log("length", conversartions.length)
-
         for (let i = currentLength; i < conversartions.length; i++) {
-
-
             AppendToSidebar(conversartions[i]);
         }
     } else if (data != undefined){
@@ -94,7 +85,7 @@ const AppendToSidebar = ({ persona, id, dateCreated,reason }) => {
     CalculateDates();
 }
 
-const username = str => `<span class="avatar-initial rounded-circle bg-label-success">${str.charAt(0)}${str.charAt(str.length - 1) }</span>`
+const username = str => `<span class="avatar-initial rounded-circle bg-label-${backgrounds[str.charAt(str.length - 1)]}">${str.charAt(0)}${str.charAt(str.length - 1)}</span>`
 
 function CalculateDates() {
 
@@ -149,11 +140,51 @@ console.log(a.diff(b, 'weeks')) // 4 */
     })
 }
 
-function UpdateChatActiveConversation() {
+function UpdateChatActiveConversation(data) {
+
+
+
     if (activeConversation == undefined)
         return;
 
-    const { id, reason, persona, rawConversations } = activeConversation;                
+    const { id, reason, persona, rawConversations } = activeConversation;  
+
+    const a = $("#ConvList");
+
+    let lastConv;
+
+    if (data != undefined && rawConversations.length < data.length) {
+
+        lastConv = data[data.length - 1];
+
+        activeConversation.rawConversations.push(lastConv);
+
+        a.append(message(lastConv))
+
+     
+        return;
+       // 
+    } else if (data != undefined && rawConversations.length == data.length) {
+
+        lastConv = data[data.length - 1];
+
+        let it = rawConversations[rawConversations.length - 1];
+
+       
+
+        if (it.message == null && lastConv.message != null) {
+
+            success("You have a message !")
+
+            a.append(message(lastConv,true))
+
+            rawConversations[rawConversations.length - 1] = lastConv;
+
+            activeConversation.rawConversations = rawConversations;
+        }
+
+        return;
+    }
 
     $("#chat-contact-info").html(`<i class="bx bx-menu bx-sm cursor-pointer d-lg-none d-block me-2" data-bs-toggle="sidebar" data-overlay="" data-target="#app-chat-contacts"></i>
                             <div class="flex-shrink-0 avatar">
@@ -165,37 +196,63 @@ function UpdateChatActiveConversation() {
                             </div>`);
 
 
-    $("#ConvList").html('');
+    a.html('');
 
     for (let i = 0; i < rawConversations.length; i++) {
 
         const conv = rawConversations[i];
 
-        $("#ConvList").append(message(conv, true)).append(message(conv));
+        attachMessage(conv,a)
 
         CalculateDates()
     }
 }
 
-const message = (conv, isReply = false) => `<li class="chat-message ${isReply ? 'chat-message-right' :' '} ">
+
+
+const attachMessage=(conv, a)=>{
+
+    a.append(message(conv)).append(message(conv, true));
+}
+
+const message=(conv, isReply=false) => isReply ? response(conv) : question(conv) 
+
+const response = (conv) => `<li class="chat-message">
+              <div class="d-flex overflow-hidden">
+                <div class="user-avatar flex-shrink-0 me-3">
+                  <div class="avatar avatar-sm">
+                    <span class="avatar-initial rounded-circle bg-label-success">${ username(activeConversation.persona.chatID) }</span>
+                  </div>
+                </div>
+                <div class="chat-message-wrapper flex-grow-1">
+                  <div class="chat-message-text">
+                    <p class="mb-0">${ conv.message}</p>
+                  </div>
+                  <div class="text-muted mt-1">
+                        <small class='moment-date' data-format='h:mm' data-date='${ conv.responseTimeStamp}'></small> 
+                  </div>
+                </div>
+              </div>
+            </li>`;
+
+const question = (conv) => `<li class="chat-message chat-message-right ">
                             <div class="d-flex overflow-hidden">
                                 <div class="chat-message-wrapper flex-grow-1">
                                     <div class="chat-message-text">
-                                        <p class="mb-0">${isReply ? conv.question : conv.message}</p>
+                                        <p class="mb-0">${ conv.question }</p>
                                     </div>
                                     <div class="text-end text-muted mt-1">
                                         <i class="bx bx-check-double text-success"></i>
-                                        <small class='moment-date' data-format='h:mm' data-date='${isReply ? conv.questionTimeStamp : conv.responseTimeStamp}'></small>
+                                        <small class='moment-date' data-format='h:mm' data-date='${conv.questionTimeStamp}'></small>
                                     </div>
                                 </div>
                                 <div class="user-avatar flex-shrink-0 ms-3">
                                     <div class="avatar avatar-sm">
-                                        <span class="avatar-initial rounded-circle bg-label-success">${!isReply ? 'CM' : 'BOT'}</span>
+                                        <span class="avatar-initial rounded-circle bg-label-success">${'BOT'}</span>
                                     </div>
                                 </div>
                             </div>
                         </li>`;
-
 
 $(document).on('click', '.chat-contact-list-item', function () {
 
@@ -223,12 +280,38 @@ $(document).on('click', '.chat-contact-list-item', function () {
 $(document).on('submit', '.fsend-message', function (e) {
 
     e.preventDefault();
+    
+    const a = $("#fsend-imessage");
 
-    $(e).find("input")
+    if (activeConversation == undefined) {
+        error("there is no active conversation");
+    }
 
-    $("#ConvList").append(message({ question: " HellowThere", questionTimeStamp:"" } , true))
+    //$("#ConvList").append(message({ question: a.val(), questionTimeStamp:"" } , true))
+
+    $.post("/Conversation/CreateResponse", { conversationId: activeConversation.id, question: a.val() }).then(resp => {
+        a.val('');
+        CheckForUpdatesActiveConversation();
+
+    });
+
 
 });
+
+
+function CheckForUpdatesActiveConversation() {
+
+    //GetRawConversations
+
+    if (activeConversation == undefined)
+        return;
+
+    $.post("/Conversation/GetRawConversations/?id=" + activeConversation.id).then(resp => {
+
+        
+        UpdateChatActiveConversation(resp.responseData)
+    })
+}
 
 
 
@@ -243,4 +326,10 @@ $(document).ready(function () {
         console.log(iteration, interval);
 
     }, interval);*/
+
+    setInterval(function () {
+        CalculateDates();
+
+        CheckForUpdatesActiveConversation();
+    },5000)
 });
