@@ -82,6 +82,8 @@ namespace RedCrossChat.Dialogs
         {
             stepContext.Values[UserInfo] = new Client();
 
+            //reason  && Context Activity Message 
+
             var question = "To start Select language, Kuanza Chagua lugha";
 
             return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions
@@ -426,7 +428,6 @@ namespace RedCrossChat.Dialogs
 
             var persona= await  _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstOrDefaultAsync();
 
-
             Conversation conversation;
 
             if (persona != null)
@@ -471,7 +472,11 @@ namespace RedCrossChat.Dialogs
 
                     Language = me.language,
 
-                    Persona = new Persona() { SenderId = stepContext.Context.Activity.From.Id }
+                    Persona = new Persona() { 
+                        SenderId = stepContext.Context.Activity.From.Id,
+                        FromId = stepContext.Context.Activity.From.Id,
+                        Name = stepContext.Context.Activity.From.Name 
+                    }
                 };
 
                
