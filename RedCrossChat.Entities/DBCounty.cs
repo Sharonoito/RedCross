@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RedCrossChat.Entities
 {
-    public class DBCounty:BaseEntity
+    public class DBCounty : BaseEntity
     {
         public string Name { get; set; }    
 

@@ -35,8 +35,9 @@ namespace RedCrossChat.Dialogs
         public AwarenessDialog(
             ILogger<AwarenessDialog> logger, 
             IRepositoryWrapper wrapper, UserState userState,
-            HumanHandOverDialog humanHandOverDialog
-            ) : base(nameof(AwarenessDialog))
+            HumanHandOverDialog humanHandOverDialog,
+            BaseDialog baseDialog
+            ) : base(nameof(AwarenessDialog), baseDialog,wrapper)
         {
 
             _repository = wrapper;
@@ -343,9 +344,9 @@ namespace RedCrossChat.Dialogs
                             new Choice() { Value = "hotline", Action = new CardAction() { Title = "hotline", Type = ActionTypes.OpenUrl, Value = "https://referraldirectories.redcross.or.ke/" } }
                         };
 
-                       // return await stepContext.BeginDialogAsync(nameof(HumanHandOverDialog), me, cancellationToken);
+                        return await stepContext.BeginDialogAsync(nameof(HumanHandOverDialog), me, cancellationToken);
 
-                        return await stepContext.EndDialogAsync(me, cancellationToken);
+                        //return await stepContext.EndDialogAsync(me, cancellationToken);
 
 
                     case Validations.NO:

@@ -25,18 +25,19 @@ namespace RedCrossChat
                 new AzureKeyCredential(_apiKey)
             );
 
-           
+
+            string preText = "You are a Counselor based in Kenya, helping people with mental and social issues." + (!language ? " respond in swahili" : "");
 
             var chatCompletionsOptions = new ChatCompletionsOptions
             {
                 MaxTokens = 400,
-                Temperature = 1f,
+                Temperature = 2f,
                 FrequencyPenalty = 0.0f,
                 PresencePenalty = 0.0f,
                 NucleusSamplingFactor = 0.95f,
                 Messages =
                 {
-                    new ChatMessage(ChatRole.System, "You are a Counselor helping people with mental and social issues."+( !language ? "respond in swahili" : "")),
+                    new ChatMessage(ChatRole.System, preText),
                   
                 },
             };

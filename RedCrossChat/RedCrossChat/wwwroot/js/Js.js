@@ -1,6 +1,19 @@
 ﻿
 let counter = 1;
 
+const ACTIVE_CONV = "com.redcross.chat.bot-simple-mde"
+
+function SetActiveConversation(id) {
+
+    console.log(ACTIVE_CONV, id);
+
+    localStorage.setItem(ACTIVE_CONV, id)
+}
+
+function GetActiveConversation() {
+    return localStorage.getItem(ACTIVE_CONV)
+}
+
 function ShowHandOverRequest(request) {
 
     Swal.fire({
@@ -25,8 +38,11 @@ function ShowHandOverRequest(request) {
         if (t.value) {
             $.post("/Conversation/UpdateHandOverRequest/?id=" + request.id).then(response => {
 
-                console.log("Conversation",response)
-                window.location ="/Conversation/"
+             
+
+                SetActiveConversation(request.conversationId);
+
+                window.location = "/Conversation/"
             })
         }
     })
@@ -35,7 +51,7 @@ function ShowHandOverRequest(request) {
 
 setInterval(function () {
 
-  //  CheckForHumanHandOverRequests();
+    CheckForHumanHandOverRequests();
 
     counter++;
 
@@ -47,6 +63,8 @@ let isShowing = false;
 function CheckForHumanHandOverRequests() {
 
     $.post("/Conversation/CheckHandOverRequests/").then(response => {
+
+        if (response.success)
         if (response.responseData.length > 0) {
 
             let request = response.responseData[response.responseData.length - 1];
@@ -63,5 +81,11 @@ function CheckForHumanHandOverRequests() {
 
 $(document).ready(function () {
 
+    if (GetActiveConversation() != undefined || GetActiveConversation() != "") {
+
+
+
+
+    }
 
 })

@@ -415,7 +415,7 @@ namespace RedCrossChat.Controllers
                     return NotFound();
                 }
 
-                var ageBandViewModel = new AgeBandVm
+                var ageBandViewModel = new AgeBandVM
                 {
                     Id = agebandEntity.Id,
                     Name = agebandEntity.Name,
@@ -435,7 +435,7 @@ namespace RedCrossChat.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SaveAgeBand(AgeBandVm ageBand)
+        public async Task<IActionResult> SaveAgeBand(AgeBandVM ageBand)
         {
             if (!ModelState.IsValid && ModelState.ErrorCount > 1)
                 return Error("Validation error!, please check your data.");

@@ -8,6 +8,7 @@ using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
 using RedCrossChat.Contracts;
+using RedCrossChat.Dialogs;
 using RedCrossChat.Objects;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,14 +20,17 @@ namespace RedCrossChat.Bots
         where T : Dialog
     {
         protected readonly Dialog Dialog ;
+
+        protected readonly DialogSet dialogSet;
         protected readonly BotState ConversationState ;
         protected readonly BotState UserState ;
         protected readonly ILogger Logger ;
 
         private readonly IRepositoryWrapper _repository;
         protected readonly DialogSet _dialog;
-        private readonly IStatePropertyAccessor<ResponseDto> _userProfileAccessor; 
-            
+        private readonly IStatePropertyAccessor<ResponseDto> _userProfileAccessor;
+
+        //calling the dialog context's cancel all dialogs
 
         public DialogBot(ConversationState conversationState, UserState userState, T dialog, ILogger<DialogBot<T>> logger, IRepositoryWrapper repository)
         {
@@ -35,13 +39,18 @@ namespace RedCrossChat.Bots
             Dialog = dialog;
             Logger = logger;
             _repository = repository;
-            _userProfileAccessor =
-            userState.CreateProperty<ResponseDto>(DialogConstants.ProfileAssesor);
+            _userProfileAccessor = userState.CreateProperty<ResponseDto>(DialogConstants.ProfileAssesor);
+
+            this.dialogSet = new DialogSet(conversationState.CreateProperty<DialogState>("DialogState"));
+
+            
         }
 
         public override async Task OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken = default)
         {
            await base.OnTurnAsync(turnContext, cancellationToken);
+
+          
 
             // Save any state changes that might have occured during the turn.
             await ConversationState.SaveChangesAsync(turnContext, false, cancellationToken);
@@ -49,14 +58,13 @@ namespace RedCrossChat.Bots
 
 
         }
-        
+
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
-            //Microsoft.Bot.Configuration.BotConfiguration.
-           
+            var userInput = turnContext.Activity.Text.ToLowerInvariant();
+
             var responseDto = await GetUserProfile(turnContext, cancellationToken);
 
-            // Run the Dialog with the new message Activity.
             await Dialog.RunAsync(turnContext, ConversationState.CreateProperty<DialogState>("DialogState"), cancellationToken);
 
             await SaveResponse(turnContext, responseDto, cancellationToken);
@@ -75,7 +83,9 @@ namespace RedCrossChat.Bots
             if (!string.IsNullOrEmpty(responseDto.Question) && !string.IsNullOrEmpty(responseDto.Message))
             {
                 _repository.RawConversation.Create(new Entities.RawConversation
-                { Question = responseDto.Question, ConversationId = responseDto.ConversationId, Message = turnContext.Activity.Text });
+                { Question = responseDto.Question, 
+                    ConversationId = responseDto.ConversationId,
+                    Message = turnContext.Activity.Text,QuestionTimeStamp=responseDto.QuestionTimeStamp,ResponseTimeStamp=responseDto.ResponseTimeStamp });
 
                 bool response=await _repository.SaveChangesAsync();
 

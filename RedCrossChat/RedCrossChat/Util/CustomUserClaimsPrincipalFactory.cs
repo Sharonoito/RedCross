@@ -20,6 +20,7 @@ namespace RedCrossChat
         protected override async Task<ClaimsIdentity> GenerateClaimsAsync(AppUser user)
         {
             var identity = await base.GenerateClaimsAsync(user);
+
             identity.AddClaim(new Claim("UserId", user.Id));
             
             return identity;

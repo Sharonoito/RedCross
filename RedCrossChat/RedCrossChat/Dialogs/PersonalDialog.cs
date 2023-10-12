@@ -32,8 +32,9 @@ namespace RedCrossChat.Dialogs
                                BreathingDialog breathingDialog,AiDialog aiDialog,
                                ILogger<PersonalDialog> logger,  
                                IRepositoryWrapper wrapper,
-                               UserState userState
-            ) : base(nameof(PersonalDialog))
+                               UserState userState,
+                               BaseDialog baseDialog
+            ) : base(nameof(PersonalDialog),baseDialog, wrapper)
         {
             _logger = logger;
 
