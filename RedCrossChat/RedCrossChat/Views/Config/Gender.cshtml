@@ -39,7 +39,7 @@
                 </li>
 
                 <li class="nav-item @(Html.IsSelected(controller: "Config", action: "Gender") == "active" ? "active" : "")">
-                    <a asp-action="Gender" asp-controller="Config" class="nav-link">
+                    <a asp-action="Gender" asp-controller="Config" class="nav-link @(Html.IsSelected(controller: "Config", action: "Gender"))">
                         <i class="bx bx-bell me-1"></i> Gender
                     </a>
                 </li>

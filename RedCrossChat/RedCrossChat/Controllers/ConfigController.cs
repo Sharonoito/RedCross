@@ -18,6 +18,7 @@ using Microsoft.Bot.Schema;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Model;
 using Microsoft.EntityFrameworkCore.Internal;
 using Sentry;
+using System.ComponentModel.DataAnnotations;
 
 namespace RedCrossChat.Controllers
 {
@@ -899,6 +900,155 @@ namespace RedCrossChat.Controllers
         public IActionResult AppUserTeam() 
         { 
             return View();
+        }
+
+        public IActionResult CreateAppUserTeam()
+        {
+            ViewBag.Title = "Create AppUserTeam";
+
+            return View("_AppUserTeam");
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> GetAppUserTeam(IDataTablesRequest dtRequest)
+        {
+
+            try
+            {
+                var data = await _repository.AppUserTeam.GetAllAsync();
+
+                var filteredRows = data
+                    .AsQueryable()
+                    .FilterBy(dtRequest.Search, dtRequest.Columns);
+
+                var pagedRows = filteredRows
+                    .SortBy(dtRequest.Columns)
+                    .Skip(dtRequest.Start)
+                    .Take(dtRequest.Length);
+
+
+                var response = DataTablesResponse.Create(dtRequest, data.Count(),
+                    filteredRows.Count(), pagedRows);
+
+                return new DataTablesJsonResult(response);
+
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveAppUserTeam(AppUserTeamVm appUserTeam)
+        {
+            if (!ModelState.IsValid  && ModelState.ErrorCount >1)
+                return Error("Validation error!, please check your data.");
+
+
+            try
+            {
+                if (appUserTeam.Id == Guid.Empty)
+                {
+                    var appUserTeamEntity = new AppUserTeam
+                    {
+                        AppUser = appUserTeam.Employee,
+                        //AppUserId = appUserTeam.UserID,
+                        //TeamId = appUserTeam.TeamID,
+                        Team = appUserTeam.Team
+                    };
+
+                    _repository.AppUserTeam.Create(appUserTeamEntity);
+
+
+                    var result = await _repository.SaveChangesAsync();
+
+                    if (!result)
+                        return Error("Error Creating AppUserTeam!");
+                }
+                else
+                {
+                    var appUserTeamDB = await _repository.AppUserTeam.FindByCondition(x => x.Id == appUserTeam.Id).FirstOrDefaultAsync();
+
+                    if (appUserTeamDB == null)
+                    {
+                        return Error("AppUserTeam not found");
+                    }
+
+
+                    appUserTeam.Employee = appUserTeam.Employee;
+                    appUserTeam.Team = appUserTeam.Team;
+
+                    _repository.AppUserTeam.Update(appUserTeamDB);
+
+                    var result = await _repository.SaveChangesAsync();
+
+                    if (!result)
+                        // return Success(null, null);
+                        return Error("Error updating appUserTeam");
+                }
+            }
+            catch (Exception ex)
+            {
+                return Error("Something broke" + ex.Message);
+            }
+            return Success("AppUserTeam Saved successfully");
+        }
+
+
+        public async Task<IActionResult> EditAppUserTeam(Guid clientId)
+
+        {
+            try
+            {
+                var appUserTeamEntity = _repository.AppUserTeam.FindByCondition(x => x.Id == clientId).FirstOrDefault();
+                if (appUserTeamEntity  == null)
+                {
+                    return NotFound();
+                }
+
+                var appUserTeamViewModel = new AppUserTeamVm
+                {
+                    Id = appUserTeamEntity.Id,
+                    Employee = appUserTeamEntity.AppUser,
+                    Team = appUserTeamEntity.Team,
+                };
+
+                ViewBag.Title = "Edit AppUserTeam";
+                return View("_AppUserTeam", appUserTeamViewModel);
+            }
+            catch (Exception ex)
+            {
+                return Error("Something broke" + ex.Message);
+            }
+        }
+
+        public async Task<IActionResult> DeleteAppUserTeam(Guid id)
+        {
+            try
+            {
+                var appUserTeamEntity = await _repository.AppUserTeam.FindByCondition(x => x.Id == id).FirstOrDefaultAsync();
+                if (appUserTeamEntity == null)
+                {
+                    return NotFound();
+                }
+
+                _repository.AppUserTeam.Delete(appUserTeamEntity);
+                var result = await _repository.SaveChangesAsync();
+
+                if (!result)
+                {
+                    return Error("Error deleting appUserTeam");
+                }
+
+                return Success("AppUserTeam deleted successfully");
+            }
+            catch (Exception ex)
+            {
+                return Error("Something broke" + ex.Message);
+            }
         }
 
         #endregion

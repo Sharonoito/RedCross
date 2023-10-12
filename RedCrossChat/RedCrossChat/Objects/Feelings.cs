@@ -105,7 +105,7 @@ namespace RedCrossChat.Objects
     public static class ValidationsSwahili
     {
         public const string YES="Ndio";
-        public const string NO="la";
+        public const string NO="La";
     }
 
     public static class Gender

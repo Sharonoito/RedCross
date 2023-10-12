@@ -81,12 +81,12 @@ namespace RedCrossChat.Dialogs
         {
             stepContext.Values[UserInfo] = new Client();
 
-            var question = "To start Select language , Kuanza Chagua lugha";
+            var question = "To start select language , Kuanza chagua lugha";
 
             return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions
             {
                 Prompt = MessageFactory.Text(question),
-                RetryPrompt = MessageFactory.Text("Please select a langugae , Tafadhali Chagua Lugha"),
+                RetryPrompt = MessageFactory.Text("Please select a langugae , Tafadhali chagua Lugha"),
                 Choices = new List<Choice>()
                 {
                     new Choice("English"),
@@ -323,7 +323,7 @@ namespace RedCrossChat.Dialogs
         {
             Client me = (Client)stepContext.Values[UserInfo];
 
-            var question =me.language? "Please Specify the feeling "  : "Tafadhali Bainisha hisia";
+            var question =me.language? "Please specify the feeling "  : "Tafadhali bainisha hisia";
 
             var response = stepContext.Context.Activity.Text;
 

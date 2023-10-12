@@ -57,15 +57,19 @@ namespace RedCrossChat.Repository
             }
         }
 
+
+
         public IAppUserTeam _appUserTeam;
 
-        public IAppUserTeam GetQuestion()
+        public IAppUserTeam AppUserTeam
         {
+            get {
+                if(_appUserTeam==null) { _appUserTeam = new AppUserTeamRepo(_repoContext); }
 
-            if (_appUserTeam==null) { _appUserTeam = new AppUserTeamRepo(_repoContext); }
-
-            return _appUserTeam;
+                return _appUserTeam;
+            }
         }
+
 
 
         #endregion

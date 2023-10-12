@@ -120,16 +120,21 @@
                                                     data-action='@Url.Action("EditUser", "Auth")?clientId=${row.id}'
                                                     title='Edit'>
                                                     <i class='fa fa-pencil-alt'></i>
-                                              
-                                                <button class='delete btn btn-outline-danger btn-xs'
-                                                    data-action='@Url.Action("DeleteUser", "Auth")?clientId=${row.id}'
+                                                </button>
+
+
+                                                <button class="delete btn btn-outline-danger btn-xs"
+                                                    data-bs-toggle="button" aria-pressed="true"
+                                                    data-action='@Url.Action("DeactivateAccount", "Auth")?clientId=${row.id}'
                                                     data-table='tblClients'
                                                     data-id='${row.id}'
                                                     data-toggle='tooltip'
-                                                    title='Delete'>
-                                                    <i class='fa fa-trash'></i>
+                                                    title='Deactivate'>
+                                                    <i class='fas fa-toggle-on'></i>
                                                 </button>
+
                                             </div>`;
+                           
 
                             return actionsHtml;
                         },

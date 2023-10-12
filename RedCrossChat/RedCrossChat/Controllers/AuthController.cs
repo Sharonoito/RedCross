@@ -84,7 +84,8 @@ namespace RedCrossChat.Controllers
 
         }
 
-        [HttpPost]
+
+        [AllowAnonymous]
         public async Task<IActionResult> DeactivateAccount()
         {
             var user = await _userManager.GetUserAsync(User);
@@ -93,15 +94,15 @@ namespace RedCrossChat.Controllers
                 user.IsDeactivated = true;
                 await _userManager.UpdateAsync(user);
 
-                
+
                 await _signInManager.SignOutAsync();
 
-                return RedirectToAction("accountdeactivated","auth");
+
+                return PartialView("_AccountDeactivated");
             }
 
-            return RedirectToAction("profile", "auth");
+            return Content("Account deactivation failed. User not found.");
         }
-
 
 
         public IActionResult Profile()

@@ -80,7 +80,7 @@ namespace RedCrossChat.Cards
         {
             var heroCard = new HeroCard
             {
-                Title = "Hotline Numbers ",
+                Title = "Hotline numbers ",
                 Subtitle = "Referral pathways",
                 Text = "For any other advanced support feel free to check our detailed referral pathways",
 

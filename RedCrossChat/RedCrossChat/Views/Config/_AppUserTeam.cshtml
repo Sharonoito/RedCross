@@ -6,12 +6,12 @@
     Layout = null;
 }
 
-<div class="modal-header">
+@*<div class="modal-header">
     <h5 class="modal-title">@ViewBag.Title</h5>
     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-</div>
+</div>*@
 
-@using (Html.BeginForm(actionName: "SaveTeam", controllerName: "Config", FormMethod.Post, new { @class = "modal-Crud", data_modal = "clientModal", data_callback = "", data_table = "tblTeam", autocomplete = "off", @id = "frmClient" }))
+@using (Html.BeginForm(actionName: "SaveAppUserTeam", controllerName: "Config", FormMethod.Post, new { @class = "modal-Crud", data_modal = "clientModal", data_callback = "", data_table = "tblAppUserTeam", autocomplete = "off", @id = "frmClient" }))
 {
 
     <input type="hidden" asp-for="Id">
@@ -19,7 +19,7 @@
     <div class="modal-body">
         <div class="row">
             
-
+@*
             <div class="form-group col-lg-12 mb-2">
                 <label asp-for="Employee"></label>
                 <input asp-for="Employee" class="form-control" autocomplete="off" />
@@ -36,25 +36,32 @@
                 <label asp-for="TeamID"></label>
                 <input asp-for="TeamID" class="form-control" autocomplete="off" />
                 <span asp-validation-for="TeamID" class="text-danger"></span>
+            </div>*@
+
+
+            <div class="row gx-3 gy-2 align-items-center">
+                <div class="col-md-6">
+                    <label asp-for="Team"></label>
+                    <select id="selectTypeOpt" class="form-select color-dropdown" name="employee">
+                        <option value= "-1" selected>Select Employee</option>
+@*                        @foreach (var employee in Model.Team)
+                        {
+                            <option value="@employee">@employee</option>
+                        }*@
+
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="showToastPlacement">&nbsp;</label>
+                    <button id="showToastPlacement" class="btn btn-primary d-block">Add Employee</button>
+                </div>
             </div>
-
-            <div class="form-group col-lg-12 mb-2">
-                <label asp-for="Team"></label>
-                <input asp-for="Team" class="form-control" autocomplete="off" />
-                <span asp-validation-for="Team" class="text-danger"></span>
-            </div>
-
-
 
           
         </div>
+        <div>
+            @Html.Partial("AppUserTeam")
+        </div>
 
-    </div>
-
-    <div class="modal-footer">
-       
-            <button type="submit" class="btn btn-primary me-sm-3 me-1 mt-3">Submit</button>
-            <button type="reset" class="btn btn-label-secondary btn-reset mt-3" data-bs-dismiss="modal" aria-label="Close">Cancel</button>
-        
     </div>
 }

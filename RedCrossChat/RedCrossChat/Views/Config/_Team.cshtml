@@ -2,6 +2,7 @@
 
 @model TeamVm
 
+
 @{
     Layout = null;
 }
@@ -10,6 +11,7 @@
     <h5 class="modal-title">@ViewBag.Title</h5>
     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 </div>
+
 
 @using (Html.BeginForm(actionName: "SaveTeam", controllerName: "Config", FormMethod.Post, new { @class = "modal-Crud", data_modal = "clientModal", data_callback = "", data_table = "tblTeam", autocomplete = "off", @id = "frmClient" }))
 {
@@ -36,10 +38,14 @@
 
     </div>
 
+    @Html.Partial("_AppUserTeam")
+
     <div class="modal-footer">
        
             <button type="submit" class="btn btn-primary me-sm-3 me-1 mt-3">Submit</button>
             <button type="reset" class="btn btn-label-secondary btn-reset mt-3" data-bs-dismiss="modal" aria-label="Close">Cancel</button>
         
     </div>
+
+   
 }

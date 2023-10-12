@@ -10,6 +10,9 @@ namespace RedCrossChat.Contracts
         IRoleRepository Role { get; }
         IAppClaimRepository AppClaim { get; }
         IAppModuleRepository AppModule { get; }
+
+        IAppUserTeam AppUserTeam { get; }
+
         #endregion
 
         #region Dependencies              
