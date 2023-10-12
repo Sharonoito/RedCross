@@ -1,6 +1,6 @@
 ﻿@using RedCrossChat.ViewModel;
 
-@model AppUserTeamVm
+@model TeamVm
 
 @{
     Layout = null;
@@ -11,7 +11,7 @@
     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 </div>*@
 
-@using (Html.BeginForm(actionName: "SaveAppUserTeam", controllerName: "Config", FormMethod.Post, new { @class = "modal-Crud", data_modal = "clientModal", data_callback = "", data_table = "tblAppUserTeam", autocomplete = "off", @id = "frmClient" }))
+@using (Html.BeginForm(actionName: "SaveAppUserTeam", controllerName: "Config", FormMethod.Post, new { @class = "modal-Crud", data_modal = "clientModal", data_callback = "showTeamEmployees", data_table = "tblAppUserTeam", autocomplete = "off", @id = "frmClient" }))
 {
 
     <input type="hidden" asp-for="Id">
