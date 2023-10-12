@@ -53,5 +53,5 @@ jobs:
         with:
           app-name: 'Recross-chat-bot'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_C07E78390BBF46E09B9A934E3C1705F9 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_02BCACB94B144568AF73CF25AEF24A38 }}
           package: .
