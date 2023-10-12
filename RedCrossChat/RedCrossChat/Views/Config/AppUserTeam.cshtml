@@ -4,84 +4,18 @@
 @{
 }
 
-<div class="container-xxl flex-grow-1 container-p-y">
-
-
-    <h4 class="py-3 mb-4">
-        <span class="text-muted fw-light">Account Settings /</span> Account
-    </h4>
-
-    <div class="row fv-plugins-icon-container">
-        <div class="col-md-12">
-            <ul class="nav nav-pills flex-column flex-md-row mb-3">
-                <li class="nav-item">
-                    <a class="nav-link active" href="javascript:void(0);" style="background-color: #ED1C24;">
-                        <i class="bx bx-user me-1"></i> Feelings
-                    </a>
-                </li>
-
-                <li class="nav-item @(Html.IsSelected(controller: "Config", action: "Profession") == "active" ? "active" : "")">
-                    <a asp-action="Profession" asp-controller="Config" class="nav-link">
-                        <i class="bx bx-grid-alt me-1"></i> Professional Status
-                    </a>
-                </li>
-
-                <li class="nav-item @(Html.IsSelected(controller: "Config", action: "AgeBand"))">
-                    <a asp-action="AgeBand" asp-controller="Config" class="nav-link @(Html.IsSelected(controller: "Config", action: "AgeBand"))">
-                        <i class="bx bx-bell me-1"></i> Age Band
-                    </a>
-                </li>
-
-                <li class="nav-item @(Html.IsSelected(controller: "Config", action: "MaritalState") == "active" ? "active" : "")">
-                    <a asp-action="MaritalState" asp-controller="Config" class="nav-link">
-                        <i class="bx bx-bell me-1"></i> Marital Status
-                    </a>
-                </li>
-
-                <li class="nav-item @(Html.IsSelected(controller: "Config", action: "Gender") == "active" ? "active" : "")">
-                    <a asp-action="Gender" asp-controller="Config" class="nav-link">
-                        <i class="bx bx-bell me-1"></i> Gender
-                    </a>
-                </li>
-            </ul>
-
-
-        </div>
-    </div>
-
-
-</div>
-
 <section class="content-header">
     <div class="container-fluid">
         <div class="card">
-            <div class="card-header">
-                <h3 class="card-title"><i class="fa fa-info-circle"></i> Manage AgeBand</h3>
-
-                <div class="card-tools">
-
-                    <button type="button"
-                            class="load-modal text-right btn btn-sm btn-outline-primary float-right"
-                            data-toggle="modal"
-                            data-target="#clientModal"
-                            data-modal="clientModal"
-                            data-viewurl="true"
-                            data-action="@Url.Action("CreateAgeBand")" data-bs-toggle="modal" data-bs-target="#clientModal">
-                        <i class="fa fa-plus"></i> Add AgeBand
-                    </button>
-
-                </div>
-            </div>
 
             <div class="card-body p-0">
-                <table class="table table-striped" id="tblAgeBand">
+                <table class="table table-striped" id="tblAppUserTeam">
                     <thead>
                         <tr>
-                            <th>Name</th>
-                            <th>Kiswahili</th>
-                            <th>Highest</th>
-                            <th>Lowest</th>
-                            <th>Synonyms</th>
+                            <th>Employee Name</th>
+@*                            <th>UserID</th>
+                            <th>TeamID</th>
+                            <th>Team</th>*@
                             <th style="width: 40px">Actions</th>
                         </tr>
                     </thead>
@@ -93,12 +27,12 @@
         </div>
     </div>
 
-    <div class="modal fade" data-keyboard="false" id="clientModal" tabindex="-1" role="dialog" style="display:none" aria-labelledby="clientModal" aria-hidden="true">
+@*    <div class="modal fade" data-keyboard="false" id="clientModal" tabindex="-1" role="dialog" style="display:none" aria-labelledby="clientModal" aria-hidden="true">
         <div class="modal-dialog ">
             <div class="modal-content">
             </div>
         </div>
-    </div>
+    </div>*@
 
 </section>
 
@@ -136,20 +70,19 @@
         var jsdtClient = {
             table: null,
             initializeDataTable: function () {
-                jsdtClient.table = $('#tblAgeBand').DataTable({
+                jsdtClient.table = $('#tblAppUserTeam').DataTable({
                     processing: true,
                     serverSide: true,
                     serverMethod: 'post',
                     ajax: {
-                        url: "@Url.Action("GetAgeBand")",
+                        url: "@Url.Action("GetAppUserTeam")",
                         type: "POST"
                     },
                     columns: [
-                        { data: 'name' },
-                        { data: 'kiswahili' },
-                        { data: 'highest' },
-                        { data: 'lowest' },
-                        { data: 'synonyms' },
+                        { data: 'employee' },
+                        //{ data: 'userId' },
+                        //{ data: 'teamId' },
+                        //{ data: 'team' },
                         { data: 'id', name: 'Id' },
                
                     ],
@@ -165,12 +98,12 @@
                                                             data-modal='clientModal'
                                                             data-bs-toggle="modal" data-bs-target="#clientModal"
                                                             data-viewurl='true'
-                                                                    data-action='@Url.Action("EditAgeBand", "Config")?clientId=${row.id}'
+                                                            data-action='@Url.Action("EditAppUserTeam", "Config")?clientId=${row.id}'
                                                             title='Edit'>
                                                             <i class='fa fa-pencil-alt'></i>
 
                                                         <button class='delete btn btn-outline-danger btn-xs'
-                                                                    data-action='@Url.Action("DeleteAgeBand", "Config")?clientId=${row.id}'
+                                                                    data-action='@Url.Action("DeleteAppUserTeam", "Config")?clientId=${row.id}'
                                                             data-table='tblClients'
                                                             data-id='${row.id}'
                                                             data-toggle='tooltip'

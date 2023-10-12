@@ -1,3 +1,5 @@
+@import url('../demo.css');
+@import url('theme-semi-dark.css');
 :root {
     --bs-blue: #007bff;
     --bs-indigo: #6610f2;
@@ -58,7 +60,7 @@
     --bs-border-radius-2xl: 2rem;
     --bs-border-radius-pill: 50rem;
     --bs-link-color: #696cff;
-    --bs-link-hover-color: #5f61e6;
+    --bs-link-hover-color: #ED1C24;
     --bs-code-color: #e83e8c;
     --bs-highlight-bg: #ffeecc
 }

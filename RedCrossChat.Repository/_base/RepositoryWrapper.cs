@@ -57,6 +57,21 @@ namespace RedCrossChat.Repository
             }
         }
 
+
+
+        public IAppUserTeam _appUserTeam;
+
+        public IAppUserTeam AppUserTeam
+        {
+            get {
+                if(_appUserTeam==null) { _appUserTeam = new AppUserTeamRepo(_repoContext); }
+
+                return _appUserTeam;
+            }
+        }
+
+
+
         #endregion
 
 
@@ -185,6 +200,19 @@ namespace RedCrossChat.Repository
                 return _persona;
             }
         }
+
+        public ITeam _team;
+        public ITeam Team
+        {
+            get
+            {
+
+                if (_team==null) { _team = new TeamRepo(_repoContext); }
+
+                return _team;
+            }
+        }
+
 
         public IRawConversation _rawConversation;
 

@@ -18,6 +18,7 @@ using Microsoft.Bot.Schema;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Model;
 using Microsoft.EntityFrameworkCore.Internal;
 using Sentry;
+using System.ComponentModel.DataAnnotations;
 
 namespace RedCrossChat.Controllers
 {
@@ -86,7 +87,6 @@ namespace RedCrossChat.Controllers
 
             return View("_Feeling");
         }
-
         public async Task<IActionResult> EditFeeling(Guid clientId)
         
         {
@@ -102,7 +102,7 @@ namespace RedCrossChat.Controllers
                 {
                     Id = feelingEntity.Id,
                     Name = feelingEntity.Name,
-                    Description = feelingEntity.Description,
+                    //Description = feelingEntity.Description,
                     Kiswahili=feelingEntity.Kiswahili,
                     Synonyms = feelingEntity.Synonymns
                 };
@@ -115,7 +115,6 @@ namespace RedCrossChat.Controllers
                 return Error("Something broke" + ex.Message);
             }
         }
-
 
         //[HttpPost]
         public async Task<IActionResult> DeleteFeeling(Guid id)
@@ -147,7 +146,7 @@ namespace RedCrossChat.Controllers
         [HttpPost]
         public async Task<IActionResult>SaveFeeling(FeelingVm feeling)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid && ModelState.ErrorCount >1)
                 return Error("Validation error!, please check your data.");
 
        
@@ -216,7 +215,6 @@ namespace RedCrossChat.Controllers
             return View("_Profession");
         }
 
-
         [HttpPost]
         public async Task<IActionResult> GetProfession(IDataTablesRequest dtRequest)
         {
@@ -251,7 +249,7 @@ namespace RedCrossChat.Controllers
         [HttpPost]
         public async Task<IActionResult> SaveProfession(ProfessionVm profession)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid  && ModelState.ErrorCount >1)
                 return Error("Validation error!, please check your data.");
 
 
@@ -302,6 +300,35 @@ namespace RedCrossChat.Controllers
                 return Error("Something broke" + ex.Message);
             }
             return Success("Profession Saved successfully");
+        }
+
+
+        public async Task<IActionResult> EditProfession(Guid clientId)
+
+        {
+            try
+            {
+                var professionEntity = _repository.Profession.FindByCondition(x => x.Id == clientId).FirstOrDefault();
+                if (professionEntity  == null)
+                {
+                    return NotFound();
+                }
+
+                var professionViewModel = new ProfessionVm
+                {
+                    Id = professionEntity.Id,
+                    Name = professionEntity.Name,
+                    Kiswahili= professionEntity.Kiswahili,
+                    Synonyms = professionEntity.Synonyms
+                };
+
+                ViewBag.Title = "Edit Profession";
+                return View("_Profession", professionViewModel);
+            }
+            catch (Exception ex)
+            {
+                return Error("Something broke" + ex.Message);
+            }
         }
 
         public async Task<IActionResult> DeleteProfession(Guid id)
@@ -377,17 +404,47 @@ namespace RedCrossChat.Controllers
             }
         }
 
+        public async Task<IActionResult> EditAgeBand(Guid clientId)
+
+        {
+            try
+            {
+                var agebandEntity = _repository.AgeBand.FindByCondition(x => x.Id == clientId).FirstOrDefault();
+                if (agebandEntity == null)
+                {
+                    return NotFound();
+                }
+
+                var ageBandViewModel = new AgeBandVM
+                {
+                    Id = agebandEntity.Id,
+                    Name = agebandEntity.Name,
+                    Kiswahili=agebandEntity.Kiswahili,
+                    //Highest = agebandEntity.Highest,
+                    //Lowest = agebandEntity.Lowest,
+                    Synonyms = agebandEntity.Synonyms
+                };
+
+                ViewBag.Title = "Edit AgeBand";
+                return View("_AgeBand", ageBandViewModel);
+            }
+            catch (Exception ex)
+            {
+                return Error("Something broke" + ex.Message);
+            }
+        }
+
         [HttpPost]
         public async Task<IActionResult> SaveAgeBand(AgeBandVM ageBand)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid && ModelState.ErrorCount > 1)
                 return Error("Validation error!, please check your data.");
-
 
             try
             {
                 if (ageBand.Id == Guid.Empty)
                 {
+                    // Creating a new AgeBand
                     var ageBandEntity = new AgeBand
                     {
                         Name = ageBand.Name,
@@ -397,7 +454,6 @@ namespace RedCrossChat.Controllers
 
                     _repository.AgeBand.Create(ageBandEntity);
 
-
                     var result = await _repository.SaveChangesAsync();
 
                     if (!result)
@@ -405,6 +461,7 @@ namespace RedCrossChat.Controllers
                 }
                 else
                 {
+                    // Retrieving the existing AgeBand from the database
                     var ageBandDB = await _repository.AgeBand.FindByCondition(x => x.Id == ageBand.Id).FirstOrDefaultAsync();
 
                     if (ageBandDB == null)
@@ -412,18 +469,17 @@ namespace RedCrossChat.Controllers
                         return Error("AgeBand not found");
                     }
 
+                    // Updating properties of ageBandDB with values from ageBand
+                    ageBandDB.Name = ageBand.Name;
+                    ageBandDB.Kiswahili = ageBand.Kiswahili;
+                    ageBandDB.Synonyms = ageBand.Synonyms;
 
-                    ageBand.Name = ageBand.Name;
-                    ageBand.Kiswahili = ageBand.Kiswahili;
-                    ageBand.Synonyms = ageBand.Synonyms;
-
+                    // Mark the entity as modified and save changes to the database
                     _repository.AgeBand.Update(ageBandDB);
-
                     var result = await _repository.SaveChangesAsync();
 
                     if (!result)
-                        return Success(null, null);
-                    return Error("Error updating ageBand");
+                        return Error("Error updating ageBand");
                 }
             }
             catch (Exception ex)
@@ -432,6 +488,64 @@ namespace RedCrossChat.Controllers
             }
             return Success("AgeBand Saved successfully");
         }
+
+
+        //[HttpPost]
+        //public async Task<IActionResult> SaveAgeBand(AgeBandVm ageBand)
+
+        //{
+        //    if (!ModelState.IsValid && ModelState.ErrorCount > 1)
+        //        return Error("Validation error!, please check your data.");
+
+
+        //    try
+        //    {
+        //        if (ageBand.Id == Guid.Empty)
+        //        {
+        //            var ageBandEntity = new AgeBand
+        //            {
+        //                Name = ageBand.Name,
+        //                Kiswahili = ageBand.Kiswahili,
+        //                Synonyms = ageBand.Synonyms
+        //            };
+
+        //            _repository.AgeBand.Create(ageBandEntity);
+
+
+        //            var result = await _repository.SaveChangesAsync();
+
+        //            if (!result)
+        //                return Error("Error Creating AgeBand!");
+        //        }
+        //        else
+        //        {
+        //            var ageBandDB = await _repository.AgeBand.FindByCondition(x => x.Id == ageBand.Id).FirstOrDefaultAsync();
+
+        //            if (ageBandDB == null)
+        //            {
+        //                return Error("AgeBand not found");
+        //            }
+
+
+        //            ageBand.Name = ageBand.Name;
+        //            ageBand.Kiswahili = ageBand.Kiswahili;
+        //            ageBand.Synonyms = ageBand.Synonyms;
+
+        //            _repository.AgeBand.Update(ageBandDB);
+
+        //            var result = await _repository.SaveChangesAsync();
+
+        //            if (!result)
+        //                return Success(null, null);
+        //            return Error("Error updating ageBand");
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Error("Something broke" + ex.Message);
+        //    }
+        //    return Success("AgeBand Saved successfully");
+        //}
 
         public async Task<IActionResult> DeleteAgeBand(Guid id)
         {
@@ -481,7 +595,7 @@ namespace RedCrossChat.Controllers
 
             try
             {
-                var data = await _repository.AgeBand.GetAllAsync();
+                var data = await _repository.MaritalState.GetAllAsync();
 
                 var filteredRows = data
                     .AsQueryable()
@@ -506,11 +620,592 @@ namespace RedCrossChat.Controllers
             }
         }
 
+        public async Task<IActionResult> EditMaritalState(Guid clientId)
+
+        {
+            try
+            {
+                var maritalEntity = _repository.MaritalState.FindByCondition(x => x.Id == clientId).FirstOrDefault();
+                if (maritalEntity == null)
+                {
+                    return NotFound();
+                }
+
+                var maritalStateViewModel = new MaritalStateVm
+                {
+                    Id = maritalEntity.Id,
+                    Name = maritalEntity.Name,
+                    Kiswahili= maritalEntity.Kiswahili,
+                    Synonyms = maritalEntity.Synonyms
+                };
+
+                ViewBag.Title = "Edit MaritalState";
+                return View("_MaritalState", maritalStateViewModel);
+            }
+            catch (Exception ex)
+            {
+                return Error("Something broke" + ex.Message);
+            }
+        }
+
+
+
+        [HttpPost]
+        public async Task<IActionResult> SaveMaritalState(MaritalStateVm maritalState)
+
+        {
+            if (!ModelState.IsValid && ModelState.ErrorCount > 1)
+                return Error("Validation error!, please check your data.");
+
+
+            try
+            {
+                if (maritalState.Id == Guid.Empty)
+                {
+                    var maritalStateEntity = new MaritalState
+                    {
+                        Name = maritalState.Name,
+                        Kiswahili=maritalState.Kiswahili,
+                        Synonyms = maritalState.Synonyms
+                    };
+
+                    _repository.MaritalState.Create(maritalStateEntity);
+
+
+                    var result = await _repository.SaveChangesAsync();
+
+                    if (!result)
+                        return Error("Error Creating Marital State!");
+                }
+
+                else
+                {
+                    var maritalStateDB = await _repository.MaritalState.FindByCondition(x => x.Id == maritalState.Id).FirstOrDefaultAsync();
+
+                    if (maritalStateDB == null)
+                    {
+                        return Error("Marital Status not found");
+                    }
+
+
+                    maritalStateDB.Name = maritalState.Name;
+                    maritalStateDB.Kiswahili = maritalState.Kiswahili;
+                    maritalStateDB.Synonyms = maritalState.Synonyms;
+
+                    _repository.MaritalState.Update(maritalStateDB);
+
+                    var result = await _repository.SaveChangesAsync();
+
+                    if (!result)
+                        // return Success(null, null);
+                        return Error("Error updating Marital State");
+                }
+            }
+            catch (Exception ex)
+            {
+                return Error("Something broke" + ex.Message);
+            }
+            return Success("Marital State Saved successfully");
+        }
+
+        public async Task<IActionResult> DeleteMaritalState(Guid id)
+        {
+            try
+            {
+                var maritalStateEntity = await _repository.MaritalState.FindByCondition(x => x.Id == id).FirstOrDefaultAsync();
+                if (maritalStateEntity == null)
+                {
+                    return NotFound();
+                }
+
+                _repository.MaritalState.Delete(maritalStateEntity);
+                var result = await _repository.SaveChangesAsync();
+
+                if (!result)
+                {
+                    return Error("Error deleting Marital state");
+                }
+
+                return Success("Marital state deleted successfully");
+            }
+            catch (Exception ex)
+            {
+                return Error("Something broke" + ex.Message);
+            }
+        }
 
 
         #endregion
 
+        #region Gender
+        public IActionResult Gender()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetGender(IDataTablesRequest dtRequest)
+        {
+
+            try
+            {
+                var data = await _repository.Gender.GetAllAsync();
+
+                var filteredRows = data
+                    .AsQueryable()
+                    .FilterBy(dtRequest.Search, dtRequest.Columns);
+
+                var pagedRows = filteredRows
+                    .SortBy(dtRequest.Columns)
+                    .Skip(dtRequest.Start)
+                    .Take(dtRequest.Length);
+
+
+                var response = DataTablesResponse.Create(dtRequest, data.Count(),
+                    filteredRows.Count(), pagedRows);
+
+                return new DataTablesJsonResult(response);
+
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+
+            }
+        }
+
+        public IActionResult CreateGender()
+        {
+            ViewBag.Title = "Create Gender";
+
+            return View("_Gender");
+        }
+
+        public async Task<IActionResult> EditGender(Guid clientId)
+
+        {
+            try
+            {
+                var genderEntity = _repository.Gender.FindByCondition(x => x.Id == clientId).FirstOrDefault();
+                if (genderEntity == null)
+                {
+                    return NotFound();
+                }
+
+                var genderViewModel = new GenderVm
+                {
+                    Id = genderEntity.Id,
+                    Name = genderEntity.Name,
+                    Kiswahili=genderEntity.Kiswahili,
+                
+                };
+
+                ViewBag.Title = "Edit Gender";
+                return View("_Gender", genderViewModel);
+            }
+            catch (Exception ex)
+            {
+                return Error("Something broke" + ex.Message);
+            }
+        }
+
+
+        public async Task<IActionResult> DeleteGender(Guid id)
+        {
+            try
+            {
+                var genderEntity = await _repository.Gender.FindByCondition(x => x.Id == id).FirstOrDefaultAsync();
+                if (genderEntity == null)
+                {
+                    return NotFound();
+                }
+
+                _repository.Gender.Delete(genderEntity);
+                var result = await _repository.SaveChangesAsync();
+
+                if (!result)
+                {
+                    return Error("Error deleting Gender");
+                }
+
+                return Success("Gender deleted successfully");
+            }
+            catch (Exception ex)
+            {
+                return Error("Something broke" + ex.Message);
+            }
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> SaveGender(GenderVm gender)
+        {
+            if (!ModelState.IsValid && ModelState.ErrorCount > 1)
+                return Error("Validation error!, please check your data.");
+
+
+            try
+            {
+                if (gender.Id == Guid.Empty)
+                {
+                    var genderEntity = new Entities.Gender
+                    {
+                        Name = gender.Name,
+                        Kiswahili=gender.Kiswahili,
+                    };
+
+                    _repository.Gender.Create(genderEntity);
+
+
+                    var result = await _repository.SaveChangesAsync();
+
+                    if (!result)
+                        return Error("Error Creating Gender!");
+                }
+                else
+                {
+
+                    var genderDB = await _repository.Gender.FindByCondition(x => x.Id == gender.Id).FirstOrDefaultAsync();
+
+                    if (genderDB == null)
+                    {
+                        return Error("Gender not found");
+                    }
+
+
+                    genderDB.Name = gender.Name;
+                    genderDB.Kiswahili = gender.Kiswahili;
+
+                    _repository.Gender.Update(genderDB);
+
+                    var result = await _repository.SaveChangesAsync();
+
+                    if (!result)
+                        // return Success(null, null);
+                        return Error("Error updating Gender");
+                }
+            }
+            catch (Exception ex)
+            {
+                return Error("Something broke" + ex.Message);
+            }
+            return Success("Gender Saved successfully");
+        }
+
+
+
+        #endregion
+
+        #region AppUserTeam
+        public IActionResult AppUserTeam() 
+        { 
+            return View();
+        }
+
+        public IActionResult CreateAppUserTeam()
+        {
+            ViewBag.Title = "Create AppUserTeam";
+
+            return View("_AppUserTeam");
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> GetAppUserTeam(IDataTablesRequest dtRequest)
+        {
+
+            try
+            {
+                var data = await _repository.AppUserTeam.GetAllAsync();
+
+                var filteredRows = data
+                    .AsQueryable()
+                    .FilterBy(dtRequest.Search, dtRequest.Columns);
+
+                var pagedRows = filteredRows
+                    .SortBy(dtRequest.Columns)
+                    .Skip(dtRequest.Start)
+                    .Take(dtRequest.Length);
+
+
+                var response = DataTablesResponse.Create(dtRequest, data.Count(),
+                    filteredRows.Count(), pagedRows);
+
+                return new DataTablesJsonResult(response);
+
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveAppUserTeam(AppUserTeamVm appUserTeam)
+        {
+            if (!ModelState.IsValid  && ModelState.ErrorCount >1)
+                return Error("Validation error!, please check your data.");
+
+
+            try
+            {
+                if (appUserTeam.Id == Guid.Empty)
+                {
+                    var appUserTeamEntity = new AppUserTeam
+                    {
+                        AppUser = appUserTeam.Employee,
+                        //AppUserId = appUserTeam.UserID,
+                        //TeamId = appUserTeam.TeamID,
+                        Team = appUserTeam.Team
+                    };
+
+                    _repository.AppUserTeam.Create(appUserTeamEntity);
+
+
+                    var result = await _repository.SaveChangesAsync();
+
+                    if (!result)
+                        return Error("Error Creating AppUserTeam!");
+                }
+                else
+                {
+                    var appUserTeamDB = await _repository.AppUserTeam.FindByCondition(x => x.Id == appUserTeam.Id).FirstOrDefaultAsync();
+
+                    if (appUserTeamDB == null)
+                    {
+                        return Error("AppUserTeam not found");
+                    }
+
+
+                    appUserTeam.Employee = appUserTeam.Employee;
+                    appUserTeam.Team = appUserTeam.Team;
+
+                    _repository.AppUserTeam.Update(appUserTeamDB);
+
+                    var result = await _repository.SaveChangesAsync();
+
+                    if (!result)
+                        // return Success(null, null);
+                        return Error("Error updating appUserTeam");
+                }
+            }
+            catch (Exception ex)
+            {
+                return Error("Something broke" + ex.Message);
+            }
+            return Success("AppUserTeam Saved successfully");
+        }
+
+
+        public async Task<IActionResult> EditAppUserTeam(Guid clientId)
+
+        {
+            try
+            {
+                var appUserTeamEntity = _repository.AppUserTeam.FindByCondition(x => x.Id == clientId).FirstOrDefault();
+                if (appUserTeamEntity  == null)
+                {
+                    return NotFound();
+                }
+
+                var appUserTeamViewModel = new AppUserTeamVm
+                {
+                    Id = appUserTeamEntity.Id,
+                    Employee = appUserTeamEntity.AppUser,
+                    Team = appUserTeamEntity.Team,
+                };
+
+                ViewBag.Title = "Edit AppUserTeam";
+                return View("_AppUserTeam", appUserTeamViewModel);
+            }
+            catch (Exception ex)
+            {
+                return Error("Something broke" + ex.Message);
+            }
+        }
+
+        public async Task<IActionResult> DeleteAppUserTeam(Guid id)
+        {
+            try
+            {
+                var appUserTeamEntity = await _repository.AppUserTeam.FindByCondition(x => x.Id == id).FirstOrDefaultAsync();
+                if (appUserTeamEntity == null)
+                {
+                    return NotFound();
+                }
+
+                _repository.AppUserTeam.Delete(appUserTeamEntity);
+                var result = await _repository.SaveChangesAsync();
+
+                if (!result)
+                {
+                    return Error("Error deleting appUserTeam");
+                }
+
+                return Success("AppUserTeam deleted successfully");
+            }
+            catch (Exception ex)
+            {
+                return Error("Something broke" + ex.Message);
+            }
+        }
+
+        #endregion
+
+
+        #region Team
+        public IActionResult Team()
+        { 
+            return View();
+        }
+
+        public IActionResult CreateTeam()
+        {
+            ViewBag.Title = "Create Team";
+
+            return View("_Team");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetTeam(IDataTablesRequest dtRequest)
+        {
+
+            try
+            {
+                var data = await _repository.Team.GetAllAsync();
+
+                var filteredRows = data
+                    .AsQueryable()
+                    .FilterBy(dtRequest.Search, dtRequest.Columns);
+
+                var pagedRows = filteredRows
+                    .SortBy(dtRequest.Columns)
+                    .Skip(dtRequest.Start)
+                    .Take(dtRequest.Length);
+
+
+                var response = DataTablesResponse.Create(dtRequest, data.Count(),
+                    filteredRows.Count(), pagedRows);
+
+                return new DataTablesJsonResult(response);
+
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveTeam(TeamVm team)
+        {
+            if (!ModelState.IsValid  && ModelState.ErrorCount >1)
+                return Error("Validation error!, please check your data.");
+
+
+            try
+            {
+                if (team.Id == Guid.Empty)
+                {
+                    var teamEntity = new Team
+                    {
+                        Name = team.Name,
+                        NotificationType = team.NotificationType,
+                    };
+
+                    _repository.Team.Create(teamEntity);
+
+
+                    var result = await _repository.SaveChangesAsync();
+
+                    if (!result)
+                        return Error("Error Creating Team!");
+                }
+                else
+                {
+                    var teamDB = await _repository.Team.FindByCondition(x => x.Id == team.Id).FirstOrDefaultAsync();
+
+                    if (teamDB == null)
+                    {
+                        return Error("Team not found");
+                    }
+
+
+                    team.Name = team.Name;
+                    team.NotificationType= team.NotificationType;
+
+                    _repository.Team.Update(teamDB);
+
+                    var result = await _repository.SaveChangesAsync();
+
+                    if (!result)
+                        // return Success(null, null);
+                        return Error("Error updating team");
+                }
+            }
+            catch (Exception ex)
+            {
+                return Error("Something broke" + ex.Message);
+            }
+            return Success("Team Saved successfully");
+        }
+
+        public async Task<IActionResult> EditTeam(Guid clientId)
+
+        {
+            try
+            {
+                var teamEntity = _repository.Team.FindByCondition(x => x.Id == clientId).FirstOrDefault();
+                if (teamEntity  == null)
+                {
+                    return NotFound();
+                }
+
+                var teamViewModel = new TeamVm
+                {
+                    Id = teamEntity.Id,
+                    Name = teamEntity.Name,
+                    NotificationType = teamEntity.NotificationType,
+                };
+
+                ViewBag.Title = "Edit Team";
+                return View("_Team", teamViewModel);
+            }
+            catch (Exception ex)
+            {
+                return Error("Something broke" + ex.Message);
+            }
+        }
+
+        public async Task<IActionResult> DeleteTeam(Guid id)
+        {
+            try
+            {
+                var teamEntity = await _repository.Team.FindByCondition(x => x.Id == id).FirstOrDefaultAsync();
+                if (teamEntity == null)
+                {
+                    return NotFound();
+                }
+
+                _repository.Team.Delete(teamEntity);
+                var result = await _repository.SaveChangesAsync();
+
+                if (!result)
+                {
+                    return Error("Error deleting team");
+                }
+
+                return Success("Team deleted successfully");
+            }
+            catch (Exception ex)
+            {
+                return Error("Something broke" + ex.Message);
+            }
+        }
+
+
+        #endregion
     }
 }
-
-

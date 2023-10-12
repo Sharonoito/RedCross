@@ -13,5 +13,18 @@ namespace RedCrossChat.Repository
 
         public async Task<IEnumerable<MaritalState>> GetAll()
          => await FindAll().ToListAsync();
+
+
+        public async Task<IEnumerable<MaritalState>> GetAllAsync()
+        {
+            return await FindAll().ToListAsync();
+        }
     }
 }
+
+
+
+
+
+
+

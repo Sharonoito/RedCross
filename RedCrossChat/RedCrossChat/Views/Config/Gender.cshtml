@@ -11,57 +11,6 @@
         <span class="text-muted fw-light">Account Settings /</span> Account
     </h4>
 
-@*    <div class="row fv-plugins-icon-container">
-        <div class="col-md-12">
-            <ul class="nav nav-pills flex-column flex-md-row mb-3">
-                <li class="nav-item"><a class="nav-link active" href="javascript:void(0);"
-                    style="background-color: #ED1C24;">
-                    <i class="bx bx-user me-1"></i> Feelings</a>
-                </li>
-
-                <li class="nav-item"><a class=" nav-link" @Html.IsSelected(controller: "Config", action: "Profession")><a asp-action="Profession" style="text-decoration: none; color: inherit;" asp-controller="Config"><i class="bx bx-grid-alt me-1"></i>Professional Status</a></li>
-                <li class="nav-item"><a class="nav-link" @Html.IsSelected(controller: "Config", action: "AgeBand")><a asp-action="AgeBand" style="text-decoration: none; color: inherit;" asp-controller="Config"><i class="bx bx-bell me-1"></i> Age Band</a></li>
-                <li class="nav-item"><a class="nav-link" @Html.IsSelected(controller: "Config", action: "MaritalState")><a asp-action="MaritalState" style="text-decoration: none; color: inherit;" asp-controller="Config"><i class="bx bx-bell me-1"></i> Marital Status</a></li>
-                <li class="nav-item"><a class="nav-link" @Html.IsSelected(controller: "Config", action: "Gender")><a asp-action="Gender" style="text-decoration: none; color: inherit;" asp-controller="Config"><i class="bx bx-bell me-1"></i> Gender</a></li>
-            </ul>
-
-        </div>
-    </div>*@
-    <ul class="nav nav-pills flex-column flex-md-row mb-3">
-        <li class="nav-item">
-            <a class="nav-link active" href="javascript:void(0);" style="background-color: #ED1C24;">
-                <i class="bx bx-user me-1"></i> Feelings
-            </a>
-        </li>
-
-        <li class="nav-item @(Html.IsSelected(controller: "Config", action: "Profession") == "active" ? "active" : "")">
-            <a asp-action="Profession" asp-controller="Config" class="nav-link">
-                <i class="bx bx-grid-alt me-1"></i> Professional Status
-            </a>
-        </li>
-
-        <li class="nav-item @(Html.IsSelected(controller: "Config", action: "AgeBand") == "active" ? "active" : "")">
-            <a asp-action="AgeBand" asp-controller="Config" class="nav-link">
-                <i class="bx bx-bell me-1"></i> Age Band
-            </a>
-        </li>
-
-        <li class="nav-item @(Html.IsSelected(controller: "Config", action: "MaritalState") == "active" ? "active" : "")">
-            <a asp-action="MaritalState" asp-controller="Config" class="nav-link">
-                <i class="bx bx-bell me-1"></i> Marital Status
-            </a>
-        </li>
-
-        <li class="nav-item @(Html.IsSelected(controller: "Config", action: "Gender") == "active" ? "active" : "")">
-            <a asp-action="Gender" asp-controller="Config" class="nav-link">
-                <i class="bx bx-bell me-1"></i> Gender
-            </a>
-        </li>
-    </ul>
-
-
-
-@*
     <div class="row fv-plugins-icon-container">
         <div class="col-md-12">
             <ul class="nav nav-pills flex-column flex-md-row mb-3">
@@ -71,21 +20,34 @@
                     </a>
                 </li>
 
-                @foreach (var item in Model.NavItems)
-                {
-                    <li class="nav-item">
-                        <a class="nav-link @(Html.IsSelected(item.Controller, item.Action) ? "active" : "")"
-                           asp-controller="@item.Controller"
-                           asp-action="@item.Action"
-                           style="text-decoration: none; color: inherit;">
-                            <i class="@(item.IconClass) me-1"></i> @item.Text
-                        </a>
-                    </li>
-                }
+                <li class="nav-item @(Html.IsSelected(controller: "Config", action: "Profession") == "active" ? "active" : "")">
+                    <a asp-action="Profession" asp-controller="Config" class="nav-link">
+                        <i class="bx bx-grid-alt me-1"></i> Professional Status
+                    </a>
+                </li>
+
+                <li class="nav-item @(Html.IsSelected(controller: "Config", action: "AgeBand") == "active" ? "active" : "")">
+                    <a asp-action="AgeBand" asp-controller="Config" class="nav-link">
+                        <i class="bx bx-bell me-1"></i> Age Band
+                    </a>
+                </li>
+
+                <li class="nav-item @(Html.IsSelected(controller: "Config", action: "MaritalState") == "active" ? "active" : "")">
+                    <a asp-action="MaritalState" asp-controller="Config" class="nav-link">
+                        <i class="bx bx-bell me-1"></i> Marital Status
+                    </a>
+                </li>
+
+                <li class="nav-item @(Html.IsSelected(controller: "Config", action: "Gender") == "active" ? "active" : "")">
+                    <a asp-action="Gender" asp-controller="Config" class="nav-link @(Html.IsSelected(controller: "Config", action: "Gender"))">
+                        <i class="bx bx-bell me-1"></i> Gender
+                    </a>
+                </li>
             </ul>
+
+
         </div>
     </div>
-*@
 
 
 </div>
@@ -94,7 +56,7 @@
     <div class="container-fluid">
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title"><i class="fa fa-info-circle"></i> Manage Feelings</h3>
+                <h3 class="card-title"><i class="fa fa-info-circle"></i> Manage Gender</h3>
 
                 <div class="card-tools">
 
@@ -104,20 +66,19 @@
                             data-target="#clientModal"
                             data-modal="clientModal"
                             data-viewurl="true"
-                            data-action="@Url.Action("CreateFeeling")" data-bs-toggle="modal" data-bs-target="#clientModal">
-                        <i class="fa fa-plus"></i> Add Feeling
+                            data-action="@Url.Action("CreateGender")" data-bs-toggle="modal" data-bs-target="#clientModal">
+                        <i class="fa fa-plus"></i> Add Gender
                     </button>
 
                 </div>
             </div>
 
             <div class="card-body p-0">
-                <table class="table table-striped" id="tblFeelings">
+                <table class="table table-striped" id="tblGender">
                     <thead>
                         <tr>
                             <th>Name</th>
-                            <th>Description</th>
-                            <th>Synonymns</th>
+                            <th>Kiswahili</th>
                             <th style="width: 40px">Actions</th>
                         </tr>
                     </thead>
@@ -172,18 +133,17 @@
         var jsdtClient = {
             table: null,
             initializeDataTable: function () {
-                jsdtClient.table = $('#tblFeelings').DataTable({
+                jsdtClient.table = $('#tblGender').DataTable({
                     processing: true,
                     serverSide: true,
                     serverMethod: 'post',
                     ajax: {
-                        url: "@Url.Action("GetFeelings")",
+                        url: "@Url.Action("GetGender")",
                         type: "POST"
                     },
                     columns: [
                         { data: 'name' },
-                        { data: 'description' },
-                        { data: 'synonymns' },
+                        { data: 'kiswahili' },
                         { data: 'id', name: 'Id' },
                
                     ],
@@ -199,12 +159,12 @@
                                                             data-modal='clientModal'
                                                             data-bs-toggle="modal" data-bs-target="#clientModal"
                                                             data-viewurl='true'
-                                                            data-action='@Url.Action("EditFeeling", "Config")?clientId=${row.id}'
+                                                            data-action='@Url.Action("EditGender", "Config")?clientId=${row.id}'
                                                             title='Edit'>
                                                             <i class='fa fa-pencil-alt'></i>
 
                                                         <button class='delete btn btn-outline-danger btn-xs'
-                                                            data-action='@Url.Action("DeleteFeeling", "Config")?clientId=${row.id}'
+                                                            data-action='@Url.Action("DeleteGender", "Config")?clientId=${row.id}'
                                                             data-table='tblClients'
                                                             data-id='${row.id}'
                                                             data-toggle='tooltip'

@@ -327,7 +327,7 @@ namespace RedCrossChat.Dialogs
         {
             Client me = (Client)stepContext.Values[UserInfo];
 
-            var question =me.language? "Please Specify the feeling "  : "Tafadhali Bainisha hisia";
+            var question =me.language? "Please specify the feeling "  : "Tafadhali bainisha hisia";
 
             var response = stepContext.Context.Activity.Text;
 
