@@ -415,7 +415,7 @@ namespace RedCrossChat.Controllers
                     return NotFound();
                 }
 
-                var ageBandViewModel = new AgeBandVm
+                var ageBandViewModel = new AgeBandVM
                 {
                     Id = agebandEntity.Id,
                     Name = agebandEntity.Name,
