@@ -378,7 +378,7 @@ namespace RedCrossChat.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SaveAgeBand(AgeBandVm ageBand)
+        public async Task<IActionResult> SaveAgeBand(AgeBandVM ageBand)
         {
             if (!ModelState.IsValid)
                 return Error("Validation error!, please check your data.");

@@ -378,6 +378,16 @@ namespace RedCrossChat.Controllers
 
             return Success("Items fetched Successfully", conversations);
         }
+        [HttpGet]
+        public async Task<IActionResult> GetConversation(Guid id)
+        {
+
+            var conv = await _repository.Conversation.FindByCondition(x=>x.Id==id).Include(x=>x.RawConversations).FirstOrDefaultAsync();
+
+           //= await _repository.RawConversation.FindByCondition(x => x.ConversationId == id).ToListAsync();
+
+            return Success("Fetched Successfully", conv);
+        }
 
         [HttpPost]
         public async Task<IActionResult> CreateResponse(RawConversationVm rawConversation)

@@ -13,29 +13,28 @@ let backgrounds = ['primary', 'secondary', 'primary', 'danger', 'info', 'success
 
 
 
-const GetMyConversations=()=>{
+const GetMyConversations = (func) => {
+     
     $.post("/Conversation/GetMyConversations").then(response => {
 
         if (response.success) {
             let data = response.responseData;
 
             if (data.length == 0) {
-                //Show the no messages available
 
                 conversartions = data;
 
                 $('#no-chats').fadeIn()
 
             } else {
-                console.log("update the UI")
-                // update the interface
-
-                
+              
                 UpdateUI(data);
             }
+
+            if (func != undefined)
+                func();
+
         }
-        
-      
     });
 }
 
@@ -66,6 +65,7 @@ const UpdateUI=(data)=>{
 const AppendToSidebar = ({ persona, id, dateCreated,reason }) => {
     //this is to append the conversation ton the side bar
 
+    console.log(id, persona)
   
 
     $("#chat-list").append(`
@@ -85,7 +85,7 @@ const AppendToSidebar = ({ persona, id, dateCreated,reason }) => {
     CalculateDates();
 }
 
-const username = str => `<span class="avatar-initial rounded-circle bg-label-${backgrounds[str.charAt(str.length - 1)]}">${str.charAt(0)}${str.charAt(str.length - 1)}</span>`
+const username = str => str != null ? `<span class="avatar-initial rounded-circle bg-label-${backgrounds[str.charAt(str.length - 1)]}">${str.charAt(0)}${str.charAt(str.length - 1)}</span>` : '';
 
 function CalculateDates() {
 
@@ -130,18 +130,11 @@ function CalculateDates() {
 
             return
         }
-
        
-
-        /**console.log(a.diff(b, 'minutes')) // 44700
-console.log(a.diff(b, 'hours')) // 745
-console.log(a.diff(b, 'days')) // 31
-console.log(a.diff(b, 'weeks')) // 4 */
     })
 }
 
 function UpdateChatActiveConversation(data) {
-
 
 
     if (activeConversation == undefined)
@@ -208,8 +201,6 @@ function UpdateChatActiveConversation(data) {
     }
 }
 
-
-
 const attachMessage=(conv, a)=>{
 
     a.append(message(conv)).append(message(conv, true));
@@ -254,27 +245,53 @@ const question = (conv) => `<li class="chat-message chat-message-right ">
                             </div>
                         </li>`;
 
-$(document).on('click', '.chat-contact-list-item', function () {
 
-    let current = this;
+const GetConversation = id => {
+
+    $.get("/Conversation/GetConversation?id=" + id).then(resp => {
+
+        activeConversation = resp.responseData;
+
+        UpdateChatActiveConversation();
+
+    })
+}
+const StartConversation=(id)=>{
 
     $('.chat-contact-list-item').toArray().forEach(chat => {
         $(chat).removeClass('active');
     });
 
 
+    if (conversartions.length == 0) {
+
+        console.log("fetch the conv", conversartions);
+
+        return GetConversation(id);
+    }
+
+
     for (let i = 0; i < conversartions.length; i++) {
 
-        if ($(current).data('id') == conversartions[i].id) {
+        if ( id == conversartions[i].id) {
             activeConversation = conversartions[i];
-
-            console.log('Found', activeConversation)
         }
     }
 
+    console.log("ActiveConversation", conversartions)
+
     UpdateChatActiveConversation();
 
-    $(current).addClass('active');
+
+    $(".chat-contact-list-item").find("[data-id='" + id + "']").addClass('active')
+
+}
+
+$(document).on('click', '.chat-contact-list-item', function () {
+
+    let current = this;
+
+    StartConversation($(current).data('id'));
 });
 
 $(document).on('submit', '.fsend-message', function (e) {
@@ -317,19 +334,21 @@ function CheckForUpdatesActiveConversation() {
 
 $(document).ready(function () {
 
+    if (GetActiveConversation() != null) {
+
+        console.log("CurrentActiveConversation",GetActiveConversation());
+
+        StartConversation(GetActiveConversation());
+
+    }
+
+
     GetMyConversations();
-
-   /* setInterval(function () {
-
-        GetMyConversations();
-
-        console.log(iteration, interval);
-
-    }, interval);*/
 
     setInterval(function () {
         CalculateDates();
 
         CheckForUpdatesActiveConversation();
-    },5000)
+    }, 5000);
+
 });
