@@ -41,14 +41,14 @@ document.addEventListener("DOMContentLoaded", function () {
         }), d && new PerfectScrollbar(d, {
             wheelPropagation: !1,
             suppressScrollX: !0
-        }), a(), m.length && m.maxlength({
+        }), a(),/* m.length && m.maxlength({
             alwaysShow: !0,
             warningClass: "label label-success bg-success text-white",
             limitReachedClass: "label label-danger",
             separator: "/",
             validate: !0,
             threshold: 120
-        }), h.forEach(e => {
+        }),*/ h.forEach(e => {
             e.addEventListener("click", e => {
                 var t = document.querySelector(".chat-sidebar-left-user .avatar"),
                     e = e.currentTarget.value,
@@ -68,29 +68,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 c = [].slice.call(document.querySelectorAll("#chat-list li:not(.chat-contact-list-item-title)")),
                 r = [].slice.call(document.querySelectorAll("#contact-list li:not(.chat-contact-list-item-title)"));
             l(c, 0, e, t), l(r, 0, e, a)
-        }),
-            p != undefined ?
-                p.addEventListener("submit", e => {
-                    e.preventDefault(), v.value && ((e = document.createElement("div")).className = "chat-message-text mt-2", e.innerHTML = '<p class="mb-0 text-break">' + v.value + "</p>", document.querySelector("li:last-child .chat-message-wrapper").appendChild(e), v.value = "", a())
-                }) : null;
+        });
+            
            
             
-        let e = document.querySelector(".chat-history-header [data-target='#app-chat-contacts']"),
-            t = document.querySelector(".app-chat-sidebar-left .close-sidebar");
-        var c, r, s;
-        e.addEventListener("click", e => {
-            t.removeAttribute("data-overlay")
-        }), f.length && null != (c = c || webkitSpeechRecognition) && (r = new c, s = !1, f.on("click", function () {
-            const t = $(this);
-            !(r.onspeechstart = function () {
-                s = !0
-            }) === s && r.start(), r.onerror = function (e) {
-                s = !1
-            }, r.onresult = function (e) {
-                t.closest(".form-send-message").find(".message-input").val(e.results[0][0].transcript)
-            }, r.onspeechend = function (e) {
-                s = !1, r.stop()
-            }
-        }))
+       
     }
 });

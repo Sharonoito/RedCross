@@ -6,6 +6,7 @@
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Schema;
+using RedCrossChat.Contracts;
 using System.Threading;
 using System.Threading.Tasks;
 using static System.Net.Mime.MediaTypeNames;
@@ -16,9 +17,10 @@ namespace RedCrossChat.Dialogs
     {
         private const string HelpMsgText = "Do you wish to talk to an agent?";
         private const string CancelMsgText = "Cancelling...";
-
-        public CancelAndHelpDialog(string id):base(id) {
+        // //stepContext.Context.Activity.Conversation.Id  2bf7bf00-62c5-11ee-a514-cbe89faff2c0|livechat 2bf7bf00-62c5-11ee-a514-cbe89faff2c0|livechat
+        public CancelAndHelpDialog(string id,BaseDialog baseDialog, IRepositoryWrapper wrapper) :base(id) {
         
+            AddDialog(baseDialog);
         }
         protected override async Task<DialogTurnResult> OnContinueDialogAsync(DialogContext innerDc, CancellationToken cancellationToken = default)
         {
@@ -41,7 +43,19 @@ namespace RedCrossChat.Dialogs
 
             var text=innerDc.Context.Activity.Text.ToLowerInvariant();
 
-            if (!string.IsNullOrEmpty(text) && (text.ToLower() == "help" || text.ToLower() == "cancel"))
+
+            if(!string.IsNullOrEmpty(text) &&  innerDc.Context.Activity.ChannelId=="telegram"  && text.ToLower() == "/start")
+            {
+
+                var cancelMessage = MessageFactory.Text("the conversation has been Cancelled type anything to restart", CancelMsgText, InputHints.IgnoringInput);
+
+                await innerDc.Context.SendActivityAsync(cancelMessage, cancellationToken);
+
+                await innerDc.CancelAllDialogsAsync(cancellationToken);
+
+            }
+
+            if (!string.IsNullOrEmpty(text) && (text.ToLower() == "help" || text.ToLower() == "cancel" || text.ToLower() == "exit" || text.ToLower()== "quit")     )
             {
                // var text = innerDc.Context.Activity.Text.ToLowerInvariant();
 
@@ -57,9 +71,15 @@ namespace RedCrossChat.Dialogs
                     case "exit":
                     case "close":
                     case "quit":
+
+                        
                         var cancelMessage = MessageFactory.Text(CancelMsgText, CancelMsgText, InputHints.IgnoringInput);
+                        
                         await innerDc.Context.SendActivityAsync(cancelMessage, cancellationToken);
-                        return await innerDc.CancelAllDialogsAsync(cancellationToken);
+                         
+                        await innerDc.CancelAllDialogsAsync(cancellationToken);
+
+                        return await innerDc.BeginDialogAsync(nameof(BaseDialog));
                 }
             }
 

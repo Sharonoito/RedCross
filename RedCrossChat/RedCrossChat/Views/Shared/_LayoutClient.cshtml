@@ -1,78 +1,133 @@
-﻿
-<!DOCTYPE html>
-<!--
-This is a starter template page. Use this page to start your new project from
-scratch. This page gets rid of all links and provides the needed markup only.
--->
-<html lang="en">
+﻿<!DOCTYPE html>
+
+<html lang="en" class="light-style layout-menu-fixed" dir="ltr" data-theme="theme-default" data-template="vertical-menu-template-free" data-assets-path="/library/sneat/assets/">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta charset="utf-8" />
 
-    <title> @ViewData["Title"]</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+
+    <title> RedCross PSS </title>
+
+    <meta name="description" content="" />
     <!-- Favicon -->
-    <link rel="shortcut icon" href="~/img/favicon.png" type="image/x-icon">
+    <link rel="shortcut icon" type="image/x-icon" href="/images/serengeti.ico" />
 
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="~/lib/fontawesome-free/css/all.min.css">
-    <!-- Theme style -->
-    <link rel="stylesheet" href="~/adminlte/css/adminlte.min.css">
+    <partial name="_StyleSheet" />
 
-    @*<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />*@
-    <link rel="stylesheet" href="~/css/site.css" />
-
-    <!-- Toastr -->
-    <link rel="stylesheet" href="~/lib/toastr/toastr.min.css">
-
-
-    <!-- Add local styles, mostly for plugins css file -->
     @if (IsSectionDefined("Styles"))
     {
-        @RenderSection("Styles", required: false) 
+        @RenderSection("Styles", required: false)
     }
 
-    <!-- Google Font: Source Sans Pro -->
-    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+    <!-- Helpers -->
+    <script src="/library/sneat/assets/vendor/js/helpers.js"></script>
+
+
+
+    <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
+    <!--? Template customizer: To hide customizer set displayCustomizer value false in config.js.  -->
+    <script src="/library/sneat/assets/vendor/js/template-customizer.js"></script>
+    <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
+    <script src="/library/sneat/assets/js/config.js"></script>
+
+    <style>
+        .custom-footer {
+            background-color: #ED1C24;
+            color: white;
+            padding: 1%;
+        }
+    </style>
 </head>
-<body class="hold-transition layout-top-nav">
-    <div class="wrapper">
 
-        <!-- Navbar -->
-        <partial name="_NavbarClient" />
+<body>
+    <div class="demo-inline-spacing position-fixed " id="loaders" style="z-index: 10300;right: -360px">
+        <div class="spinner-grow" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <div class="spinner-grow " role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <div class="spinner-grow text-dark" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <div class="spinner-grow text-dark" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <div class="spinner-grow " role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <div class="spinner-grow text-dark" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <div class="spinner-grow text-dark" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <div class="spinner-grow text-dark" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <div class="spinner-grow text-dark" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+    <!-- Layout wrapper -->
+    <div class="layout-wrapper layout-content-navbar">
+        <div class="layout-container">
+            <!-- Menu -->
+           
+            <!-- / Menu -->
+            <!-- Layout container -->
+            <div class="layout-page">
+                <!-- Navbar -->
+               
 
-        <!-- Content Wrapper. Contains page content -->
-        <div class="content-wrapper">
-            @RenderBody()
+                <!-- / Navbar -->
+                <!-- Content wrapper -->
+                
+                    <!-- Content -->
+
+                    <div class="container-fluid">
+
+                        <div class=" flex-grow-1 container-p-y">
+                            @RenderBody()
+                        </div>
+
+
+                    </div>
+                    <!-- / Content -->
+                    <!-- Footer -->
+                    <footer class="content-footer footer custom-footer">
+                        <div class=" d-flex flex-wrap justify-content-between py-2 flex-md-row flex-column">
+                            <div class="mb-2 mb-md-0 float-end right">
+
+                                Powered by Pathways Technologies
+                                ©
+                                <script>
+                                    document.write(new Date().getFullYear());
+                                </script>
+                            </div>
+                            <div>
+                            </div>
+                        </div>
+                    </footer>
+                    <!-- / Footer -->
+                    @*<div class="content-backdrop fade"></div>*@
+                
+                <!-- Content wrapper -->
+            </div>
+            <!-- / Layout page -->
         </div>
 
-      @*  <!-- Control Sidebar -->
-        <aside class="control-sidebar control-sidebar-dark">
-            <div class="p-3">
-                <h5>Title</h5>
-                <p>Sidebar content</p>
-            </div>
-        </aside>*@
-
-        <!-- Main Footer -->
-        <partial name="_FooterClient" />
-
+        <!-- Overlay -->
+        @*<div class="layout-overlay layout-menu-toggle"></div>*@
     </div>
 
-    <!-- REQUIRED SCRIPTS -->
-    <!-- jQuery -->
-    <script src="~/lib/jquery/jquery.min.js"></script>
-    <!-- Bootstrap 4 -->
-    <script src="~/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <!-- AdminLTE App -->
-    <script src="~/adminlte/js/adminlte.min.js"></script>
 
-    <!-- Toastr -->
-    <script src="~/lib/toastr/toastr.min.js"></script>
+    <partial name="_JsScript" />
 
+    @RenderSection("Scripts", required: false);
 
-    @RenderSection("Scripts", required: false)
 
 </body>
 </html>
