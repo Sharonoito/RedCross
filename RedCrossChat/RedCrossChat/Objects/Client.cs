@@ -27,5 +27,9 @@ namespace RedCrossChat.Objects
         public bool HandOverToUser { get; set; } = false;
 
         public int Iteration { get; set; } = 0;
+
+        public string LastResponse { get; set; }
+
+        public Guid ActiveRawConversation { get; set; }
     }
 }

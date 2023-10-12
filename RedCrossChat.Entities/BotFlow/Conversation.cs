@@ -12,15 +12,7 @@ namespace RedCrossChat.Entities
 
         public string ConversationId {  get; set; }
 
-        public List<AiConversation> AiConversations { get; set; }
-
-        public Persona Persona {  get; set; }
-
-        public Guid PersonaId { get; set; }
-
-        public AppUser? AppUser { get; set; }
-
-        public Guid? AppUserId { get; set; }
+       
 
         public string Reason { get; set; } = "";
 
@@ -33,5 +25,17 @@ namespace RedCrossChat.Entities
         public bool ConversedWithAI { get; set; } = false;
 
         public bool Language {  get; set; } = true;
+
+        public Persona Persona { get; set; }
+
+        public Guid PersonaId { get; set; }
+
+        public AppUser? AppUser { get; set; }
+
+        public Guid? AppUserId { get; set; }
+
+        public List<AiConversation> AiConversations { get; set; }
+
+        public List<RawConversation> RawConversations { get; set; }
     }
 }

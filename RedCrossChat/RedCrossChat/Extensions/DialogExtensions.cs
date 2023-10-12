@@ -1,8 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
-using Microsoft.Bot.Connector;
-using RedCrossChat.Entities;
+
 using RedCrossChat.Objects;
 using System;
 using System.Threading.Tasks;
@@ -19,7 +18,8 @@ namespace RedCrossChat
             var responseDto = await _userProfileAccessor.GetAsync(stepContext.Context, () => new ResponseDto());
 
             responseDto.Question = Question;
-            //responseDto.ConversationId = ConversationId;
+            responseDto.QuestionTimeStamp=DateTime.Now;
+            
 
             await _userProfileAccessor.SetAsync(stepContext.Context, responseDto);
             await _userState.SaveChangesAsync(stepContext.Context);
@@ -46,6 +46,7 @@ namespace RedCrossChat
 
             responseDto.Message = answer;
             responseDto.NextQuestion = nextQuestion;
+            responseDto.ResponseTimeStamp=DateTime.Now;
 
             await _userProfileAccessor.SetAsync(stepContext.Context, responseDto);
             await _userState.SaveChangesAsync(stepContext.Context);

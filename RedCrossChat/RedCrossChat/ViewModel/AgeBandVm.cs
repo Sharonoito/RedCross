@@ -1,19 +1,21 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System;
+﻿using System;
 
-namespace RedCrossChat.ViewModel
+namespace RedCrossChat
 {
-    public class AgeBandVm
+    public class AgeBandVM
     {
-        public Guid Id { get; set; }
-
-        [Display(Name = "Name")]
         public string Name { get; set; }
 
-        [Display(Name = "Kiswahili")]
+        public Guid Id { get; set; }
+
         public string Kiswahili { get; set; }
 
-        [Display(Name = "Synonyms")]
-        public string Synonyms { get; set; }
+        public string Synonyms { get; set; } = "";
+
+        public string Lowest { get; set; } = "";
+
+        public string Highest { get; set; } = "";
+
+        public bool IsActive { get; set; } = true;
     }
 }

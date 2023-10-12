@@ -43,6 +43,18 @@ namespace RedCrossChat.Dialogs
 
             var text=innerDc.Context.Activity.Text.ToLowerInvariant();
 
+
+            if(!string.IsNullOrEmpty(text) &&  innerDc.Context.Activity.ChannelId=="telegram"  && text.ToLower() == "/start")
+            {
+
+                var cancelMessage = MessageFactory.Text("the conversation has been Cancelled type anything to restart", CancelMsgText, InputHints.IgnoringInput);
+
+                await innerDc.Context.SendActivityAsync(cancelMessage, cancellationToken);
+
+                await innerDc.CancelAllDialogsAsync(cancellationToken);
+
+            }
+
             if (!string.IsNullOrEmpty(text) && (text.ToLower() == "help" || text.ToLower() == "cancel" || text.ToLower() == "exit" || text.ToLower()== "quit")     )
             {
                // var text = innerDc.Context.Activity.Text.ToLowerInvariant();

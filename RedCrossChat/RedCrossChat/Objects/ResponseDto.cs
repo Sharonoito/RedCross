@@ -11,5 +11,7 @@ namespace RedCrossChat.Objects
         public string NextQuestion { get; set; }
 
         public Guid ConversationId { get; set; }
+        public DateTime ResponseTimeStamp { get;  set; }
+        public DateTime QuestionTimeStamp { get;  set; }
     }
 }

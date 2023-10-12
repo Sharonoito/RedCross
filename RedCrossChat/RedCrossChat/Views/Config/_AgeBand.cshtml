@@ -1,6 +1,4 @@
-﻿@using RedCrossChat.ViewModel;
-
-@model AgeBandVm
+﻿@model AgeBandVM;
 
 @{
     Layout = null;
@@ -13,9 +11,6 @@
 
 @using (Html.BeginForm(actionName: "SaveAgeBand", controllerName: "Config", FormMethod.Post, new { @class = "modal-Crud", data_modal = "clientModal", data_callback = "", data_table = "tblClients", autocomplete = "off", @id = "frmClient" }))
 {
-   
-    
-
     <div class="modal-body">
         <div class="row">
             

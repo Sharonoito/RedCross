@@ -6,6 +6,9 @@ namespace RedCrossChat.Entities
     {
         public string SenderId { get; set; }
 
+        public string? Name { get; set; }
+        public string? FromId { get; set; }
+
         public Guid? FeelingId { get; set; }
         public DBFeeling Feeling { get; set; }
 
@@ -23,6 +26,8 @@ namespace RedCrossChat.Entities
 
         public Guid? MaritalStateId { get; set; }
         public MaritalState MaritalState { get; set; }
+
+        public string? ChatID { get; set; }
 
         public string IsAwareOfFeelings { get; set; } = "";
         
