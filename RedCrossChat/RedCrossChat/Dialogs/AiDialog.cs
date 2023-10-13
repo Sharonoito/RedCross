@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace RedCrossChat.Dialogs
 {
-    public class AiDialog : CancelAndHelpDialog
+    public class AiDialog : ComponentDialog
     {
         protected readonly ILogger _logger;
 
@@ -31,7 +31,7 @@ namespace RedCrossChat.Dialogs
 
         protected readonly UserState _userState;
 
-        public AiDialog(ILogger<AiDialog> logger, IRepositoryWrapper wrapper, UserState userState, BaseDialog baseDialog) : base(nameof(AiDialog), baseDialog,wrapper)
+        public AiDialog(ILogger<AiDialog> logger, IRepositoryWrapper wrapper, UserState userState, BaseDialog baseDialog) : base(nameof(AiDialog))
         {
             _logger = logger;
 
@@ -84,14 +84,12 @@ namespace RedCrossChat.Dialogs
             return await stepContext.PromptAsync(nameof(ChoicePrompt), options, token);
         }
 
-
-
         public async Task<DialogTurnResult> IntialTaskAsync(WaterfallStepContext stepContext, CancellationToken token)
         {
             Client me = (Client)stepContext.Options;
 
             Conversation conversation = await _repository.Conversation
-                    .FindByCondition(x => x.ConversationId == stepContext.Context.Activity.Conversation.Id)
+                    .FindByCondition(x => x.Id==me.ConversationId)
                     .Include(x => x.AiConversations)
                     .FirstAsync();
 
@@ -136,11 +134,16 @@ namespace RedCrossChat.Dialogs
                 int iteration = 0;
 
                 Conversation conversation = await _repository.Conversation
-                    .FindByCondition(x => x.ConversationId == stepContext.Context.Activity.Conversation.Id)
+                    .FindByCondition(x => x.Id==me.ConversationId)
                     .Include(x => x.AiConversations)
                     .FirstAsync();
 
                 string question = stepContext.Context.Activity.Text;
+
+                if (question.ToLower() == "exit"  || question.ToLower() =="cancel")
+                {
+                    return await stepContext.EndDialogAsync(null);
+                }
 
                 string response = await ChatGptDialog.GetChatGPTResponses(question, conversation.AiConversations,me.language);
 
@@ -209,6 +212,8 @@ namespace RedCrossChat.Dialogs
 
             iteration++;
         }
+
+
 
 
 

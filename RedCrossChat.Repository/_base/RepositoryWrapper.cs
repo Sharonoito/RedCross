@@ -1,6 +1,4 @@
-﻿using RedCrossChat.Contracts;
-
-
+using RedCrossChat.Contracts;
 using RedCrossChat.Domain;
 
 

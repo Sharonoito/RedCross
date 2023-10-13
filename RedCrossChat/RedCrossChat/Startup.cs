@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Hosting.Internal;
 using RedCrossChat.Bots;
 using RedCrossChat.Dialogs;
 using RedCrossChat.Domain;
@@ -18,9 +19,12 @@ namespace RedCrossChat
 
         private readonly IConfiguration _config;
 
-        public Startup(IConfiguration configuration)
+        public IWebHostEnvironment HostingEnvironment { get; }
+
+        public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
             _config = configuration;
+            HostingEnvironment = environment;
         }
 
         
