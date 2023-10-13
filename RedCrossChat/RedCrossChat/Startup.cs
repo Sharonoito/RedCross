@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Hosting.Internal;
 using RedCrossChat.Bots;
 using RedCrossChat.Dialogs;
 using RedCrossChat.Domain;
@@ -18,9 +19,12 @@ namespace RedCrossChat
 
         private readonly IConfiguration _config;
 
-        public Startup(IConfiguration configuration)
+        public IWebHostEnvironment HostingEnvironment { get; }
+
+        public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
             _config = configuration;
+            HostingEnvironment = environment;
         }
 
         
@@ -36,7 +40,7 @@ namespace RedCrossChat
             // Create the storage we'll be using for User and Conversation state. (Memory is great for testing purposes.)
             services.AddSingleton<IStorage, MemoryStorage>();
 
-            var connectionString = _config.GetConnectionString("LocalConnection");
+            var connectionString = _config.GetConnectionString(HostingEnvironment.IsDevelopment() ?  "DefaultConnection": "LocalConnection");
 
             //Use sql Server Conversations
             services.AddDbContextPool<AppDBContext>(options =>

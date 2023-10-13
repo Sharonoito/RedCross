@@ -1,67 +1,62 @@
 ﻿@using RedCrossChat.ViewModel;
 
-@model AppUserTeamVm
+
+
 
 @{
     Layout = null;
 }
 
-@*<div class="modal-header">
-    <h5 class="modal-title">@ViewBag.Title</h5>
-    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-</div>*@
-
-@using (Html.BeginForm(actionName: "SaveAppUserTeam", controllerName: "Config", FormMethod.Post, new { @class = "modal-Crud", data_modal = "clientModal", data_callback = "", data_table = "tblAppUserTeam", autocomplete = "off", @id = "frmClient" }))
-{
-
-    <input type="hidden" asp-for="Id">
+ 
 
     <div class="modal-body">
+         <div class="modal-header">
+    <div class="text-center mb-4">
+        <h3>Team Management</h3>
+        <p>Add new Employee to team</p>
+    </div>
+  </div>
+
         <div class="row">
-            
-@*
-            <div class="form-group col-lg-12 mb-2">
-                <label asp-for="Employee"></label>
-                <input asp-for="Employee" class="form-control" autocomplete="off" />
-                <span asp-validation-for="Employee" class="text-danger"></span>
-            </div>
-
-            <div class="form-group col-lg-12 mb-2">
-                <label asp-for="UserID"></label>
-                <input asp-for="UserID" class="form-control" autocomplete="off" />
-                <span asp-validation-for="UserID" class="text-danger"></span>
-            </div>
-
-            <div class="form-group col-lg-12 mb-2">
-                <label asp-for="TeamID"></label>
-                <input asp-for="TeamID" class="form-control" autocomplete="off" />
-                <span asp-validation-for="TeamID" class="text-danger"></span>
-            </div>*@
-
 
             <div class="row gx-3 gy-2 align-items-center">
                 <div class="col-md-6">
-                    <label asp-for="Team"></label>
+                    <label for="Team">Select Employee</label>
                     <select id="selectTypeOpt" class="form-select color-dropdown" name="employee">
                         <option value= "-1" selected>Select Employee</option>
-@*                        @foreach (var employee in Model.Team)
-                        {
-                            <option value="@employee">@employee</option>
-                        }*@
-
                     </select>
                 </div>
                 <div class="col-md-6">
                     <label class="form-label" for="showToastPlacement">&nbsp;</label>
-                    <button id="showToastPlacement" class="btn btn-primary d-block">Add Employee</button>
+                    <button id="showToastPlacement" class="btn btn-primary d-block" type="button">Add Employee</button>
                 </div>
             </div>
-
-          
+        
         </div>
+
+        <div class="row mt-3">
+        <div class="card ">
+
+            <div class="card-body p-0">
+                <table class="table table-striped" id="tblAppUserTeam">
+                    <thead>
+                        <tr>
+                            <th>Employee Name</th>
+                            <th style="width: 40px">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+        </div>
+        
         <div>
-            @Html.Partial("AppUserTeam")
+           
+        
         </div>
 
     </div>
-}
