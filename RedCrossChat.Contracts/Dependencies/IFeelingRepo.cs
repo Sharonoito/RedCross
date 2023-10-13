@@ -7,6 +7,8 @@ namespace RedCrossChat.Contracts
      
         Task<IEnumerable<DBFeeling>> GetAll();
 
+        Task<IEnumerable<DBFeeling>> GetAllAsync();
+
     }
 }
 
