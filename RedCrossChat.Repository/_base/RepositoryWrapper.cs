@@ -214,6 +214,19 @@ namespace RedCrossChat.Repository
         }
 
 
+        public IItention _itention;
+
+        public IItention Itention
+        {
+            get 
+            {
+                if(_itention == null) { _itention = new IntetionRepo(_repoContext); }
+                return _itention;
+            }
+        }
+
+
+        
         public IRawConversation _rawConversation;
 
         public IRawConversation RawConversation
