@@ -74,7 +74,9 @@ namespace RedCrossChat.Dialogs
             await stepContext.Context.SendActivityAsync(MessageFactory.Text(me.language ? "Thank you for your feedback. We value your input!" : " Asante kwa maoni yako. Tunathamini mchango wako"));
 
 
-            return await stepContext.EndDialogAsync(null,token);
+            return await stepContext.EndDialogAsync(token);
         }
+
+        
     }
 }

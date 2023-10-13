@@ -21,7 +21,7 @@ namespace RedCrossChat.Extensions
 
         public static void ConfigureDialogs(this IServiceCollection services)
         {
-            services.AddTransient<CounselorDialog>();
+            //services.AddTransient<CounselorDialog>();
 
             services.AddTransient<PersonalDialog>();
 
@@ -29,9 +29,9 @@ namespace RedCrossChat.Extensions
 
             services.AddTransient<BreathingDialog>();
 
-            services.AddTransient<HumanHandOverDialog>();
+            services.AddScoped<HumanHandOverDialog>();
 
-            services.AddTransient<AiDialog>();
+            services.AddScoped<AiDialog>();
 
             // The MainDialog that will be run by the bot.
             services.AddTransient<MainDialog>();

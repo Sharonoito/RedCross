@@ -114,7 +114,7 @@
                         render: function (data, type, row) {
                             var actionsHtml =
                                 `<div class='text-center'>
-                                                        <button class='btn btn-outline-primary btn-xs load-modal'
+                                                        <button class='btn btn-outline-primary btn-xs load-modal team-manager'
                                                             data-hidden='Id'
                                                             data-id='${row.id}'
                                                             data-toggle='modal'
@@ -164,6 +164,25 @@
                 }
             }
         }
+
+
+        $(document).on('click', '.team-manager', function () {
+
+            const current = this;
+
+            //selectTypeOpt
+
+            setTimeout(function(){
+
+                $.get("@Url.Action("GetTeamUsers")?id="+$(current).data('id')).then(resp => {
+
+                    console.log("responsive",resp)
+
+                })
+
+
+            },1000)
+        })
 
     </script>
 }

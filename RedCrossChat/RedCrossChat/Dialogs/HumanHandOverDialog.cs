@@ -12,11 +12,11 @@ using System.Threading.Tasks;
 
 namespace RedCrossChat.Dialogs
 {
-    public class HumanHandOverDialog : CancelAndHelpDialog
+    public class HumanHandOverDialog : ComponentDialog
     {
         private IRepositoryWrapper repository;
 
-        public HumanHandOverDialog(IRepositoryWrapper _repository, BaseDialog baseDialog):base(nameof(HumanHandOverDialog), baseDialog,_repository) { 
+        public HumanHandOverDialog(IRepositoryWrapper _repository, BaseDialog baseDialog):base(nameof(HumanHandOverDialog)) { 
 
             repository = _repository;
 
@@ -39,7 +39,7 @@ namespace RedCrossChat.Dialogs
 
             me.HandOverToUser = me.Iteration != 0;
 
-            var conversation=await GetActiveConversation(stepContext);
+            var conversation= await repository.Conversation.FindByCondition(x => x.Id==me.ConversationId).FirstOrDefaultAsync();
 
             if (!me.HandOverToUser)
             {

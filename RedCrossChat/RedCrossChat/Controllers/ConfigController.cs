@@ -1155,29 +1155,51 @@ namespace RedCrossChat.Controllers
         public async Task<IActionResult> EditTeam(Guid clientId)
 
         {
-            try
+            var teamEntity = _repository.Team.FindByCondition(x => x.Id == clientId).FirstOrDefault();
+           
+            if (teamEntity == null)
             {
-                var teamEntity = _repository.Team.FindByCondition(x => x.Id == clientId).FirstOrDefault();
-                if (teamEntity  == null)
-                {
-                    return NotFound();
-                }
-
-                var teamViewModel = new TeamVm
-                {
-                    Id = teamEntity.Id,
-                    Name = teamEntity.Name,
-                    NotificationType = teamEntity.NotificationType,
-                };
-
-                ViewBag.Title = "Edit Team";
-                return View("_Team", teamViewModel);
+                return NotFound();
             }
-            catch (Exception ex)
+
+            var teamViewModel = new TeamVm
             {
-                return Error("Something broke" + ex.Message);
-            }
+                Id = teamEntity.Id,
+                Name = teamEntity.Name,
+                NotificationType = teamEntity.NotificationType,
+            };
+
+            ViewBag.Title = "Edit Team";
+
+            return View("_AppUserTeam", teamViewModel);
         }
+
+        public async Task<IActionResult> GetTeamUsers(Guid id)
+        {
+
+            var users = await _repository.User.GetAllAsync();
+
+
+            var teamUsers = await _repository.AppUserTeam.FindByCondition(x => x.TeamId == id).Include(x => x.AppUser).ToListAsync();
+
+            var obj = new AppUserVM
+            {
+               
+                TeamUsers = teamUsers
+            };
+
+            return Success("Fetched Successfully", obj);
+        }
+
+
+        public async Task<IActionResult> GetTeamActiveUsers(Guid id)
+        {
+
+            var users = await _repository.AppUserTeam.FindByCondition(x=>x.TeamId==id).Include(x=>x.AppUser).ToListAsync();
+
+            return Success("Fetched Successfully", users);
+        }
+
 
         public async Task<IActionResult> DeleteTeam(Guid id)
         {
