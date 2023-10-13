@@ -339,7 +339,7 @@ namespace RedCrossChat.Dialogs
 
                 return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text(question) }, token);
             }
-
+          
             Conversation conversation = await _repository.Conversation
                 .FindByCondition(x => x.Id==me.ConversationId)
                 .Include(x => x.Persona)
@@ -372,17 +372,20 @@ namespace RedCrossChat.Dialogs
         {
             Client me = (Client)stepContext.Values[UserInfo];
 
-         
-            if (stepContext.Result is not Client)
-            {
-                //Save response to the question
-                
-            }
-
             Conversation conversation = await _repository.Conversation
                     .FindByCondition(x => x.Id==me.ConversationId)
                     .Include(x => x.Persona)
                     .FirstOrDefaultAsync();
+
+            if (stepContext.Context.Activity.ChannelId == "telegram" && !conversation.IsReturnClient)
+            {
+                var items=await _repository.Conversation.FindByCondition(x=>x.ConversationId== stepContext.Context.Activity.Conversation.Id).ToListAsync();
+
+                if(items.Count >1 )
+                {
+                    return await stepContext.BeginDialogAsync(nameof(PersonalDialog), me, token);
+                }
+            }
 
             if (conversation.IsReturnClient)
             {

@@ -36,7 +36,8 @@ namespace RedCrossChat.Dialogs
             ILogger<AwarenessDialog> logger, 
             IRepositoryWrapper wrapper, UserState userState,
             HumanHandOverDialog humanHandOverDialog,
-            BaseDialog baseDialog
+            BaseDialog baseDialog,
+            BreathingDialog breathingDialog
             ) : base(nameof(AwarenessDialog), baseDialog,wrapper)
         {
 
@@ -45,6 +46,8 @@ namespace RedCrossChat.Dialogs
             _userState = userState;
 
             _userProfileAccessor = userState.CreateProperty<ResponseDto>(DialogConstants.ProfileAssesor);
+
+            AddDialog( breathingDialog );
 
             AddDialog(new ChoicePrompt(nameof(ChoicePrompt)));
 
