@@ -8,6 +8,7 @@ using NuGet.Protocol.Core.Types;
 using RedCrossChat.Contracts;
 using RedCrossChat.Entities;
 using RedCrossChat.Objects;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -38,21 +39,29 @@ namespace RedCrossChat.Dialogs
 
         public async Task<DialogTurnResult> InitialStepAsync(WaterfallStepContext stepContext,CancellationToken token)
         {
-            stepContext.Values[UserInfo] = new Client();
+            var me = new Client();
 
-            return await stepContext.BeginDialogAsync(nameof(MainDialog), null, token);
+            return await stepContext.BeginDialogAsync(nameof(MainDialog), me, token);
         }
 
 
         public async Task<DialogTurnResult> CheckFeedBackAsync(WaterfallStepContext stepContext, CancellationToken token)
         {
-            Conversation conversation = await _repository.Conversation
-                    .FindByCondition(x => x.ConversationId == stepContext.Context.Activity.Conversation.Id).FirstOrDefaultAsync();
+            var conversations = await _repository.Conversation
+                    .FindByCondition(x => x.ConversationId == stepContext.Context.Activity.Conversation.Id).ToListAsync();
+
+            var conversation = conversations.Last();
 
             stepContext.Values[UserInfo] = new Client()
             {
                 language = conversation.Language,
             };
+
+
+            if (conversation.IsReturnClient  && conversations.Count % 10 !=0)
+            {
+                return await stepContext.EndDialogAsync(null);
+            }
 
             var options = new PromptOptions()
             {
@@ -74,7 +83,7 @@ namespace RedCrossChat.Dialogs
             await stepContext.Context.SendActivityAsync(MessageFactory.Text(me.language ? "Thank you for your feedback. We value your input!" : " Asante kwa maoni yako. Tunathamini mchango wako"));
 
 
-            return await stepContext.EndDialogAsync(token);
+            return await stepContext.EndDialogAsync(null);
         }
 
         
