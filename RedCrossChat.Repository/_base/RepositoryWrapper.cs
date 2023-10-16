@@ -1,7 +1,6 @@
 using RedCrossChat.Contracts;
 using RedCrossChat.Domain;
-
-
+using RedCrossChat.Entities;
 
 namespace RedCrossChat.Repository
 {
@@ -208,6 +207,30 @@ namespace RedCrossChat.Repository
                 if (_team==null) { _team = new TeamRepo(_repoContext); }
 
                 return _team;
+            }
+        }
+
+
+        public IItention _itention;
+
+        public IItention Itention
+        {
+            get 
+            {
+                if(_itention == null) { _itention = new IntetionRepo(_repoContext); }
+                return _itention;
+            }
+        }
+
+
+        public ISubIntention? _subintention;
+
+        public ISubIntention SubIntention
+        {
+            get
+            {
+                if(_subintention == null) { _subintention = new SubIntentionRepo(_repoContext); };
+                return _subintention; 
             }
         }
 

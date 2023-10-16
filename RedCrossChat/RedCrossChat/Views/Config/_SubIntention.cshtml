@@ -1,0 +1,76 @@
+﻿
+@using RedCrossChat.ViewModel;
+
+
+
+
+@{
+    Layout = null;
+}
+
+ 
+
+    <div class="modal-body">
+         <div class="modal-header">
+    <div class="text-center mb-4">
+        <p>Add Sub-Intention to Intention</p>
+    </div>
+  </div>
+
+        <div class="row">
+
+            <div class="row gx-3 gy-2 align-items-center">
+                <div class="col-md-6">
+                <label for="Team">Select Intention</label>
+@*                    <select id="selectTypeOpt" class="form-select color-dropdown" name="employee">
+                    <option value="-1" selected>Select Sub-Intention</option>
+                    @foreach (var intention in Model.Intentions)
+                    {
+                        <option value="@Model.Id">@Model.Name</option>
+
+                    }
+                </select>*@
+
+
+                <select id="intentionSelect" class="form-select color-dropdown">
+                    <option value="@Model.Id">@Model.Name</option>
+                </select>
+
+
+
+
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="showToastPlacement">&nbsp;</label>
+                    <button id="showToastPlacement" class="btn btn-primary d-block" type="button">Add Sub-Intention</button>
+                </div>
+            </div>
+        
+        </div>
+
+        <div class="row mt-3">
+        <div class="card ">
+
+            <div class="card-body p-0">
+                <table class="table table-striped" id="tblAppUserTeam">
+                    <thead>
+                        <tr>
+                            <th>Sub-Intention</th>
+                            <th style="width: 40px">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+        </div>
+        
+        <div>
+           
+        
+        </div>
+
+    </div>

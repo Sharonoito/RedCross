@@ -107,6 +107,12 @@
                     ],
                     columnDefs: [{
                         render: function (data, type, row) {
+
+                            if (row.isDeactivated) {
+                                return '';
+                            }
+
+
                             var actionsHtml =
                                 `<div class='text-center'>
                                                 <button class='btn btn-outline-primary btn-xs load-modal'
@@ -160,7 +166,7 @@
                 if (jsdtClient.table == null) {
                     jsdtClient.initializeDataTable();
                 } else {
-                    jsdtClient.table.ajax.reload();
+                    jsdtClient.table.ajax.reload(null,false);
                 }
             }
         }

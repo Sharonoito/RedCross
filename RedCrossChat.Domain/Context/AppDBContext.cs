@@ -43,6 +43,10 @@ namespace RedCrossChat.Domain
 
         public DbSet<Team> Team { get; set; }
 
+        public DbSet<Intention> Intention { get; set; }
+
+        public DbSet<SubIntention> SubIntention { get; set; }
+
         public DbSet<AppUserTeam> AppUserTeam { get; set; }
 
 

@@ -10,7 +10,7 @@ namespace RedCrossChat.Cards
             return new HeroCard
             {
 
-                Title = "Redcross Chat bot",
+                Title = "Chat-care",
                 Subtitle = language? "Terms and Conditions" : "Sheria na Masharti",
                 Text = language ? "We would like to know more about you ? Please accept terms and conditions below to continue.": "Tungependa kukufahamu zaidi ya ulivyotueleza. Ili kuendelea, tafadhali kubali sheria na masharti yafuatayo",
                 Buttons = new List<CardAction> { new CardAction(ActionTypes.OpenUrl,language? "Terms and Conditions" : "Sheria na Masharti", value: "https://www.redcross.or.ke/ASSETS/DATA-PROTECTION-POLICY.pdf") },
@@ -22,7 +22,7 @@ namespace RedCrossChat.Cards
         {
             var heroCard = new HeroCard
             {
-                Title = "RedCross",
+                Title = "Chat-care",
                 Subtitle = "Volunteers & MemberShip",
                 Text = "To volunteer or be involved in our activities please follow the link.",
                 Buttons = new List<CardAction> {
@@ -37,7 +37,7 @@ namespace RedCrossChat.Cards
         {
             var heroCard = new HeroCard
             {
-                Title = "RedCross",
+                Title = "Chat-care",
                 Subtitle = "Kujitolea na kuwa mshirika",
                 Text = "Kujitolea na kuwa mshirika tafadhali fuata kiungo hiki.",
                 Buttons = new List<CardAction> {
@@ -50,7 +50,7 @@ namespace RedCrossChat.Cards
         {
             var heroCard = new HeroCard
             {
-                Title = "RedCross |  Careers",
+                Title = "Chat-care |  Careers",
                 
                 Text = "For career opportunities please follow this link.",
                 Buttons = new List<CardAction> {
@@ -65,7 +65,7 @@ namespace RedCrossChat.Cards
         {
             var heroCard = new HeroCard
             {
-                Title = "RedCross |  Taaluma",
+                Title = "Chat-care |  Taaluma",
 
                 Text = "Kwa taaluma tafadhali fuata kiungo hiki",
                 Buttons = new List<CardAction> {
