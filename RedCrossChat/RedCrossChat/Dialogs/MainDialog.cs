@@ -28,7 +28,7 @@ namespace RedCrossChat.Dialogs
 
         public MainDialog(
             FlightBookingRecognizer luisRecognizer,
-            CounselorDialog counselorDialog,
+           
             PersonalDialog personalDialog,
             AiDialog aiDialog,
             AwarenessDialog awarenessDialog,
@@ -49,7 +49,7 @@ namespace RedCrossChat.Dialogs
             AddDialog(new TextPrompt(nameof(TextPrompt)));
             AddDialog(new ChoicePrompt(nameof(ChoicePrompt)));
 
-            AddDialog(counselorDialog);
+            //AddDialog(counselorDialog);
             AddDialog(personalDialog);
             AddDialog(aiDialog);
             AddDialog(awarenessDialog);
@@ -113,7 +113,9 @@ namespace RedCrossChat.Dialogs
                 client.language = !client.language;
             }
 
-            await CreateConversationDBInstance(stepContext);
+            var conv=await CreateConversationDBInstance(stepContext);
+
+            client.ConversationId = conv.Id;
 
             var question = client.language ?
                 "Hello dear friend!! Welcome to Kenya Red Cross Society, we are offering tele-counselling services to public at no charges . How can I help you today?\r\n" :
@@ -337,14 +339,13 @@ namespace RedCrossChat.Dialogs
 
                 return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text(question) }, token);
             }
-
+          
             Conversation conversation = await _repository.Conversation
-                .FindByCondition(x => x.ConversationId == stepContext.Context.Activity.Conversation.Id)
+                .FindByCondition(x => x.Id==me.ConversationId)
                 .Include(x => x.Persona)
                 .FirstOrDefaultAsync();
 
-           // var item = response.ToLower().Trim() == "other";
-
+         
             if (conversation != null)
             {
                 me.ConversationId = conversation.Id;
@@ -371,17 +372,20 @@ namespace RedCrossChat.Dialogs
         {
             Client me = (Client)stepContext.Values[UserInfo];
 
-         
-            if (stepContext.Result is not Client)
-            {
-                //Save response to the question
-                
-            }
-
             Conversation conversation = await _repository.Conversation
-                    .FindByCondition(x => x.ConversationId == stepContext.Context.Activity.Conversation.Id)
+                    .FindByCondition(x => x.Id==me.ConversationId)
                     .Include(x => x.Persona)
                     .FirstOrDefaultAsync();
+
+            if (stepContext.Context.Activity.ChannelId == "telegram" && !conversation.IsReturnClient)
+            {
+                var items=await _repository.Conversation.FindByCondition(x=>x.ConversationId== stepContext.Context.Activity.Conversation.Id).ToListAsync();
+
+                if(items.Count >1 )
+                {
+                    return await stepContext.BeginDialogAsync(nameof(PersonalDialog), me, token);
+                }
+            }
 
             if (conversation.IsReturnClient)
             {
@@ -498,6 +502,8 @@ namespace RedCrossChat.Dialogs
 
             }
 
+
+            me.ConversationId = conversation.Id;
            
 
             await DialogExtensions.UpdateDialogConversationId(conversation.Id, stepContext, _userProfileAccessor, _userState);

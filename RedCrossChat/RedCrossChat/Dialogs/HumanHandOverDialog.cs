@@ -12,11 +12,11 @@ using System.Threading.Tasks;
 
 namespace RedCrossChat.Dialogs
 {
-    public class HumanHandOverDialog : CancelAndHelpDialog
+    public class HumanHandOverDialog : ComponentDialog
     {
         private IRepositoryWrapper repository;
 
-        public HumanHandOverDialog(IRepositoryWrapper _repository, BaseDialog baseDialog):base(nameof(HumanHandOverDialog), baseDialog,_repository) { 
+        public HumanHandOverDialog(IRepositoryWrapper _repository, BaseDialog baseDialog):base(nameof(HumanHandOverDialog)) { 
 
             repository = _repository;
 
@@ -39,7 +39,7 @@ namespace RedCrossChat.Dialogs
 
             me.HandOverToUser = me.Iteration != 0;
 
-            var conversation=await GetActiveConversation(stepContext);
+            var conversation= await repository.Conversation.FindByCondition(x => x.Id==me.ConversationId).FirstOrDefaultAsync();
 
             if (!me.HandOverToUser)
             {
@@ -92,9 +92,16 @@ namespace RedCrossChat.Dialogs
 
                 await Task.Delay(request.HasBeenReceived ? 1000  : 10000); // Delay for 2 seconds (2000 milliseconds)
 
-                if(iterations % 5 == 0 && !me.HandOverToUser)
+                if(iterations % 10 == 0 && !me.HandOverToUser  && iterations !=30)
                 {
                     await stepContext.Context.SendActivityAsync(MessageFactory.Text("An agent will be getting in touch with you shortly"), token);
+                }
+
+                if(iterations  >=  30)
+                {
+                    await stepContext.Context.SendActivityAsync(MessageFactory.Text("it seems we are facing a number of requests, let's connect later"), token);
+
+                    return await stepContext.EndDialogAsync(null);
                 }
 
 

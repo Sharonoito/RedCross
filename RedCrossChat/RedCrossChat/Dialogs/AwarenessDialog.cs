@@ -36,7 +36,8 @@ namespace RedCrossChat.Dialogs
             ILogger<AwarenessDialog> logger, 
             IRepositoryWrapper wrapper, UserState userState,
             HumanHandOverDialog humanHandOverDialog,
-            BaseDialog baseDialog
+            BaseDialog baseDialog,
+            BreathingDialog breathingDialog
             ) : base(nameof(AwarenessDialog), baseDialog,wrapper)
         {
 
@@ -45,6 +46,8 @@ namespace RedCrossChat.Dialogs
             _userState = userState;
 
             _userProfileAccessor = userState.CreateProperty<ResponseDto>(DialogConstants.ProfileAssesor);
+
+            AddDialog( breathingDialog );
 
             AddDialog(new ChoicePrompt(nameof(ChoicePrompt)));
 
@@ -112,8 +115,9 @@ namespace RedCrossChat.Dialogs
 
             if (stepContext.Result != null && stepContext.Result is FoundChoice choiceResult)
             {
+                Conversation conv = await _repository.Conversation.FindByCondition(x => x.Id == me.ConversationId).Include(x => x.Persona).FirstOrDefaultAsync();
 
-                Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
+                Persona persona =  conv.Persona;
 
                 persona.IsAwareOfFeelings = stepContext.Context.Activity.Text;
 
@@ -167,7 +171,9 @@ namespace RedCrossChat.Dialogs
             var question = me.language ?"It's always relieving talking to someone trusted about what we are feeling. Would you want to speak to a professional therapist from Kenya Red Cross Society?":
                 "Daima ni kutuliza kuzungumza na mtu anayeaminika kuhusu kile tunachohisi. Je, ungependa kuzungumza na mtaalamu wa tiba kutoka Chama cha Msalaba Mwekundu cha Kenya";
 
-            Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
+            Conversation conv = await _repository.Conversation.FindByCondition(x => x.Id == me.ConversationId).Include(x => x.Persona).FirstOrDefaultAsync();
+
+            Persona persona = conv.Persona;
 
             persona.HasTalkedTOSomeone = true;
 
@@ -210,7 +216,9 @@ namespace RedCrossChat.Dialogs
 
             Client me = (Client)stepContext.Values[UserInfo];
 
-            Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
+            Conversation conv = await _repository.Conversation.FindByCondition(x => x.Id == me.ConversationId).Include(x => x.Persona).FirstOrDefaultAsync();
+
+            Persona persona = conv.Persona;
 
 
             if (stepContext.Result == null)
@@ -243,7 +251,9 @@ namespace RedCrossChat.Dialogs
 
             var question = me.language ? "What makes you seek our psychological support?" : "Ni nini kinakufanya utafute msaada wetu wa kisaikolojia?";
 
-            Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
+            Conversation conv = await _repository.Conversation.FindByCondition(x => x.Id == me.ConversationId).Include(x => x.Persona).FirstOrDefaultAsync();
+
+            Persona persona = conv.Persona;
 
             persona.WantsBreathingExcercises = true;
 
@@ -268,9 +278,11 @@ namespace RedCrossChat.Dialogs
 
             var question = me.language ? "Would you wish to talk to a Professional Counselor?" : "Je, ungependa kuongea na mshauri wa kitaalam?";
 
-            var conversation = await _repository.Conversation.FindByCondition(x => x.ConversationId == stepContext.Context.Activity.Conversation.Id).FirstOrDefaultAsync();
+            Conversation conversation = await _repository.Conversation.FindByCondition(x => x.Id == me.ConversationId).Include(x => x.Persona).FirstOrDefaultAsync();
 
-            if(conversation !=null)
+            //Persona persona = conversation.Persona;
+
+            if (conversation !=null)
             {
                 conversation.Reason = stepContext.Context.Activity.Text;
 
@@ -294,7 +306,7 @@ namespace RedCrossChat.Dialogs
         {
             Client me = (Client)stepContext.Values[UserInfo];
 
-            var conversation = await _repository.Conversation.FindByCondition(x => x.ConversationId == stepContext.Context.Activity.Conversation.Id).FirstOrDefaultAsync();
+            Conversation conversation = await _repository.Conversation.FindByCondition(x => x.Id == me.ConversationId).Include(x => x.Persona).FirstOrDefaultAsync();
 
             if (stepContext.Result != null)
             {
@@ -345,9 +357,6 @@ namespace RedCrossChat.Dialogs
                         };
 
                         return await stepContext.BeginDialogAsync(nameof(HumanHandOverDialog), me, cancellationToken);
-
-                        //return await stepContext.EndDialogAsync(me, cancellationToken);
-
 
                     case Validations.NO:
                     case ValidationsSwahili.NO:
