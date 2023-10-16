@@ -85,7 +85,7 @@ namespace RedCrossChat.Controllers
 
 
         [AllowAnonymous]
-        public async Task<IActionResult> DeactivateAccount()
+        public async Task<IActionResult> DeactivateAccount(Guid clientId)
         {
             var user = await _userManager.GetUserAsync(User);
 
@@ -95,14 +95,14 @@ namespace RedCrossChat.Controllers
                 await _userManager.UpdateAsync(user);
 
 
-                await _signInManager.SignOutAsync();
-
-
-                return PartialView("_AccountDeactivated");
+                //return PartialView("_AccountDeactivated");
+                return Json(new { success = true });
             }
+            return Json(new { success = false, message = "Account deactivation failed. User not found." });
 
-            return Content("Account deactivation failed. User not found.");
+            //return Content("Account deactivation failed. User not found.");
         }
+
 
 
         public IActionResult Profile()
@@ -220,7 +220,7 @@ namespace RedCrossChat.Controllers
 
         public async Task< IActionResult> SaveUser(UserVm user) {
 
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid && ModelState.ErrorCount >1)
                 return Error("Validation error!, please check your data.");
 
             try

@@ -15,13 +15,13 @@
         <div class="col-md-12">
             <ul class="nav nav-pills flex-column flex-md-row mb-3">
                 <li class="nav-item">
-                    <a class="nav-link active" href="javascript:void(0);" style="background-color: #ED1C24;">
+                    <a class="nav-link " href="javascript:void(0);" style="background-color: #ED1C24;">
                         <i class="bx bx-user me-1"></i> Feelings
                     </a>
                 </li>
 
-                <li class="nav-item @(Html.IsSelected(controller: "Config", action: "Profession") == "active" ? "active" : "")">
-                    <a asp-action="Profession" asp-controller="Config" class="nav-link">
+                <li class="nav-item @(Html.IsSelected(controller: "Config", action: "Profession") )">
+                    <a asp-action="Profession" asp-controller="Config" class="nav-link @(Html.IsSelected(controller: "Config", action: "Profession"))">
                         <i class="bx bx-grid-alt me-1"></i> Professional Status
                     </a>
                 </li>
@@ -33,7 +33,7 @@
                 </li>
 
                 <li class="nav-item @(Html.IsSelected(controller: "Config", action: "MaritalState") == "active" ? "active" : "")">
-                    <a asp-action="MaritalState" asp-controller="Config" class="nav-link @(Html.IsSelected(controller: "Config", action: "MaritalState"))">
+                    <a asp-action="MaritalState" asp-controller="Config" class="nav-link">
                         <i class="bx bx-bell me-1"></i> Marital Status
                     </a>
                 </li>
@@ -43,18 +43,18 @@
                         <i class="bx bx-bell me-1"></i> Gender
                     </a>
                 </li>
-                
+
                   <li class="nav-item @(Html.IsSelected(controller: "Config", action: "Intention") == "active" ? "active" : "")">
                     <a asp-action="Intention" asp-controller="Config" class="nav-link">
-                        <i class="bx bx-bell me-1"></i> Intention
+                        <i  class="bx bx-bell me-1"></i> Intention
                     </a>
                 </li>
-            </ul>
 
+
+            </ul>
 
         </div>
     </div>
-
 
 </div>
 
@@ -62,7 +62,7 @@
     <div class="container-fluid">
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title"><i class="fa fa-info-circle"></i> Manage Marital State</h3>
+                <h3 class="card-title"><i class="fa fa-info-circle"></i> Manage Intention</h3>
 
                 <div class="card-tools">
 
@@ -72,20 +72,18 @@
                             data-target="#clientModal"
                             data-modal="clientModal"
                             data-viewurl="true"
-                            data-action="@Url.Action("CreateMaritalState")" data-bs-toggle="modal" data-bs-target="#clientModal">
-                        <i class="fa fa-plus"></i> Add Marital State
+                            data-action="@Url.Action("CreateIntention")" data-bs-toggle="modal" data-bs-target="#clientModal">
+                        <i class="fa fa-plus"></i> Add Intention
                     </button>
 
                 </div>
             </div>
 
             <div class="card-body p-0">
-                <table class="table table-striped" id="tblMaritalState">
+                <table class="table table-striped" id="tblIntention">
                     <thead>
                         <tr>
                             <th>Name</th>
-                            <th>Kiswahili</th>
-                            <th>Synonymns</th>
                             <th style="width: 40px">Actions</th>
                         </tr>
                     </thead>
@@ -132,6 +130,7 @@
 
     </environment>
 
+
     <script type="text/javascript">
         $(document).ready(function () {
             jsdtClient.getData();
@@ -140,18 +139,16 @@
         var jsdtClient = {
             table: null,
             initializeDataTable: function () {
-                jsdtClient.table = $('#tblMaritalState').DataTable({
+                jsdtClient.table = $('#tblIntention').DataTable({
                     processing: true,
                     serverSide: true,
                     serverMethod: 'post',
                     ajax: {
-                        url: "@Url.Action("GetMaritalState")",
+                        url: "@Url.Action("GetIntention")",
                         type: "POST"
                     },
                     columns: [
                         { data: 'name' },
-                        { data: 'kiswahili' },
-                        { data: 'synonyms' },
                         { data: 'id', name: 'Id' },
                
                     ],
@@ -167,12 +164,12 @@
                                                             data-modal='clientModal'
                                                             data-bs-toggle="modal" data-bs-target="#clientModal"
                                                             data-viewurl='true'
-                                                            data-action='@Url.Action("EditMaritalState", "Config")?clientId=${row.id}'
+                                                            data-action='@Url.Action("EditIntention", "Config")?clientId=${row.id}'
                                                             title='Edit'>
                                                             <i class='fa fa-pencil-alt'></i>
 
                                                         <button class='delete btn btn-outline-danger btn-xs'
-                                                            data-action='@Url.Action("DeleteMaritalState", "Config")?clientId=${row.id}'
+                                                            data-action='@Url.Action("DeleteIntention", "Config")?clientId=${row.id}'
                                                             data-table='tblClients'
                                                             data-id='${row.id}'
                                                             data-toggle='tooltip'
