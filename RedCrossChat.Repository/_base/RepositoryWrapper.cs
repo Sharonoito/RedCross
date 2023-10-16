@@ -1,7 +1,6 @@
 using RedCrossChat.Contracts;
 using RedCrossChat.Domain;
-
-
+using RedCrossChat.Entities;
 
 namespace RedCrossChat.Repository
 {
@@ -224,7 +223,18 @@ namespace RedCrossChat.Repository
         }
 
 
-        
+        public ISubIntention? _subintention;
+
+        public ISubIntention SubIntention
+        {
+            get
+            {
+                if(_subintention == null) { _subintention = new SubIntentionRepo(_repoContext); };
+                return _subintention; 
+            }
+        }
+
+
         public IRawConversation _rawConversation;
 
         public IRawConversation RawConversation

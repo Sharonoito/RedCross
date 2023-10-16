@@ -1185,9 +1185,6 @@ namespace RedCrossChat.Controllers
             return View("_Intention");
         }
 
-
-   
-
         [HttpPost]
         public async Task<IActionResult> GetIntention(IDataTablesRequest dtRequest)
         {
@@ -1289,7 +1286,8 @@ namespace RedCrossChat.Controllers
                 };
                 ViewBag.Title = "Edit Intention";
 
-                return View("_Intention", intentionViewModel);
+                return View("_SubIntention", intentionViewModel);
+
 
             }
             catch (Exception ex)

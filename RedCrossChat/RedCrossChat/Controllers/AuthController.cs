@@ -170,6 +170,7 @@ namespace RedCrossChat.Controllers
             return View("_User");
         }
 
+
         public IActionResult ResetPassword()
         {
 
@@ -194,7 +195,7 @@ namespace RedCrossChat.Controllers
 
         public async Task< IActionResult> SaveUser(UserVm user) {
 
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid && ModelState.ErrorCount >1)
                 return Error("Validation error!, please check your data.");
 
             try

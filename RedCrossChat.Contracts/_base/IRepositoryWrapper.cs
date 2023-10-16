@@ -39,6 +39,8 @@ namespace RedCrossChat.Contracts
 
         IItention Itention { get; }
 
+        ISubIntention SubIntention { get; }
+
         IQuestionOption QuestionOption { get; }
 
         IHandOverRequest HandOverRequest { get; }
