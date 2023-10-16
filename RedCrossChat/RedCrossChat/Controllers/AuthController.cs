@@ -88,6 +88,7 @@ namespace RedCrossChat.Controllers
         public async Task<IActionResult> DeactivateAccount()
         {
             var user = await _userManager.GetUserAsync(User);
+
             if (user != null)
             {
                 user.IsDeactivated = true;
@@ -170,10 +171,35 @@ namespace RedCrossChat.Controllers
             return View("_User");
         }
 
-        public IActionResult ResetPassword()
+        public async Task<IActionResult> ResetPassword()
         {
 
+            
+
             return View("_ResetPassword");
+        }
+
+        public async Task< IActionResult> UpdatePassword(ProfileVm vm)
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user != null) {
+
+               var token= await _userManager.GeneratePasswordResetTokenAsync(user);
+
+               var status=await _userManager.ResetPasswordAsync(user, token, vm.ConfirmPassword);
+
+                if (status.Succeeded)
+                {
+                    return Success("Updated Successfully");
+                }
+                else
+                {
+                    return Error(status.Errors.First().Description);
+                }
+
+            }
+            return Error("Something broke");
         }
 
         public async Task<IActionResult> EditUser(Guid clientId)
