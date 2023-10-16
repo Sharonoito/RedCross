@@ -50,6 +50,12 @@
                     </a>
                 </li>
 
+                <li class="nav-item @(Html.IsSelected(controller: "Config", action: "SubIntention") == "active" ? "active" : "")">
+                    <a asp-action="SubIntention" asp-controller="Config" class="nav-link @(Html.IsSelected(controller: "Config", action: "SubIntention"))">
+                        <i class="bx bx-bell me-1"></i> SubIntention
+                    </a>
+                </li>
+
 
             </ul>
 
