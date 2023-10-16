@@ -226,13 +226,11 @@
                         <li >
                             <button type="button" class="dropdown-item load-modal"
                                id="EditUser"
-                               data-hidden='Id'
-                               data-id='${row.id}'
                                data-viewurl="true"
-                               data-toggle='modal' 
-                               data-target='#clientModal'
-                               data-modal="clientModal"
-                               data-bs-toggle="modal" data-bs-target="#clientModal"
+                               data-toggle='modal'
+                               data-target='#resetModal'
+                               data-modal="resetModal"
+                               data-bs-toggle="modal" data-bs-target="#resetModal"
                                data-action='@Url.Action("ResetPassword", "Auth")'>
                                
                                 <i class="bx bx-user me-2"></i>
@@ -275,8 +273,8 @@
 
 
 
-<div class="modal fade" data-keyboard="false" id="clientModal" tabindex="-1" role="dialog" style="display:none" aria-labelledby="clientModal" aria-hidden="true">
-    <div class="modal-dialog ">
+<div class="modal fade" data-keyboard="false" id="resetModal" tabindex="-1" role="dialog" style="display:none" aria-labelledby="resetModal" aria-hidden="true">
+    <div class="modal-dialog">
         <div class="modal-content">
 
         </div>
