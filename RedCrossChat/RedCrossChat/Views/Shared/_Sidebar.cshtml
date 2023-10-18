@@ -1,12 +1,13 @@
 ﻿@{
 }
-
+<img src="C:\Users\oitos\Downloads\KRCS.LogosDark.png" />
 <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
     <div class="app-brand demo">
         <a href="index.html" class="app-brand-link">
             <span class="app-brand-logo demo"></span>
             <span class="app-brand-text demo menu-text fw-bolder ms-2" >
-                <img src="~/img/KRCLOGO.png" alt="Kenya Red Cross Logo" class="brand-image" style="object-fit:contain;width: 60%">
+                <img id="light-mode-logo" src="~/img/KRCLOGO.png" alt="Kenya Red Cross Logo" class="brand-image" style="object-fit:contain;width: 60%">
+                <img id="dark-mode-logo" src="~/img/KRCS.LogosDark.png" alt="Kenya Red Cross Dark Logo" class="brand-image" style="object-fit: contain; width: 3%">
             </span>
         </a>
 
@@ -88,3 +89,23 @@
 
     </ul>
 </aside>
+
+@*
+<script>
+    function toggleDarkMode() {
+        const darkModeLogo = document.getElementById('dark-mode-logo');
+
+        // Check if dark mode is enabled (you may need to modify this based on your template)
+        const isDarkMode = /* Add your dark mode detection logic here */;
+
+        if (isDarkMode) {
+            darkModeLogo.style.display = 'block'; // Show dark mode logo
+        } else {
+            darkModeLogo.style.display = 'none'; // Hide dark mode logo
+        }
+    }
+
+    // Call the function when your website loads or when dark mode status changes
+    toggleDarkMode();
+
+</script>*@

@@ -1286,7 +1286,7 @@ namespace RedCrossChat.Controllers
                 };
                 ViewBag.Title = "Edit Intention";
 
-                return View("_SubIntention", intentionViewModel);
+                return View("_Intention", intentionViewModel);
 
 
             }
@@ -1325,5 +1325,178 @@ namespace RedCrossChat.Controllers
 
         #endregion
 
+        #region SubIntention
+        public IActionResult SubIntention()
+        {
+            return View();
+        }
+
+        public async Task<IActionResult> CreateSubIntention()
+        {
+
+            var intentions = await _repository.Itention.GetAllAsync();
+
+            ViewBag.Intentions = intentions;
+
+            return View("_SubIntention");
+
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetSubIntention(IDataTablesRequest dtRequest)
+        {
+
+            try
+            {
+                var data = await _repository.SubIntention.GetAllAsync();
+
+                var filteredRows = data
+                    .AsQueryable()
+                    .FilterBy(dtRequest.Search, dtRequest.Columns);
+
+                var pagedRows = filteredRows
+                    .SortBy(dtRequest.Columns)
+                    .Skip(dtRequest.Start)
+                    .Take(dtRequest.Length);
+
+
+                var response = DataTablesResponse.Create(dtRequest, data.Count(),
+                    filteredRows.Count(), pagedRows);
+
+                return new DataTablesJsonResult(response);
+
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+
+            }
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> SaveSubIntention(SubIntentionVm subintention)
+        {
+
+            try
+            {
+
+                var intentionEntity = await _repository.Itention.GetByIdAsync(subintention.ItentionId);
+
+                if (intentionEntity == null)
+                {
+                    ModelState.AddModelError("ItentionId", "Intention not found");
+                    return View("_SubIntention", subintention);
+                }
+
+                if (subintention.Id == Guid.Empty)
+                {
+                    var subintentionEntity = new SubIntention
+                    {
+                        Name = subintention.Name,
+                        IntentionId = subintention.ItentionId
+                    };
+
+                    _repository.SubIntention.Create(subintentionEntity);
+
+
+                }
+                else
+                {
+                    var subintentionDB = await _repository.SubIntention.FindByCondition(x => x.Id == subintention.Id).FirstOrDefaultAsync();
+
+                    if (subintentionDB == null)
+                    {
+                        ModelState.AddModelError("Id", "SubIntention not found");
+                        return View("_SubIntention", subintention);
+
+                    }
+
+                    subintentionDB.Name = subintention.Name;
+                    subintentionDB.IntentionId = subintention.ItentionId;
+
+
+                    _repository.SubIntention.Update(subintentionDB);
+                }
+
+                var result = await _repository.SaveChangesAsync();
+
+                if (result)
+                {
+               
+                    return Success("SubIntention saved Successfully");
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("ServerError", "Something broke: " + ex.Message);
+                return Error("There was an error creating subIntention");
+            }
+
+            return Error("Sorry SubIntention was not created");
+        }
+
+
+        public async Task<IActionResult> EditSubIntention(SubIntentionVm subintention)
+        {
+            try
+            {
+
+                var subintentionEntity = await _repository.SubIntention.FindByCondition(x => x.Id == subintention.Id).FirstOrDefaultAsync();
+
+                if (subintentionEntity == null)
+                {
+                    return NotFound();
+                }
+
+                var subintentionViewModel = new SubIntentionVm
+                {
+                    Id = subintentionEntity.Id,
+                    Name= subintentionEntity.Name,
+                    ItentionId = subintention.ItentionId
+                };
+                ViewBag.Title = "Edit SubIntention";
+
+                return View("_SubIntention", subintentionViewModel);
+
+
+            }
+            catch (Exception ex)
+            {
+                return Error("Something broke" + ex.Message);
+            }
+        }
+
+
+        public async Task<IActionResult> DeleteSubIntention(Guid id)
+        {
+            try
+            {
+                var subintentionEntity = await _repository.SubIntention.FindByCondition(x => x.Id == id).FirstOrDefaultAsync();
+                if (subintentionEntity == null)
+                {
+                    return NotFound();
+                }
+
+                _repository.SubIntention.Delete(subintentionEntity);
+                var result = await _repository.SaveChangesAsync();
+
+                if (!result)
+                {
+                    return Error("Error deleting subintention");
+                }
+
+                return Success("Subintention deleted successfully");
+            }
+            catch (Exception ex)
+            {
+                return Error("Something broke" + ex.Message);
+            }
+        }
+
+
+        #endregion
+
     }
 }
+
