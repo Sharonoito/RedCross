@@ -82,15 +82,6 @@ namespace RedCrossChat.Dialogs
         }
 
 
-
-        //public async Task<DialogTurnResult> InitialStepAsync(WaterfallStepContext stepContext,CancellationToken token)
-        //        {
-        //            var me = new Client();
-
-        //            return await stepContext.BeginDialogAsync(nameof(MainDialog), me, token);
-        //        }
-
-
         public async Task<DialogTurnResult> CheckFeedBackAsync(WaterfallStepContext stepContext, CancellationToken token)
         {
             var conversations = await _repository.Conversation

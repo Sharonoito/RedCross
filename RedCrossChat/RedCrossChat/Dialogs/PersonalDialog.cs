@@ -192,7 +192,7 @@ namespace RedCrossChat.Dialogs
                 Prompt = MessageFactory.Text(question),
                 RetryPrompt = MessageFactory.Text(me.language? "Please select a valid age-group or type a valid age" : "Tafadhali chagua kikundi halali cha umri au andika umri sahihi"),
                 Choices =choices,
-                Style = ListStyle.SuggestedAction,
+                Style = ListStyle.HeroCard,
             };
 
 
