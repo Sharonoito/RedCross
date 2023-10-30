@@ -8,6 +8,7 @@ using NuGet.Protocol.Core.Types;
 using RedCrossChat.Contracts;
 using RedCrossChat.Entities;
 using RedCrossChat.Objects;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -47,6 +48,7 @@ namespace RedCrossChat.Dialogs
 
         public async Task<DialogTurnResult> CheckFeedBackAsync(WaterfallStepContext stepContext, CancellationToken token)
         {
+
             var conversations = await _repository.Conversation
                     .FindByCondition(x => x.ConversationId == stepContext.Context.Activity.Conversation.Id).ToListAsync();
 
@@ -60,6 +62,13 @@ namespace RedCrossChat.Dialogs
 
             if (conversation.IsReturnClient  && conversations.Count % 10 !=0)
             {
+                //ask chat gpt for an encouraging quote
+                //todo : make the goodbye dynamic 
+                
+                var resp=await ChatGptDialog.GetChatGPTResponses("Give me a random encouraging quote",new List<AiConversation>(),conversation.Language);
+
+                await stepContext.Context.SendActivityAsync(MessageFactory.Text(conversation.Language ? $"Thank you , have a lovely day  {resp}" : $" Asante,kuwa na siku njema  {resp}"));
+
                 return await stepContext.EndDialogAsync(null);
             }
 
@@ -80,7 +89,9 @@ namespace RedCrossChat.Dialogs
 
             Client me = (Client)stepContext.Values[UserInfo];
 
-            await stepContext.Context.SendActivityAsync(MessageFactory.Text(me.language ? "Thank you for your feedback. We value your input!" : " Asante kwa maoni yako. Tunathamini mchango wako"));
+            var resp = await ChatGptDialog.GetChatGPTResponses("Give me a random encouraging quote", new List<AiConversation>(), me.language);
+
+            await stepContext.Context.SendActivityAsync(MessageFactory.Text(me.language ? $"Thank you for your feedback. We value your input! {resp}" : $" Asante kwa maoni yako. Tunathamini mchango wako {resp}"));
 
 
             return await stepContext.EndDialogAsync(null);

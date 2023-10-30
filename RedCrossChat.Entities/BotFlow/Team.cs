@@ -12,6 +12,7 @@ namespace RedCrossChat.Entities
 
         public int NotificationType { get; set; } = 1;
 
+        public List<AppUserTeam> AppUserTeams { get; set; }
     }
 }
 

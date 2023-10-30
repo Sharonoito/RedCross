@@ -1,7 +1,6 @@
 ﻿@using RedCrossChat.ViewModel;
 
-
-
+@model TeamVm
 
 @{
     Layout = null;
@@ -28,7 +27,7 @@
                 </div>
                 <div class="col-md-6">
                     <label class="form-label" for="showToastPlacement">&nbsp;</label>
-                    <button id="showToastPlacement" class="btn btn-primary d-block" type="button">Add Employee</button>
+                    <button id="addUserToTeam" data-id="@Model.Id" class="btn btn-primary d-block" type="button">Add Employee</button>
                 </div>
             </div>
         
