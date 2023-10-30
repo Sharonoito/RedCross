@@ -1,0 +1,60 @@
+﻿
+@using RedCrossChat.ViewModel;
+
+
+
+
+@model SubIntentionVm
+
+
+@{
+    Layout = null;
+}
+
+
+<div class="modal-header">
+    <h5 class="modal-title">@ViewBag.Title</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+@using (Html.BeginForm(actionName: "SaveSubIntention", controllerName: "Config", FormMethod.Post, new { @class = "modal-Crud", data_modal = "clientModal", data_callback = "", data_table = "tblSubIntention", autocomplete = "off", @id = "frmClient" }))
+{
+
+    <input type="hidden" asp-for="Id">
+    <div class="modal-body">
+        <div class="row">
+            <div class="row gx-3 gy-2 align-items-center">
+                <div class="col-md-6">
+                    <label for="Team">Select Intention</label>
+                    <select class="form-select color-dropdown" asp-for="ItentionId">
+                        <option value="-1" selected>Select Intention</option>
+
+                        @if (ViewBag.Intentions != null)
+                        {
+                            foreach (var intention in ViewBag.Intentions)
+                            {
+                                <option value="@intention.Id">@intention.Name</option>
+                            }
+                        }
+                    </select>
+
+                </div>
+            </div>
+
+           <div class="form-group col-lg-12 mb-2">
+                <label asp-for="Name"></label>
+                <input asp-for="Name" class="form-control" autocomplete="off" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>   
+          
+            
+
+        </div>
+    </div>
+    <div class="modal-footer">
+
+        <button type="submit" class="btn btn-primary me-sm-3 me-1 mt-3">Submit</button>
+        <button type="reset" class="btn btn-label-secondary btn-reset mt-3" data-bs-dismiss="modal" aria-label="Close">Cancel</button>
+
+    </div>
+}

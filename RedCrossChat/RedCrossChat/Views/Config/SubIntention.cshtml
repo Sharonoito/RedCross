@@ -15,19 +15,19 @@
         <div class="col-md-12">
             <ul class="nav nav-pills flex-column flex-md-row mb-3">
                 <li class="nav-item">
-                    <a class="nav-link active" href="javascript:void(0);" style="background-color: #ED1C24;">
+                    <a class="nav-link " href="javascript:void(0);" style="background-color: #ED1C24;">
                         <i class="bx bx-user me-1"></i> Feelings
                     </a>
                 </li>
 
-                <li class="nav-item @(Html.IsSelected(controller: "Config", action: "Profession") == "active" ? "active" : "")">
-                    <a asp-action="Profession" asp-controller="Config" class="nav-link">
+                <li class="nav-item @(Html.IsSelected(controller: "Config", action: "Profession") )">
+                    <a asp-action="Profession" asp-controller="Config" class="nav-link @(Html.IsSelected(controller: "Config", action: "Profession"))">
                         <i class="bx bx-grid-alt me-1"></i> Professional Status
                     </a>
                 </li>
 
-                <li class="nav-item @(Html.IsSelected(controller: "Config", action: "AgeBand"))">
-                    <a asp-action="AgeBand" asp-controller="Config" class="nav-link @(Html.IsSelected(controller: "Config", action: "AgeBand"))">
+                <li class="nav-item @(Html.IsSelected(controller: "Config", action: "AgeBand") == "active" ? "active" : "")">
+                    <a asp-action="AgeBand" asp-controller="Config" class="nav-link">
                         <i class="bx bx-bell me-1"></i> Age Band
                     </a>
                 </li>
@@ -43,23 +43,24 @@
                         <i class="bx bx-bell me-1"></i> Gender
                     </a>
                 </li>
-                
+
                   <li class="nav-item @(Html.IsSelected(controller: "Config", action: "Intention") == "active" ? "active" : "")">
                     <a asp-action="Intention" asp-controller="Config" class="nav-link">
-                        <i class="bx bx-bell me-1"></i> Intention
+                        <i  class="bx bx-bell me-1"></i> Intention
                     </a>
                 </li>
+
                 <li class="nav-item @(Html.IsSelected(controller: "Config", action: "SubIntention") == "active" ? "active" : "")">
                     <a asp-action="SubIntention" asp-controller="Config" class="nav-link @(Html.IsSelected(controller: "Config", action: "SubIntention"))">
                         <i class="bx bx-bell me-1"></i> SubIntention
                     </a>
                 </li>
-            </ul>
 
+
+            </ul>
 
         </div>
     </div>
-
 
 </div>
 
@@ -67,7 +68,7 @@
     <div class="container-fluid">
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title"><i class="fa fa-info-circle"></i> Manage AgeBand</h3>
+                <h3 class="card-title"><i class="fa fa-info-circle"></i> Manage SubIntention</h3>
 
                 <div class="card-tools">
 
@@ -77,22 +78,18 @@
                             data-target="#clientModal"
                             data-modal="clientModal"
                             data-viewurl="true"
-                            data-action="@Url.Action("CreateAgeBand")" data-bs-toggle="modal" data-bs-target="#clientModal">
-                        <i class="fa fa-plus"></i> Add AgeBand
+                            data-action="@Url.Action("CreateSubIntention")" data-bs-toggle="modal" data-bs-target="#clientModal">
+                        <i class="fa fa-plus"></i> Add SubIntention
                     </button>
 
                 </div>
             </div>
 
             <div class="card-body p-0">
-                <table class="table table-striped" id="tblAgeBand">
+                <table class="table table-striped" id="tblSubIntention">
                     <thead>
                         <tr>
                             <th>Name</th>
-                            <th>Kiswahili</th>
-                            <th>Highest</th>
-                            <th>Lowest</th>
-                            <th>Synonyms</th>
                             <th style="width: 40px">Actions</th>
                         </tr>
                     </thead>
@@ -139,6 +136,7 @@
 
     </environment>
 
+
     <script type="text/javascript">
         $(document).ready(function () {
             jsdtClient.getData();
@@ -147,20 +145,16 @@
         var jsdtClient = {
             table: null,
             initializeDataTable: function () {
-                jsdtClient.table = $('#tblAgeBand').DataTable({
+                jsdtClient.table = $('#tblSubIntention').DataTable({
                     processing: true,
                     serverSide: true,
                     serverMethod: 'post',
                     ajax: {
-                        url: "@Url.Action("GetAgeBand")",
+                        url: "@Url.Action("GetSubIntention")",
                         type: "POST"
                     },
                     columns: [
                         { data: 'name' },
-                        { data: 'kiswahili' },
-                        { data: 'highest' },
-                        { data: 'lowest' },
-                        { data: 'synonyms' },
                         { data: 'id', name: 'Id' },
                
                     ],
@@ -176,12 +170,12 @@
                                                             data-modal='clientModal'
                                                             data-bs-toggle="modal" data-bs-target="#clientModal"
                                                             data-viewurl='true'
-                                                                    data-action='@Url.Action("EditAgeBand", "Config")?clientId=${row.id}'
+                                                                    data-action='@Url.Action("EditSubIntention", "Config")?subintention.Id=${row.id}'
                                                             title='Edit'>
                                                             <i class='fa fa-pencil-alt'></i>
 
                                                         <button class='delete btn btn-outline-danger btn-xs'
-                                                                    data-action='@Url.Action("DeleteAgeBand", "Config")?clientId=${row.id}'
+                                                                    data-action='@Url.Action("DeleteSubIntention", "Config")?subintention.Id=${row.id}'
                                                             data-table='tblClients'
                                                             data-id='${row.id}'
                                                             data-toggle='tooltip'

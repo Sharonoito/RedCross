@@ -85,23 +85,24 @@ namespace RedCrossChat.Controllers
 
 
         [AllowAnonymous]
-        public async Task<IActionResult> DeactivateAccount()
+        public async Task<IActionResult> DeactivateAccount(Guid clientId)
         {
             var user = await _userManager.GetUserAsync(User);
+
             if (user != null)
             {
                 user.IsDeactivated = true;
                 await _userManager.UpdateAsync(user);
 
 
-                await _signInManager.SignOutAsync();
-
-
-                return PartialView("_AccountDeactivated");
+                //return PartialView("_AccountDeactivated");
+                return Json(new { success = true });
             }
+            return Json(new { success = false, message = "Account deactivation failed. User not found." });
 
-            return Content("Account deactivation failed. User not found.");
+            //return Content("Account deactivation failed. User not found.");
         }
+
 
 
         public IActionResult Profile()
@@ -170,10 +171,35 @@ namespace RedCrossChat.Controllers
             return View("_User");
         }
 
-        public IActionResult ResetPassword()
+        public async Task<IActionResult> ResetPassword()
         {
 
+            
+
             return View("_ResetPassword");
+        }
+
+        public async Task< IActionResult> UpdatePassword(ProfileVm vm)
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user != null) {
+
+               var token= await _userManager.GeneratePasswordResetTokenAsync(user);
+
+               var status=await _userManager.ResetPasswordAsync(user, token, vm.ConfirmPassword);
+
+                if (status.Succeeded)
+                {
+                    return Success("Updated Successfully");
+                }
+                else
+                {
+                    return Error(status.Errors.First().Description);
+                }
+
+            }
+            return Error("Something broke");
         }
 
         public async Task<IActionResult> EditUser(Guid clientId)
@@ -194,7 +220,7 @@ namespace RedCrossChat.Controllers
 
         public async Task< IActionResult> SaveUser(UserVm user) {
 
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid && ModelState.ErrorCount >1)
                 return Error("Validation error!, please check your data.");
 
             try

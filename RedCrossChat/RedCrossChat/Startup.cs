@@ -43,6 +43,7 @@ namespace RedCrossChat
            var connectionString = _config.GetConnectionString(HostingEnvironment.IsDevelopment() ?  "DefaultConnection": "LocalConnection");
            // var connectionString = _config.GetConnectionString("LocalConnection");
 
+
             //Use sql Server Conversations
             services.AddDbContextPool<AppDBContext>(options =>
                 options.UseSqlServer(connectionString));

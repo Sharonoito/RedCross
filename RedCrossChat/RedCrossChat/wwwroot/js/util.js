@@ -503,7 +503,7 @@ $(document).on("click", ".load-modal", function () {
                     // Reload same page - Sirme
                     //window.location.href = window.location.href;
                 } else {
-                    //console.log('Tumepita');
+                    console.log('Tumepita');
                     if (viewUrl) {
                         try {
                             var obj = JSON.parse(response);
@@ -525,6 +525,9 @@ $(document).on("click", ".load-modal", function () {
                             // do nothing, it's html content
                         }
 
+                        console.log("content",content);
+
+                        console.log("response",response)
                         $('#' + modal).find(content).html(response);
                         // $('#' + modal).html(response);
 

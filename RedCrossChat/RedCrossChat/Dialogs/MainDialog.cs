@@ -8,6 +8,7 @@ using RedCrossChat.Cards;
 using RedCrossChat.Contracts;
 using RedCrossChat.Entities;
 using RedCrossChat.Objects;
+using Sentry;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -416,6 +417,7 @@ namespace RedCrossChat.Dialogs
                 Choices = RedCrossLists.GetRating(me.language),
                 Style = ListStyle.HeroCard,
             };
+
 
             return await stepContext.PromptAsync(nameof(ChoicePrompt), options, cancellationToken);
         }
