@@ -14,7 +14,7 @@ namespace RedCrossChat.Objects
     {
         public static readonly List<Choice> choices = new()
         {
-            new Choice() { Value = Validations.YES, Synonyms = new List<string> { "y", "Y", "YES", "YE", "ye", "yE", "1" },Action=ActionTypes. },
+            new Choice() { Value = Validations.YES, Synonyms = new List<string> { "y", "Y", "YES", "YE", "ye", "yE", "1" } },
             new Choice() { Value = Validations.NO, Synonyms = new List<string> { "n", "N", "no" } }
         };
 

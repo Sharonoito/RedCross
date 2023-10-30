@@ -31,7 +31,7 @@ namespace RedCrossChat
             var chatCompletionsOptions = new ChatCompletionsOptions
             {
                 MaxTokens = 400,
-                Temperature = 2f,
+                Temperature = 1.8f,
                 FrequencyPenalty = 0.0f,
                 PresencePenalty = 0.0f,
                 NucleusSamplingFactor = 0.95f,
