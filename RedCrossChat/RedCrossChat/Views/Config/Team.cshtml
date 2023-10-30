@@ -165,6 +165,15 @@
             }
         }
 
+        $(document).on('click', '#addUserToTeam', function () {
+
+            if ($("#selectTypeOpt").val() == "-1")
+                return;
+
+            $.post("@Url.Action("CreateTeamUser")", { UserId: $("#selectTypeOpt").val(), TeamId: $(this).data('id') }).then(resp => {
+
+            })
+        })
 
         $(document).on('click', '.team-manager', function () {
 
@@ -176,12 +185,15 @@
 
                 $.get("@Url.Action("GetTeamUsers")?id="+$(current).data('id')).then(resp => {
 
-                    console.log("responsive",resp)
+                    let { teamUsers, users } = resp.responseData;
+
+
+                    users.forEach(user => $("#selectTypeOpt").append(`<option value='${user.id}'>${user.fullName}</option>`));
 
                 })
 
 
-            },1000)
+            },500)
         })
 
     </script>

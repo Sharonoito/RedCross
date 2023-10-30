@@ -70,8 +70,7 @@ namespace RedCrossChat.Dialogs
 
             var prompts = new PromptOptions
             {
-                Prompt = MessageFactory.Text(question)
-                ,
+                Prompt = MessageFactory.Text(question),
                 Choices = user.language ? RedCrossLists.choices : RedCrossLists.choicesKiswahili,
                 Style = ListStyle.HeroCard
             };

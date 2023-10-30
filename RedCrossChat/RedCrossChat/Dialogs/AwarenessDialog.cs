@@ -6,6 +6,7 @@ using Microsoft.Bot.Schema;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
+using Newtonsoft.Json.Linq;
 using NuGet.Protocol.Core.Types;
 using RedCrossChat.Cards;
 using RedCrossChat.Contracts;
@@ -258,6 +259,16 @@ namespace RedCrossChat.Dialogs
             _repository.Persona.Update(persona);
 
             await _repository.SaveChangesAsync();
+
+            var intentions=await _repository.Itention.GetAllAsync();
+
+            var list =new List<Choice>();
+
+
+            foreach (var choice in intentions)
+            {
+                list.Add(new Choice{Value = choice.Name});
+            }
 
             await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
 

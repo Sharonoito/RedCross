@@ -3,13 +3,9 @@ using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Dialogs.Choices;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Clients.ActiveDirectory;
-using NuGet.Protocol.Core.Types;
 using RedCrossChat.Contracts;
 using RedCrossChat.Entities;
 using RedCrossChat.Objects;
-using Sentry;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -19,7 +15,7 @@ namespace RedCrossChat.Dialogs
 {
     public class BaseDialog :ComponentDialog
     {
-        private readonly string UserInfo = "Clien-info";
+        private readonly string UserInfo = "Client-info";
 
         private readonly IRepositoryWrapper _repository;
 
@@ -32,7 +28,8 @@ namespace RedCrossChat.Dialogs
 
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog),new WaterfallStep[]
             {
-                HandleChoiceResultAsync,
+                InitialStepAsync,
+               // HandleChoiceResultAsync,
                 CheckFeedBackAsync,
                 EndConversationAsync,
             }));
@@ -42,19 +39,18 @@ namespace RedCrossChat.Dialogs
 
         //check if the user is using facebook channel 
 
-        public async Task<DialogTurnResult> InitialStepAsync(WaterfallStepContext stepContext, CancellationToken token) 
+       /* public async Task<DialogTurnResult> InitialStepAsync(WaterfallStepContext stepContext, CancellationToken token) 
         {
             if (stepContext.Context.Activity.ChannelId == "facebook")
             {
-                Client me = (Client)stepContext.Values[UserInfo];
-                var question = me.language ? "Do you want to talk to an agent?" : "Unataka kuzungumza na wakala ?";
+                var question = "Do you want to talk to an agent?";
 
                 var options = new PromptOptions()
                 {
                     Prompt=MessageFactory.Text(question),
-                    RetryPrompt = MessageFactory.Text(me.language ? "Please select a valid option ('Yes' or 'No')." : "Tafadhali fanya chaguo sahihi"),
-                    Choices = me.language ? RedCrossLists.choices : RedCrossLists.choicesKiswahili,
-                    Style = ListStyle.HeroCard
+                    RetryPrompt = MessageFactory.Text("Please select a valid option ('Yes' or 'No')."),
+                    Choices = RedCrossLists.choices ,
+                   // Style = ListStyle.HeroCard
                 };
                 return await stepContext.PromptAsync(nameof(ChoicePrompt), options,token);
             }
@@ -63,7 +59,7 @@ namespace RedCrossChat.Dialogs
                 var me = new Client();
                 return await stepContext.BeginDialogAsync(nameof(MainDialog), me, token);
             }
-        }
+        }*/
 
 
         public async Task<DialogTurnResult> HandleChoiceResultAsync(WaterfallStepContext stepContext, CancellationToken token)
@@ -82,8 +78,26 @@ namespace RedCrossChat.Dialogs
         }
 
 
+
+        public async Task<DialogTurnResult> InitialStepAsync(WaterfallStepContext stepContext,CancellationToken token)
+        {
+            var me = new Client();
+
+            if (stepContext.Reason.ToString() == "BeginCalled")
+            {
+                return await stepContext.NextAsync(null);
+            }
+            else
+            {
+                return await stepContext.BeginDialogAsync(nameof(MainDialog), me, token);
+            }
+            
+        }
+
+
         public async Task<DialogTurnResult> CheckFeedBackAsync(WaterfallStepContext stepContext, CancellationToken token)
         {
+
             var conversations = await _repository.Conversation
                     .FindByCondition(x => x.ConversationId == stepContext.Context.Activity.Conversation.Id).ToListAsync();
 
@@ -97,6 +111,13 @@ namespace RedCrossChat.Dialogs
 
             if (conversation.IsReturnClient  && conversations.Count % 10 !=0)
             {
+                //ask chat gpt for an encouraging quote
+                //todo : make the goodbye dynamic 
+                
+                var resp=await ChatGptDialog.GetChatGPTResponses("Give me a random encouraging quote",new List<AiConversation>(),conversation.Language);
+
+                await stepContext.Context.SendActivityAsync(MessageFactory.Text(conversation.Language ? $"Thank you , have a lovely day  {resp}" : $" Asante,kuwa na siku njema  {resp}"));
+
                 return await stepContext.EndDialogAsync(null);
             }
 
@@ -117,7 +138,9 @@ namespace RedCrossChat.Dialogs
 
             Client me = (Client)stepContext.Values[UserInfo];
 
-            await stepContext.Context.SendActivityAsync(MessageFactory.Text(me.language ? "Thank you for your feedback. We value your input!" : " Asante kwa maoni yako. Tunathamini mchango wako"));
+            var resp = await ChatGptDialog.GetChatGPTResponses("Give me a random encouraging quote", new List<AiConversation>(), me.language);
+
+            await stepContext.Context.SendActivityAsync(MessageFactory.Text(me.language ? $"Thank you for your feedback. We value your input! {resp}" : $" Asante kwa maoni yako. Tunathamini mchango wako {resp}"));
 
 
             return await stepContext.EndDialogAsync(null);
