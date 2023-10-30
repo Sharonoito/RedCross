@@ -1236,6 +1236,7 @@ namespace RedCrossChat.Controllers
                     var intentionEntity = new Intention
                     {
                         Name = intention.Name,
+                        Kiswahili = intention.Kiswahili,
                     };
 
                     _repository.Itention.Create(intentionEntity);
@@ -1257,6 +1258,7 @@ namespace RedCrossChat.Controllers
 
 
                     intention.Name = intention.Name;
+                    intention.Kiswahili = intentionDB.Kiswahili;
 
                     _repository.Itention.Update(intentionDB);
 
@@ -1288,6 +1290,7 @@ namespace RedCrossChat.Controllers
                 {
                     Id = intentionEntity.Id,
                     Name= intentionEntity.Name,
+                    Kiswahili=intentionEntity.Kiswahili,
 
                 };
                 ViewBag.Title = "Edit Intention";
@@ -1400,7 +1403,8 @@ namespace RedCrossChat.Controllers
                     var subintentionEntity = new SubIntention
                     {
                         Name = subintention.Name,
-                        IntentionId = subintention.ItentionId
+                        IntentionId = subintention.ItentionId,
+                        Kiswahili = subintention.Kiswahili,
                     };
 
                     _repository.SubIntention.Create(subintentionEntity);
@@ -1420,6 +1424,7 @@ namespace RedCrossChat.Controllers
 
                     subintentionDB.Name = subintention.Name;
                     subintentionDB.IntentionId = subintention.ItentionId;
+                    subintentionDB.Kiswahili = subintention.Kiswahili;
 
 
                     _repository.SubIntention.Update(subintentionDB);
@@ -1459,7 +1464,8 @@ namespace RedCrossChat.Controllers
                 {
                     Id = subintentionEntity.Id,
                     Name= subintentionEntity.Name,
-                    ItentionId = subintention.ItentionId
+                    ItentionId = subintention.ItentionId,
+                    Kiswahili = subintention.Kiswahili,
                 };
                 ViewBag.Title = "Edit SubIntention";
 
