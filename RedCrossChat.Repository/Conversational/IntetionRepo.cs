@@ -3,7 +3,6 @@ using RedCrossChat.Contracts;
 using RedCrossChat.Domain;
 using RedCrossChat.Entities;
 
-
 namespace RedCrossChat.Repository
 {
     public class IntetionRepo : RepositoryBase<Intention>, IItention
@@ -16,6 +15,9 @@ namespace RedCrossChat.Repository
         public async Task<IEnumerable<Intention>> GetAllAsync()
         { return await FindAll().ToListAsync(); }
 
+
+        public async Task<IEnumerable<Intention>> GetByIdAsync(Guid id)
+        { return await FindAll().ToListAsync(); }
 
     }
 }

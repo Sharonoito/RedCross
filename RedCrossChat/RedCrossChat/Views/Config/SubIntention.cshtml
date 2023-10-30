@@ -50,6 +50,12 @@
                     </a>
                 </li>
 
+                <li class="nav-item @(Html.IsSelected(controller: "Config", action: "SubIntention") == "active" ? "active" : "")">
+                    <a asp-action="SubIntention" asp-controller="Config" class="nav-link @(Html.IsSelected(controller: "Config", action: "SubIntention"))">
+                        <i class="bx bx-bell me-1"></i> SubIntention
+                    </a>
+                </li>
+
 
             </ul>
 
@@ -62,7 +68,7 @@
     <div class="container-fluid">
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title"><i class="fa fa-info-circle"></i> Manage Intention</h3>
+                <h3 class="card-title"><i class="fa fa-info-circle"></i> Manage SubIntention</h3>
 
                 <div class="card-tools">
 
@@ -72,15 +78,15 @@
                             data-target="#clientModal"
                             data-modal="clientModal"
                             data-viewurl="true"
-                            data-action="@Url.Action("CreateIntention")" data-bs-toggle="modal" data-bs-target="#clientModal">
-                        <i class="fa fa-plus"></i> Add Intention
+                            data-action="@Url.Action("CreateSubIntention")" data-bs-toggle="modal" data-bs-target="#clientModal">
+                        <i class="fa fa-plus"></i> Add SubIntention
                     </button>
 
                 </div>
             </div>
 
             <div class="card-body p-0">
-                <table class="table table-striped" id="tblIntention">
+                <table class="table table-striped" id="tblSubIntention">
                     <thead>
                         <tr>
                             <th>Name</th>
@@ -139,12 +145,12 @@
         var jsdtClient = {
             table: null,
             initializeDataTable: function () {
-                jsdtClient.table = $('#tblIntention').DataTable({
+                jsdtClient.table = $('#tblSubIntention').DataTable({
                     processing: true,
                     serverSide: true,
                     serverMethod: 'post',
                     ajax: {
-                        url: "@Url.Action("GetIntention")",
+                        url: "@Url.Action("GetSubIntention")",
                         type: "POST"
                     },
                     columns: [
@@ -164,12 +170,12 @@
                                                             data-modal='clientModal'
                                                             data-bs-toggle="modal" data-bs-target="#clientModal"
                                                             data-viewurl='true'
-                                                            data-action='@Url.Action("EditIntention", "Config")?clientId=${row.id}'
+                                                                    data-action='@Url.Action("EditSubIntention", "Config")?subintention.Id=${row.id}'
                                                             title='Edit'>
                                                             <i class='fa fa-pencil-alt'></i>
 
                                                         <button class='delete btn btn-outline-danger btn-xs'
-                                                            data-action='@Url.Action("DeleteIntention", "Config")?clientId=${row.id}'
+                                                                    data-action='@Url.Action("DeleteSubIntention", "Config")?subintention.Id=${row.id}'
                                                             data-table='tblClients'
                                                             data-id='${row.id}'
                                                             data-toggle='tooltip'

@@ -9,5 +9,7 @@ namespace RedCrossChat.Contracts
 
         Task<IEnumerable<Intention>> GetAllAsync();
 
+        Task <IEnumerable<Intention>> GetByIdAsync(Guid id);
+
     }
 }

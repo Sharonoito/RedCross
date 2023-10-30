@@ -56,6 +56,11 @@ namespace RedCrossChat.Domain
             base.OnModelCreating(modelBuilder);
 
             new DbInitializer(modelBuilder).Seed();
+
+            modelBuilder.Entity<Intention>()
+                .HasMany(i => i.SubIntentions)
+                .WithOne(si => si.Intention)
+                .HasForeignKey(si => si.IntentionId);
         }
     }
 }
