@@ -92,7 +92,7 @@ namespace RedCrossChat.Controllers
         {
             try
             {
-                var feelingEntity = _repository.Feeling.FindByCondition(x => x.Id == clientId).FirstOrDefault();
+                var feelingEntity = await _repository.Feeling.FindByCondition(x => x.Id == clientId).FirstOrDefaultAsync();
                 if (feelingEntity == null)
                 {
                     return NotFound(); 
@@ -308,7 +308,7 @@ namespace RedCrossChat.Controllers
         {
             try
             {
-                var professionEntity = _repository.Profession.FindByCondition(x => x.Id == clientId).FirstOrDefault();
+                var professionEntity =await _repository.Profession.FindByCondition(x => x.Id == clientId).FirstOrDefaultAsync();
                 if (professionEntity  == null)
                 {
                     return NotFound();
@@ -409,7 +409,7 @@ namespace RedCrossChat.Controllers
         {
             try
             {
-                var agebandEntity = _repository.AgeBand.FindByCondition(x => x.Id == clientId).FirstOrDefault();
+                var agebandEntity = await _repository.AgeBand.FindByCondition(x => x.Id == clientId).FirstOrDefaultAsync();
                 if (agebandEntity == null)
                 {
                     return NotFound();
@@ -625,7 +625,7 @@ namespace RedCrossChat.Controllers
         {
             try
             {
-                var maritalEntity = _repository.MaritalState.FindByCondition(x => x.Id == clientId).FirstOrDefault();
+                var maritalEntity = await _repository.MaritalState.FindByCondition(x => x.Id == clientId).FirstOrDefaultAsync();
                 if (maritalEntity == null)
                 {
                     return NotFound();
@@ -786,7 +786,7 @@ namespace RedCrossChat.Controllers
         {
             try
             {
-                var genderEntity = _repository.Gender.FindByCondition(x => x.Id == clientId).FirstOrDefault();
+                var genderEntity = await _repository.Gender.FindByCondition(x => x.Id == clientId).FirstOrDefaultAsync();
                 if (genderEntity == null)
                 {
                     return NotFound();
@@ -952,7 +952,7 @@ namespace RedCrossChat.Controllers
             {
                 if (appUserTeam.Id == Guid.Empty)
                 {
-                    var appUserTeamEntity = new AppUserTeam
+                   /* var appUserTeamEntity = new AppUserTeam
                     {
                         AppUser = appUserTeam.Employee,
                         //AppUserId = appUserTeam.UserID,
@@ -963,10 +963,10 @@ namespace RedCrossChat.Controllers
                     _repository.AppUserTeam.Create(appUserTeamEntity);
 
 
-                    var result = await _repository.SaveChangesAsync();
+                    var result = await _repository.SaveChangesAsync();*/
 
-                    if (!result)
-                        return Error("Error Creating AppUserTeam!");
+                   /* if (!result)
+                        return Error("Error Creating AppUserTeam!");*/
                 }
                 else
                 {
@@ -1003,7 +1003,7 @@ namespace RedCrossChat.Controllers
         {
             try
             {
-                var appUserTeamEntity = _repository.AppUserTeam.FindByCondition(x => x.Id == clientId).FirstOrDefault();
+                var appUserTeamEntity = await _repository.AppUserTeam.FindByCondition(x => x.Id == clientId).FirstOrDefaultAsync();
                 if (appUserTeamEntity  == null)
                 {
                     return NotFound();
@@ -1012,8 +1012,7 @@ namespace RedCrossChat.Controllers
                 var appUserTeamViewModel = new AppUserTeamVm
                 {
                     Id = appUserTeamEntity.Id,
-                    Employee = appUserTeamEntity.AppUser,
-                    Team = appUserTeamEntity.Team,
+                   
                 };
 
                 ViewBag.Title = "Edit AppUserTeam";
@@ -1052,7 +1051,6 @@ namespace RedCrossChat.Controllers
         }
 
         #endregion
-
 
         #region Team
         public IActionResult Team()
@@ -1155,7 +1153,7 @@ namespace RedCrossChat.Controllers
         public async Task<IActionResult> EditTeam(Guid clientId)
 
         {
-            var teamEntity = _repository.Team.FindByCondition(x => x.Id == clientId).FirstOrDefault();
+            var teamEntity = await _repository.Team.FindByCondition(x => x.Id == clientId).FirstOrDefaultAsync();
            
             if (teamEntity == null)
             {
@@ -1176,30 +1174,37 @@ namespace RedCrossChat.Controllers
 
         public async Task<IActionResult> GetTeamUsers(Guid id)
         {
+            var team = await _repository.Team.FindByCondition(x => x.Id == id).Include(x => x.AppUserTeams).FirstOrDefaultAsync();
 
             var users = await _repository.User.GetAllAsync();
 
-
-            var teamUsers = await _repository.AppUserTeam.FindByCondition(x => x.TeamId == id).Include(x => x.AppUser).ToListAsync();
-
             var obj = new AppUserVM
             {
-               
-                TeamUsers = teamUsers
+                Users=users.ToList(),
+                TeamUsers = team.AppUserTeams.ToList(),
             };
 
             return Success("Fetched Successfully", obj);
         }
 
-
-        public async Task<IActionResult> GetTeamActiveUsers(Guid id)
+        [HttpPost]
+        public async Task<IActionResult> CreateTeamUser(IFormCollection formData)
         {
+            string userId = formData["UserId"];
 
-            var users = await _repository.AppUserTeam.FindByCondition(x=>x.TeamId==id).Include(x=>x.AppUser).ToListAsync();
+            string teamId = formData["TeamId"];
 
-            return Success("Fetched Successfully", users);
+           // await _repository.User.FindByCondition(x => x.Id == userId).FirstOrDefaultAsync();
+
+            _repository.AppUserTeam.Create(new AppUserTeam { AppUserId = Guid.Parse(userId), TeamId = Guid.Parse(teamId) });
+
+            var status = await _repository.SaveChangesAsync();
+
+            if (status)
+                return Success("Created Successfully");
+
+            return Error("Unable to Create");
         }
-
 
         public async Task<IActionResult> DeleteTeam(Guid id)
         {
