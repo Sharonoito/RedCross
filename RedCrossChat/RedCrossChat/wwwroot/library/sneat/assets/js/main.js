@@ -81,16 +81,15 @@ document.getElementById("layout-menu") && (isHorizontalLayout = document.getElem
                 function toggleLogo() {
                     if (window.Helpers.isLightStyle()) {
                         // Light mode
-                        document.querySelector('#light-mode-logo').style.display = 'block'; // Show the light logo
-                        document.querySelector('#dark-mode-logo').style.display = 'none';  // Hide the dark logo
+                        document.querySelector('#light-mode-logo').style.display = 'block'; 
+                        document.querySelector('#dark-mode-logo').style.display = 'none';  
                     } else {
                         // Dark mode
-                        document.querySelector('#light-mode-logo').style.display = 'none';  // Hide the light logo
-                        document.querySelector('#dark-mode-logo').style.display = 'block';  // Show the dark logo
+                        document.querySelector('#light-mode-logo').style.display = 'none';  
+                        document.querySelector('#dark-mode-logo').style.display = 'block'; 
                     }
                 }
 
-                // Call the toggleLogo function to set the initial logo based on the mode
                 toggleLogo();
 
 
