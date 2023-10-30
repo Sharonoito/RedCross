@@ -503,17 +503,12 @@ namespace RedCrossChat.Dialogs
             {
 
             }
-
-
             me.ConversationId = conversation.Id;
            
-
             await DialogExtensions.UpdateDialogConversationId(conversation.Id, stepContext, _userProfileAccessor, _userState);
 
             return conversation;
-        }
-
-      
+        }     
 
     }
 }

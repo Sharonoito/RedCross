@@ -8,6 +8,9 @@ using NuGet.Protocol.Core.Types;
 using RedCrossChat.Contracts;
 using RedCrossChat.Entities;
 using RedCrossChat.Objects;
+using Sentry;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -29,7 +32,7 @@ namespace RedCrossChat.Dialogs
 
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog),new WaterfallStep[]
             {
-                
+                HandleChoiceResultAsync,
                 CheckFeedBackAsync,
                 EndConversationAsync,
             }));
@@ -37,12 +40,55 @@ namespace RedCrossChat.Dialogs
             InitialDialogId=nameof(WaterfallDialog);
         }
 
-        public async Task<DialogTurnResult> InitialStepAsync(WaterfallStepContext stepContext,CancellationToken token)
-        {
-            var me = new Client();
+        //check if the user is using facebook channel 
 
-            return await stepContext.BeginDialogAsync(nameof(MainDialog), me, token);
+        public async Task<DialogTurnResult> InitialStepAsync(WaterfallStepContext stepContext, CancellationToken token) 
+        {
+            if (stepContext.Context.Activity.ChannelId == "facebook")
+            {
+                Client me = (Client)stepContext.Values[UserInfo];
+                var question = me.language ? "Do you want to talk to an agent?" : "Unataka kuzungumza na wakala ?";
+
+                var options = new PromptOptions()
+                {
+                    Prompt=MessageFactory.Text(question),
+                    RetryPrompt = MessageFactory.Text(me.language ? "Please select a valid option ('Yes' or 'No')." : "Tafadhali fanya chaguo sahihi"),
+                    Choices = me.language ? RedCrossLists.choices : RedCrossLists.choicesKiswahili,
+                    Style = ListStyle.HeroCard
+                };
+                return await stepContext.PromptAsync(nameof(ChoicePrompt), options,token);
+            }
+            else
+            {
+                var me = new Client();
+                return await stepContext.BeginDialogAsync(nameof(MainDialog), me, token);
+            }
         }
+
+
+        public async Task<DialogTurnResult> HandleChoiceResultAsync(WaterfallStepContext stepContext, CancellationToken token)
+        {
+            var choiceValues = ((FoundChoice)stepContext.Result).Value;
+
+            if (choiceValues != null && choiceValues == "Yes")
+            {
+                return await stepContext.BeginDialogAsync(nameof(HumanHandOverDialog));
+            }
+            else
+            {
+                return await stepContext.EndDialogAsync(null);
+            }
+
+        }
+
+
+
+        //public async Task<DialogTurnResult> InitialStepAsync(WaterfallStepContext stepContext,CancellationToken token)
+        //        {
+        //            var me = new Client();
+
+        //            return await stepContext.BeginDialogAsync(nameof(MainDialog), me, token);
+        //        }
 
 
         public async Task<DialogTurnResult> CheckFeedBackAsync(WaterfallStepContext stepContext, CancellationToken token)

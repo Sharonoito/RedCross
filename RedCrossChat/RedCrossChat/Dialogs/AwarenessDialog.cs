@@ -93,8 +93,6 @@ namespace RedCrossChat.Dialogs
                 Prompt = MessageFactory.Text(question),
 
                 Choices = me.language ? RedCrossLists.choices : RedCrossLists.choicesKiswahili,
-                Style = ListStyle.HeroCard
-
 
             };
 

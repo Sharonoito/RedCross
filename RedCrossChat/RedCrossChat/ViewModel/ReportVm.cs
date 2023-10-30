@@ -27,6 +27,8 @@ namespace RedCrossChat
 
         public List<AgeBand> Agebands;
 
+        public List<Intention> Intentions;
+
         public ReportVm() { 
         
         }

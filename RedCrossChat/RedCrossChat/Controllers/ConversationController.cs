@@ -92,6 +92,8 @@ namespace RedCrossChat.Controllers
 
             string county = formData["County"];
 
+            string intention = formData["Intention"];
+
            // string county = formData["County"];
 
             
