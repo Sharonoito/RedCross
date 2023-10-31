@@ -95,6 +95,7 @@
 
         </div>
     </div>
+
     <div class="col-lg-3">
 
        @* <div class="col-12 mb-4">
@@ -197,9 +198,34 @@
                 </div>
             </div>
         </div>
+
+        <div class="col-12 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="card-title">
+                        <h5 class="text-nowrap mb-2">Intention</h5>
+
+                    </div>
+                    <div class="">
+                        <select class="form-control filters" name="intention">
+                            <option value="-1">Select Intention</option>
+                            @if (Model.Intentions != null)
+                            {
+                                @foreach (var intention in Model.Intentions)
+                                {
+                                    <option value="@intention.Id">@intention.Name</option>
+                                }
+                            }
+
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
 </div>
+<br><br>
 
 @section Scripts {
     @{
@@ -231,6 +257,7 @@
             }],
             xaxis: {
                 categories: [1,3]
+               
             }
         };
 

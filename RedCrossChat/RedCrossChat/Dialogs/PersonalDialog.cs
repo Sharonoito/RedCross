@@ -273,7 +273,6 @@ namespace RedCrossChat.Dialogs
                 Prompt = MessageFactory.Text(question),
                 Choices = professions,
                 Style = ListStyle.HeroCard,
-        
             }, cancellationToken);
 
         }

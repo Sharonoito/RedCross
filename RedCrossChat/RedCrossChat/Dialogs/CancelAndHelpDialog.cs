@@ -74,9 +74,9 @@ namespace RedCrossChat.Dialogs
                     case "goodbye":
                     case "good bye":
                         
-                        var cancelMessage = MessageFactory.Text(CancelMsgText, CancelMsgText, InputHints.IgnoringInput);
+                        //var cancelMessage = MessageFactory.Text(CancelMsgText, CancelMsgText, InputHints.IgnoringInput);
                         
-                        await innerDc.Context.SendActivityAsync(cancelMessage, cancellationToken);
+                       // await innerDc.Context.SendActivityAsync(cancelMessage, cancellationToken);
                          
                         await innerDc.CancelAllDialogsAsync(cancellationToken);
 
