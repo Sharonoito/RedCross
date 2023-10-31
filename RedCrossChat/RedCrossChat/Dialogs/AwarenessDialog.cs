@@ -345,7 +345,7 @@ namespace RedCrossChat.Dialogs
             }
 
          
-            me.WantstoTalkToAProfessional = true;
+           /* me.WantstoTalkToAProfessional = true;
 
             me.HandOverToUser = true;
 
@@ -356,7 +356,7 @@ namespace RedCrossChat.Dialogs
                 _repository.Conversation.Update(conversation);
 
                 await _repository.SaveChangesAsync();
-            }
+            }*/
 
             var agentMessage = me.language ? "The next available counsellor will call you shortly, you can also contact us directly by dialing 1199, request to speak to a psychologist." :
                              "Utaweza kuzungumza na mhudumu baada ya muda mfupi ama pia unaweza piga nambari 1199 ili kuongea na mshauri. Utaweza kupigiwa na mshauri baada ya muda mfupi, ama upige simu ili kuongea na mwanasaikolojia kupitia nambari 1199";
@@ -379,9 +379,12 @@ namespace RedCrossChat.Dialogs
             await stepContext.Context.SendActivityAsync(message, cancellationToken);
 
             var choices = new List<Choice>
-                        {
-                            new Choice() { Value = "hotline", Action = new CardAction() { Title = "hotline", Type = ActionTypes.OpenUrl, Value = "https://referraldirectories.redcross.or.ke/" } }
-                        };
+            {
+                new Choice() { Value = "hotline", Action = new CardAction() { 
+                    Title = "hotline", Type = ActionTypes.OpenUrl, 
+                    Value = "https://referraldirectories.redcross.or.ke/" } 
+                }
+            };
 
             return await stepContext.BeginDialogAsync(nameof(HumanHandOverDialog), me, cancellationToken);
         }

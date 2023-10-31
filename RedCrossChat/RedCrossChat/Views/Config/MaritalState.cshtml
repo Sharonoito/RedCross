@@ -3,65 +3,7 @@
 *@
 @{
 }
-
-<div class="container-xxl flex-grow-1 container-p-y">
-
-
-    <h4 class="py-3 mb-4">
-        <span class="text-muted fw-light">Account Settings /</span> Account
-    </h4>
-
-    <div class="row fv-plugins-icon-container">
-        <div class="col-md-12">
-            <ul class="nav nav-pills flex-column flex-md-row mb-3">
-                <li class="nav-item">
-                    <a class="nav-link active" href="javascript:void(0);" style="background-color: #ED1C24;">
-                        <i class="bx bx-user me-1"></i> Feelings
-                    </a>
-                </li>
-
-                <li class="nav-item @(Html.IsSelected(controller: "Config", action: "Profession") == "active" ? "active" : "")">
-                    <a asp-action="Profession" asp-controller="Config" class="nav-link">
-                        <i class="bx bx-grid-alt me-1"></i> Professional Status
-                    </a>
-                </li>
-
-                <li class="nav-item @(Html.IsSelected(controller: "Config", action: "AgeBand") == "active" ? "active" : "")">
-                    <a asp-action="AgeBand" asp-controller="Config" class="nav-link">
-                        <i class="bx bx-bell me-1"></i> Age Band
-                    </a>
-                </li>
-
-                <li class="nav-item @(Html.IsSelected(controller: "Config", action: "MaritalState") == "active" ? "active" : "")">
-                    <a asp-action="MaritalState" asp-controller="Config" class="nav-link @(Html.IsSelected(controller: "Config", action: "MaritalState"))">
-                        <i class="bx bx-bell me-1"></i> Marital Status
-                    </a>
-                </li>
-
-                <li class="nav-item @(Html.IsSelected(controller: "Config", action: "Gender") == "active" ? "active" : "")">
-                    <a asp-action="Gender" asp-controller="Config" class="nav-link">
-                        <i class="bx bx-bell me-1"></i> Gender
-                    </a>
-                </li>
-                
-                  <li class="nav-item @(Html.IsSelected(controller: "Config", action: "Intention") == "active" ? "active" : "")">
-                    <a asp-action="Intention" asp-controller="Config" class="nav-link">
-                        <i class="bx bx-bell me-1"></i> Intention
-                    </a>
-                </li>
-                <li class="nav-item @(Html.IsSelected(controller: "Config", action: "SubIntention") == "active" ? "active" : "")">
-                    <a asp-action="SubIntention" asp-controller="Config" class="nav-link @(Html.IsSelected(controller: "Config", action: "SubIntention"))">
-                        <i class="bx bx-bell me-1"></i> SubIntention
-                    </a>
-                </li>
-            </ul>
-
-
-        </div>
-    </div>
-
-
-</div>
+<partial name="~/Views/Config/_ConfigLayout.cshtml" />
 
 <section class="content-header">
     <div class="container-fluid">
