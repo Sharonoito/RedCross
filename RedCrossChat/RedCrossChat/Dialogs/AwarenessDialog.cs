@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Dialogs.Choices;
@@ -12,6 +13,7 @@ using RedCrossChat.Cards;
 using RedCrossChat.Contracts;
 using RedCrossChat.Entities;
 using RedCrossChat.Objects;
+using RedCrossChat.ViewModel;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -73,7 +75,8 @@ namespace RedCrossChat.Dialogs
                 HandleCaregiverChoiceAsync,
                 EvaluateDialogTurnAsync,
                 CheckFeelingAware,
-                CheckProfessionalSwitchAsync,
+                ValidateFeeling,
+                //CheckProfessionalSwitchAsync,
                 FinalStepAsync
             };
         }
@@ -267,7 +270,7 @@ namespace RedCrossChat.Dialogs
 
             foreach (var choice in intentions)
             {
-                list.Add(new Choice{Value = choice.Name});
+                list.Add(new Choice{Value = me.language? choice.Name :choice.Kiswahili});
             }
 
             await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
@@ -275,40 +278,50 @@ namespace RedCrossChat.Dialogs
             return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions()
             {
                 Prompt = MessageFactory.Text(question),
-                Choices =me.language ? RedCrossLists.Reasons : RedCrossLists.ReasonsKiswahili,
+                Choices =list,
                 Style = ListStyle.HeroCard
             }, cancellationToken);
         }
 
-        private async Task<DialogTurnResult> CheckProfessionalSwitchAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        public async Task<DialogTurnResult> ValidateFeeling(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             Client me = (Client)stepContext.Values[UserInfo];
 
+            string response = stepContext.Context.Activity.Text;
 
-            var question = me.language ? "Would you wish to talk to a Professional Counselor?" : "Je, ungependa kuongea na mshauri wa kitaalam?";
+            var intention=await _repository.Itention.FindByCondition(x=>x.Name==response || x.Kiswahili==response).Include(x=>x.SubIntentions).FirstOrDefaultAsync();
 
-            Conversation conversation = await _repository.Conversation.FindByCondition(x => x.Id == me.ConversationId).Include(x => x.Persona).FirstOrDefaultAsync();
+            Conversation conv = await _repository.Conversation.FindByCondition(x => x.Id == me.ConversationId).Include(x => x.Persona).FirstOrDefaultAsync();
 
-            //Persona persona = conversation.Persona;
+            conv.IntentionId=intention.Id;
 
-            if (conversation !=null)
+            _repository.Conversation.Update(conv);
+
+            await _repository.SaveChangesAsync();
+
+            if (intention.SubIntentions.Count == 0)
             {
-                conversation.Reason = stepContext.Context.Activity.Text;
-
-                _repository.Conversation.Update(conversation);
-
-                await _repository.SaveChangesAsync();
+                return await stepContext.NextAsync(null);
             }
-           
-            await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
+
+            List<SubIntention> subIntentions=await _repository.SubIntention.FindByCondition(x=>x.IntentionId==intention.Id).ToListAsync();
+
+            List<Choice> choices=new List<Choice>();
+
+            foreach(var subIntention in subIntentions)
+            {
+                choices.Add(new Choice { Value = me.language ? subIntention.Name : subIntention.Kiswahili });
+            }
+
+            string question = me.language ?"Please Specify ": "Tafadhali fafanua";
 
             return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions()
             {
                 Prompt = MessageFactory.Text(question),
-                Choices = me.language? RedCrossLists.choices : RedCrossLists.choicesKiswahili,
+                Choices = choices,
                 Style = ListStyle.HeroCard
-
             }, cancellationToken);
+
         }
 
         private async Task<DialogTurnResult> FinalStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
@@ -319,65 +332,58 @@ namespace RedCrossChat.Dialogs
 
             if (stepContext.Result != null)
             {
-                switch (((FoundChoice)stepContext.Result).Value)
+                string response = stepContext.Context.Activity.Text;
+
+                SubIntention subIntention = await _repository.SubIntention.FindByCondition(x => x.Name == response || x.Kiswahili == response).FirstOrDefaultAsync();
+
+                if (subIntention != null)
                 {
-                    case Validations.YES:
-                    case ValidationsSwahili.YES:
 
-                        me.WantstoTalkToAProfessional= true;
+                    conversation.SubIntentionId = subIntention.Id;
+                    
+                }
+            }
 
-                        me.HandOverToUser = true;
+         
+            me.WantstoTalkToAProfessional = true;
 
-                        /*Updating the database*/
+            me.HandOverToUser = true;
 
-                        if (conversation != null)
-                        {
-                            conversation.HandedOver = true;
+            if (conversation != null)
+            {
+                conversation.HandedOver = true;
 
-                            _repository.Conversation.Update(conversation);
+                _repository.Conversation.Update(conversation);
 
-                            await _repository.SaveChangesAsync();
-                        }
+                await _repository.SaveChangesAsync();
+            }
 
-                        // Send the message to the user about the next available agent or calling 1199.
-                        var agentMessage = me.language ? "The next available counsellor will call you shortly, you can also contact us directly by dialing 1199, request to speak to a psychologist.":
-                            "Utaweza kuzungumza na mhudumu baada ya muda mfupi ama pia unaweza piga nambari 1199 ili kuongea na mshauri. Utaweza kupigiwa na mshauri baada ya muda mfupi, ama upige simu ili kuongea na mwanasaikolojia kupitia nambari 1199";
-                        await stepContext.Context.SendActivityAsync(MessageFactory.Text(agentMessage), cancellationToken);
-
-
-                        var hotline = PersonalDialogCard.GetHotlineCard();
-                        var hotlineSwahili = PersonalDialogCard.GetHotlineCardKiswahili();
+            var agentMessage = me.language ? "The next available counsellor will call you shortly, you can also contact us directly by dialing 1199, request to speak to a psychologist." :
+                             "Utaweza kuzungumza na mhudumu baada ya muda mfupi ama pia unaweza piga nambari 1199 ili kuongea na mshauri. Utaweza kupigiwa na mshauri baada ya muda mfupi, ama upige simu ili kuongea na mwanasaikolojia kupitia nambari 1199";
+            await stepContext.Context.SendActivityAsync(MessageFactory.Text(agentMessage), cancellationToken);
 
 
-                        var attachment = new Attachment
-                        {
-                            ContentType = HeroCard.ContentType,
-                 
-                            Content = !me.language ? hotlineSwahili : hotline,
-                        };
+            var hotline = PersonalDialogCard.GetHotlineCard();
+            var hotlineSwahili = PersonalDialogCard.GetHotlineCardKiswahili();
 
 
-                        var message = MessageFactory.Attachment(attachment);
-                        await stepContext.Context.SendActivityAsync(message, cancellationToken);
+            var attachment = new Attachment
+            {
+                ContentType = HeroCard.ContentType,
 
-                        var choices = new List<Choice>
+                Content = !me.language ? hotlineSwahili : hotline,
+            };
+
+
+            var message = MessageFactory.Attachment(attachment);
+            await stepContext.Context.SendActivityAsync(message, cancellationToken);
+
+            var choices = new List<Choice>
                         {
                             new Choice() { Value = "hotline", Action = new CardAction() { Title = "hotline", Type = ActionTypes.OpenUrl, Value = "https://referraldirectories.redcross.or.ke/" } }
                         };
 
-                        return await stepContext.BeginDialogAsync(nameof(HumanHandOverDialog), me, cancellationToken);
-
-                    case Validations.NO:
-                    case ValidationsSwahili.NO:
-                       
-                        return await stepContext.BeginDialogAsync(nameof(BreathingDialog), me, cancellationToken);
-                    default:
-                        
-                        break;
-                }
-            }
-
-            return await stepContext.EndDialogAsync(me);
+            return await stepContext.BeginDialogAsync(nameof(HumanHandOverDialog), me, cancellationToken);
         }
 
 
