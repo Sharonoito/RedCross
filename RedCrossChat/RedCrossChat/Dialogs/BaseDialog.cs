@@ -19,9 +19,16 @@ namespace RedCrossChat.Dialogs
 
         private readonly IRepositoryWrapper _repository;
 
-        public BaseDialog(IRepositoryWrapper repository):base(nameof(BaseDialog)) {
+          private readonly UserState _userState;
+        private readonly IStatePropertyAccessor<ResponseDto> _userProfileAccessor;
+
+        public BaseDialog(IRepositoryWrapper repository,UserState userState):base(nameof(BaseDialog)) {
         
             _repository = repository;
+
+            _userState = userState;
+
+            _userProfileAccessor = userState.CreateProperty<ResponseDto>(DialogConstants.ProfileAssesor);
 
             AddDialog(new ChoicePrompt(nameof(ChoicePrompt)));
 
@@ -31,6 +38,7 @@ namespace RedCrossChat.Dialogs
                 InitialStepAsync,
                // HandleChoiceResultAsync,
                 CheckFeedBackAsync,
+                EvaluateFeedbackAsync,
                 EndConversationAsync,
             }));
 
@@ -121,16 +129,44 @@ namespace RedCrossChat.Dialogs
                 return await stepContext.EndDialogAsync(null);
             }
 
+            string question = conversation.Language ? "How would you rate your experience.with the bot?" : "Je, unaweza kukadiria vipi uzoefu wako ? ";
+
             var options = new PromptOptions()
             {
-                Prompt = MessageFactory.Text(conversation.Language ? "How would you rate your experience.with the bot?" : "Je, unaweza kukadiria vipi uzoefu wako ? "),
+                Prompt = MessageFactory.Text(question),
                 RetryPrompt = MessageFactory.Text(conversation.Language ? "Please select a valid option ('Yes' or 'No')." : "Tafadhali fanya chaguo sahihi"),
                 Choices = RedCrossLists.GetRating(conversation.Language),
                 Style = ListStyle.HeroCard,
             };
 
+            await DialogExtensions.UpdateDialogAnswer("", question, stepContext, _userProfileAccessor, _userState);
+
             return await stepContext.PromptAsync(nameof(ChoicePrompt), options, token);
         }
+
+        public async Task<DialogTurnResult> EvaluateFeedbackAsync(WaterfallStepContext stepContext, CancellationToken token)
+        {
+            var me = new Client();
+
+            string question = me.language ? "please give us a reason why so that we can improve your experience ": "tafadhali tupe sababu kwa nini ili tuweze kuboresha matumizi yako";
+
+            await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
+
+            if(stepContext.Context.Activity.Text.ToLower()  == "excellent")
+            {
+                return await stepContext.NextAsync(null);
+            }
+
+
+            return await stepContext.PromptAsync(nameof(TextPrompt),
+                new PromptOptions
+                {
+                    Prompt = MessageFactory.Text(question),
+                },token);
+
+
+        }
+
 
         public async Task<DialogTurnResult> EndConversationAsync(WaterfallStepContext stepContext, CancellationToken token)
         {
@@ -140,7 +176,11 @@ namespace RedCrossChat.Dialogs
 
             var resp = await ChatGptDialog.GetChatGPTResponses("Give me a random encouraging quote", new List<AiConversation>(), me.language);
 
-            await stepContext.Context.SendActivityAsync(MessageFactory.Text(me.language ? $"Thank you for your feedback. We value your input! {resp}" : $" Asante kwa maoni yako. Tunathamini mchango wako {resp}"));
+            string question=me.language ? $"Thank you for your feedback. We value your input! {resp}" : $" Asante kwa maoni yako. Tunathamini mchango wako {resp}";
+
+            await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, "Feedback", stepContext, _userProfileAccessor, _userState);
+
+            await stepContext.Context.SendActivityAsync(MessageFactory.Text(question));
 
 
             return await stepContext.EndDialogAsync(null);
