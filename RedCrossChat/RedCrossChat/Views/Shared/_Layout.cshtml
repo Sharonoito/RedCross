@@ -69,10 +69,10 @@
             <!-- Menu -->
 
             @{
-                var renderSidebar = ViewData["RenderSidebar"] == null || (bool)ViewData["RenderSidebar"];
+                var renderSidebar = ViewData["RenderSideNav"] == null || (bool)ViewData["RenderSideNav"];
                 var renderNavbar = ViewData["RenderNavbar"] == null || (bool)ViewData["RenderNavbar"];
             }
-
+            
             @if (renderSidebar)
             {
               <partial name="_Sidebar" />               
