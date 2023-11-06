@@ -176,9 +176,17 @@ namespace RedCrossChat.Dialogs
 
             var resp = await ChatGptDialog.GetChatGPTResponses("Give me a random encouraging quote", new List<AiConversation>(), me.language);
 
+//fetch the conversation -> var conversation = await _repository.Conversation
+                   // .FindByCondition(x => x.ConversationId == stepContext.Context.Activity.Conversation.Id).firstOrdefaultasync();
+
+                   //conversation.reason = stepContext.Context.Activity.Text
+
+                   //_repository.converation.update(conversation)
+
+                   //_reposioty.saveChanges()
             string question=me.language ? $"Thank you for your feedback. We value your input! {resp}" : $" Asante kwa maoni yako. Tunathamini mchango wako {resp}";
 
-            await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, "Feedback", stepContext, _userProfileAccessor, _userState);
+            //await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, "Feedback", stepContext, _userProfileAccessor, _userState);
 
             await stepContext.Context.SendActivityAsync(MessageFactory.Text(question));
 
