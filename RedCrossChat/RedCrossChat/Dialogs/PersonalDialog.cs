@@ -108,7 +108,7 @@ namespace RedCrossChat.Dialogs
             Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync(cancellationToken: cancellationToken);
 
 
-            var question = me.language? "Which county are you located in?" : "Unapatikana kaunti gani?";
+            var question = me.language? "Which county?" : "Unapatikana kaunti gani?";
 
             var questionRetry = me.language? "Please input a county" : "Tafadhali andika katika kaunti";
 
