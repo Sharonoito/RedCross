@@ -94,7 +94,7 @@ namespace RedCrossChat.Dialogs
 
                 if(iterations % 10 == 0 && !me.HandOverToUser  && iterations !=30)
                 {
-                    await stepContext.Context.SendActivityAsync(MessageFactory.Text("An agent will be getting in touch with you shortly"), token);
+                    await stepContext.Context.SendActivityAsync(MessageFactory.Text("One of our psychologists  will be getting in touch with you shortly"), token);
                 }
 
                 if(iterations  >=  30)

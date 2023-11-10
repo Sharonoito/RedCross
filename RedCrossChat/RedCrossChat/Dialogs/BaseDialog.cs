@@ -150,6 +150,7 @@ namespace RedCrossChat.Dialogs
 
             string question = me.language ? "please give us a reason why so that we can improve your experience ": "tafadhali tupe sababu kwa nini ili tuweze kuboresha matumizi yako";
 
+
             await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
 
             if(stepContext.Context.Activity.Text.ToLower()  == "excellent")
@@ -170,30 +171,37 @@ namespace RedCrossChat.Dialogs
 
         public async Task<DialogTurnResult> EndConversationAsync(WaterfallStepContext stepContext, CancellationToken token)
         {
-            var ratingChoice = ((FoundChoice)stepContext.Result).Value;
+            //var ratingChoice = ((FoundChoice)stepContext.Result).Value;
 
             Client me = (Client)stepContext.Values[UserInfo];
+            var feedbackResponse = stepContext.Result.ToString();
+
 
             var resp = await ChatGptDialog.GetChatGPTResponses("Give me a random encouraging quote", new List<AiConversation>(), me.language);
 
-//fetch the conversation -> var conversation = await _repository.Conversation
-                   // .FindByCondition(x => x.ConversationId == stepContext.Context.Activity.Conversation.Id).firstOrdefaultasync();
 
-                   //conversation.reason = stepContext.Context.Activity.Text
+            var conversations = await _repository.Conversation
+               .FindByCondition(x => x.ConversationId == stepContext.Context.Activity.Conversation.Id)
+               .FirstOrDefaultAsync();
 
-                   //_repository.converation.update(conversation)
+            conversations.RatingReason = feedbackResponse;
 
-                   //_reposioty.saveChanges()
-            string question=me.language ? $"Thank you for your feedback. We value your input! {resp}" : $" Asante kwa maoni yako. Tunathamini mchango wako {resp}";
+            _repository.Conversation.Update(conversations);
+
+            await _repository.SaveChangesAsync();
+
+
+
+            string question = me.language
+                ? $"Thank you for your feedback. We value your input! {resp}"
+                : $"Asante kwa maoni yako. Tunathamini mchango wako {resp}";
 
             //await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, "Feedback", stepContext, _userProfileAccessor, _userState);
 
             await stepContext.Context.SendActivityAsync(MessageFactory.Text(question));
 
-
             return await stepContext.EndDialogAsync(null);
         }
 
-        
     }
 }

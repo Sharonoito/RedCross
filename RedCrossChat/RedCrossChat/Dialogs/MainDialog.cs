@@ -119,7 +119,7 @@ namespace RedCrossChat.Dialogs
             client.ConversationId = conv.Id;
 
             var question = client.language ?
-                "Hello dear friend!! Welcome to Kenya Red Cross Society, we are offering tele-counselling services to public at no charges . How can I help you today?\r\n" :
+                "Hello dear friend!! Welcome to the Kenya Red Cross Society, we're are offering tele - mental health and counseling services to the public at no costs. How can we help you today?\r\n" :
 
                 "Hujambo rafiki? Karibu katika Shirika la Msalaba Mwekundu ambapo tunatoa ushauri kupitia kwenye simu bila malipo yoyote. Je, ungependa nikusaidie vipi?";
 
@@ -145,7 +145,7 @@ namespace RedCrossChat.Dialogs
             var question = client.language ?
 
 
-                "Hello dear friend!! Welcome to Kenya Red Cross Society, we are offering tele-counselling services to public at no charges . How can I help you today?\r\n" :
+                "Hello dear friend!! Welcome to the Kenya Red Cross Society, we're are offering tele - mental health and counseling services to the public at no costs. How can we help you today?\r\n" :
 
                 "Hujambo rafiki? Karibu katika Shirika la Msalaba Mwekundu ambapo tunatoa ushauri kupitia kwenye simu bila malipo yoyote. Je, ungependa nikusaidie vipi?";
 

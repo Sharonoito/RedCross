@@ -42,7 +42,7 @@ namespace RedCrossChat.Entities
 
         public List<RawConversation> RawConversations { get; set; }
 
-        public string RatingReason { get; set; }
+        public string RatingReason { get; set; } = "";
 
     }
 }
