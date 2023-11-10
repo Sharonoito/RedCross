@@ -13,7 +13,7 @@ namespace RedCrossChat.Cards
 
                 Title = "Chat-care",
                 Subtitle = language ? "Terms and Conditions" : "Sheria na Masharti",
-                Text = language ? "We would like to know more about you ? Please accept terms and conditions below to continue." : "Tungependa kukufahamu zaidi ya ulivyotueleza. Ili kuendelea, tafadhali kubali sheria na masharti yafuatayo",
+                Text = language ? "For us to be able to help you better, we would like to know more about you! Please accept terms and conditions below to continue." : "Tungependa kukufahamu zaidi ya ulivyotueleza. Ili kuendelea, tafadhali kubali sheria na masharti yafuatayo",
                 Buttons = new List<CardAction> { new CardAction(ActionTypes.OpenUrl, language ? "Terms and Conditions" : "Sheria na Masharti", value: "https://www.redcross.or.ke/ASSETS/DATA-PROTECTION-POLICY.pdf") },
             };
 

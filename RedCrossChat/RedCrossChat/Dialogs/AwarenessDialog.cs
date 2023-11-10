@@ -358,7 +358,7 @@ namespace RedCrossChat.Dialogs
                 await _repository.SaveChangesAsync();
             }*/
 
-            var agentMessage = me.language ? "The next available counsellor will call you shortly, you can also contact us directly by dialing 1199, request to speak to a psychologist." :
+            var agentMessage = me.language ? "The next available psychologist will call you shortly, you can also contact us directly by dialing 1199, request to speak to a psychologist." :
                              "Utaweza kuzungumza na mhudumu baada ya muda mfupi ama pia unaweza piga nambari 1199 ili kuongea na mshauri. Utaweza kupigiwa na mshauri baada ya muda mfupi, ama upige simu ili kuongea na mwanasaikolojia kupitia nambari 1199";
             await stepContext.Context.SendActivityAsync(MessageFactory.Text(agentMessage), cancellationToken);
 

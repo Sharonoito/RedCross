@@ -41,5 +41,8 @@ namespace RedCrossChat.Entities
         public List<AiConversation> AiConversations { get; set; }
 
         public List<RawConversation> RawConversations { get; set; }
+
+        public string RatingReason { get; set; } = "";
+
     }
 }
