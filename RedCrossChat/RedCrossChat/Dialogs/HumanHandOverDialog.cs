@@ -97,8 +97,23 @@ namespace RedCrossChat.Dialogs
                     await stepContext.Context.SendActivityAsync(MessageFactory.Text("One of our psychologists  will be getting in touch with you shortly"), token);
                 }
 
-                if(iterations  >=  30)
+                if(iterations  >=  30 && !me.HandOverToUser)
                 {
+
+                    request = await repository.HandOverRequest.FindByCondition(x => x.ConversationId == conversation.Id).FirstOrDefaultAsync();
+
+                    if(request != null)
+                    {
+                        request.isActive= false;
+
+                        request.HasBeenReceived = true;
+
+                        repository.HandOverRequest.Update(request);
+
+                        await repository.SaveChangesAsync();
+
+                    }
+
                     await stepContext.Context.SendActivityAsync(MessageFactory.Text("it seems we are facing a number of requests, let's connect later"), token);
 
                     return await stepContext.EndDialogAsync(null);
@@ -122,6 +137,18 @@ namespace RedCrossChat.Dialogs
 
             me.Iteration++;
 
+            ChatMessage chatMessage = new ChatMessage
+            {
+                ConversationId = me.ConversationId,
+
+                Message = stepContext.Result.ToString(),
+
+                Type=Constants.User
+
+            };
+
+            repository.ChatMessage.Create(chatMessage);
+
             var lastConv= await repository.RawConversation.FindByCondition(x=>x.Id==me.ActiveRawConversation).FirstOrDefaultAsync();
 
             if(lastConv != null && lastConv.HasReply)
@@ -133,9 +160,10 @@ namespace RedCrossChat.Dialogs
                 lastConv.HasReply= false;
 
                 repository.RawConversation.Update(lastConv);
-
-                bool result=await repository.SaveChangesAsync();
+                
             }
+
+            bool result = await repository.SaveChangesAsync();
 
 
             return await stepContext.BeginDialogAsync(nameof(WaterfallDialog), me, token);

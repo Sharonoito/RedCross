@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Attachment = Microsoft.Bot.Schema.Attachment;
+using Constants = RedCrossChat.Objects.Constants;
 
 namespace RedCrossChat.Dialogs
 {
@@ -299,10 +300,20 @@ namespace RedCrossChat.Dialogs
         {
             Client me = (Client)stepContext.Values[UserInfo];
 
-            
+            Question quiz = await _repository.Question.FindByCondition(x => x.Code == 1).FirstAsync();
 
-            var question = me.language?  "How would you describe how you are feeling today?" : "Je, unajihisi vipi leo?";
+            ChatMessage chatMessage = new ChatMessage
+            {
+                QuestionId = quiz.Id,
+                Type = Constants.Bot,
+                ConversationId = me.ConversationId
+            };
 
+            var question = me.language ? quiz.question : quiz.Kiswahili;
+
+            _repository.ChatMessage.Create(chatMessage);
+
+            await _repository.SaveChangesAsync();
 
             var feelings = await _repository.Feeling.GetAll();
 
@@ -334,9 +345,30 @@ namespace RedCrossChat.Dialogs
 
             var response = stepContext.Context.Activity.Text;
 
+            ChatMessage chatMessage = new ChatMessage
+            {
+                Message = response,
+                Type = Constants.User,
+                ConversationId = me.ConversationId
+            };
+
             if (response.ToLower().Trim() == "other" || response.ToLower() == "zinginezo")
             {
-                await DialogExtensions.UpdateDialogAnswer(response, question, stepContext, _userProfileAccessor, _userState);
+
+                _repository.ChatMessage.CreateRange(new List<ChatMessage>
+                {
+                    chatMessage,
+
+                    new ChatMessage
+                    {
+                        Message = question,
+                        Type = Constants.Bot,
+                        ConversationId = me.ConversationId
+                    }
+                });
+
+
+                await _repository.SaveChangesAsync();
 
                 return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text(question) }, token);
             }
@@ -345,8 +377,7 @@ namespace RedCrossChat.Dialogs
                 .FindByCondition(x => x.Id==me.ConversationId)
                 .Include(x => x.Persona)
                 .FirstOrDefaultAsync();
-
-         
+        
             if (conversation != null)
             {
                 me.ConversationId = conversation.Id;
@@ -358,10 +389,9 @@ namespace RedCrossChat.Dialogs
                 persona.FeelingId = feeling.Id;
 
                 _repository.Persona.Update(persona);
-
-                await _repository.SaveChangesAsync();
-               
             }
+
+            await _repository.SaveChangesAsync();
 
             return await stepContext.NextAsync(me);
 
@@ -377,6 +407,25 @@ namespace RedCrossChat.Dialogs
                     .FindByCondition(x => x.Id==me.ConversationId)
                     .Include(x => x.Persona)
                     .FirstOrDefaultAsync();
+
+            
+
+            if (stepContext.Reason.ToString() =="NextCalled")
+            {
+                string response = stepContext.Context.Activity.Text;
+
+                ChatMessage chatMessage = new ChatMessage
+                {
+                    Message = response,
+                    Type = Constants.User,
+                    ConversationId = me.ConversationId
+                };
+
+                _repository.ChatMessage.Create(chatMessage);
+
+                await _repository.SaveChangesAsync();
+
+            }
 
             if (stepContext.Context.Activity.ChannelId == "telegram" && !conversation.IsReturnClient)
             {
