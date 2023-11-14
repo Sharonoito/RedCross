@@ -5,8 +5,8 @@
 <section class="content-header">
     <div class="container-fluid">
         <ul class="nav nav-tabs bordered">
-            <li>
-                <a class="nav-link active" data-toggle="tab" href="#tab-1">
+            <li class="nav-item @(Html.IsSelected(controller: "Config", action: "Users") )">
+                <a asp-action="Users" asp-controller="Auth" class="nav-link @(Html.IsSelected(controller: "Auth", action: "Users") )">
                     <i class="fa fa-md fa-users mr-2"></i> Users
                 </a>
             </li>
@@ -20,53 +20,9 @@
 
         </ul>
 
-        <div id="tab-1" class="tab-pane fade show active mt-1">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title"><i class="fa fa-info-circle"></i> Manage Users</h3>
-
-                <div class="card-tools">
-                   
-                    <button type="button"
-                            class="load-modal text-right btn btn-sm btn-outline-primary float-right"
-                            data-toggle="modal"
-                            data-target="#clientModal"
-                            data-modal="clientModal"
-                            data-viewurl="true"
-                            data-action="@Url.Action("CreateUser")" data-bs-toggle="modal" data-bs-target="#clientModal">
-                        <i class="fa fa-plus"></i> Add Client
-                    </button>
-
-                </div>
-            </div>
-
-            <div class="card-body p-0">
-                <table class="table table-striped" id="tblUsers">
-                    <thead>
-                        <tr>
-                            <th style="width: 10px">#</th>
-                            <th>First Name</th>
-                            <th>Last Name</th>
-                            <th>Email Address</th>
-                            <th>latest Login</th>
-                            <th style="width: 40px">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                      
-                       
-                       
-                    </tbody>
-                </table>
-            </div>
-
-        </div>
-
-    </div>
-
 
         <!-- Roles -->
-@*        <div id="tab-2" class="tab-pane fadeIn mt-1">
+        <div id="tab-2" class="tab-pane fadeIn mt-1">
             <div class="card">
                 <div class="card-body">
                     <div class="row mb-3">
@@ -106,7 +62,7 @@
             </div>
         </div>
 
-*@
+
 
 
 

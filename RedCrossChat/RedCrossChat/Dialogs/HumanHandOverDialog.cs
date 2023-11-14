@@ -100,6 +100,7 @@ namespace RedCrossChat.Dialogs
                 if(iterations  >=  30)
                 {
                     await stepContext.Context.SendActivityAsync(MessageFactory.Text("it seems we are facing a number of requests, let's connect later"), token);
+                   // string question = me.language ? "please give us a reason why so that we can improve your experience " : "tafadhali tupe sababu kwa nini ili tuweze kuboresha matumizi yako";
 
                     return await stepContext.EndDialogAsync(null);
                 }
