@@ -49,31 +49,32 @@ namespace RedCrossChat.Controllers
             });
         }
 
+
         [HttpPost]
         [AllowAnonymous]
         public async Task<IActionResult> Login(LoginVM model, string returnUrl = null)
         {
-
             if (!ModelState.IsValid)
                 return View(model);
 
             // Sign out any previous sessions
             await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
 
+            var user = await _userManager.FindByEmailAsync(model.Email);
 
-            var result = await _signInManager
-               .PasswordSignInAsync(model.Email, model.Password, true, false);
-
-            if (result.Succeeded)
-                return RedirectToLocal(returnUrl);
-            else
+            if (user != null && !user.IsDeactivated)
             {
-                ModelState.AddModelError("", "Invalid username or password!");
-                return View(new LoginVM()
-                {
-                    ReturnUrl = returnUrl
-                });
+                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, true, false);
+
+                if (result.Succeeded)
+                    return RedirectToLocal(returnUrl);
             }
+
+            ModelState.AddModelError("", "Invalid username or password!");
+            return View(new LoginVM()
+            {
+                ReturnUrl = returnUrl
+            });
         }
 
         private IActionResult RedirectToLocal(string returnUrl)
@@ -94,17 +95,12 @@ namespace RedCrossChat.Controllers
                 user.IsDeactivated = true;
                 await _userManager.UpdateAsync(user);
 
-
-                //await _signInManager.SignOutAsync();
-
-
                 return PartialView("_AccountDeactivated");
             }
             return Json(new { success = false, message = "Account deactivation failed. User not found." });
 
             //return Content("Account deactivation failed. User not found.");
         }
-
 
 
         public IActionResult Profile()
@@ -139,13 +135,9 @@ namespace RedCrossChat.Controllers
                 var data = await _repository.User.GetAllAsync();
                 // Filter them
 
-
-
                 var filteredRows = data
                     .AsQueryable()
                     .FilterBy(dtRequest.Search, dtRequest.Columns);
-
-                
 
                 // Sort and paginate them
                 var pagedRows = filteredRows
@@ -255,6 +247,7 @@ namespace RedCrossChat.Controllers
                     userDB.Email = user.Email;
                     userDB.UserName = user.UserName;
 
+
                     _repository.User.Update(userDB);
 
                     var result = await _repository.SaveChangesAsync();
@@ -271,6 +264,13 @@ namespace RedCrossChat.Controllers
 
             return Error("No response");
         }
+
+
+        public IActionResult Roles()
+        {
+            return View();
+        }
+
 
 
     }

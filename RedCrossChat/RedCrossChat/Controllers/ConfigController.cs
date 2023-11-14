@@ -38,7 +38,6 @@ namespace RedCrossChat.Controllers
             _roleManager=roleManager;
             _repository=repository;
         }
-
         public IActionResult Index() 
         { 
             return View();
@@ -46,6 +45,7 @@ namespace RedCrossChat.Controllers
         #region Feeling
         public IActionResult Feeling()
         {
+            ViewBag.PageTitle = "Feelings";
             return View();
         }
 
@@ -205,6 +205,7 @@ namespace RedCrossChat.Controllers
         #region Professional
         public IActionResult Profession()
         {
+            ViewBag.PageTitle = "Professional Status";
             return View();
         }
 
@@ -362,6 +363,7 @@ namespace RedCrossChat.Controllers
         #region AgeBand
         public IActionResult AgeBand()
         {
+            ViewBag.PageTitle = "Age Band";
             return View();
         }
 
@@ -521,6 +523,7 @@ namespace RedCrossChat.Controllers
         #region MaritalState
         public IActionResult MaritalState()
         {
+            ViewBag.PageTitle = "Marital Status";
             return View();
         }
 
@@ -683,6 +686,7 @@ namespace RedCrossChat.Controllers
         #region Gender
         public IActionResult Gender()
         {
+            ViewBag.PageTitle = "Gender";
             return View();
         }
 
@@ -1174,13 +1178,12 @@ namespace RedCrossChat.Controllers
                 return Error("Something broke" + ex.Message);
             }
         }
-
-
         #endregion
 
         #region Intention
         public IActionResult Intention()
         {
+            ViewBag.PageTitle = "Intention";
             return View();
         }
 
@@ -1257,8 +1260,8 @@ namespace RedCrossChat.Controllers
                     }
 
 
-                    intention.Name = intention.Name;
-                    intention.Kiswahili = intentionDB.Kiswahili;
+                    intentionDB.Name = intention.Name;
+                    intentionDB.Kiswahili = intention.Kiswahili;
 
                     _repository.Itention.Update(intentionDB);
 
@@ -1280,7 +1283,8 @@ namespace RedCrossChat.Controllers
         {
             try
             {
-                var intentionEntity = _repository.Itention.FindByCondition(x => x.Id == clientId).FirstOrDefault();
+                var intentionEntity = await _repository.Itention.FindByCondition(x => x.Id == clientId).FirstOrDefaultAsync();
+
                 if (intentionEntity == null)
                 {
                     return NotFound();
@@ -1337,6 +1341,7 @@ namespace RedCrossChat.Controllers
         #region SubIntention
         public IActionResult SubIntention()
         {
+            ViewBag.PageTitle = "Sub Intention";
             return View();
         }
 
@@ -1386,6 +1391,8 @@ namespace RedCrossChat.Controllers
         [HttpPost]
         public async Task<IActionResult> SaveSubIntention(SubIntentionVm subintention)
         {
+            if (!ModelState.IsValid  && ModelState.ErrorCount >1)
+                return Error("Validation error!, please check your data.");
 
             try
             {

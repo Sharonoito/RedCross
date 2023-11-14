@@ -91,6 +91,8 @@ namespace RedCrossChat.Dialogs
         {
             var me = new Client();
 
+
+
             if (stepContext.Reason.ToString() == "BeginCalled")
             {
                 return await stepContext.NextAsync(null);
@@ -111,10 +113,13 @@ namespace RedCrossChat.Dialogs
 
             var conversation = conversations.Last();
 
-            stepContext.Values[UserInfo] = new Client()
+            Client me = new Client()
             {
                 language = conversation.Language,
+                ConversationId = conversation.Id,
             };
+
+            stepContext.Values[UserInfo] =me;
 
 
             if (conversation.IsReturnClient  && conversations.Count % 10 !=0)
@@ -146,7 +151,7 @@ namespace RedCrossChat.Dialogs
 
         public async Task<DialogTurnResult> EvaluateFeedbackAsync(WaterfallStepContext stepContext, CancellationToken token)
         {
-            var me = new Client();
+            Client me = (Client)stepContext.Values[UserInfo];
 
             string question = me.language ? "please give us a reason why so that we can improve your experience ": "tafadhali tupe sababu kwa nini ili tuweze kuboresha matumizi yako";
 
@@ -171,17 +176,17 @@ namespace RedCrossChat.Dialogs
 
         public async Task<DialogTurnResult> EndConversationAsync(WaterfallStepContext stepContext, CancellationToken token)
         {
-            //var ratingChoice = ((FoundChoice)stepContext.Result).Value;
-
             Client me = (Client)stepContext.Values[UserInfo];
-            var feedbackResponse = stepContext.Result.ToString();
+
+           var feedbackResponse = stepContext.Result.ToString();
 
 
             var resp = await ChatGptDialog.GetChatGPTResponses("Give me a random encouraging quote", new List<AiConversation>(), me.language);
 
 
             var conversations = await _repository.Conversation
-               .FindByCondition(x => x.ConversationId == stepContext.Context.Activity.Conversation.Id)
+               .FindByCondition(x => x.Id == me.ConversationId)
+
                .FirstOrDefaultAsync();
 
             conversations.RatingReason = feedbackResponse;
