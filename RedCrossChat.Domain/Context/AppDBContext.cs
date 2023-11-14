@@ -37,6 +37,8 @@ namespace RedCrossChat.Domain
 
         public DbSet<DBFeeling> Feeling { get; set; }
 
+        public DbSet<ChatMessage> ChatMessage { get; set; }
+
         public DbSet<DBCounty> County { get; set; }
 
         public DbSet<RawConversation> RawConversation { get; set; }

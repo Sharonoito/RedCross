@@ -200,10 +200,10 @@ namespace RedCrossChat.Controllers
             string value = formData["Value"];
             string type = formData["Type"];
 
-             var item = new Entities.Question { Value = value, Type = Int32.Parse(type) };
+             //var item = new Entities.Question { Value = value, Type = Int32.Parse(type) };
 
 
-             _repository.Question.Create(item);
+            // _repository.Question.Create(item);
 
              bool status = await _repository.SaveChangesAsync();
 
