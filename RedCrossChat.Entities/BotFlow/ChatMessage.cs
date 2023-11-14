@@ -8,6 +8,8 @@ namespace RedCrossChat.Entities
 
         public int Type { get; set; } = 0;
 
+        public Boolean IsDisplayed { get; set; } = false;
+
         public Conversation Conversation { get; set; }
 
         public Guid ConversationId { get; set; }
