@@ -7,6 +7,7 @@ namespace RedCrossChat.Entities
         public string? Message { get; set; }
 
         public int Type { get; set; } = 0;
+
         public Conversation Conversation { get; set; }
 
         public Guid ConversationId { get; set; }
