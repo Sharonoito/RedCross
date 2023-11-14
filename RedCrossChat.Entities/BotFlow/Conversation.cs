@@ -11,9 +11,6 @@ namespace RedCrossChat.Entities
         public string SenderId {  get; set; }
 
         public string ConversationId {  get; set; }
-
-       
-
         public string Reason { get; set; } = "";
 
         public bool RequestedHandedOver { get; set; } = false;
@@ -34,8 +31,20 @@ namespace RedCrossChat.Entities
 
         public Guid? AppUserId { get; set; }
 
+        public Intention Intention { get; set; }
+        public Guid? IntentionId { get; set; }
+
+        public SubIntention SubIntention { get; set; }
+
+        public Guid? SubIntentionId { get; set; }
+
         public List<AiConversation> AiConversations { get; set; }
 
         public List<RawConversation> RawConversations { get; set; }
+
+        public List<ChatMessage> ChatMessages { get; set; }
+
+        public string RatingReason { get; set; } = "";
+
     }
 }

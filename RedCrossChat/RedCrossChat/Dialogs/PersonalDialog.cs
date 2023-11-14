@@ -28,17 +28,17 @@ namespace RedCrossChat.Dialogs
         protected string iterations = "user-iterations";
         protected string CurrentQuestion = "CurrentQuestion";
 
-        public PersonalDialog( AwarenessDialog awarenessDialog,
-                               BreathingDialog breathingDialog,AiDialog aiDialog,
-                               ILogger<PersonalDialog> logger,  
+        public PersonalDialog(AwarenessDialog awarenessDialog,
+                               BreathingDialog breathingDialog, AiDialog aiDialog,
+                               ILogger<PersonalDialog> logger,
                                IRepositoryWrapper wrapper,
                                UserState userState,
                                BaseDialog baseDialog
-            ) : base(nameof(PersonalDialog),baseDialog, wrapper)
+            ) : base(nameof(PersonalDialog), baseDialog, wrapper)
         {
             _logger = logger;
 
-            _repository=wrapper;
+            _repository = wrapper;
 
             _userState = userState;
 
@@ -66,7 +66,7 @@ namespace RedCrossChat.Dialogs
 
             });
 
-       
+
 
             AddDialog(mainDialog);
 
@@ -76,20 +76,32 @@ namespace RedCrossChat.Dialogs
 
         private async Task<DialogTurnResult> PrivateDetailsCountryBracketAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            var me= (Client)stepContext.Options;
+            var me = (Client)stepContext.Options;
 
             stepContext.Values[UserInfo] = me;
 
             var persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
 
-            var question = me.language ? "What is your Country of Origin" : "Chagua nchi yako.";
+            Question quiz = await _repository.Question.FindByCondition(x => x.Code == 11).FirstAsync();
 
+            ChatMessage chatMessage = new ChatMessage
+            {
+                QuestionId = quiz.Id,
+                Type = Constants.Bot,
+                ConversationId = me.ConversationId
+            };
+
+            var question = me.language ? quiz.question : quiz.Kiswahili;
+
+            _repository.ChatMessage.Create(chatMessage);
+
+            await _repository.SaveChangesAsync();
 
             var options = new PromptOptions()
             {
                 Prompt = MessageFactory.Text(question),
-                RetryPrompt = MessageFactory.Text(me.language ?  "Please select a Choose between the two" : "Tafadhali chagua Chaguo kati ya hizo mbili"),
-                Choices = me.language? RedCrossLists.Countrys : RedCrossLists.CountryKiswahili,
+                RetryPrompt = MessageFactory.Text(me.language ? "Please select a Choose between the two" : "Tafadhali chagua Chaguo kati ya hizo mbili"),
+                Choices = me.language ? RedCrossLists.Countrys : RedCrossLists.CountryKiswahili,
                 Style = ListStyle.HeroCard,
 
             };
@@ -103,21 +115,22 @@ namespace RedCrossChat.Dialogs
         {
             Client me = (Client)stepContext.Values[UserInfo];
 
-            var hint =me.language? "( hint: type in Kiambu or 022,Nairobi or 047 )": "( dokezo: andika Kiambu au 022, Nairobi au 047 )";
+            var hint = me.language ? "( hint: type in Kiambu or 022,Nairobi or 047 )" : "( dokezo: andika Kiambu au 022, Nairobi au 047 )";
 
-            Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync(cancellationToken: cancellationToken);
+            Conversation conv = await _repository.Conversation.FindByCondition(x => x.Id == me.ConversationId).Include(x => x.Persona).FirstAsync();
+
+            Persona persona = conv.Persona;
+
+            var question = me.language ? "Which county?" : "Unapatikana kaunti gani?";
+
+            var questionRetry = me.language ? "Please input a county" : "Tafadhali andika katika kaunti";
 
 
-            var question = me.language? "Which county are you located in?" : "Unapatikana kaunti gani?";
-
-            var questionRetry = me.language? "Please input a county" : "Tafadhali andika katika kaunti";
-
-
-            question=$"{question} \n {hint} ";
+            question = $"{question} \n {hint} ";
 
             var select = ((FoundChoice)stepContext.Result).Value;
 
-          
+
 
             if (persona != null)
             {
@@ -127,19 +140,33 @@ namespace RedCrossChat.Dialogs
 
                 await _repository.SaveChangesAsync();
 
-                await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
-
             }
+
+            ChatMessage chatMessage = new ChatMessage
+            {
+                Message = stepContext.Context.Activity.Text,
+                Type = Constants.User,
+                ConversationId = me.ConversationId
+            };
 
             var promptId = RedCrossDialogTypes.SelectCounty;
 
-            if (select != CountryValidation.Kenya || select !=CountrySwahili.Kenya)
+            if (select != CountryValidation.Kenya || select != CountrySwahili.Kenya)
             {
                 question = me.language ? "Which Country are you from ?" : "Unatoka Nchi gani ?";
-                promptId=nameof(TextPrompt);
 
-
+                promptId = nameof(TextPrompt);
             }
+
+            _repository.ChatMessage.CreateRange(new List<ChatMessage> { chatMessage,new ChatMessage
+            {
+                Message = question,
+                Type = Constants.Bot,
+                ConversationId = conv.Id,
+            }
+            });
+
+            await _repository.SaveChangesAsync();
 
             var promptOptions = new PromptOptions
             {
@@ -150,11 +177,20 @@ namespace RedCrossChat.Dialogs
             return await stepContext.PromptAsync(promptId, promptOptions, cancellationToken);
         }
 
+        private async Task<Conversation> getConversation(Client me)
+        {
+            return await _repository.Conversation.FindByCondition(x => x.Id == me.ConversationId).Include(x => x.Persona).FirstAsync();
+        }
+
         private async Task<DialogTurnResult> PrivateDetailsAgeBracketAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             Client me = (Client)stepContext.Values[UserInfo];
 
-            Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
+            Conversation conversation = await getConversation(me);
+
+            Question quiz=await _repository.Question.FindByCondition(x=>x.Code==2).FirstAsync();
+
+            Persona persona = conversation.Persona;
 
             var ageGroups = await _repository.AgeBand.GetAll();
 
@@ -163,30 +199,41 @@ namespace RedCrossChat.Dialogs
             foreach (var ageGroup in ageGroups)
             {
                 choices.Add(new Choice() { Value = me.language ? ageGroup.Name : ageGroup.Kiswahili });
-            }
+            }  
 
             var response = stepContext.Context.Activity.Text;
 
-            var question = me.language? "How old are you?" : "Je, una miaka mingapi?";
+            var question = me.language? quiz.question : quiz.Kiswahili;
 
             if (stepContext.Values != null)
             {
                 var county = await GetCountyResponse(response);
 
-                if(county != null)
+                if (county != null)
                 {
                     persona.CountyId = county.Id;
 
                     _repository.Persona.Update(persona);
-
-                    await _repository.SaveChangesAsync();
-
-                }
-            
-                
-                await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
-
+                }  
             }
+            var list = new List<ChatMessage>() {
+                new ChatMessage
+                {
+                    Message= response,
+                    Type=Constants.User,
+                    ConversationId=conversation.Id,
+                },
+                new ChatMessage
+                {
+                    QuestionId = quiz.Id,
+                    Type = Constants.Bot,
+                    ConversationId = conversation.Id,
+                }
+            };
+
+            _repository.ChatMessage.CreateRange(list);
+
+            await _repository.SaveChangesAsync();
 
             var options = new PromptOptions(){
                 Prompt = MessageFactory.Text(question),
@@ -204,12 +251,14 @@ namespace RedCrossChat.Dialogs
         {
             Client me = (Client)stepContext.Values[UserInfo];
 
-            var question = me.language? "What is your relationship status ?" : " Je, hali yako ya uhusiano ikoje";
+            Conversation conversation = await getConversation(me);
+
+            Question quiz = await _repository.Question.FindByCondition(x => x.Code == 12).FirstAsync();
+
+            var question = me.language? quiz.question : quiz.Kiswahili;
 
             var response = stepContext.Context.Activity.Text;
-
-            await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
-
+        
             var status = await _repository.MaritalState.GetAll();
 
             var choices = new List<Choice>();
@@ -223,7 +272,7 @@ namespace RedCrossChat.Dialogs
 
             if(ageGroup != null)
             {
-                Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
+                Persona persona = conversation.Persona;
 
                 persona.AgeBandId = ageGroup.Id;
 
@@ -232,7 +281,26 @@ namespace RedCrossChat.Dialogs
                 bool result = await _repository.SaveChangesAsync();
 
             }
-          
+
+            var list = new List<ChatMessage>() {
+                new ChatMessage
+                {
+                    Message= response,
+                    Type=Constants.User,
+                    ConversationId=conversation.Id,
+                },
+                new ChatMessage
+                {
+                    QuestionId = quiz.Id,
+                    Type = Constants.Bot,
+                    ConversationId = conversation.Id,
+                }
+            };
+
+            _repository.ChatMessage.CreateRange(list);
+
+            await _repository.SaveChangesAsync();
+
             return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions()
             {
                 Prompt = MessageFactory.Text(question),
@@ -246,15 +314,40 @@ namespace RedCrossChat.Dialogs
         {
             Client me = (Client)stepContext.Values[UserInfo];
 
-            var question = me.language? "What is your professional status ?" : "Je, unafanya kazi yoyote?";
+            Conversation conversation = await getConversation(me);
 
-            await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, question, stepContext, _userProfileAccessor, _userState);
+            Question quiz = await _repository.Question.FindByCondition(x => x.Code == 3).FirstAsync();
 
-            Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
+            var question = me.language? quiz.question : quiz.Kiswahili;
+    
+            Persona persona = conversation.Persona;
+
+            var response = stepContext.Context.Activity.Text;
+
+            MaritalState state=await _repository.MaritalState.FindByCondition(x => x.Name == response || x.Kiswahili == response).FirstAsync();
 
             persona.MaritalStatus = ((FoundChoice)stepContext.Result).Value;
 
+            persona.MaritalStateId=state.Id;
+
             _repository.Persona.Update(persona);
+
+            var list = new List<ChatMessage>() {
+                new ChatMessage
+                {
+                    Message= response,
+                    Type=Constants.User,
+                    ConversationId=conversation.Id,
+                },
+                new ChatMessage
+                {
+                    QuestionId = quiz.Id,
+                    Type = Constants.Bot,
+                    ConversationId = conversation.Id,
+                }
+            };
+
+            _repository.ChatMessage.CreateRange(list);
 
             bool result = await _repository.SaveChangesAsync();
 
@@ -273,7 +366,6 @@ namespace RedCrossChat.Dialogs
                 Prompt = MessageFactory.Text(question),
                 Choices = professions,
                 Style = ListStyle.HeroCard,
-        
             }, cancellationToken);
 
         }
@@ -283,24 +375,46 @@ namespace RedCrossChat.Dialogs
         {
             Client me = (Client)stepContext.Values[UserInfo];
 
-            Persona persona = await _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstAsync();
+            Conversation conversation = await getConversation(me);
+
+            Question quiz = await _repository.Question.FindByCondition(x => x.Code == 13).FirstAsync();
 
             await EvaluateDialog.ProcessStepAsync(stepContext, cancellationToken);
 
-            var question = me.language? "What is your Gender" : "Je, wewe ni wa jinsia gani? ";
+            var question = me.language? quiz.question : quiz.Kiswahili;
 
+            var response = stepContext.Context.Activity.Text;
 
             if (stepContext.Values != null)
             {
+                Persona persona = conversation.Persona;
 
-                await DialogExtensions.UpdateDialogAnswer(((FoundChoice)stepContext.Result).Value.ToString(), question, stepContext, _userProfileAccessor, _userState);
-
+                Profession prof=await _repository.Profession.FindByCondition(x=>x.Kiswahili==response || x.Name==response).FirstAsync();
+             
                 persona.ProfessionalStatus = ((FoundChoice)stepContext.Result).Value;
 
-                _repository.Persona.Update(persona);
+                persona.ProfessionId = prof.Id;
 
-                bool result = await _repository.SaveChangesAsync();
+                _repository.Persona.Update(persona);
             }
+            var list = new List<ChatMessage>() {
+                new ChatMessage
+                {
+                    Message= response,
+                    Type=Constants.User,
+                    ConversationId=conversation.Id,
+                },
+                new ChatMessage
+                {
+                    QuestionId = quiz.Id,
+                    Type = Constants.Bot,
+                    ConversationId = conversation.Id,
+                }
+            };
+
+            _repository.ChatMessage.CreateRange(list);
+
+            bool result = await _repository.SaveChangesAsync();
 
             var DboGenders = await _repository.Gender.GetAll();
 
@@ -335,8 +449,6 @@ namespace RedCrossChat.Dialogs
                 try
                 {
                    int ageText= Int32.Parse(promptContext.Context.Activity.Text);
-
-
                 }
                 catch (FormatException)
                 {
@@ -389,7 +501,21 @@ namespace RedCrossChat.Dialogs
         //validation for mental awarenesss
         private async Task<DialogTurnResult> LaunchAwarenessDialogAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
+            var response = stepContext.Context.Activity.Text;
+
             Client me = (Client)stepContext.Values[UserInfo];
+
+            Conversation conv =await getConversation(me);
+
+            _repository.ChatMessage.Create(new ChatMessage
+            {
+                Message = response,
+                Type = Constants.User,
+                ConversationId = conv.Id,
+            });
+
+            await _repository.SaveChangesAsync();
+
 
             return await stepContext.BeginDialogAsync(nameof(AwarenessDialog), me, cancellationToken);
 

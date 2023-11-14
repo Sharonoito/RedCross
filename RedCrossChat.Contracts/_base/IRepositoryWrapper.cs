@@ -37,9 +37,15 @@ namespace RedCrossChat.Contracts
 
         ITeam Team { get; }
 
+        IItention Itention { get; }
+
+        ISubIntention SubIntention { get; }
+
         IQuestionOption QuestionOption { get; }
 
-         IHandOverRequest HandOverRequest { get; }
+        IHandOverRequest HandOverRequest { get; }
+        
+        IChatMessage ChatMessage { get; }
         #endregion
 
         IPersonaRepo Persona { get; }

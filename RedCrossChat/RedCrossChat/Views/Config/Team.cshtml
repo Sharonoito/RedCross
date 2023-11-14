@@ -1,21 +1,9 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿
 @{
 }
+<partial name="~/Views/Config/_ConfigLayout.cshtml" />
 
-<div class="container-xxl flex-grow-1 container-p-y">
-
-
-    <h4 class="py-3 mb-4">
-        <span class="text-muted fw-light">Account Settings /</span> Account
-    </h4>
-
-
-
-</div>
-
-<section class="content-header">
+<section class="content-header container-p-y">
     <div class="container-fluid">
         <div class="card">
             <div class="card-header">
@@ -114,7 +102,7 @@
                         render: function (data, type, row) {
                             var actionsHtml =
                                 `<div class='text-center'>
-                                                        <button class='btn btn-outline-primary btn-xs load-modal'
+                                                        <button class='btn btn-outline-primary btn-xs load-modal team-manager'
                                                             data-hidden='Id'
                                                             data-id='${row.id}'
                                                             data-toggle='modal'
@@ -164,6 +152,37 @@
                 }
             }
         }
+
+        $(document).on('click', '#addUserToTeam', function () {
+
+            if ($("#selectTypeOpt").val() == "-1")
+                return;
+
+            $.post("@Url.Action("CreateTeamUser")", { UserId: $("#selectTypeOpt").val(), TeamId: $(this).data('id') }).then(resp => {
+
+            })
+        })
+
+        $(document).on('click', '.team-manager', function () {
+
+            const current = this;
+
+            //selectTypeOpt
+
+            setTimeout(function(){
+
+                $.get("@Url.Action("GetTeamUsers")?id="+$(current).data('id')).then(resp => {
+
+                    let { teamUsers, users } = resp.responseData;
+
+
+                    users.forEach(user => $("#selectTypeOpt").append(`<option value='${user.id}'>${user.fullName}</option>`));
+
+                })
+
+
+            },500)
+        })
 
     </script>
 }

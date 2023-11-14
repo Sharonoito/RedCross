@@ -12,7 +12,6 @@ using System.Linq;
 using DataTables.AspNet.Core;
 using DataTables.AspNet.AspNetCore;
 using Microsoft.EntityFrameworkCore;
-using RedCrossChat.Objects;
 
 namespace RedCrossChat.Controllers
 {
@@ -50,31 +49,32 @@ namespace RedCrossChat.Controllers
             });
         }
 
+
         [HttpPost]
         [AllowAnonymous]
         public async Task<IActionResult> Login(LoginVM model, string returnUrl = null)
         {
-
             if (!ModelState.IsValid)
                 return View(model);
 
             // Sign out any previous sessions
             await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
 
+            var user = await _userManager.FindByEmailAsync(model.Email);
 
-            var result = await _signInManager
-               .PasswordSignInAsync(model.Email, model.Password, true, false);
-
-            if (result.Succeeded)
-                return RedirectToLocal(returnUrl);
-            else
+            if (user != null && !user.IsDeactivated)
             {
-                ModelState.AddModelError("", "Invalid username or password!");
-                return View(new LoginVM()
-                {
-                    ReturnUrl = returnUrl
-                });
+                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, true, false);
+
+                if (result.Succeeded)
+                    return RedirectToLocal(returnUrl);
             }
+
+            ModelState.AddModelError("", "Invalid username or password!");
+            return View(new LoginVM()
+            {
+                ReturnUrl = returnUrl
+            });
         }
 
         private IActionResult RedirectToLocal(string returnUrl)
@@ -95,14 +95,11 @@ namespace RedCrossChat.Controllers
                 user.IsDeactivated = true;
                 await _userManager.UpdateAsync(user);
 
-
-                //await _signInManager.SignOutAsync();
-
-
                 return PartialView("_AccountDeactivated");
             }
+            return Json(new { success = false, message = "Account deactivation failed. User not found." });
 
-            return Content("Account deactivation failed. User not found.");
+            //return Content("Account deactivation failed. User not found.");
         }
 
 
@@ -138,13 +135,9 @@ namespace RedCrossChat.Controllers
                 var data = await _repository.User.GetAllAsync();
                 // Filter them
 
-
-
                 var filteredRows = data
                     .AsQueryable()
                     .FilterBy(dtRequest.Search, dtRequest.Columns);
-
-                
 
                 // Sort and paginate them
                 var pagedRows = filteredRows
@@ -172,10 +165,35 @@ namespace RedCrossChat.Controllers
             return View("_User");
         }
 
-        public IActionResult ResetPassword()
+        public async Task<IActionResult> ResetPassword()
         {
 
+            
+
             return View("_ResetPassword");
+        }
+
+        public async Task< IActionResult> UpdatePassword(ProfileVm vm)
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user != null) {
+
+               var token= await _userManager.GeneratePasswordResetTokenAsync(user);
+
+               var status=await _userManager.ResetPasswordAsync(user, token, vm.ConfirmPassword);
+
+                if (status.Succeeded)
+                {
+                    return Success("Updated Successfully");
+                }
+                else
+                {
+                    return Error(status.Errors.First().Description);
+                }
+
+            }
+            return Error("Something broke");
         }
 
         public async Task<IActionResult> EditUser(Guid clientId)
@@ -196,7 +214,7 @@ namespace RedCrossChat.Controllers
 
         public async Task< IActionResult> SaveUser(UserVm user) {
 
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid && ModelState.ErrorCount >1)
                 return Error("Validation error!, please check your data.");
 
             try
@@ -229,6 +247,7 @@ namespace RedCrossChat.Controllers
                     userDB.Email = user.Email;
                     userDB.UserName = user.UserName;
 
+
                     _repository.User.Update(userDB);
 
                     var result = await _repository.SaveChangesAsync();
@@ -245,6 +264,13 @@ namespace RedCrossChat.Controllers
 
             return Error("No response");
         }
+
+
+        public IActionResult Roles()
+        {
+            return View();
+        }
+
 
 
     }

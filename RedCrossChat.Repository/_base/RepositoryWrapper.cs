@@ -1,9 +1,6 @@
-﻿using RedCrossChat.Contracts;
-
-
+using RedCrossChat.Contracts;
 using RedCrossChat.Domain;
-
-
+using RedCrossChat.Entities;
 
 namespace RedCrossChat.Repository
 {
@@ -214,6 +211,30 @@ namespace RedCrossChat.Repository
         }
 
 
+        public IItention _itention;
+
+        public IItention Itention
+        {
+            get 
+            {
+                if(_itention == null) { _itention = new IntetionRepo(_repoContext); }
+                return _itention;
+            }
+        }
+
+
+        public ISubIntention? _subintention;
+
+        public ISubIntention SubIntention
+        {
+            get
+            {
+                if(_subintention == null) { _subintention = new SubIntentionRepo(_repoContext); };
+                return _subintention; 
+            }
+        }
+
+
         public IRawConversation _rawConversation;
 
         public IRawConversation RawConversation
@@ -223,6 +244,18 @@ namespace RedCrossChat.Repository
                 if (_rawConversation == null) { _rawConversation = new RawConversationRepo(_repoContext); }
 
                 return _rawConversation;
+            }
+        }
+
+        public IChatMessage _chatMessage;
+
+        public IChatMessage ChatMessage
+        {
+            get
+            {
+                if (_chatMessage == null) _chatMessage = new ChatMessageRepo(_repoContext);
+
+                return _chatMessage;
             }
         }
 

@@ -5,28 +5,30 @@ namespace RedCrossChat.Cards
 {
     public class PersonalDialogCard
     {
-        public static HeroCard GetKnowYouCard(bool language=true)
+        //Usechoice prompt instead of herocard
+        public static HeroCard GetKnowYouCard(bool language = true)
         {
             return new HeroCard
             {
 
-                Title = "Redcross Chat bot",
-                Subtitle = language? "Terms and Conditions" : "Sheria na Masharti",
-                Text = language ? "We would like to know more about you ? Please accept terms and conditions below to continue.": "Tungependa kukufahamu zaidi ya ulivyotueleza. Ili kuendelea, tafadhali kubali sheria na masharti yafuatayo",
-                Buttons = new List<CardAction> { new CardAction(ActionTypes.OpenUrl,language? "Terms and Conditions" : "Sheria na Masharti", value: "https://www.redcross.or.ke/ASSETS/DATA-PROTECTION-POLICY.pdf") },
+                Title = "Chat-care",
+                Subtitle = language ? "Terms and Conditions" : "Sheria na Masharti",
+                Text = language ? "For us to be able to help you better, we would like to know more about you! Please accept terms and conditions below to continue." : "Tungependa kukufahamu zaidi ya ulivyotueleza. Ili kuendelea, tafadhali kubali sheria na masharti yafuatayo",
+                Buttons = new List<CardAction> { new CardAction(ActionTypes.OpenUrl, language ? "Terms and Conditions" : "Sheria na Masharti", value: "https://www.redcross.or.ke/ASSETS/DATA-PROTECTION-POLICY.pdf") },
             };
+
         }
 
-        
         public static HeroCard GetKnowledgeBaseCard()
         {
             var heroCard = new HeroCard
             {
-                Title = "RedCross",
+                Title = "Chat-care",
                 Subtitle = "Volunteers & MemberShip",
                 Text = "To volunteer or be involved in our activities please follow the link.",
                 Buttons = new List<CardAction> {
-                    new CardAction(ActionTypes.OpenUrl, "Get Started", value: "https://www.redcross.or.ke/volunteer")
+                    new CardAction(ActionTypes.OpenUrl, "Get Started", value: "https://wema.redcross.or.ke/")
+
                 },
             };
 
@@ -37,7 +39,7 @@ namespace RedCrossChat.Cards
         {
             var heroCard = new HeroCard
             {
-                Title = "RedCross",
+                Title = "Chat-care",
                 Subtitle = "Kujitolea na kuwa mshirika",
                 Text = "Kujitolea na kuwa mshirika tafadhali fuata kiungo hiki.",
                 Buttons = new List<CardAction> {
@@ -50,7 +52,7 @@ namespace RedCrossChat.Cards
         {
             var heroCard = new HeroCard
             {
-                Title = "RedCross |  Careers",
+                Title = "Chat-care |  Careers",
                 
                 Text = "For career opportunities please follow this link.",
                 Buttons = new List<CardAction> {
@@ -65,7 +67,7 @@ namespace RedCrossChat.Cards
         {
             var heroCard = new HeroCard
             {
-                Title = "RedCross |  Taaluma",
+                Title = "Chat-care |  Taaluma",
 
                 Text = "Kwa taaluma tafadhali fuata kiungo hiki",
                 Buttons = new List<CardAction> {
@@ -93,6 +95,7 @@ namespace RedCrossChat.Cards
             return heroCard;
         }
 
+       
         public static HeroCard GetHotlineCardKiswahili()
         {
             var heroCard = new HeroCard
@@ -106,7 +109,8 @@ namespace RedCrossChat.Cards
 
                 },
             };
-
+            
+           
             return heroCard;
         }
 

@@ -38,7 +38,6 @@ namespace RedCrossChat.Controllers
             _roleManager=roleManager;
             _repository=repository;
         }
-
         public IActionResult Index() 
         { 
             return View();
@@ -46,6 +45,7 @@ namespace RedCrossChat.Controllers
         #region Feeling
         public IActionResult Feeling()
         {
+            ViewBag.PageTitle = "Feelings";
             return View();
         }
 
@@ -92,7 +92,7 @@ namespace RedCrossChat.Controllers
         {
             try
             {
-                var feelingEntity = _repository.Feeling.FindByCondition(x => x.Id == clientId).FirstOrDefault();
+                var feelingEntity = await _repository.Feeling.FindByCondition(x => x.Id == clientId).FirstOrDefaultAsync();
                 if (feelingEntity == null)
                 {
                     return NotFound(); 
@@ -205,6 +205,7 @@ namespace RedCrossChat.Controllers
         #region Professional
         public IActionResult Profession()
         {
+            ViewBag.PageTitle = "Professional Status";
             return View();
         }
 
@@ -308,7 +309,7 @@ namespace RedCrossChat.Controllers
         {
             try
             {
-                var professionEntity = _repository.Profession.FindByCondition(x => x.Id == clientId).FirstOrDefault();
+                var professionEntity =await _repository.Profession.FindByCondition(x => x.Id == clientId).FirstOrDefaultAsync();
                 if (professionEntity  == null)
                 {
                     return NotFound();
@@ -362,6 +363,7 @@ namespace RedCrossChat.Controllers
         #region AgeBand
         public IActionResult AgeBand()
         {
+            ViewBag.PageTitle = "Age Band";
             return View();
         }
 
@@ -409,7 +411,7 @@ namespace RedCrossChat.Controllers
         {
             try
             {
-                var agebandEntity = _repository.AgeBand.FindByCondition(x => x.Id == clientId).FirstOrDefault();
+                var agebandEntity = await _repository.AgeBand.FindByCondition(x => x.Id == clientId).FirstOrDefaultAsync();
                 if (agebandEntity == null)
                 {
                     return NotFound();
@@ -490,63 +492,6 @@ namespace RedCrossChat.Controllers
         }
 
 
-        //[HttpPost]
-        //public async Task<IActionResult> SaveAgeBand(AgeBandVm ageBand)
-
-        //{
-        //    if (!ModelState.IsValid && ModelState.ErrorCount > 1)
-        //        return Error("Validation error!, please check your data.");
-
-
-        //    try
-        //    {
-        //        if (ageBand.Id == Guid.Empty)
-        //        {
-        //            var ageBandEntity = new AgeBand
-        //            {
-        //                Name = ageBand.Name,
-        //                Kiswahili = ageBand.Kiswahili,
-        //                Synonyms = ageBand.Synonyms
-        //            };
-
-        //            _repository.AgeBand.Create(ageBandEntity);
-
-
-        //            var result = await _repository.SaveChangesAsync();
-
-        //            if (!result)
-        //                return Error("Error Creating AgeBand!");
-        //        }
-        //        else
-        //        {
-        //            var ageBandDB = await _repository.AgeBand.FindByCondition(x => x.Id == ageBand.Id).FirstOrDefaultAsync();
-
-        //            if (ageBandDB == null)
-        //            {
-        //                return Error("AgeBand not found");
-        //            }
-
-
-        //            ageBand.Name = ageBand.Name;
-        //            ageBand.Kiswahili = ageBand.Kiswahili;
-        //            ageBand.Synonyms = ageBand.Synonyms;
-
-        //            _repository.AgeBand.Update(ageBandDB);
-
-        //            var result = await _repository.SaveChangesAsync();
-
-        //            if (!result)
-        //                return Success(null, null);
-        //            return Error("Error updating ageBand");
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return Error("Something broke" + ex.Message);
-        //    }
-        //    return Success("AgeBand Saved successfully");
-        //}
-
         public async Task<IActionResult> DeleteAgeBand(Guid id)
         {
             try
@@ -578,6 +523,7 @@ namespace RedCrossChat.Controllers
         #region MaritalState
         public IActionResult MaritalState()
         {
+            ViewBag.PageTitle = "Marital Status";
             return View();
         }
 
@@ -625,7 +571,7 @@ namespace RedCrossChat.Controllers
         {
             try
             {
-                var maritalEntity = _repository.MaritalState.FindByCondition(x => x.Id == clientId).FirstOrDefault();
+                var maritalEntity = await _repository.MaritalState.FindByCondition(x => x.Id == clientId).FirstOrDefaultAsync();
                 if (maritalEntity == null)
                 {
                     return NotFound();
@@ -740,6 +686,7 @@ namespace RedCrossChat.Controllers
         #region Gender
         public IActionResult Gender()
         {
+            ViewBag.PageTitle = "Gender";
             return View();
         }
 
@@ -786,7 +733,7 @@ namespace RedCrossChat.Controllers
         {
             try
             {
-                var genderEntity = _repository.Gender.FindByCondition(x => x.Id == clientId).FirstOrDefault();
+                var genderEntity = await _repository.Gender.FindByCondition(x => x.Id == clientId).FirstOrDefaultAsync();
                 if (genderEntity == null)
                 {
                     return NotFound();
@@ -952,7 +899,7 @@ namespace RedCrossChat.Controllers
             {
                 if (appUserTeam.Id == Guid.Empty)
                 {
-                    var appUserTeamEntity = new AppUserTeam
+                   /* var appUserTeamEntity = new AppUserTeam
                     {
                         AppUser = appUserTeam.Employee,
                         //AppUserId = appUserTeam.UserID,
@@ -963,10 +910,10 @@ namespace RedCrossChat.Controllers
                     _repository.AppUserTeam.Create(appUserTeamEntity);
 
 
-                    var result = await _repository.SaveChangesAsync();
+                    var result = await _repository.SaveChangesAsync();*/
 
-                    if (!result)
-                        return Error("Error Creating AppUserTeam!");
+                   /* if (!result)
+                        return Error("Error Creating AppUserTeam!");*/
                 }
                 else
                 {
@@ -1003,7 +950,7 @@ namespace RedCrossChat.Controllers
         {
             try
             {
-                var appUserTeamEntity = _repository.AppUserTeam.FindByCondition(x => x.Id == clientId).FirstOrDefault();
+                var appUserTeamEntity = await _repository.AppUserTeam.FindByCondition(x => x.Id == clientId).FirstOrDefaultAsync();
                 if (appUserTeamEntity  == null)
                 {
                     return NotFound();
@@ -1012,8 +959,7 @@ namespace RedCrossChat.Controllers
                 var appUserTeamViewModel = new AppUserTeamVm
                 {
                     Id = appUserTeamEntity.Id,
-                    Employee = appUserTeamEntity.AppUser,
-                    Team = appUserTeamEntity.Team,
+                   
                 };
 
                 ViewBag.Title = "Edit AppUserTeam";
@@ -1052,7 +998,6 @@ namespace RedCrossChat.Controllers
         }
 
         #endregion
-
 
         #region Team
         public IActionResult Team()
@@ -1155,28 +1100,57 @@ namespace RedCrossChat.Controllers
         public async Task<IActionResult> EditTeam(Guid clientId)
 
         {
-            try
+            var teamEntity = await _repository.Team.FindByCondition(x => x.Id == clientId).FirstOrDefaultAsync();
+           
+            if (teamEntity == null)
             {
-                var teamEntity = _repository.Team.FindByCondition(x => x.Id == clientId).FirstOrDefault();
-                if (teamEntity  == null)
-                {
-                    return NotFound();
-                }
-
-                var teamViewModel = new TeamVm
-                {
-                    Id = teamEntity.Id,
-                    Name = teamEntity.Name,
-                    NotificationType = teamEntity.NotificationType,
-                };
-
-                ViewBag.Title = "Edit Team";
-                return View("_Team", teamViewModel);
+                return NotFound();
             }
-            catch (Exception ex)
+
+            var teamViewModel = new TeamVm
             {
-                return Error("Something broke" + ex.Message);
-            }
+                Id = teamEntity.Id,
+                Name = teamEntity.Name,
+                NotificationType = teamEntity.NotificationType,
+            };
+
+            ViewBag.Title = "Edit Team";
+
+            return View("_AppUserTeam", teamViewModel);
+        }
+
+        public async Task<IActionResult> GetTeamUsers(Guid id)
+        {
+            var team = await _repository.Team.FindByCondition(x => x.Id == id).Include(x => x.AppUserTeams).FirstOrDefaultAsync();
+
+            var users = await _repository.User.GetAllAsync();
+
+            var obj = new AppUserVM
+            {
+                Users=users.ToList(),
+                TeamUsers = team.AppUserTeams.ToList(),
+            };
+
+            return Success("Fetched Successfully", obj);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateTeamUser(IFormCollection formData)
+        {
+            string userId = formData["UserId"];
+
+            string teamId = formData["TeamId"];
+
+           // await _repository.User.FindByCondition(x => x.Id == userId).FirstOrDefaultAsync();
+
+            _repository.AppUserTeam.Create(new AppUserTeam { AppUserId = Guid.Parse(userId), TeamId = Guid.Parse(teamId) });
+
+            var status = await _repository.SaveChangesAsync();
+
+            if (status)
+                return Success("Created Successfully");
+
+            return Error("Unable to Create");
         }
 
         public async Task<IActionResult> DeleteTeam(Guid id)
@@ -1204,8 +1178,344 @@ namespace RedCrossChat.Controllers
                 return Error("Something broke" + ex.Message);
             }
         }
+        #endregion
+
+        #region Intention
+        public IActionResult Intention()
+        {
+            ViewBag.PageTitle = "Intention";
+            return View();
+        }
+
+        public IActionResult CreateIntention()
+        {
+            ViewBag.Title = "Create intention";
+
+            return View("_Intention");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetIntention(IDataTablesRequest dtRequest)
+        {
+
+            try
+            {
+                var data = await _repository.Itention.GetAllAsync();
+
+                var filteredRows = data
+                    .AsQueryable()
+                    .FilterBy(dtRequest.Search, dtRequest.Columns);
+
+                var pagedRows = filteredRows
+                    .SortBy(dtRequest.Columns)
+                    .Skip(dtRequest.Start)
+                    .Take(dtRequest.Length);
+
+
+                var response = DataTablesResponse.Create(dtRequest, data.Count(),
+                    filteredRows.Count(), pagedRows);
+
+                return new DataTablesJsonResult(response);
+
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveIntention(IntentionVm intention)
+        {
+            if (!ModelState.IsValid  && ModelState.ErrorCount >1)
+                return Error("Validation error!, please check your data.");
+
+
+            try
+            {
+                if (intention.Id == Guid.Empty)
+                {
+                    var intentionEntity = new Intention
+                    {
+                        Name = intention.Name,
+                        Kiswahili = intention.Kiswahili,
+                    };
+
+                    _repository.Itention.Create(intentionEntity);
+
+
+                    var result = await _repository.SaveChangesAsync();
+
+                    if (!result)
+                        return Error("Error Creating Intention!");
+                }
+                else
+                {
+                    var intentionDB = await _repository.Itention.FindByCondition(x => x.Id == intention.Id).FirstOrDefaultAsync();
+
+                    if (intentionDB == null)
+                    {
+                        return Error("Intention not found");
+                    }
+
+
+                    intentionDB.Name = intention.Name;
+                    intentionDB.Kiswahili = intention.Kiswahili;
+
+                    _repository.Itention.Update(intentionDB);
+
+                    var result = await _repository.SaveChangesAsync();
+
+                    if (!result)
+                        // return Success(null, null);
+                        return Error("Error updating intention");
+                }
+            }
+            catch (Exception ex)
+            {
+                return Error("Something broke" + ex.Message);
+            }
+            return Success("Intention Saved successfully");
+        }
+
+        public async Task<IActionResult> EditIntention(Guid clientId)
+        {
+            try
+            {
+                var intentionEntity = await _repository.Itention.FindByCondition(x => x.Id == clientId).FirstOrDefaultAsync();
+
+                if (intentionEntity == null)
+                {
+                    return NotFound();
+                }
+
+                var intentionViewModel = new IntentionVm
+                {
+                    Id = intentionEntity.Id,
+                    Name= intentionEntity.Name,
+                    Kiswahili=intentionEntity.Kiswahili,
+
+                };
+                ViewBag.Title = "Edit Intention";
+
+                return View("_Intention", intentionViewModel);
+
+
+            }
+            catch (Exception ex)
+            {
+                return Error("Something broke" + ex.Message);
+            }
+        }
+
+        public async Task<IActionResult> DeleteIntention(Guid id)
+        {
+            try
+            {
+                var intentionEntity = await _repository.Itention.FindByCondition(x => x.Id == id).FirstOrDefaultAsync();
+                if (intentionEntity == null)
+                {
+                    return NotFound();
+                }
+
+                _repository.Itention.Delete(intentionEntity);
+                var result = await _repository.SaveChangesAsync();
+
+                if (!result)
+                {
+                    return Error("Error deleting intention");
+                }
+
+                return Success("Intention deleted successfully");
+            }
+            catch (Exception ex)
+            {
+                return Error("Something broke" + ex.Message);
+            }
+        }
 
 
         #endregion
+
+        #region SubIntention
+        public IActionResult SubIntention()
+        {
+            ViewBag.PageTitle = "Sub Intention";
+            return View();
+        }
+
+        public async Task<IActionResult> CreateSubIntention()
+        {
+
+            var intentions = await _repository.Itention.GetAllAsync();
+
+            ViewBag.Intentions = intentions;
+
+            return View("_SubIntention");
+
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetSubIntention(IDataTablesRequest dtRequest)
+        {
+
+            try
+            {
+                var data = await _repository.SubIntention.GetAllAsync();
+
+                var filteredRows = data
+                    .AsQueryable()
+                    .FilterBy(dtRequest.Search, dtRequest.Columns);
+
+                var pagedRows = filteredRows
+                    .SortBy(dtRequest.Columns)
+                    .Skip(dtRequest.Start)
+                    .Take(dtRequest.Length);
+
+
+                var response = DataTablesResponse.Create(dtRequest, data.Count(),
+                    filteredRows.Count(), pagedRows);
+
+                return new DataTablesJsonResult(response);
+
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+
+            }
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> SaveSubIntention(SubIntentionVm subintention)
+        {
+            if (!ModelState.IsValid  && ModelState.ErrorCount >1)
+                return Error("Validation error!, please check your data.");
+
+            try
+            {
+
+                var intentionEntity = await _repository.Itention.GetByIdAsync(subintention.ItentionId);
+
+                if (intentionEntity == null)
+                {
+                    ModelState.AddModelError("ItentionId", "Intention not found");
+                    return View("_SubIntention", subintention);
+                }
+
+                if (subintention.Id == Guid.Empty)
+                {
+                    var subintentionEntity = new SubIntention
+                    {
+                        Name = subintention.Name,
+                        IntentionId = subintention.ItentionId,
+                        Kiswahili = subintention.Kiswahili,
+                    };
+
+                    _repository.SubIntention.Create(subintentionEntity);
+
+
+                }
+                else
+                {
+                    var subintentionDB = await _repository.SubIntention.FindByCondition(x => x.Id == subintention.Id).FirstOrDefaultAsync();
+
+                    if (subintentionDB == null)
+                    {
+                        ModelState.AddModelError("Id", "SubIntention not found");
+                        return View("_SubIntention", subintention);
+
+                    }
+
+                    subintentionDB.Name = subintention.Name;
+                    subintentionDB.IntentionId = subintention.ItentionId;
+                    subintentionDB.Kiswahili = subintention.Kiswahili;
+
+
+                    _repository.SubIntention.Update(subintentionDB);
+                }
+
+                var result = await _repository.SaveChangesAsync();
+
+                if (result)
+                {
+               
+                    return Success("SubIntention saved Successfully");
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("ServerError", "Something broke: " + ex.Message);
+                return Error("There was an error creating subIntention");
+            }
+
+            return Error("Sorry SubIntention was not created");
+        }
+
+
+        public async Task<IActionResult> EditSubIntention(SubIntentionVm subintention)
+        {
+            try
+            {
+
+                var subintentionEntity = await _repository.SubIntention.FindByCondition(x => x.Id == subintention.Id).FirstOrDefaultAsync();
+
+                if (subintentionEntity == null)
+                {
+                    return NotFound();
+                }
+
+                var subintentionViewModel = new SubIntentionVm
+                {
+                    Id = subintentionEntity.Id,
+                    Name= subintentionEntity.Name,
+                    ItentionId = subintention.ItentionId,
+                    Kiswahili = subintention.Kiswahili,
+                };
+                ViewBag.Title = "Edit SubIntention";
+
+                return View("_SubIntention", subintentionViewModel);
+
+
+            }
+            catch (Exception ex)
+            {
+                return Error("Something broke" + ex.Message);
+            }
+        }
+
+
+        public async Task<IActionResult> DeleteSubIntention(Guid id)
+        {
+            try
+            {
+                var subintentionEntity = await _repository.SubIntention.FindByCondition(x => x.Id == id).FirstOrDefaultAsync();
+                if (subintentionEntity == null)
+                {
+                    return NotFound();
+                }
+
+                _repository.SubIntention.Delete(subintentionEntity);
+                var result = await _repository.SaveChangesAsync();
+
+                if (!result)
+                {
+                    return Error("Error deleting subintention");
+                }
+
+                return Success("Subintention deleted successfully");
+            }
+            catch (Exception ex)
+            {
+                return Error("Something broke" + ex.Message);
+            }
+        }
+
+
+        #endregion
+
     }
 }
+

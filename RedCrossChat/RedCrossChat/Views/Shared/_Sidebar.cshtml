@@ -1,12 +1,12 @@
 ﻿@{
 }
-
 <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
     <div class="app-brand demo">
         <a href="index.html" class="app-brand-link">
             <span class="app-brand-logo demo"></span>
             <span class="app-brand-text demo menu-text fw-bolder ms-2" >
-                <img src="~/img/KRCLOGO.png" alt="Kenya Red Cross Logo" class="brand-image" style="object-fit:contain;width: 60%">
+                <img id="light-mode-logo" src="~/img/KRCLOGO.png" alt="Kenya Red Cross Logo" class="brand-image" style="object-fit:contain;width: 60%">
+                <img id="dark-mode-logo" src="~/img/KRCS.LogosDark.png" alt="Kenya Red Cross Dark Logo" class="brand-image" style="object-fit: contain; width: 3%">
             </span>
         </a>
 
@@ -52,18 +52,6 @@
                         <div data-i18n="Team"></div>
                     </a>
                 </li>
-@*                <li class="menu-item @Html.IsSelected(controller: "Conversation", action: "Flow") ">
-                    <a asp-action="Flow" asp-controller="Conversation" class="menu-link text-danger">
-                        <i class="menu-icon tf-icons bx bx-layout"></i>
-                        <div data-i18n="Conversation Flow"></div>
-                    </a>
-                </li>
-                <li class="menu-item @Html.IsSelected(controller: "Conversation", action: "Languages") ">
-                    <a asp-action="Languages" asp-controller="Conversation" class="menu-link  text-danger">
-                        <i class="menu-icon tf-icons bx bx-layout"></i>
-                        <div data-i18n="Languages"></div>
-                    </a>
-                </li>*@
 
             </ul>
         </li>
@@ -88,3 +76,5 @@
 
     </ul>
 </aside>
+
+

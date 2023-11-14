@@ -1,9 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualBasic;
-using NuGet.Protocol.Core.Types;
 using RedCrossChat.Contracts;
-
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -41,7 +38,13 @@ namespace RedCrossChat
             return View();
         }
 
-       
+        public async Task<IActionResult> GenderGraph()
+        {
+            var genders = await _repository.Gender.FindAll().ToListAsync();
+            return View();
+        }
+
+
 
     }
 }

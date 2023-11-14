@@ -8,11 +8,13 @@ using RedCrossChat.Cards;
 using RedCrossChat.Contracts;
 using RedCrossChat.Entities;
 using RedCrossChat.Objects;
+using Sentry;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Attachment = Microsoft.Bot.Schema.Attachment;
+using Constants = RedCrossChat.Objects.Constants;
 
 namespace RedCrossChat.Dialogs
 {
@@ -28,7 +30,7 @@ namespace RedCrossChat.Dialogs
 
         public MainDialog(
             FlightBookingRecognizer luisRecognizer,
-            CounselorDialog counselorDialog,
+           
             PersonalDialog personalDialog,
             AiDialog aiDialog,
             AwarenessDialog awarenessDialog,
@@ -49,7 +51,7 @@ namespace RedCrossChat.Dialogs
             AddDialog(new TextPrompt(nameof(TextPrompt)));
             AddDialog(new ChoicePrompt(nameof(ChoicePrompt)));
 
-            AddDialog(counselorDialog);
+            //AddDialog(counselorDialog);
             AddDialog(personalDialog);
             AddDialog(aiDialog);
             AddDialog(awarenessDialog);
@@ -113,10 +115,12 @@ namespace RedCrossChat.Dialogs
                 client.language = !client.language;
             }
 
-            await CreateConversationDBInstance(stepContext);
+            var conv=await CreateConversationDBInstance(stepContext);
+
+            client.ConversationId = conv.Id;
 
             var question = client.language ?
-                "Hello dear friend!! Welcome to Kenya Red Cross Society, we are offering tele-counselling services to public at no charges . How can I help you today?\r\n" :
+                "Hello dear friend!! Welcome to the Kenya Red Cross Society, we're are offering tele - mental health and counseling services to the public at no costs. How can we help you today?\r\n" :
 
                 "Hujambo rafiki? Karibu katika Shirika la Msalaba Mwekundu ambapo tunatoa ushauri kupitia kwenye simu bila malipo yoyote. Je, ungependa nikusaidie vipi?";
 
@@ -142,7 +146,7 @@ namespace RedCrossChat.Dialogs
             var question = client.language ?
 
 
-                "Hello dear friend!! Welcome to Kenya Red Cross Society, we are offering tele-counselling services to public at no charges . How can I help you today?\r\n" :
+                "Hello dear friend!! Welcome to the Kenya Red Cross Society, we're are offering tele - mental health and counseling services to the public at no costs. How can we help you today?\r\n" :
 
                 "Hujambo rafiki? Karibu katika Shirika la Msalaba Mwekundu ambapo tunatoa ushauri kupitia kwenye simu bila malipo yoyote. Je, ungependa nikusaidie vipi?";
 
@@ -296,10 +300,20 @@ namespace RedCrossChat.Dialogs
         {
             Client me = (Client)stepContext.Values[UserInfo];
 
-            
+            Question quiz = await _repository.Question.FindByCondition(x => x.Code == 1).FirstAsync();
 
-            var question = me.language?  "How would you describe how you are feeling today?" : "Je, unajihisi vipi leo?";
+            ChatMessage chatMessage = new ChatMessage
+            {
+                QuestionId = quiz.Id,
+                Type = Constants.Bot,
+                ConversationId = me.ConversationId
+            };
 
+            var question = me.language ? quiz.question : quiz.Kiswahili;
+
+            _repository.ChatMessage.Create(chatMessage);
+
+            await _repository.SaveChangesAsync();
 
             var feelings = await _repository.Feeling.GetAll();
 
@@ -331,20 +345,39 @@ namespace RedCrossChat.Dialogs
 
             var response = stepContext.Context.Activity.Text;
 
+            ChatMessage chatMessage = new ChatMessage
+            {
+                Message = response,
+                Type = Constants.User,
+                ConversationId = me.ConversationId
+            };
+
             if (response.ToLower().Trim() == "other" || response.ToLower() == "zinginezo")
             {
-                await DialogExtensions.UpdateDialogAnswer(response, question, stepContext, _userProfileAccessor, _userState);
+
+                _repository.ChatMessage.CreateRange(new List<ChatMessage>
+                {
+                    chatMessage,
+
+                    new ChatMessage
+                    {
+                        Message = question,
+                        Type = Constants.Bot,
+                        ConversationId = me.ConversationId
+                    }
+                });
+
+
+                await _repository.SaveChangesAsync();
 
                 return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text(question) }, token);
             }
-
+          
             Conversation conversation = await _repository.Conversation
-                .FindByCondition(x => x.ConversationId == stepContext.Context.Activity.Conversation.Id)
+                .FindByCondition(x => x.Id==me.ConversationId)
                 .Include(x => x.Persona)
                 .FirstOrDefaultAsync();
-
-           // var item = response.ToLower().Trim() == "other";
-
+        
             if (conversation != null)
             {
                 me.ConversationId = conversation.Id;
@@ -356,10 +389,9 @@ namespace RedCrossChat.Dialogs
                 persona.FeelingId = feeling.Id;
 
                 _repository.Persona.Update(persona);
-
-                await _repository.SaveChangesAsync();
-               
             }
+
+            await _repository.SaveChangesAsync();
 
             return await stepContext.NextAsync(me);
 
@@ -371,17 +403,39 @@ namespace RedCrossChat.Dialogs
         {
             Client me = (Client)stepContext.Values[UserInfo];
 
-         
-            if (stepContext.Result is not Client)
-            {
-                //Save response to the question
-                
-            }
-
             Conversation conversation = await _repository.Conversation
-                    .FindByCondition(x => x.ConversationId == stepContext.Context.Activity.Conversation.Id)
+                    .FindByCondition(x => x.Id==me.ConversationId)
                     .Include(x => x.Persona)
                     .FirstOrDefaultAsync();
+
+            
+
+            if (stepContext.Reason.ToString() =="NextCalled")
+            {
+                string response = stepContext.Context.Activity.Text;
+
+                ChatMessage chatMessage = new ChatMessage
+                {
+                    Message = response,
+                    Type = Constants.User,
+                    ConversationId = me.ConversationId
+                };
+
+                _repository.ChatMessage.Create(chatMessage);
+
+                await _repository.SaveChangesAsync();
+
+            }
+
+            if (stepContext.Context.Activity.ChannelId == "telegram" && !conversation.IsReturnClient)
+            {
+                var items=await _repository.Conversation.FindByCondition(x=>x.ConversationId== stepContext.Context.Activity.Conversation.Id).ToListAsync();
+
+                if(items.Count >1 )
+                {
+                    return await stepContext.BeginDialogAsync(nameof(PersonalDialog), me, token);
+                }
+            }
 
             if (conversation.IsReturnClient)
             {
@@ -412,6 +466,7 @@ namespace RedCrossChat.Dialogs
                 Choices = RedCrossLists.GetRating(me.language),
                 Style = ListStyle.HeroCard,
             };
+
 
             return await stepContext.PromptAsync(nameof(ChoicePrompt), options, cancellationToken);
         }
@@ -497,15 +552,12 @@ namespace RedCrossChat.Dialogs
             {
 
             }
-
+            me.ConversationId = conversation.Id;
            
-
             await DialogExtensions.UpdateDialogConversationId(conversation.Id, stepContext, _userProfileAccessor, _userState);
 
             return conversation;
-        }
-
-      
+        }     
 
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Bot.Builder.Dialogs.Choices;
+using Microsoft.Bot.Schema;
 using System.Collections.Generic;
 
 namespace RedCrossChat.Objects

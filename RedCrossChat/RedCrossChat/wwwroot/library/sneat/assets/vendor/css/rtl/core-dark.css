@@ -20239,6 +20239,10 @@ html:not(.layout-menu-fixed) .menu-inner-shadow {
     justify-content: space-between
 }
 
+.full-width {
+    width: 100%;
+}
+
 .content-backdrop {
     position: fixed;
     top: 0;

@@ -9,6 +9,8 @@ namespace RedCrossChat.Entities
 
         public bool HasBeenReceived { get; set; }
 
+        public bool HasResponse { get; set; } = false;
+
         public bool isActive { get; set; }=false;
 
         public DateTime? ResolvedAt { get; set; }
@@ -21,6 +23,9 @@ namespace RedCrossChat.Entities
 
         public Guid ConversationId { get; set; }
 
+        public ChatMessage? LastChatMessage { get; set; }
+
+        public Guid? LastChatMessageId { get; set; }
 
     }
 }
