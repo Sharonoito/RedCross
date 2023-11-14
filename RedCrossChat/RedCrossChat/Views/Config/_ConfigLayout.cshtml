@@ -7,14 +7,14 @@
 <div class="container-xxl flex-grow-1 container-p-y">
 
     <h4 class="py-3 mb-4">
-        <span class="text-muted fw-light"> Settings /</span> Profession
+        <span class="text-muted fw-light"> Settings /</span> @ViewBag.PageTitle
     </h4>
 
     <div class="row fv-plugins-icon-container">
         <div class="col-md-12">
             <ul class="nav nav-pills flex-column flex-md-row mb-3">
                 <li class="nav-item @(Html.IsSelected(controller: "Config", action: "Feeling") )">
-                    <a class="nav-link @(Html.IsSelected(controller: "Config", action: "Feeling") ) " href="javascript:void(0);">
+                    <a asp-action="Feeling" asp-controller="Config" class="nav-link @(Html.IsSelected(controller: "Config", action: "Feeling") )">
                         <i class="bx bx-user me-1"></i> Feelings
                     </a>
                 </li>

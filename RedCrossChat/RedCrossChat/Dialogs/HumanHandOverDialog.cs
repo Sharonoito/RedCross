@@ -68,38 +68,65 @@ namespace RedCrossChat.Dialogs
             {
                 //Check if there is a response for the last database call
 
-                var request=await repository.HandOverRequest.FindByCondition(x=>x.ConversationId==conversation.Id).FirstOrDefaultAsync();
+                var request=await repository.HandOverRequest.FindByCondition(x=>x.ConversationId==conversation.Id)
+                    .Include(x=>x.LastChatMessage)
+                    .FirstOrDefaultAsync();
 
                 if (request.HasBeenReceived)
                 {
-                    var conv = await repository.RawConversation.FindByCondition(x => x.Conversation.Id == conversation.Id).ToListAsync();
 
-                    var lastConv = conv.Last();
-
-                    if (lastConv != null && lastConv.HasReply)
+                    if(request.HasResponse && request.LastChatMessage !=null)
                     {
+
                         skip = false;
 
                         me.HandOverToUser = true;
 
-                        me.ActiveRawConversation = lastConv.Id;
+                        me.ActiveRawConversation = request.LastChatMessage.Id;
 
-                        var promptMessage = MessageFactory.Text(lastConv.Question, null, InputHints.ExpectingInput);
+                        var promptMessage = MessageFactory.Text(request.LastChatMessage.Message, null, InputHints.ExpectingInput);
 
                         return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = promptMessage }, token);
                     }
+                    
                 }
 
-                await Task.Delay(request.HasBeenReceived ? 1000  : 10000); // Delay for 2 seconds (2000 milliseconds)
+                int delay = request.HasBeenReceived ? 1000 : 10000;
+
+                await Task.Delay(delay); // Delay for 2 seconds (2000 milliseconds)
 
                 if(iterations % 10 == 0 && !me.HandOverToUser  && iterations !=30)
                 {
-                    await stepContext.Context.SendActivityAsync(MessageFactory.Text("An agent will be getting in touch with you shortly"), token);
+                    await stepContext.Context.SendActivityAsync(MessageFactory.Text("One of our psychologists  will be getting in touch with you shortly"), token);
                 }
 
-                if(iterations  >=  30)
+                if(iterations  >=  300 && !me.HandOverToUser)
                 {
+
+                    request = await repository.HandOverRequest.FindByCondition(x => x.ConversationId == conversation.Id).FirstOrDefaultAsync();
+
+                    if(request != null)
+                    {
+                        request.isActive= false;
+
+                        request.HasBeenReceived = true;
+
+                        repository.HandOverRequest.Update(request);
+
+                        await repository.SaveChangesAsync();
+
+                    }
+
                     await stepContext.Context.SendActivityAsync(MessageFactory.Text("it seems we are facing a number of requests, let's connect later"), token);
+
+
+                    var agentMessage = me.language ? " you can  contact us directly by dialing 1199, request to speak to a psychologist." :
+                            "pia unaweza piga nambari 1199 ili kuongea na mshauri. Utaweza kupigiwa na mshauri baada ya muda mfupi, ama upige simu ili kuongea na mwanasaikolojia kupitia nambari 1199";
+                    
+                    await stepContext.Context.SendActivityAsync(MessageFactory.Text(agentMessage), token);
+
+
+                   // string question = me.language ? "please give us a reason why so that we can improve your experience " : "tafadhali tupe sababu kwa nini ili tuweze kuboresha matumizi yako";
 
                     return await stepContext.EndDialogAsync(null);
                 }
@@ -122,20 +149,30 @@ namespace RedCrossChat.Dialogs
 
             me.Iteration++;
 
-            var lastConv= await repository.RawConversation.FindByCondition(x=>x.Id==me.ActiveRawConversation).FirstOrDefaultAsync();
-
-            if(lastConv != null && lastConv.HasReply)
+            ChatMessage chatMessage = new ChatMessage
             {
-                lastConv.Message=me.LastResponse.ToString();
+                ConversationId = me.ConversationId,
 
-                lastConv.IsReply = true;
+                Message = stepContext.Result.ToString(),
 
-                lastConv.HasReply= false;
+                Type=Constants.User
 
-                repository.RawConversation.Update(lastConv);
+            };
 
-                bool result=await repository.SaveChangesAsync();
+            repository.ChatMessage.Create(chatMessage);
+
+            var request = await repository.HandOverRequest
+                .FindByCondition(x => x.ConversationId == me.ConversationId)
+                .FirstOrDefaultAsync();
+
+            if (request != null)
+            {
+                request.HasResponse = false;
             }
+
+            repository.HandOverRequest.Update(request);
+
+            bool result = await repository.SaveChangesAsync();
 
 
             return await stepContext.BeginDialogAsync(nameof(WaterfallDialog), me, token);
