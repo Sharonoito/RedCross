@@ -97,7 +97,7 @@ namespace RedCrossChat.Dialogs
             _repository.ChatMessage.Create(new ChatMessage
             {
                 QuestionId = quiz.Id,
-                Type = Constants.User,
+                Type = Constants.Bot,
                 ConversationId = me.ConversationId
             });
 
@@ -280,26 +280,29 @@ namespace RedCrossChat.Dialogs
            
             var response = stepContext.Context.Activity.Text;
 
+            var chat = new ChatMessage
+            {
+                Message = response,
+                Type = Constants.User,
+                ConversationId = conversation.Id,
+            };
+
+            _repository.ChatMessage.Create(chat);
+
+           
+
             if (stepContext.Result == null)
             {
                 persona.WantsToTalkToSomeone = true;
 
                 _repository.Persona.Update(persona);
 
-                var chat = new ChatMessage
-                {
-                    Message = response,
-                    Type = Constants.User,
-                    ConversationId = conversation.Id,
-                };
-
-                _repository.ChatMessage.Create(chat);   
 
                 await _repository.SaveChangesAsync();
 
-
                 return await stepContext.EndDialogAsync(me, cancellationToken);
             }
+            await _repository.SaveChangesAsync();
 
             switch (((FoundChoice)stepContext.Result).Value)
             {

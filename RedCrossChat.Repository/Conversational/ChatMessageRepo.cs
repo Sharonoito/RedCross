@@ -1,4 +1,5 @@
-﻿using RedCrossChat.Contracts;
+﻿using Microsoft.EntityFrameworkCore;
+using RedCrossChat.Contracts;
 using RedCrossChat.Domain;
 using RedCrossChat.Entities;
 
@@ -11,5 +12,8 @@ namespace RedCrossChat.Repository
         {
 
         }
+
+        public async Task<IEnumerable<ChatMessage>> GetAll()
+        => await FindAll().ToListAsync();
     }
 }

@@ -9,6 +9,6 @@ namespace RedCrossChat.Contracts
 {
     public interface IChatMessage : IRepositoryBase<ChatMessage>
     {
-
+        Task<IEnumerable<ChatMessage>> GetAll();
     }
 }
