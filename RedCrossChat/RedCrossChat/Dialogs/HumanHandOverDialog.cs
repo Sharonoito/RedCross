@@ -87,8 +87,7 @@ namespace RedCrossChat.Dialogs
                         var promptMessage = MessageFactory.Text(request.LastChatMessage.Message, null, InputHints.ExpectingInput);
 
                         return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = promptMessage }, token);
-                    }
-                    
+                    }                    
                 }
 
                 int delay = request.HasBeenReceived ? 1000 : 10000;
