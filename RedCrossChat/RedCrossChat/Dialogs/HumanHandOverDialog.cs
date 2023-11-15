@@ -74,8 +74,9 @@ namespace RedCrossChat.Dialogs
 
                 if (request.HasBeenReceived)
                 {
+                    me.HandOverToUser = true;
 
-                    if(request.HasResponse && request.LastChatMessage !=null)
+                    if (request.HasResponse && request.LastChatMessage !=null)
                     {
 
                         skip = false;
@@ -94,7 +95,7 @@ namespace RedCrossChat.Dialogs
 
                 await Task.Delay(delay); // Delay for 2 seconds (2000 milliseconds)
 
-                if(iterations % 10 == 0 && !me.HandOverToUser  && iterations !=30)
+                if(iterations % 100 == 0 && !me.HandOverToUser  && iterations !=30)
                 {
                     await stepContext.Context.SendActivityAsync(MessageFactory.Text("One of our psychologists  will be getting in touch with you shortly"), token);
                 }
