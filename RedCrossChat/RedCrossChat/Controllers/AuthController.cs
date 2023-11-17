@@ -93,13 +93,12 @@ namespace RedCrossChat.Controllers
             if (user != null)
             {
                 user.IsDeactivated = true;
+
                 await _userManager.UpdateAsync(user);
 
                 return PartialView("_AccountDeactivated");
             }
             return Json(new { success = false, message = "Account deactivation failed. User not found." });
-
-            //return Content("Account deactivation failed. User not found.");
         }
 
 

@@ -34,18 +34,21 @@ namespace RedCrossChat.Dialogs
 
         public async Task<DialogTurnResult> InitialAction(WaterfallStepContext stepContext,CancellationToken token)
         {
-            //Client me = (Client)stepContext.Values[UserInfo];
+            
             Client me= (Client)stepContext.Options;
 
             me.HandOverToUser = me.Iteration != 0;
 
-            var conversation= await repository.Conversation.FindByCondition(x => x.Id==me.ConversationId).FirstOrDefaultAsync();
+            var conversation= await repository.Conversation
+                .FindByCondition(x => x.Id==me.ConversationId)
+                .Include(x => x.Persona)
+                .FirstOrDefaultAsync();
 
             if (!me.HandOverToUser)
             {
                 repository.HandOverRequest.Create(new Entities.HandOverRequest
                 {
-                    Title="User 0001 : Requested Hand Over",
+                    Title=conversation.Persona.Name,
                     ConversationId=conversation.Id,
                     isActive=true,
                 });

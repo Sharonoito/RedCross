@@ -92,18 +92,23 @@
                 <i class="bx bx-x cursor-pointer position-absolute top-0 end-0 mt-2 me-1 fs-4 d-lg-none d-block" data-overlay="" data-bs-toggle="sidebar" data-target="#app-chat-contacts"></i>
             </div>
             <hr class="container-m-nx mt-3 mb-0">
-            <div class="sidebar-body ps ps--active-y">
+            <div class="sidebar-body">
 
                 <!-- Chats -->
-                <ul class="list-unstyled chat-contact-list pt-1" id="chat-list">
+                <ul class="list-unstyled chat-contact-list pt-1  ps ps--active-y" id="chat-list" style="height: 50%;">
                     <li class="chat-contact-list-item chat-contact-list-item-title">
                         <h5 class="text-primary mb-0">Chats</h5>
                     </li>
-                    <li class="chat-contact-list-item chat-list-item-0 d-none" id="no-chats">
+                    <li class="chat-contact-list-item chat-list-item-0 d-none" id="no-chats" style="min-height: 50vh">
                         <h6 class="text-muted mb-0">No Chats Found</h6>
+                    </li>  
+                </ul>
+
+                <ul class="list-unstyled chat-contact-list mb-0 w-100  ps ps--active-y" id="chat-handover-requests" style="height:50%">
+                    <li class="chat-contact-list-item chat-contact-list-item-title">
+                        <h5 class="text-primary mb-0">Handover Requests </h5>
                     </li>
-                  
-                    
+
                 </ul>
                 
                
@@ -134,10 +139,10 @@
                 </div>
                 <div class="chat-history-body ps ps--active-y d-flex">
                     <ul class="list-unstyled chat-history mb-0 w-100" id="ConvList">
-                        
-                        
-                        
+
                     </ul>
+
+                  
                     <div class="ps__rail-x" style="left: 0px; bottom: 0px;">
                         <div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div>
                     </div>
@@ -257,7 +262,9 @@
 
             let backgrounds = ['primary', 'secondary', 'primary', 'danger', 'info', 'success', 'dark','primary','info','success']
 
+            const i = document.querySelector(".chat-history-body")
 
+            showHandOverPopup = false;
 
             const GetMyConversations = (func) => {
 
@@ -308,21 +315,36 @@
 
             }
 
-            const AppendToSidebar = ({ persona, id, dateCreated,reason }) => {
+            const AppendToSidebar = (data, container = "#chat-list") => {
                 //this is to append the conversation ton the side bar
 
-                console.log(id, persona)
+                const { persona, id, dateCreated, reason,chatMessages } = data;
 
+                let lastMessage = chatMessages[chatMessages.length - 1].message;
 
-                $("#chat-list").append(`
-                                  <li class="chat-contact-list-item " data-id='${id}'>
+                if(lastMessage ==null){
+
+                    /*chatMessages.reverse().forEach(message => {
+
+                        if (message.message != null) {
+                            lastMessage = message.message
+
+                            break;
+                        }
+
+                    });*/
+
+                }
+
+                $(container).append(`
+                                  <li class="chat-contact-list-item chat-item" data-id='${id}'>
                                     <a class="d-flex align-items-center">
                                         <div class="flex-shrink-0 avatar avatar-busy">
                                             ${username(persona.chatID)}
                                         </div>
                                         <div class="chat-contact-info flex-grow-1 ms-3">
                                             <h6 class="chat-contact-name text-truncate m-0">${persona.chatID}</h6>
-                                            <p class="chat-contact-status text-truncate mb-0 text-muted">${reason}</p>
+                                            <p class="chat-contact-status text-truncate mb-0 text-muted">${lastMessage}</p>
                                         </div>
                                         <small class="text-muted mb-auto moment-date" data-date='${dateCreated}'></small>
                                     </a>
@@ -391,8 +413,6 @@
 
                 const a = $("#ConvList");
 
-                console.log("UpDateChatActiveConversation", data)
-
                 let lastConv;
 
                 if (data != undefined && chatMessages.length < data.length) {
@@ -404,6 +424,8 @@
                     a.append(message(lastConv))
 
                     success("You have a message !")
+
+                    i.scrollTo(0, i.scrollHeight)
 
                     return;
                    
@@ -438,6 +460,8 @@
 
                 a.html('');
 
+               
+
                 for (let i = 0; i < chatMessages.length; i++) {
 
                     const conv = chatMessages[i];
@@ -446,6 +470,8 @@
 
                     CalculateDates()
                 }
+                console.log("called at this point")
+                
             }
 
             const attachMessage=(conv, a)=>{
@@ -518,7 +544,6 @@
             
             };
 
-
             const GetConversation = id => {
 
                 $.get("/Conversation/GetConversation?id=" + id).then(resp => {
@@ -531,6 +556,7 @@
 
                 })
             }
+           
             const StartConversation=(id)=>{
 
                 $('.chat-contact-list-item').toArray().forEach(chat => {
@@ -557,17 +583,19 @@
 
                 UpdateChatActiveConversation();
 
-
                 $(".chat-contact-list-item").find("[data-id='" + id + "']").addClass('active')
 
             }
 
-            $(document).on('click', '.chat-contact-list-item', function () {
+            $(document).on('click', '#chat-list .chat-contact-list-item', function () {
 
                 let current = this;
 
                 StartConversation($(current).data('id'));
             });
+
+
+
 
             $(document).on('submit', '.fsend-message', function (e) {
 
@@ -599,8 +627,6 @@
                     return;
 
                 $.post("/Conversation/GetRawConversations/?id=" + activeConversation.id).then(resp => {
-
-
                     UpdateChatActiveConversation(resp.responseData)
                 })
             }
@@ -623,10 +649,59 @@
                 setInterval(function () {
                     CalculateDates();
 
-                    CheckForUpdatesActiveConversation();
-                }, 5000);
+                    getConversationsObject()
+
+                }, interval);
 
             });
+
+            function getConversationsObject(){
+                $.post("/Conversation/GetMyConversationIncludingHandOverRequests").then(resp => {
+                    
+                    const data=resp.responseData;
+
+                    if (data.handOverRequests.length > 0){
+
+                        // add the title for the human hand over requesrs
+                        $("#chat-handover-requests").html('').html(
+                            ` <li class="chat-contact-list-item chat-contact-list-item-title">
+                                    <h5 class="text-primary mb-0">Handover Requests </h5>
+                                </li>`);
+
+                        displayHandOverRequests(data.handOverRequests)
+                    }
+
+                    console.log("all-data-including-requests",resp);
+                })
+            }
+
+
+
+            function displayHandOverRequests(data){
+
+                data.forEach(request => {
+
+                    $("#chat-handover-requests").append(appendHandOverRequest(request))
+
+                });
+
+            }
+
+            const appendHandOverRequest = (request) => {
+
+                return `<li class="chat-contact-list-item">
+                        <a class="d-flex align-items-center">
+                          <div class="flex-shrink-0 avatar avatar-offline">
+                               ${username(request.title)}
+                          </div>
+                          <div class="chat-contact-info flex-grow-1 ms-3">
+                            <h6 class="chat-contact-name text-truncate m-0">${request.title}</h6>
+                            <p class="chat-contact-status text-truncate mb-0 text-muted">pending handover</p>
+                          </div>
+                        </a>
+                      </li>`
+            }
+
         </script>
 
         <script src="~/library/sneat/assets/vendor/js/pages/page-chat.js"></script>
