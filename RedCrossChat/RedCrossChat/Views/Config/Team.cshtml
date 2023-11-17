@@ -1,7 +1,7 @@
 ﻿
 @{
+
 }
-<partial name="~/Views/Config/_ConfigLayout.cshtml" />
 
 <section class="content-header container-p-y">
     <div class="container-fluid">
@@ -29,8 +29,9 @@
                     <thead>
                         <tr>
                             <th>Name</th>
+                            <th>Supervisor</th>
                             <th>Notification Type</th>
-                            <th style="width: 40px">Actions</th>
+                            <th style="width: 10%">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -94,6 +95,7 @@
                     },
                     columns: [
                         { data: 'name' },
+                        { data: 'id',render:()=>'Supervisor Name' },
                         { data: 'notificationType' },
                         { data: 'id', name: 'Id' },
                
@@ -101,7 +103,7 @@
                     columnDefs: [{
                         render: function (data, type, row) {
                             var actionsHtml =
-                                `<div class='text-center'>
+                                `<div class='text-center btn-group'>
                                                         <button class='btn btn-outline-primary btn-xs load-modal team-manager'
                                                             data-hidden='Id'
                                                             data-id='${row.id}'
@@ -110,12 +112,28 @@
                                                             data-modal='clientModal'
                                                             data-bs-toggle="modal" data-bs-target="#clientModal"
                                                             data-viewurl='true'
-                                                                    data-action='@Url.Action("EditTeam", "Config")?clientId=${row.id}'
+                                                                            data-action='@Url.Action("CreateTeam", "Config")?teamId=${row.id}'
                                                             title='Edit'>
                                                             <i class='fa fa-pencil-alt'></i>
+                                                            
+                                                            </button>
+
+                                                                    <button class='btn btn-outline-primary btn-xs load-modal team-manager'
+                                                                    data-hidden='Id'
+                                                                    data-id='${row.id}'
+                                                                    data-toggle='modal'
+                                                                    data-target='#clientModal'
+                                                                    data-modal='clientModal'
+                                                                    data-bs-toggle="modal" data-bs-target="#clientModal"
+                                                                    data-viewurl='true'
+                                                                            data-action='@Url.Action("AssignTeam", "Config")?teamId=${row.id}'
+                                                                    title='Edit'>
+                                                                            <i class="fas fa-circle-check"></i>
+
+                                                                    </button>
 
                                                         <button class='delete btn btn-outline-danger btn-xs'
-                                                                    data-action='@Url.Action("DeleteTeam", "Config")?clientId=${row.id}'
+                                                                            data-action='@Url.Action("DeleteTeam", "Config")?teamId=${row.id}'
                                                             data-table='tblClients'
                                                             data-id='${row.id}'
                                                             data-toggle='tooltip'
@@ -157,6 +175,8 @@
 
             if ($("#selectTypeOpt").val() == "-1")
                 return;
+
+          alert("this is working")
 
             $.post("@Url.Action("CreateTeamUser")", { UserId: $("#selectTypeOpt").val(), TeamId: $(this).data('id') }).then(resp => {
 
