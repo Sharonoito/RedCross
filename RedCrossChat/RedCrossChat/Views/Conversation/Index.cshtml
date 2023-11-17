@@ -104,7 +104,7 @@
                     </li>  
                 </ul>
 
-                <ul class="list-unstyled chat-contact-list mb-0 w-100  ps ps--active-y" id="chat-handover-requests" style="height:50%">
+                <ul class="list-unstyled chat-contact-list mb-0 w-100  ps ps--active-y" id="chat-handover-requests" style="height:40%">
                     <li class="chat-contact-list-item chat-contact-list-item-title">
                         <h5 class="text-primary mb-0">Handover Requests </h5>
                     </li>
@@ -594,9 +594,6 @@
                 StartConversation($(current).data('id'));
             });
 
-
-
-
             $(document).on('submit', '.fsend-message', function (e) {
 
                 e.preventDefault();
@@ -616,6 +613,19 @@
                 });
 
 
+            });
+
+            $(document).on('click', "#chat-handover-requests .chat-contact-list-item", function () {
+
+                const btn = $(this);
+
+                $.post("/Conversation/UpdateHandOverRequest/?id=" + $(btn).data('id')).then(response => {
+
+                    $(btn).remove();
+
+                    getConversationsObject();
+                   
+                })
             });
 
 
@@ -641,6 +651,7 @@
 
                     StartConversation(GetActiveConversation());
 
+
                 }
 
 
@@ -657,10 +668,10 @@
 
             function getConversationsObject(){
                 $.post("/Conversation/GetMyConversationIncludingHandOverRequests").then(resp => {
-                    
-                    const data=resp.responseData;
 
-                    if (data.handOverRequests.length > 0){
+                    const { handOverRequests, myConversations } = resp.responseData;
+
+                    if (handOverRequests.length > 0){
 
                         // add the title for the human hand over requesrs
                         $("#chat-handover-requests").html('').html(
@@ -668,10 +679,16 @@
                                     <h5 class="text-primary mb-0">Handover Requests </h5>
                                 </li>`);
 
-                        displayHandOverRequests(data.handOverRequests)
+                        displayHandOverRequests(handOverRequests)
                     }
 
-                    console.log("all-data-including-requests",resp);
+                    if (myConversations.length > 0) {
+                        console.log("all-conv-update", myConversations);
+
+                        UpdateUI(myConversations)
+                    }
+
+                   
                 })
             }
 
@@ -689,10 +706,10 @@
 
             const appendHandOverRequest = (request) => {
 
-                return `<li class="chat-contact-list-item">
+                return `<li class="chat-contact-list-item" data-id='${request.id}'>
                         <a class="d-flex align-items-center">
                           <div class="flex-shrink-0 avatar avatar-offline">
-                               ${username(request.title)}
+                               ${username(request.conversation.persona.name)}
                           </div>
                           <div class="chat-contact-info flex-grow-1 ms-3">
                             <h6 class="chat-contact-name text-truncate m-0">${request.title}</h6>

@@ -397,9 +397,24 @@ namespace RedCrossChat.Dialogs
             return await stepContext.EndDialogAsync(null, cancellationToken);
         }
 
+        private async Task<String> getPersonaName()
+        {
+            var users = await _repository.Persona.FindAll().ToListAsync();
+
+            decimal dec = (users.Count / 10000);
+
+            string str = dec.ToString("N5");
+
+            //double count = Math.Round(dec, 5);
+
+            return str.Split(".")[1];
+        }
+
         private async Task<Conversation> CreateConversationDBInstance(WaterfallStepContext stepContext)
         {
             Client me = (Client)stepContext.Values[UserInfo];
+ 
+            String name=await getPersonaName();
 
             var persona= await  _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstOrDefaultAsync();
 
@@ -407,6 +422,7 @@ namespace RedCrossChat.Dialogs
 
             if (persona != null)
             {
+                
                  conversation = new()
                 {
                     ChannelId = stepContext.Context.Activity.ChannelId,
@@ -425,6 +441,14 @@ namespace RedCrossChat.Dialogs
 
                     PersonaId = persona.Id,
                 };
+
+                if(persona.Name == null ) {
+                
+                    persona.Name = name;
+
+                    _repository.Persona.Update(persona);
+                
+                }
 
                 _repository.Conversation.Create(conversation);
 
@@ -450,7 +474,7 @@ namespace RedCrossChat.Dialogs
                     Persona = new Persona() { 
                         SenderId = stepContext.Context.Activity.From.Id,
                         FromId = stepContext.Context.Activity.From.Id,
-                        Name = stepContext.Context.Activity.From.Name 
+                        Name = stepContext.Context.Activity.From.Name == null || stepContext.Context.Activity.From.Name.ToLower() =="user" ? name : stepContext.Context.Activity.From.Name
                     }
                 };
 
