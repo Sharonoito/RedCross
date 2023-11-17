@@ -86,9 +86,14 @@ namespace RedCrossChat.Dialogs
         {
             var me = (Client)stepContext.Options;
 
+     //       var savedFeeling = (Feeling)stepContext.Values["Feeling"];
+
             stepContext.Values[UserInfo] = me;
 
+
             Conversation conversation = await getConversation(me);
+
+
 
             Question quiz = await _repository.Question.FindByCondition(x => x.Code == 4).FirstAsync();
           
@@ -108,13 +113,14 @@ namespace RedCrossChat.Dialogs
                 Prompt = MessageFactory.Text(question),
 
                 Choices = me.language ? RedCrossLists.choices : RedCrossLists.choicesKiswahili,
+                Style = ListStyle.HeroCard
 
             };
 
             return await stepContext.PromptAsync(nameof(ChoicePrompt), options, cancellationToken);
 
         }
-
+        //var storedFeeling = (Feeling)stepContext.Values["Feeling"];
         private async Task<DialogTurnResult> ProcessMentalEvaluationChoice(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             Client me = (Client)stepContext.Values[UserInfo];
@@ -454,7 +460,7 @@ namespace RedCrossChat.Dialogs
 
             await _repository.SaveChangesAsync();
 
-            var agentMessage = me.language ? "The next available psychologist will call you shortly, you can also contact us directly by dialing 1199, request to speak to a psychologist." :
+            var agentMessage = me.language ? "The next available psychologist will get in touch with you shortly, you can also contact us directly by dialing 1199, request to speak to a psychologist." :
                              "Utaweza kuzungumza na mhudumu baada ya muda mfupi ama pia unaweza piga nambari 1199 ili kuongea na mshauri. Utaweza kupigiwa na mshauri baada ya muda mfupi, ama upige simu ili kuongea na mwanasaikolojia kupitia nambari 1199";
             await stepContext.Context.SendActivityAsync(MessageFactory.Text(agentMessage), cancellationToken);
 

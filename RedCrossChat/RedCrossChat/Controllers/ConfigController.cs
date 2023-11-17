@@ -1454,7 +1454,6 @@ namespace RedCrossChat.Controllers
             return Error("Sorry SubIntention was not created");
         }
 
-
         public async Task<IActionResult> EditSubIntention(SubIntentionVm subintention)
         {
             try
