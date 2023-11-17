@@ -247,6 +247,18 @@ namespace RedCrossChat.Repository
             }
         }
 
+        public IChatMessage _chatMessage;
+
+        public IChatMessage ChatMessage
+        {
+            get
+            {
+                if (_chatMessage == null) _chatMessage = new ChatMessageRepo(_repoContext);
+
+                return _chatMessage;
+            }
+        }
+
         public IHandOverRequest _handOverRequest;
 
         public IHandOverRequest HandOverRequest

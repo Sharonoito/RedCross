@@ -93,6 +93,10 @@ document.getElementById("layout-menu") && (isHorizontalLayout = document.getElem
                 toggleLogo();
 
 
+    function hideNavigation() {
+
+    }
+
         let a = document.getElementsByClassName("dropdown-language");
         if (a.length) {
             var l = a[0].querySelectorAll(".dropdown-item");

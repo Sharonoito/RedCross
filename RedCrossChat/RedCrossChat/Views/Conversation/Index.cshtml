@@ -1,6 +1,6 @@
-﻿
-@{
-  
+﻿@{
+
+    Layout = "~/Views/Shared/_LayoutClient.cshtml";
 }
 
 
@@ -10,17 +10,15 @@
         <div class="col app-chat-sidebar-left app-sidebar overflow-hidden" id="app-chat-sidebar-left">
             <div class="chat-sidebar-left-user sidebar-header d-flex flex-column justify-content-center align-items-center flex-wrap p-4 mt-2">
                 <div class="avatar avatar-xl avatar-online">
-                    <span class="avatar-initial rounded-circle bg-label-success">AM</span>
+                    <span class="avatar-initial rounded-circle bg-label-success">
+                        @User.Identity.Name.Substring(0, 1)
+                    </span>
                 </div>
-                <h5 class="mt-3 mb-1">John Doe</h5>
-                <small class="text-muted">UI/UX Designer</small>
+                <h5 class="mt-3 mb-1">@User.Identity.Name</h5>
+
                 <i class="bx bx-x bx-sm cursor-pointer close-sidebar me-1 fs-4 " data-bs-toggle="sidebar" data-overlay="" data-target="#app-chat-sidebar-left"></i>
             </div>
             <div class="sidebar-body px-4 pb-4 ps">
-                <div class="my-3">
-                    <span class="text-muted text-uppercase">About</span>
-                    <textarea id="chat-sidebar-left-user-about" class="form-control chat-sidebar-left-user-about mt-2" rows="4" maxlength="120">Dessert chocolate cake lemon drops jujubes. Biscuit cupcake ice cream bear claw brownie brownie marshmallow.</textarea>
-                </div>
                 <div class="my-4">
                     <span class="text-muted text-uppercase">Status</span>
                     <div class="d-grid gap-1 mt-2">
@@ -43,31 +41,37 @@
                     </div>
                 </div>
                 <div class="my-4">
-                    <span class="text-muted text-uppercase">Settings</span>
+                    <span class="text-muted text-uppercase"></span>
                     <ul class="list-unstyled d-grid gap-2 mt-2">
-                        <li class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <i class="bx bx-check-circle me-1"></i>
-                                <span class="align-middle">Two-step Verification</span>
-                            </div>
-                            <div class="form-check form-switch mb-0">
-                                <input class="form-check-input" type="checkbox" id="twoStepVerification">
-                            </div>
+                        <li class="menu-item   @Html.IsSelected(controller: "Home", action: "Dashboard") ">
+                            <a href="/" class="menu-link text-muted">
+                                <i class="menu-icon tf-icons bx bx-home-circle"></i>
+                                <div data-i18n="Dashboards"></div>
+                            </a>
                         </li>
-                        <li class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <i class="bx bx-bell me-1"></i>
-                                <span class="align-middle">Notification</span>
-                            </div>
-                            <div class="form-check form-switch mb-0">
-                                <input class="form-check-input" type="checkbox" id="switchNotification" checked="">
-                            </div>
+
+                        <li class="menu-item @Html.IsSelected(controller: "Conversation", action: "List")">
+                            <a asp-action="List" asp-controller="Conversation" class="menu-link text-muted">
+                                <i class="menu-icon tf-icons bx bx-chat text-muted"></i>
+                                <div data-i18n="Conversations"></div>
+                            </a>
                         </li>
+
+
                     </ul>
                 </div>
-                <div class="d-flex mt-4">
-                    <button class="btn btn-primary" data-bs-toggle="sidebar" data-overlay="" data-target="#app-chat-sidebar-left">Logout</button>
-                </div>
+
+                <ul>
+                    <li class="dropdown-item @Html.IsSelected(controller: "Auth", action: "Login")">
+                        <form asp-action="Login" asp-controller="Auth" method="post">
+                            <button class="btn  btn-danger" type="submit"  style="text-decoration: none; color: white; cursor: pointer;">
+                                <i class="bx bx-power-off me-2"></i>
+                                <span class="align-middle">Log Out</span>
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+
                 <div class="ps__rail-x" style="left: 0px; bottom: 0px;"><div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div></div><div class="ps__rail-y" style="top: 0px; right: 0px;"><div class="ps__thumb-y" tabindex="0" style="top: 0px; height: 0px;"></div></div>
             </div>
         </div>
@@ -77,8 +81,9 @@
             <div class="sidebar-header pt-3 px-3 mx-1">
                 <div class="d-flex align-items-center me-3 me-lg-0">
                     <div class="flex-shrink-0 avatar avatar-online me-2" data-bs-toggle="sidebar" data-overlay="app-overlay-ex" data-target="#app-chat-sidebar-left">
-                        <img class="user-avatar rounded-circle cursor-pointer" src="../../assets/img/avatars/1.png" alt="Avatar">
+                        <img src="~/img/RedCrossLogo.png" alt="Kenya Red Cross Logo" class="w-px-40 h-auto rounded-circle" />
                     </div>
+
                     <div class="flex-grow-1 input-group input-group-merge rounded-pill ms-1">
                         <span class="input-group-text" id="basic-addon-search31"><i class="bx bx-search fs-4"></i></span>
                         <input type="text" class="form-control chat-search-input" placeholder="Search..." aria-label="Search..." aria-describedby="basic-addon-search31">
@@ -87,18 +92,23 @@
                 <i class="bx bx-x cursor-pointer position-absolute top-0 end-0 mt-2 me-1 fs-4 d-lg-none d-block" data-overlay="" data-bs-toggle="sidebar" data-target="#app-chat-contacts"></i>
             </div>
             <hr class="container-m-nx mt-3 mb-0">
-            <div class="sidebar-body ps ps--active-y">
+            <div class="sidebar-body">
 
                 <!-- Chats -->
-                <ul class="list-unstyled chat-contact-list pt-1" id="chat-list">
+                <ul class="list-unstyled chat-contact-list pt-1  ps ps--active-y" id="chat-list" style="height: 50%;">
                     <li class="chat-contact-list-item chat-contact-list-item-title">
                         <h5 class="text-primary mb-0">Chats</h5>
                     </li>
-                    <li class="chat-contact-list-item chat-list-item-0 d-none" id="no-chats">
+                    <li class="chat-contact-list-item chat-list-item-0 d-none" id="no-chats" style="min-height: 50vh">
                         <h6 class="text-muted mb-0">No Chats Found</h6>
+                    </li>  
+                </ul>
+
+                <ul class="list-unstyled chat-contact-list mb-0 w-100  ps ps--active-y" id="chat-handover-requests" style="height:50%">
+                    <li class="chat-contact-list-item chat-contact-list-item-title">
+                        <h5 class="text-primary mb-0">Handover Requests </h5>
                     </li>
-                  
-                    
+
                 </ul>
                 
                
@@ -122,12 +132,6 @@
                                 <button class="btn p-0" type="button" id="chat-header-actions" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <i class="bx bx-dots-vertical-rounded fs-4"></i>
                                 </button>
-                                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="chat-header-actions">
-                                   @* <a class="dropdown-item" href="javascript:void(0);">View Contact</a>
-                                    <a class="dropdown-item" href="javascript:void(0);">Mute Notifications</a>
-                                    <a class="dropdown-item" href="javascript:void(0);">Block Contact</a>
-                                    <a class="dropdown-item" href="javascript:void(0);">Clear Chat</a>
-                                    <a class="dropdown-item" href="javascript:void(0);">Report</a>*@
                                 </div>
                             </div>
                         </div>
@@ -135,10 +139,10 @@
                 </div>
                 <div class="chat-history-body ps ps--active-y d-flex">
                     <ul class="list-unstyled chat-history mb-0 w-100" id="ConvList">
-                        
-                        
-                        
+
                     </ul>
+
+                  
                     <div class="ps__rail-x" style="left: 0px; bottom: 0px;">
                         <div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div>
                     </div>
@@ -244,7 +248,461 @@
 
     <environment names="Development,Staging,Production">
 
-        <script src="~/js/simple.js"></script>
+        <script >
+
+            let activeConversation;
+
+            let currentLength=0;
+
+            let conversartions = [];
+
+            let interval = 2500;
+
+            let iteration = 0;
+
+            let backgrounds = ['primary', 'secondary', 'primary', 'danger', 'info', 'success', 'dark','primary','info','success']
+
+            const i = document.querySelector(".chat-history-body")
+
+            showHandOverPopup = false;
+
+            const GetMyConversations = (func) => {
+
+                $.post("/Conversation/GetMyConversations").then(response => {
+
+                    if (response.success) {
+                        let data = response.responseData;
+
+                        if (data.length == 0) {
+
+                            conversartions = data;
+
+                            $('#no-chats').fadeIn()
+
+                        } else {
+
+                            UpdateUI(data);
+                        }
+
+                        if (func != undefined)
+                            func();
+
+                    }
+                });
+            }
+
+            const UpdateUI=(data)=>{
+
+                if (conversartions.length > currentLength) {
+                    for (let i = currentLength; i < conversartions.length; i++) {
+                        AppendToSidebar(conversartions[i]);
+                    }
+                } else if (data != undefined){
+
+                    //check for internal changes in the array -> conversations
+                    for (let i = 0; i < data.length; i++) {
+                        AppendToSidebar(data[i])
+                    }
+
+                    conversartions = data;
+
+                    if (iteration % 5 == 0) {
+                        interval * 10;
+                    }
+
+                    iteration++;
+                }
+
+            }
+
+            const AppendToSidebar = (data, container = "#chat-list") => {
+                //this is to append the conversation ton the side bar
+
+                const { persona, id, dateCreated, reason,chatMessages } = data;
+
+                let lastMessage = chatMessages[chatMessages.length - 1].message;
+
+                if(lastMessage ==null){
+
+                    /*chatMessages.reverse().forEach(message => {
+
+                        if (message.message != null) {
+                            lastMessage = message.message
+
+                            break;
+                        }
+
+                    });*/
+
+                }
+
+                $(container).append(`
+                                  <li class="chat-contact-list-item chat-item" data-id='${id}'>
+                                    <a class="d-flex align-items-center">
+                                        <div class="flex-shrink-0 avatar avatar-busy">
+                                            ${username(persona.chatID)}
+                                        </div>
+                                        <div class="chat-contact-info flex-grow-1 ms-3">
+                                            <h6 class="chat-contact-name text-truncate m-0">${persona.chatID}</h6>
+                                            <p class="chat-contact-status text-truncate mb-0 text-muted">${lastMessage}</p>
+                                        </div>
+                                        <small class="text-muted mb-auto moment-date" data-date='${dateCreated}'></small>
+                                    </a>
+                                </li>`);
+
+                CalculateDates();
+            }
+
+            const username = str => str != null ? `<span class="avatar-initial rounded-circle bg-label-${backgrounds[str.charAt(str.length - 1)]}">${str.charAt(0)}${str.charAt(str.length - 1)}</span>` : '';
+
+            function CalculateDates() {
+
+                let cDate = new Date();
+
+                const getDateObject = cDate => {
+
+                    return [cDate.getFullYear(), cDate.getMonth(), cDate.getDate(), cDate.getHours(), cDate.getMinutes(), cDate.getMilliseconds()]
+                }
+
+
+
+                $(".moment-date").toArray().forEach(e => {
+
+
+                    var now = moment(new Date()); //todays date
+
+                    var end = moment($(e).data('date')); // another date
+
+                    if ($(e).data('format') != undefined) {
+
+                        $(e).html(end.format($(e).data('format')));
+
+                        return;
+                    }
+
+                    if (now.diff(end, 'minutes') <= 59) {
+
+                        $(e).html(now.diff(end, 'minutes') + (" Minutes" + now.diff(end, 'minutes') !=1? 's':''))
+                        return;
+                    }
+                    if (now.diff(end, 'hours') <=24 ) {
+
+                        $(e).html(now.diff(end, 'hours') + (" hour" + now.diff(end, 'days') !=1 ? "s":''))
+
+                        return
+                    }
+
+                    if (now.diff(end, 'days') <= 7) {
+
+                        $(e).html(now.diff(end, 'days') + (" day" + now.diff(end, 'days') !=1 ? 's':''))
+
+                        return
+                    }
+
+                })
+            }
+
+            function UpdateChatActiveConversation(data) {
+
+               
+
+                if (activeConversation == undefined)
+                    return;
+
+                const { id, reason, persona, chatMessages } = activeConversation;
+
+                const a = $("#ConvList");
+
+                let lastConv;
+
+                if (data != undefined && chatMessages.length < data.length) {
+
+                    lastConv = data[data.length - 1];
+
+                    activeConversation.chatMessages.push(lastConv);
+
+                    a.append(message(lastConv))
+
+                    success("You have a message !")
+
+                    i.scrollTo(0, i.scrollHeight)
+
+                    return;
+                   
+                }
+                else if (data != undefined && chatMessages.length == data.length) {
+
+                    lastConv = data[data.length - 1];
+
+                    let it = chatMessages[chatMessages.length - 1];
+
+                    /*if (it.message == null && lastConv.message != null) {
+
+                        a.append(message(lastConv,true))
+
+                        rawConversations[rawConversations.length - 1] = lastConv;
+
+                        activeConversation.rawConversations = rawConversations;
+                    }*/
+
+                    return;
+                }
+
+                $("#chat-contact-info").html(`<i class="bx bx-menu bx-sm cursor-pointer d-lg-none d-block me-2" data-bs-toggle="sidebar" data-overlay="" data-target="#app-chat-contacts"></i>
+                                        <div class="flex-shrink-0 avatar">
+                                            ${username(persona.chatID)}
+                                        </div>
+                                        <div class="chat-contact-info flex-grow-1 ms-3" >
+                                            <h6 class="m-0">${persona.chatID}</h6>
+                                            <small class="user-status text-muted">${reason}</small>
+                                        </div>`);
+
+
+                a.html('');
+
+               
+
+                for (let i = 0; i < chatMessages.length; i++) {
+
+                    const conv = chatMessages[i];
+
+                    attachMessage(conv,a)
+
+                    CalculateDates()
+                }
+                console.log("called at this point")
+                
+            }
+
+            const attachMessage=(conv, a)=>{
+                
+                a.append(message(conv));
+            }
+
+            const message = (conv, isReply = false) => {
+
+                console.log("the message",conv)
+
+                return conv.type == 0 || conv.type==2 ? question(conv) : response(conv);
+            }    
+
+            const response = (conv) => {
+
+                let message = conv.message;
+
+                if(message ==null)
+                    message= conv.question.question
+
+                
+
+                return `<li class="chat-message">
+                                      <div class="d-flex overflow-hidden">
+                                        <div class="user-avatar flex-shrink-0 me-3">
+                                          <div class="avatar avatar-sm">
+                                            <span class="avatar-initial rounded-circle bg-label-success">${username(activeConversation.persona.chatID)}</span>
+                                          </div>
+                                        </div>
+                                        <div class="chat-message-wrapper flex-grow-1">
+                                          <div class="chat-message-text">
+                                            <p class="mb-0">${conv.message ?? conv.question.question}</p>
+                                          </div>
+                                          <div class="text-muted mt-1">
+                                                            <small class='moment-date' data-format='h:mm' data-date='${conv.dateCreated}'></small>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </li>`;
+            
+            } 
+
+            const question = (conv) => {
+
+                let question = conv.message;
+
+                if(question ==null){
+                    question = conv.question.question
+                }
+
+                return `<li class="chat-message chat-message-right ">
+                                                    <div class="d-flex overflow-hidden">
+                                                        <div class="chat-message-wrapper flex-grow-1">
+                                                            <div class="chat-message-text">
+                                                                <p class="mb-0">${question}</p>
+                                                            </div>
+                                                            <div class="text-end text-muted mt-1">
+                                                                <i class="bx bx-check-double text-success"></i>
+                                                                            <small class='moment-date' data-format='h:mm' data-date='${conv.dateCreated}'></small>
+                                                            </div>
+                                                        </div>
+                                                        <div class="user-avatar flex-shrink-0 ms-3">
+                                                            <div class="avatar avatar-sm">
+                                                                <span class="avatar-initial rounded-circle bg-label-success">${'BOT'}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </li>`
+            
+            };
+
+            const GetConversation = id => {
+
+                $.get("/Conversation/GetConversation?id=" + id).then(resp => {
+
+                    activeConversation = resp.responseData;
+
+                    console.log("GetConversation")
+
+                    UpdateChatActiveConversation();
+
+                })
+            }
+           
+            const StartConversation=(id)=>{
+
+                $('.chat-contact-list-item').toArray().forEach(chat => {
+                    $(chat).removeClass('active');
+                });
+
+
+                if (conversartions.length == 0) {
+
+                    console.log("fetch the conv", conversartions);
+
+                    return GetConversation(id);
+                }
+
+
+                for (let i = 0; i < conversartions.length; i++) {
+
+                    if ( id == conversartions[i].id) {
+                        activeConversation = conversartions[i];
+                    }
+                }
+
+                console.log("ActiveConversation", conversartions)
+
+                UpdateChatActiveConversation();
+
+                $(".chat-contact-list-item").find("[data-id='" + id + "']").addClass('active')
+
+            }
+
+            $(document).on('click', '#chat-list .chat-contact-list-item', function () {
+
+                let current = this;
+
+                StartConversation($(current).data('id'));
+            });
+
+
+
+
+            $(document).on('submit', '.fsend-message', function (e) {
+
+                e.preventDefault();
+
+                const a = $("#fsend-imessage");
+
+                if (activeConversation == undefined) {
+                    error("there is no active conversation");
+                }
+
+                //$("#ConvList").append(message({ question: a.val(), questionTimeStamp:"" } , true))
+
+                $.post("/Conversation/CreateResponse", { conversationId: activeConversation.id, question: a.val() }).then(resp => {
+                    a.val('');
+                    CheckForUpdatesActiveConversation();
+
+                });
+
+
+            });
+
+
+            function CheckForUpdatesActiveConversation() {
+
+                //GetRawConversations
+
+                if (activeConversation == undefined)
+                    return;
+
+                $.post("/Conversation/GetRawConversations/?id=" + activeConversation.id).then(resp => {
+                    UpdateChatActiveConversation(resp.responseData)
+                })
+            }
+
+
+
+            $(document).ready(function () {
+
+                if (GetActiveConversation() != null) {
+
+                    console.log("CurrentActiveConversation",GetActiveConversation());
+
+                    StartConversation(GetActiveConversation());
+
+                }
+
+
+                GetMyConversations();
+
+                setInterval(function () {
+                    CalculateDates();
+
+                    getConversationsObject()
+
+                }, interval);
+
+            });
+
+            function getConversationsObject(){
+                $.post("/Conversation/GetMyConversationIncludingHandOverRequests").then(resp => {
+                    
+                    const data=resp.responseData;
+
+                    if (data.handOverRequests.length > 0){
+
+                        // add the title for the human hand over requesrs
+                        $("#chat-handover-requests").html('').html(
+                            ` <li class="chat-contact-list-item chat-contact-list-item-title">
+                                    <h5 class="text-primary mb-0">Handover Requests </h5>
+                                </li>`);
+
+                        displayHandOverRequests(data.handOverRequests)
+                    }
+
+                    console.log("all-data-including-requests",resp);
+                })
+            }
+
+
+
+            function displayHandOverRequests(data){
+
+                data.forEach(request => {
+
+                    $("#chat-handover-requests").append(appendHandOverRequest(request))
+
+                });
+
+            }
+
+            const appendHandOverRequest = (request) => {
+
+                return `<li class="chat-contact-list-item">
+                        <a class="d-flex align-items-center">
+                          <div class="flex-shrink-0 avatar avatar-offline">
+                               ${username(request.title)}
+                          </div>
+                          <div class="chat-contact-info flex-grow-1 ms-3">
+                            <h6 class="chat-contact-name text-truncate m-0">${request.title}</h6>
+                            <p class="chat-contact-status text-truncate mb-0 text-muted">pending handover</p>
+                          </div>
+                        </a>
+                      </li>`
+            }
+
+        </script>
 
         <script src="~/library/sneat/assets/vendor/js/pages/page-chat.js"></script>
 

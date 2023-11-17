@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System;
 using RedCrossChat.Entities;
+using System.Collections.Generic;
 
 namespace RedCrossChat.ViewModel
 {
@@ -19,5 +20,9 @@ namespace RedCrossChat.ViewModel
 
         [Display(Name = "Team")]
         public string Team { get; set; }
+
+        public List<AppUser>? AppUsers { get; set; }
+
+        public List<AppUser>? TeamMembers { get; set; }
     }
 }

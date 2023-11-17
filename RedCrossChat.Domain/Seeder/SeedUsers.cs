@@ -147,6 +147,18 @@ namespace RedCrossChat.Domain
                     }
                 }
 
+                if (!context.Question.Any())
+                {
+                    var data = await SeedHelper.GetSeedData<Question>("Questions.json");
+
+                    foreach (var item in data)
+                    {
+                        context.Question.Add(new Question { Kiswahili=item.Kiswahili,question=item.question,Code=item.Code });
+
+                        await context.SaveChangesAsync();
+                    }
+                }
+
             }
 
         }
