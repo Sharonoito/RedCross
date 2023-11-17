@@ -459,15 +459,11 @@ namespace RedCrossChat.Dialogs
             await stepContext.Context.SendActivityAsync(MessageFactory.Text(agentMessage), cancellationToken);
 
 
-            var hotline = PersonalDialogCard.GetHotlineCard();
-            var hotlineSwahili = PersonalDialogCard.GetHotlineCardKiswahili();
-
-
             var attachment = new Attachment
             {
                 ContentType = HeroCard.ContentType,
 
-                Content = !me.language ? hotlineSwahili : hotline,
+                Content = PersonalDialogCard.GetHotlineCard(me.language),
             };
 
 

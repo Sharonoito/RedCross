@@ -5,8 +5,14 @@ namespace RedCrossChat.Entities
     public class RawConversation : BaseEntity
     {
         public string? Question {  get; set; }
+
+        public Question? Question1 { get; set; }
+
+        public Guid? Question1ID { get; set; }
         
         public string? Message { get; set; }
+
+        public int Type { get; set; } = 0; //
         
         public Conversation? Conversation { get; set; }
 

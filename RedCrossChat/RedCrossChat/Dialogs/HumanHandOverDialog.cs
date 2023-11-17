@@ -34,18 +34,21 @@ namespace RedCrossChat.Dialogs
 
         public async Task<DialogTurnResult> InitialAction(WaterfallStepContext stepContext,CancellationToken token)
         {
-            //Client me = (Client)stepContext.Values[UserInfo];
+            
             Client me= (Client)stepContext.Options;
 
             me.HandOverToUser = me.Iteration != 0;
 
-            var conversation= await repository.Conversation.FindByCondition(x => x.Id==me.ConversationId).FirstOrDefaultAsync();
+            var conversation= await repository.Conversation
+                .FindByCondition(x => x.Id==me.ConversationId)
+                .Include(x => x.Persona)
+                .FirstOrDefaultAsync();
 
             if (!me.HandOverToUser)
             {
                 repository.HandOverRequest.Create(new Entities.HandOverRequest
                 {
-                    Title="User 0001 : Requested Hand Over",
+                    Title=conversation.Persona.Name,
                     ConversationId=conversation.Id,
                     isActive=true,
                 });
@@ -74,8 +77,9 @@ namespace RedCrossChat.Dialogs
 
                 if (request.HasBeenReceived)
                 {
+                    me.HandOverToUser = true;
 
-                    if(request.HasResponse && request.LastChatMessage !=null)
+                    if (request.HasResponse && request.LastChatMessage !=null)
                     {
 
                         skip = false;
@@ -87,15 +91,14 @@ namespace RedCrossChat.Dialogs
                         var promptMessage = MessageFactory.Text(request.LastChatMessage.Message, null, InputHints.ExpectingInput);
 
                         return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = promptMessage }, token);
-                    }
-                    
+                    }                    
                 }
 
                 int delay = request.HasBeenReceived ? 1000 : 10000;
 
                 await Task.Delay(delay); // Delay for 2 seconds (2000 milliseconds)
 
-                if(iterations % 10 == 0 && !me.HandOverToUser  && iterations !=30)
+                if(iterations % 100 == 0 && !me.HandOverToUser  && iterations !=30)
                 {
                     await stepContext.Context.SendActivityAsync(MessageFactory.Text("One of our psychologists  will be getting in touch with you shortly"), token);
                 }

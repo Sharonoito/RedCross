@@ -1,6 +1,8 @@
 ﻿
 let counter = 1;
 
+let showHandOverPopup=true
+
 const ACTIVE_CONV = "com.redcross.chat.bot-simple-mde"
 
 function SetActiveConversation(id) {
@@ -16,6 +18,7 @@ function GetActiveConversation() {
 
 function ShowHandOverRequest(request) {
 
+    if (showHandOverPopup) 
     Swal.fire({
         title: "Human Hand Over",
         text: "A client needs Mental Support!",
@@ -37,8 +40,6 @@ function ShowHandOverRequest(request) {
 
         if (t.value) {
             $.post("/Conversation/UpdateHandOverRequest/?id=" + request.id).then(response => {
-
-             
 
                 SetActiveConversation(request.conversationId);
 
@@ -62,6 +63,7 @@ let isShowing = false;
 
 function CheckForHumanHandOverRequests() {
 
+    if (showHandOverPopup)
     $.post("/Conversation/CheckHandOverRequests/").then(response => {
 
         if (response.success)
