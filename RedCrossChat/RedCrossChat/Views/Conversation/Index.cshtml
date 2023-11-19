@@ -293,24 +293,39 @@
 
             const UpdateUI=(data)=>{
 
-                if (conversartions.length > currentLength) {
-                    for (let i = currentLength; i < conversartions.length; i++) {
-                        AppendToSidebar(conversartions[i]);
-                    }
-                } else if (data != undefined){
+                console.log("current-conversations",conversartions)
 
-                    //check for internal changes in the array -> conversations
+                console.log("incoming-conversation",data)
+
+                /** $("#chat-list").html('').html(`
+                                          <li class="chat-contact-list-item chat-contact-list-item-title">
+                                                <h5 class="text-primary mb-0">Chats</h5>
+                                            </li>`) */
+
+
+
+                if (conversartions.length == 0 && data.length > 1) {
+                     
                     for (let i = 0; i < data.length; i++) {
-                        AppendToSidebar(data[i])
+                        
+                        AppendToSidebar(data[i]);
                     }
 
-                    conversartions = data;
+                    /*data.forEach(conversartion => {
+                        conversartions[conversartion.id] = conversartion
+                    });  */
 
-                    if (iteration % 5 == 0) {
-                        interval * 10;
+                } else if (conversartions.length < data.length) {
+                     
+                    for (let i = conversartions.length; i < data.length; i++) {
+                        
+                        AppendToSidebar(data[i]);
+                    
                     }
 
-                    iteration++;
+                    /*data.forEach(conversartion => {
+                        conversartions[conversartion.id] = conversartion
+                    });*/xx
                 }
 
             }
@@ -323,16 +338,6 @@
                 let lastMessage = chatMessages[chatMessages.length - 1].message;
 
                 if(lastMessage ==null){
-
-                    /*chatMessages.reverse().forEach(message => {
-
-                        if (message.message != null) {
-                            lastMessage = message.message
-
-                            break;
-                        }
-
-                    });*/
 
                 }
 
@@ -425,7 +430,7 @@
 
                     success("You have a message !")
 
-                    i.scrollTo(0, i.scrollHeight)
+                    
 
                     return;
                    
@@ -565,9 +570,6 @@
 
 
                 if (conversartions.length == 0) {
-
-                    console.log("fetch the conv", conversartions);
-
                     return GetConversation(id);
                 }
 
@@ -578,12 +580,13 @@
                         activeConversation = conversartions[i];
                     }
                 }
-
-                console.log("ActiveConversation", conversartions)
-
+            
                 UpdateChatActiveConversation();
 
                 $(".chat-contact-list-item").find("[data-id='" + id + "']").addClass('active')
+
+                console.log("scrolling point")
+                i.scrollTo(0, i.scrollHeight)
 
             }
 
@@ -609,6 +612,8 @@
                 $.post("/Conversation/CreateResponse", { conversationId: activeConversation.id, question: a.val() }).then(resp => {
                     a.val('');
                     CheckForUpdatesActiveConversation();
+                    console.log("scrolling point")
+                    i.scrollTo(0, i.scrollHeight)
 
                 });
 
@@ -638,6 +643,9 @@
 
                 $.post("/Conversation/GetRawConversations/?id=" + activeConversation.id).then(resp => {
                     UpdateChatActiveConversation(resp.responseData)
+
+                    
+                    i.scrollTo(0, i.scrollHeight)
                 })
             }
 
@@ -683,8 +691,7 @@
                     }
 
                     if (myConversations.length > 0) {
-                        console.log("all-conv-update", myConversations);
-
+                       
                         UpdateUI(myConversations)
                     }
 

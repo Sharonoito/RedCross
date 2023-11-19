@@ -150,10 +150,17 @@ namespace RedCrossChat.Dialogs
                 client.language = !client.language;
             }
 
-
             var message = GetAttachment(choiceValues, client.language);
 
-            await stepContext.Context.SendActivityAsync(message, cancellationToken);
+
+            if(choiceValues != null || choiceValues == InitialActions.MentalHealth) {
+
+                return await stepContext.NextAsync(null, cancellationToken);
+            }
+            else
+            {
+                await stepContext.Context.SendActivityAsync(message, cancellationToken);
+            }
 
             return await stepContext.EndDialogAsync(null);
 
@@ -407,7 +414,7 @@ namespace RedCrossChat.Dialogs
 
             //double count = Math.Round(dec, 5);
 
-            return str.Split(".")[1];
+            return "Client "+str.Split(".")[1];
         }
 
         private async Task<Conversation> CreateConversationDBInstance(WaterfallStepContext stepContext)
