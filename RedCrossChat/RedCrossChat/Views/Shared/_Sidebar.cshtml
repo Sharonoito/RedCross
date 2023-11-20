@@ -19,13 +19,15 @@
 
     <ul class="menu-inner py-1">
         <!-- Dashboards -->
-        <li class="menu-item   @Html.IsSelected(controller: "Home", action: "Dashboard") ">
-            <a href="/" class="menu-link text-danger">
-                <i class="menu-icon tf-icons bx bx-home-circle"></i>
-                <div data-i18n="Dashboards"></div>
-            </a>
-        </li>
-
+        @if (User.IsInRole(Constants.Administrator) || User.IsInRole(Constants.Administrator))
+        {
+            <li class="menu-item   @Html.IsSelected(controller: "Home", action: "Dashboard") ">
+                <a href="/" class="menu-link text-danger">
+                    <i class="menu-icon tf-icons bx bx-home-circle"></i>
+                    <div data-i18n="Dashboards"></div>
+                </a>
+            </li>
+        }
         <li class="menu-item @Html.IsSelected(controller: "Conversation", action: "List")">
             <a asp-action="List" asp-controller="Conversation" class="menu-link text-danger">
                 <i class="menu-icon tf-icons bx bx-chat text-danger"></i>
