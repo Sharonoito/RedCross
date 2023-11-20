@@ -524,6 +524,7 @@ namespace RedCrossChat.Controllers
         public IActionResult MaritalState()
         {
             ViewBag.PageTitle = "Marital Status";
+
             return View();
         }
 
@@ -595,7 +596,6 @@ namespace RedCrossChat.Controllers
         }
 
 
-
         [HttpPost]
         public async Task<IActionResult> SaveMaritalState(MaritalStateVm maritalState)
 
@@ -612,7 +612,7 @@ namespace RedCrossChat.Controllers
                     {
                         Name = maritalState.Name,
                         Kiswahili=maritalState.Kiswahili,
-                        Synonyms = maritalState.Synonyms
+                        Synonyms = maritalState.Synonyms ?? ""
                     };
 
                     _repository.MaritalState.Create(maritalStateEntity);

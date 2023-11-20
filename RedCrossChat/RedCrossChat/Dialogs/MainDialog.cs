@@ -8,6 +8,7 @@ using RedCrossChat.Cards;
 using RedCrossChat.Contracts;
 using RedCrossChat.Entities;
 using RedCrossChat.Objects;
+using RedCrossChat.ViewModel;
 using Sentry;
 using System;
 using System.Collections.Generic;
@@ -145,11 +146,10 @@ namespace RedCrossChat.Dialogs
 
             var choiceValues = ((FoundChoice)stepContext.Result).Value;
 
-            if (choiceValues != null && choiceValues == "Kiswahili")
+            if(choiceValues ==InitialActions.MentalHealth || choiceValues == InitialActionsKiswahili.MentalHealth)
             {
-                client.language = !client.language;
+                return await stepContext.NextAsync(client);
             }
-
 
             var message = GetAttachment(choiceValues, client.language);
 
@@ -250,7 +250,6 @@ namespace RedCrossChat.Dialogs
                 Style = ListStyle.HeroCard,
 
             };
-            await DialogExtensions.UpdateDialogQuestion(question, stepContext, _userProfileAccessor, _userState);
 
             return await stepContext.PromptAsync(nameof(ChoicePrompt), options, cancellationToken);
         }
@@ -263,6 +262,13 @@ namespace RedCrossChat.Dialogs
 
             var response = stepContext.Context.Activity.Text;
 
+            Conversation conversation = await _repository.Conversation
+                .FindByCondition(x => x.Id == me.ConversationId)
+                .Include(x => x.Persona)
+                .FirstOrDefaultAsync();
+          
+            var feeling = await _repository.Feeling.FindByCondition(x => x.Description == response || x.Kiswahili == response).FirstOrDefaultAsync();
+
             ChatMessage chatMessage = new()
             {
                 Message = response,
@@ -270,7 +276,7 @@ namespace RedCrossChat.Dialogs
                 ConversationId = me.ConversationId
             };
 
-            if (response.ToLower().Trim() == "other" || response.ToLower() == "zinginezo")
+            if (response.ToLower().Trim() == "other" || response.ToLower() == "zinginezo" || response.ToLower().Trim() == "others")
             {
 
                 _repository.ChatMessage.CreateRange(new List<ChatMessage>
@@ -285,16 +291,23 @@ namespace RedCrossChat.Dialogs
                     }
                 });
 
+                conversation.FeelingId = feeling.Id;
+
+                _repository.Conversation.Update(conversation);
 
                 await _repository.SaveChangesAsync();
 
                 return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text(question) }, token);
             }
+            else
+            {
+
+                _repository.ChatMessage.CreateRange(new List<ChatMessage>
+                { chatMessage });
+
+            }
           
-            Conversation conversation = await _repository.Conversation
-                .FindByCondition(x => x.Id==me.ConversationId)
-                .Include(x => x.Persona)
-                .FirstOrDefaultAsync();
+            
         
             if (conversation != null)
             {
@@ -302,18 +315,18 @@ namespace RedCrossChat.Dialogs
 
                 Persona persona = conversation?.Persona;
 
-                var feeling = await _repository.Feeling.FindByCondition(x => x.Description == response || x.Kiswahili == response).FirstOrDefaultAsync();
-
                 persona.FeelingId = feeling.Id;
 
-                _repository.Persona.Update(persona);
+                conversation.FeelingId = feeling.Id;
+
+                // _repository.Persona.Update(persona);
+
+                _repository.Conversation.Update(conversation);
+
+                await _repository.SaveChangesAsync();
             }
 
-            await _repository.SaveChangesAsync();
-
-            return await stepContext.NextAsync(me);
-
-            
+            return await stepContext.NextAsync(me); 
 
         }
 
@@ -326,12 +339,11 @@ namespace RedCrossChat.Dialogs
                     .Include(x => x.Persona)
                     .FirstOrDefaultAsync();
 
-            
+            string response = stepContext.Context.Activity.Text;
 
-            if (stepContext.Reason.ToString() =="NextCalled")
+            if (stepContext.Reason.ToString() !="NextCalled")
             {
-                string response = stepContext.Context.Activity.Text;
-
+             
                 ChatMessage chatMessage = new()
                 {
                     Message = response,
@@ -340,9 +352,10 @@ namespace RedCrossChat.Dialogs
                 };
 
                 _repository.ChatMessage.Create(chatMessage);
+            
+                conversation.FeelingDetail = response;
 
-                await _repository.SaveChangesAsync();
-
+                _repository.Conversation.Update(conversation);
             }
 
             if (stepContext.Context.Activity.ChannelId == "telegram" && !conversation.IsReturnClient)
@@ -397,6 +410,33 @@ namespace RedCrossChat.Dialogs
             return await stepContext.EndDialogAsync(null, cancellationToken);
         }
 
+        private async Task<String> GetPersonaName()
+        {
+            var personas = await _repository.Persona.FindAll().ToListAsync();
+
+            decimal count = personas.Count;
+
+            decimal value = 100000;
+
+            decimal code = count / value;
+
+            int counter = 5;
+
+            string codeValue = code.ToString("N" + counter);
+
+            if (code > 1)
+            {
+                counter = codeValue.Split(".")[0].Length + counter;
+                
+                value = value * Decimal.Parse(Math.Pow(10, codeValue.Split(".")[0].Length).ToString());
+                
+                code = count / value;
+                
+                codeValue = code.ToString("N" + counter);
+            }
+            return codeValue.Split(".")[1] ;
+        }
+
         private async Task<Conversation> CreateConversationDBInstance(WaterfallStepContext stepContext)
         {
             Client me = (Client)stepContext.Values[UserInfo];
@@ -404,6 +444,8 @@ namespace RedCrossChat.Dialogs
             var persona= await  _repository.Persona.FindByCondition(x => x.SenderId == stepContext.Context.Activity.From.Id).FirstOrDefaultAsync();
 
             Conversation conversation;
+
+            String code = await GetPersonaName();
 
             if (persona != null)
             {
@@ -425,6 +467,13 @@ namespace RedCrossChat.Dialogs
 
                     PersonaId = persona.Id,
                 };
+
+                if(persona.CodeName == null)
+                {
+                    persona.CodeName = code;
+
+                    _repository.Persona.Update(persona);
+                }
 
                 _repository.Conversation.Create(conversation);
 
@@ -450,7 +499,8 @@ namespace RedCrossChat.Dialogs
                     Persona = new Persona() { 
                         SenderId = stepContext.Context.Activity.From.Id,
                         FromId = stepContext.Context.Activity.From.Id,
-                        Name = stepContext.Context.Activity.From.Name 
+                        Name = stepContext.Context.Activity.From.Name,
+                        CodeName =code
                     }
                 };
 

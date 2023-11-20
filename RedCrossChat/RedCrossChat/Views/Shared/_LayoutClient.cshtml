@@ -36,7 +36,7 @@
         .custom-footer {
             background-color: #ED1C24;
             color: white;
-            padding: 1%;
+            
         }
     </style>
 </head>
@@ -72,8 +72,8 @@
         </div>
     </div>
     <!-- Layout wrapper -->
-    <div class="layout-rapper layout-content-navbar">
-        <div class="layot-container">
+    <div class="layout-rapper layout-content-navbar" style="float: left;width: 100%;height: 100vh;">
+        <div class="layot-container" style="display: flex;flex-direction: column;float: left;width: 100%;height: 100%;">
             
             <div class="layut-page">
                
@@ -87,7 +87,7 @@
 
                     </div>
                    
-                    <footer class="content-footer footer custom-footer">
+                    <footer class="content-footer footer custom-footer py-1 mt-auto">
                         <div class=" d-flex flex-wrap justify-content-between py-2 flex-md-row flex-column">
                             <div class="mb-2 mb-md-0 float-end right">
 
@@ -113,7 +113,7 @@
 
     <partial name="_JsScript" />
 
-    @RenderSection("Scripts", required: false);
+    @RenderSection("Scripts", required: false)
 
 
 </body>

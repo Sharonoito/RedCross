@@ -94,6 +94,18 @@ namespace RedCrossChat.Dialogs
           
             var question = me.language ? quiz.question : quiz.Kiswahili;
 
+            DBFeeling feeling = conversation.Feeling;
+
+            if (feeling.Description.ToLower().Trim() == "other" || feeling.Description.ToLower().Trim() == "others")
+            {
+                question = (me.language ? "You said you are feeling " + conversation.FeelingDetail :
+                                                    "Ulisema unahisi " + conversation.FeelingDetail) + ", " + question;
+            }else
+            {
+                question = (me.language ? "You said you are feeling " + feeling.Description :
+                                      "Ulisema unahisi " + feeling.Kiswahili) + ", " + question;
+            }
+            
             _repository.ChatMessage.Create(new ChatMessage
             {
                 QuestionId = quiz.Id,
@@ -108,6 +120,7 @@ namespace RedCrossChat.Dialogs
                 Prompt = MessageFactory.Text(question),
 
                 Choices = me.language ? RedCrossLists.choices : RedCrossLists.choicesKiswahili,
+                Style=ListStyle.HeroCard
 
             };
 
@@ -420,7 +433,9 @@ namespace RedCrossChat.Dialogs
         }
         private async Task<Conversation> getConversation(Client me)
         {
-            return await _repository.Conversation.FindByCondition(x => x.Id == me.ConversationId).Include(x => x.Persona).FirstAsync();
+            return await _repository.Conversation.FindByCondition(x => x.Id == me.ConversationId)
+                .Include(x => x.Persona)
+                .Include(x=>x.Feeling).FirstAsync();
         }
         private async Task<DialogTurnResult> FinalStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
