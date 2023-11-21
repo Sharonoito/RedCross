@@ -1330,7 +1330,6 @@ namespace RedCrossChat.Controllers
                 return Error("Something broke" + ex.Message);
             }
         }
-
         public async Task<IActionResult> DeleteIntention(Guid id)
         {
             try
@@ -1476,25 +1475,31 @@ namespace RedCrossChat.Controllers
             return Error("Sorry SubIntention was not created");
         }
 
-
         public async Task<IActionResult> EditSubIntention(SubIntentionVm subintention)
         {
             try
             {
 
-                var subintentionEntity = await _repository.SubIntention.FindByCondition(x => x.Id == subintention.Id).FirstOrDefaultAsync();
+                var subintentionEntity = await _repository.SubIntention
+                    .FindByCondition(x => x.Id == subintention.Id)
+                    .Include(x => x.Intention)
+                    .FirstOrDefaultAsync();
 
                 if (subintentionEntity == null)
                 {
                     return NotFound();
                 }
 
+                var intentions = await _repository.Itention.GetAllAsync(); 
+
+
                 var subintentionViewModel = new SubIntentionVm
                 {
                     Id = subintentionEntity.Id,
                     Name= subintentionEntity.Name,
-                    ItentionId = subintention.ItentionId,
-                    Kiswahili = subintention.Kiswahili,
+                    ItentionId = subintentionEntity.IntentionId,
+                    Kiswahili = subintentionEntity.Kiswahili,
+                    Intentions=intentions.ToList()
                 };
                 ViewBag.Title = "Edit SubIntention";
 

@@ -8,6 +8,7 @@ using RedCrossChat.Cards;
 using RedCrossChat.Contracts;
 using RedCrossChat.Entities;
 using RedCrossChat.Objects;
+using RedCrossChat.ViewModel;
 using Sentry;
 using System;
 using System.Collections.Generic;
@@ -261,6 +262,8 @@ namespace RedCrossChat.Dialogs
 
             var question =me.language? "Please specify the feeling "  : "Tafadhali bainisha hisia";
 
+
+            //This is where the selected feeling is stored
             var response = stepContext.Context.Activity.Text;
 
             ChatMessage chatMessage = new()
@@ -306,16 +309,16 @@ namespace RedCrossChat.Dialogs
 
                 persona.FeelingId = feeling.Id;
 
+
                 _repository.Persona.Update(persona);
             }
 
             await _repository.SaveChangesAsync();
 
             return await stepContext.NextAsync(me);
-
-            
-
         }
+
+
 
         private async Task<DialogTurnResult> HandleFeelingAsync(WaterfallStepContext stepContext,CancellationToken token)
         {
@@ -325,8 +328,7 @@ namespace RedCrossChat.Dialogs
                     .FindByCondition(x => x.Id==me.ConversationId)
                     .Include(x => x.Persona)
                     .FirstOrDefaultAsync();
-
-            
+         
 
             if (stepContext.Reason.ToString() =="NextCalled")
             {
@@ -508,3 +510,7 @@ namespace RedCrossChat.Dialogs
 
     }
 }
+
+
+
+ 
