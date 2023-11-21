@@ -12,6 +12,8 @@ using System.Linq;
 using DataTables.AspNet.Core;
 using DataTables.AspNet.AspNetCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Data;
 
 namespace RedCrossChat.Controllers
 {
@@ -157,11 +159,35 @@ namespace RedCrossChat.Controllers
             }
         }
 
-        public IActionResult CreateUser()
+        public async Task<IActionResult> CreateUser(Guid clientId)
         {
             ViewBag.Title = "Create User";
 
-            return View("_User");
+            var userVm=new UserVm();
+
+            var roles = _roleManager.Roles.Select(x => new SelectListItem { Text = x.Name, Value = x.Name }).ToList();
+
+            if (clientId != Guid.Empty)
+            {
+                var user = await _repository.User.FindByCondition(x => x.Id == clientId.ToString()).FirstOrDefaultAsync();
+
+
+                var roleNames = await _userManager.GetRolesAsync(user);
+              
+                userVm = new UserVm
+                {
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Email = user.Email,
+                    PhoneNumber = user.PhoneNumber,
+                    RoleNames= roleNames.Cast<string>().ToArray(),
+                    Id = clientId
+                };
+            }
+
+            userVm.RoleList = roles;
+
+            return View("_User", userVm);
         }
 
         public async Task<IActionResult> ResetPassword()
@@ -195,21 +221,7 @@ namespace RedCrossChat.Controllers
             return Error("Something broke");
         }
 
-        public async Task<IActionResult> EditUser(Guid clientId)
-        {
-
-            var user=await _repository.User.FindByCondition(x => x.Id == clientId.ToString()).FirstOrDefaultAsync();
-
-            var userVm = new UserVm
-            {
-                FirstName=user.FirstName,
-                LastName=user.LastName,
-                Email=user.Email,
-                PhoneNumber=user.PhoneNumber,
-            };
-
-            return View("_User",userVm);
-        }
+      
 
         public async Task< IActionResult> SaveUser(UserVm user) {
 
@@ -232,6 +244,13 @@ namespace RedCrossChat.Controllers
 
                     var result = await _userManager.CreateAsync(appUser, "Test@!23");
 
+                    if (user.RoleNames != null)
+                    {
+                        IdentityResult addResult = await _userManager.AddToRolesAsync(appUser, user.RoleNames);
+                        if (!addResult.Succeeded)
+                            return Error("Failed to assign user roles.");
+                    }
+
                     if (!result.Succeeded)
                         return Error(result.Errors.First().Description.ToString());
 
@@ -243,16 +262,33 @@ namespace RedCrossChat.Controllers
 
                     userDB.FirstName = user.FirstName;
                     userDB.LastName = user.LastName;
-                    userDB.Email = user.Email;
-                    userDB.UserName = user.UserName;
+              
+                    userDB.PhoneNumber=user.PhoneNumber;
+             
 
+                    var currentRoles = await _userManager.GetRolesAsync(userDB);
 
                     _repository.User.Update(userDB);
 
+                    if (currentRoles != null && currentRoles.Count > 0)
+                    {
+                        IdentityResult removeResult = await _userManager.RemoveFromRolesAsync(userDB, currentRoles.ToArray());
+                        if (!removeResult.Succeeded)
+                            return Error("Failed to remove user roles.");
+                    }
+
+                    // Assign the newly selected Roles
+                    if (user.RoleNames != null)
+                    {
+                        IdentityResult addResult = await _userManager.AddToRolesAsync(userDB, user.RoleNames);
+
+                        if (!addResult.Succeeded)
+                            return Error("Failed to assign user roles.");
+                    }
+
                     var result = await _repository.SaveChangesAsync();
 
-                    if (result)
-                       return Success(null, null);
+                    return Success("Updated Successfully", null);
                 }
             }
             catch(Exception)
@@ -260,8 +296,6 @@ namespace RedCrossChat.Controllers
                 return Error("Something broke");
             }
 
-
-            return Error("No response");
         }
 
 

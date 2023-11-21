@@ -19,7 +19,7 @@
 
     <ul class="menu-inner py-1">
         <!-- Dashboards -->
-        @if (User.IsInRole(Constants.Administrator) || User.IsInRole(Constants.Administrator))
+        @if (User.IsInRole(Constants.AuditRole))
         {
             <li class="menu-item   @Html.IsSelected(controller: "Home", action: "Dashboard") ">
                 <a href="/" class="menu-link text-danger">
@@ -28,53 +28,72 @@
                 </a>
             </li>
         }
-        <li class="menu-item @Html.IsSelected(controller: "Conversation", action: "List")">
-            <a asp-action="List" asp-controller="Conversation" class="menu-link text-danger">
-                <i class="menu-icon tf-icons bx bx-chat text-danger"></i>
-                <div data-i18n="Conversations"></div>
-            </a>
-        </li>
 
-        <li class="menu-item" style="">
-            <a href="javascript:void(0);" class="menu-link menu-toggle text-danger">
-                <i class="menu-icon tf-icons bx bx-book-open"></i>
-                <div class="text-truncate" data-i18n="Config"></div>
-            </a>
-            <ul class="menu-sub">
-                <li class="menu-item @Html.IsSelected(controller: "Config", action: "Feeling") ">
-                    <a asp-action="Feeling" asp-controller="Config" class="menu-link  text-danger">
-                        <i class="menu-icon tf-icons bx bx-layout"></i>
-                        <div data-i18n="Set up"></div>
-                    </a>
-                </li>
+        @if (User.IsInRole(Constants.PssManager))
+        {
+            <li class="menu-item @Html.IsSelected(controller: "Conversation", action: "List")">
+                <a asp-action="List" asp-controller="Conversation" class="menu-link text-danger">
+                    <i class="menu-icon tf-icons bx bx-chat text-danger"></i>
+                    <div data-i18n="Conversations"></div>
+                </a>
+            </li>
+        }
+       
+        @if (User.IsInRole(Constants.SuperAdministrator) || User.IsInRole(Constants.Administrator) || User.IsInRole(Constants.PssManager))
+        {
+            <li class="menu-item" style="">
+                <a href="javascript:void(0);" class="menu-link menu-toggle text-danger">
+                    <i class="menu-icon tf-icons bx bx-book-open"></i>
+                    <div class="text-truncate" data-i18n="Config"></div>
+                </a>
+                <ul class="menu-sub">
 
-                <li class="menu-item @Html.IsSelected(controller: "Config", action: "Team") ">
-                    <a asp-action="Team" asp-controller="Config" class="menu-link  text-danger">
-                        <i class="menu-icon tf-icons bx bx-layout"></i>
-                        <div data-i18n="Team"></div>
-                    </a>
-                </li>
+                    @if (User.IsInRole(Constants.SuperAdministrator) || User.IsInRole(Constants.Administrator))
+                    {
+                        <li class="menu-item @Html.IsSelected(controller: "Config", action: "Feeling") ">
+                            <a asp-action="Feeling" asp-controller="Config" class="menu-link  text-danger">
+                                <i class="menu-icon tf-icons bx bx-layout"></i>
+                                <div data-i18n="Set up"></div>
+                            </a>
+                        </li>
+                    }
 
-            </ul>
-        </li>
+                    @if (User.IsInRole(Constants.SuperAdministrator) || User.IsInRole(Constants.Administrator) || User.IsInRole(Constants.PssManager))
+                    {
+                        <li class="menu-item @Html.IsSelected(controller: "Config", action: "Team") ">
+                            <a asp-action="Team" asp-controller="Config" class="menu-link  text-danger">
+                                <i class="menu-icon tf-icons bx bx-layout"></i>
+                                <div data-i18n="Team"></div>
+                            </a>
+                        </li>
+                    }
 
+                    
 
+                </ul>
+            </li>
+        }
+        
 
-        <li class="menu-item @Html.IsSelected(controller: "Conversation", action: "Index")">
-            <a asp-action="Index" asp-controller="Conversation" class="menu-link text-danger">
-                <i class="menu-icon tf-icons bx bx-chat"></i>
-                <div data-i18n="Chat"></div>
-            </a>
-        </li>
+        @if (User.IsInRole(Constants.PssAgent))
+        {
+            <li class="menu-item @Html.IsSelected(controller: "Conversation", action: "Index")">
+                <a asp-action="Index" asp-controller="Conversation" class="menu-link text-danger">
+                    <i class="menu-icon tf-icons bx bx-chat"></i>
+                    <div data-i18n="Chat"></div>
+                </a>
+            </li>
+        }
 
-        <li class="menu-item @Html.IsSelected(controller: "Auth", action: "Users") ">
-            <a asp-action="Users" asp-controller="Auth" class="menu-link text-danger">
-                <i class="menu-icon tf-icons bx bx-layout"></i>
-                <div data-i18n="User Management"></div>
-            </a>
-        </li>
-
-
+        @if (User.IsInRole(Constants.Administrator) || User.IsInRole(Constants.SuperAdministrator))
+        {
+            <li class="menu-item @Html.IsSelected(controller: "Auth", action: "Users") ">
+                <a asp-action="Users" asp-controller="Auth" class="menu-link text-danger">
+                    <i class="menu-icon tf-icons bx bx-layout"></i>
+                    <div data-i18n="User Management"></div>
+                </a>
+            </li>
+        }
 
     </ul>
 </aside>
