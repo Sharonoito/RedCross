@@ -6,7 +6,7 @@ namespace RedCrossChat.Entities
     {
         public AppUser? AppUser { get; set; }
 
-        public Guid UserId { get; set;}
+        public string? AppUserId { get; set;}
 
         public Team? Team { get; set; }
 

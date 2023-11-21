@@ -1163,7 +1163,7 @@ namespace RedCrossChat.Controllers
 
             // await _repository.User.FindByCondition(x => x.Id == userId).FirstOrDefaultAsync();
 
-            var appTeam = new AppUserTeam { UserId = Guid.Parse(userId), TeamId = Guid.Parse(teamId) };
+            var appTeam = new AppUserTeam { AppUserId = userId, TeamId = Guid.Parse(teamId) };
 
             _repository.AppUserTeam.Create(appTeam);
 
