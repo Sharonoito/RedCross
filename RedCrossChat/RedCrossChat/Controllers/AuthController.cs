@@ -14,6 +14,7 @@ using DataTables.AspNet.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Data;
+using RedCrossChat.Domain;
 
 namespace RedCrossChat.Controllers
 {
@@ -133,7 +134,7 @@ namespace RedCrossChat.Controllers
         {
             try
             {
-                var data = await _repository.User.GetAllAsync();
+                var data = await _repository.User.FindByCondition(x=>x.Email !=Constants.DefaultSuperAdminEmail).ToListAsync();
                 // Filter them
 
                 var filteredRows = data
@@ -170,7 +171,6 @@ namespace RedCrossChat.Controllers
             if (clientId != Guid.Empty)
             {
                 var user = await _repository.User.FindByCondition(x => x.Id == clientId.ToString()).FirstOrDefaultAsync();
-
 
                 var roleNames = await _userManager.GetRolesAsync(user);
               

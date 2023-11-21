@@ -12,12 +12,10 @@ using System.Threading.Tasks;
 using System;
 using NuGet.Protocol.Core.Types;
 using Microsoft.EntityFrameworkCore;
-using RedCrossChat.Objects;
 using RedCrossChat.ViewModel;
 using Microsoft.Bot.Schema;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Model;
 using Microsoft.EntityFrameworkCore.Internal;
-using Sentry;
 using System.ComponentModel.DataAnnotations;
 
 namespace RedCrossChat.Controllers
@@ -1044,7 +1042,7 @@ namespace RedCrossChat.Controllers
         {
             var teamEntity = await _repository.Team.FindByCondition(x => x.Id == teamId).FirstOrDefaultAsync();
 
-            var data = await _repository.User.GetAllAsync();
+            var data = await _repository.User.FindByCondition(x => x.Email != RedCrossChat.Domain.Constants.DefaultSuperAdminEmail).ToListAsync();
 
             return View("AppUserTeam", new AppUserTeamVm
             {
@@ -1141,7 +1139,8 @@ namespace RedCrossChat.Controllers
 
         public async Task<IActionResult> GetTeamUsers(Guid id)
         {
-            var team = await _repository.Team.FindByCondition(x => x.Id == id).Include(x => x.AppUserTeams).FirstOrDefaultAsync();
+            var team = await _repository.Team.FindByCondition(x => x.Id == id)
+                .Include(x => x.AppUserTeams).ThenInclude(x=>x.AppUser).FirstOrDefaultAsync();
 
             var users = await _repository.User.GetAllAsync();
 
@@ -1161,8 +1160,6 @@ namespace RedCrossChat.Controllers
 
             string teamId = formData["TeamId"];
 
-            // await _repository.User.FindByCondition(x => x.Id == userId).FirstOrDefaultAsync();
-
             var appTeam = new AppUserTeam { AppUserId = userId, TeamId = Guid.Parse(teamId) };
 
             _repository.AppUserTeam.Create(appTeam);
@@ -1173,6 +1170,29 @@ namespace RedCrossChat.Controllers
                 return Success("Created Successfully");
 
             return Error("Unable to Create");
+        }
+        [HttpPost]
+        public async Task<IActionResult> DeleteTeamUsers(IFormCollection formData)
+        {
+            string userId = formData["appUserId"];
+
+            string teamId = formData["teamId"];
+
+            var instances=await _repository.AppUserTeam.FindByCondition(x=>x.AppUserId==userId).ToListAsync();
+
+            foreach(var instance in instances)
+            {
+                if (instance.TeamId == Guid.Parse(teamId))
+                {
+                    _repository.AppUserTeam.Delete(instance);
+                }
+            }
+
+            var status= await _repository.SaveChangesAsync();
+
+            if (status) return Success("Success");
+
+            return Error("Unable to delete");
         }
 
         public async Task<IActionResult> DeleteTeam(Guid id)

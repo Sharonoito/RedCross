@@ -171,38 +171,58 @@
             }
         }
 
+        let current;
+
         $(document).on('click', '#addUserToTeam', function () {
 
             if ($("#selectTypeOpt").val() == "-1")
                 return;
 
-          alert("this is working")
-
             $.post("@Url.Action("CreateTeamUser")", { UserId: $("#selectTypeOpt").val(), TeamId: $(this).data('id') }).then(resp => {
-
+                getUsers();
             })
         })
 
         $(document).on('click', '.team-manager', function () {
 
-            const current = this;
-
-            //selectTypeOpt
+            current = this;
 
             setTimeout(function(){
 
-                $.get("@Url.Action("GetTeamUsers")?id="+$(current).data('id')).then(resp => {
-
-                    let { teamUsers, users } = resp.responseData;
-
-
-                    users.forEach(user => $("#selectTypeOpt").append(`<option value='${user.id}'>${user.fullName}</option>`));
-
-                })
-
+                
+                getUsers();
 
             },500)
         })
+
+        $(document).on('click', '.delete-team',function(){
+
+            const current = this;
+
+            $.post("@Url.Action("DeleteTeamUsers")", { appUserId: $(current).data('id'), teamId: $(current).data('team') }).then(resp => {
+                getUsers();
+            })
+
+        })
+
+        function getUsers(){
+            $.get("@Url.Action("GetTeamUsers")?id=" + $(current).data('id')).then(resp => {
+
+                let { teamUsers, users } = resp.responseData;
+
+                $("#tblAppUserTeam tbody").html('');
+
+                teamUsers.forEach(user => {
+
+                    $("#tblAppUserTeam tbody").append(` <tr><td>${user.appUser.fullName}</td><td><i class='fa fa-trash-alt delete-team text-danger' data-id='${user.appUserId}' data-team='${user.teamId}'></i></td> </tr>`);
+
+                });
+
+
+                //users.forEach(user => $("#selectTypeOpt").append(`<option value='${user.id}'>${user.fullName}</option>`));
+
+            })
+        }
 
     </script>
 }

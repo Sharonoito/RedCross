@@ -39,6 +39,7 @@ namespace RedCrossChat.Domain
         public static string PssAgent = "Pss Agent";
         public static string PssManager = "Pss Manager";
         public static string AuditRole = "Audit Roles";
+        public static string DefaultSuperAdminEmail = "admin@redcross.com";
 
         #endregion
     }

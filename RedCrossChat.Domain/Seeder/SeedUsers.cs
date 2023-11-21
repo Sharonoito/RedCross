@@ -54,7 +54,7 @@ namespace RedCrossChat.Domain
                     #endregion
                 }
 
-                if (!context.Users.Any(x => x.UserName.ToLower() == "admin@redcross.com"))
+                if (!context.Users.Any(x => x.UserName.ToLower() == Constants.DefaultSuperAdminEmail))
                 {
                     // Create admin user
                     var adminUser = new AppUser
@@ -62,8 +62,8 @@ namespace RedCrossChat.Domain
                         Id = "8bd49ae1-6059-4099-8002-9bdaea92ced3",
                         FirstName = "Admin",
                         LastName = "User",
-                        UserName = "admin@redcross.com",
-                        Email = "admin@redcross.com",
+                        UserName = Constants.DefaultSuperAdminEmail,
+                        Email = Constants.DefaultSuperAdminEmail,
                     };
                     userMgr.CreateAsync(adminUser, "Test@!23").GetAwaiter().GetResult();
 
