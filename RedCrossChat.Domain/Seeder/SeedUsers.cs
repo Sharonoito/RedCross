@@ -21,8 +21,8 @@ namespace RedCrossChat.Domain
                 var userMgr = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
                 var roleMgr = scope.ServiceProvider.GetRequiredService<RoleManager<AppRole>>();
 
-                var superAdminRole = new AppRole(Constants.SuperAdministratorId, "Super Administrator", true, DateTime.Now);
-                var adminRole = new AppRole(Constants.AdministratorId, "Administrator", true, DateTime.Now);
+                var superAdminRole = new AppRole(Constants.SuperAdministratorId, Constants.SuperAdministrator, true, DateTime.Now);
+                var adminRole = new AppRole(Constants.AdministratorId, Constants.Administrator, true, DateTime.Now);
 
                 if (!context.Roles.Any())
                 {

@@ -524,6 +524,7 @@ namespace RedCrossChat.Controllers
         public IActionResult MaritalState()
         {
             ViewBag.PageTitle = "Marital Status";
+
             return View();
         }
 
@@ -595,7 +596,6 @@ namespace RedCrossChat.Controllers
         }
 
 
-
         [HttpPost]
         public async Task<IActionResult> SaveMaritalState(MaritalStateVm maritalState)
 
@@ -612,7 +612,7 @@ namespace RedCrossChat.Controllers
                     {
                         Name = maritalState.Name,
                         Kiswahili=maritalState.Kiswahili,
-                        Synonyms = maritalState.Synonyms
+                        Synonyms = maritalState.Synonyms ?? ""
                     };
 
                     _repository.MaritalState.Create(maritalStateEntity);
@@ -1163,7 +1163,7 @@ namespace RedCrossChat.Controllers
 
             // await _repository.User.FindByCondition(x => x.Id == userId).FirstOrDefaultAsync();
 
-            var appTeam = new AppUserTeam { UserId = Guid.Parse(userId), TeamId = Guid.Parse(teamId) };
+            var appTeam = new AppUserTeam { AppUserId =userId, TeamId = Guid.Parse(teamId) };
 
             _repository.AppUserTeam.Create(appTeam);
 

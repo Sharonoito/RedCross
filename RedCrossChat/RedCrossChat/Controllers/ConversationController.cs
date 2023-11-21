@@ -442,6 +442,8 @@ namespace RedCrossChat.Controllers
                 .FindByCondition(x => x.HasBeenReceived == false)
                 .Include(x=>x.Conversation)
                 .ThenInclude(x=>x.Persona)
+                .Include(x=>x.Conversation)
+                .ThenInclude(x=>x.Feeling)
                 .ToListAsync();
 
             var myConversations = await _repository.Conversation
@@ -457,6 +459,16 @@ namespace RedCrossChat.Controllers
                 handOverRequests = handOverRequests,
                 myConversations = myConversations
             });
+        }
+
+        public async Task<IActionResult> GetHistory(Guid id)
+        {
+            var conversations =await _repository.Conversation.FindByCondition(x=>x.PersonaId == id)
+                .Include(x=>x.ChatMessages)
+                .ThenInclude(x=>x.Question)
+                .ToListAsync();
+
+            return Success("closer", conversations);
         }
     }
 }
