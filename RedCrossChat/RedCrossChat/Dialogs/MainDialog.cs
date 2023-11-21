@@ -268,6 +268,8 @@ namespace RedCrossChat.Dialogs
 
             var question =me.language? "Please specify the feeling "  : "Tafadhali bainisha hisia";
 
+
+            //This is where the selected feeling is stored
             var response = stepContext.Context.Activity.Text;
 
             Conversation conversation = await _repository.Conversation
@@ -337,6 +339,8 @@ namespace RedCrossChat.Dialogs
             return await stepContext.NextAsync(me); 
 
         }
+
+
 
         private async Task<DialogTurnResult> HandleFeelingAsync(WaterfallStepContext stepContext,CancellationToken token)
         {
@@ -569,3 +573,7 @@ namespace RedCrossChat.Dialogs
 
     }
 }
+
+
+
+ 
