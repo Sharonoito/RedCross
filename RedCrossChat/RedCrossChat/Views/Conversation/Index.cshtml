@@ -682,7 +682,12 @@
             }
 
             const appendHandOverRequest = (request) => {
-                let feeling = request.conversation.feeling.name;
+
+                let feeling = '';
+
+                if (request.conversation.feeling != null) {
+                    feeling = request.conversation.feeling.name;
+                }
 
                 if (feeling == 'others' || feeling == 'other')
                     feeling = request.conversation.feelingDetail;

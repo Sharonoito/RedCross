@@ -447,7 +447,8 @@ namespace RedCrossChat.Controllers
                 .ToListAsync();
 
             var myConversations = await _repository.Conversation
-                .FindByCondition(x => x.AppUserId == Guid.Parse(User.FindFirst("UserId").Value))
+                .FindByCondition(x => x.AppUserId == Guid.Parse(User.FindFirst("UserId").Value) & x.IsActive)
+                
                 .Include(x => x.Persona)
                 .Include(x => x.ChatMessages)
                 .ThenInclude(x => x.Question)

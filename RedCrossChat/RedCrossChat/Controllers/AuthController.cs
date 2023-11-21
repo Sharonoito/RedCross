@@ -134,7 +134,9 @@ namespace RedCrossChat.Controllers
         {
             try
             {
-                var data = await _repository.User.FindByCondition(x=>x.Email !=Constants.DefaultSuperAdminEmail).ToListAsync();
+                var data = await _repository.User
+                    //.GetAllAsync();
+                    .FindByCondition(x=>x.Email !=Constants.DefaultSuperAdminEmail).ToListAsync();
                 // Filter them
 
                 var filteredRows = data

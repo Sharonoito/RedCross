@@ -54,5 +54,7 @@ namespace RedCrossChat.Entities
 
         public string RatingReason { get; set; } = "";
 
+        public Boolean IsActive { get; set; } = true;
+
     }
 }

@@ -481,6 +481,8 @@ namespace RedCrossChat.Dialogs
                     Language = me.language,
 
                     PersonaId = persona.Id,
+
+                    IsActive=true,
                 };
 
                 if(persona.CodeName == null)
