@@ -63,6 +63,8 @@ namespace RedCrossChat.Domain
                 .HasMany(i => i.SubIntentions)
                 .WithOne(si => si.Intention)
                 .HasForeignKey(si => si.IntentionId);
+
+
         }
     }
 }

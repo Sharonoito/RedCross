@@ -1,10 +1,10 @@
 ﻿
 @{
+
 }
-<partial name="~/Views/Config/_ConfigLayout.cshtml" />
 
 <section class="content-header container-p-y">
-    <div class="container-fluid">
+    <div class="contaier-fluid">
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title"><i class="fa fa-info-circle"></i> Manage Team</h3>
@@ -24,13 +24,14 @@
                 </div>
             </div>
 
-            <div class="card-body p-0">
+            <div class="card-body p-1">
                 <table class="table table-striped" id="tblTeam">
                     <thead>
                         <tr>
                             <th>Name</th>
+                            <th>Supervisor</th>
                             <th>Notification Type</th>
-                            <th style="width: 40px">Actions</th>
+                            <th style="width: 10%">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -94,6 +95,7 @@
                     },
                     columns: [
                         { data: 'name' },
+                        { data: 'id',render:()=>'Supervisor Name' },
                         { data: 'notificationType' },
                         { data: 'id', name: 'Id' },
                
@@ -101,7 +103,7 @@
                     columnDefs: [{
                         render: function (data, type, row) {
                             var actionsHtml =
-                                `<div class='text-center'>
+                                `<div class='text-center btn-group'>
                                                         <button class='btn btn-outline-primary btn-xs load-modal team-manager'
                                                             data-hidden='Id'
                                                             data-id='${row.id}'
@@ -110,12 +112,28 @@
                                                             data-modal='clientModal'
                                                             data-bs-toggle="modal" data-bs-target="#clientModal"
                                                             data-viewurl='true'
-                                                                    data-action='@Url.Action("EditTeam", "Config")?clientId=${row.id}'
+                                                                            data-action='@Url.Action("CreateTeam", "Config")?teamId=${row.id}'
                                                             title='Edit'>
                                                             <i class='fa fa-pencil-alt'></i>
+                                                            
+                                                            </button>
+
+                                                                    <button class='btn btn-outline-primary btn-xs load-modal team-manager'
+                                                                    data-hidden='Id'
+                                                                    data-id='${row.id}'
+                                                                    data-toggle='modal'
+                                                                    data-target='#clientModal'
+                                                                    data-modal='clientModal'
+                                                                    data-bs-toggle="modal" data-bs-target="#clientModal"
+                                                                    data-viewurl='true'
+                                                                            data-action='@Url.Action("AssignTeam", "Config")?teamId=${row.id}'
+                                                                    title='Edit'>
+                                                                            <i class="fas fa-circle-check"></i>
+
+                                                                    </button>
 
                                                         <button class='delete btn btn-outline-danger btn-xs'
-                                                                    data-action='@Url.Action("DeleteTeam", "Config")?clientId=${row.id}'
+                                                                            data-action='@Url.Action("DeleteTeam", "Config")?teamId=${row.id}'
                                                             data-table='tblClients'
                                                             data-id='${row.id}'
                                                             data-toggle='tooltip'
@@ -153,36 +171,58 @@
             }
         }
 
+        let current;
+
         $(document).on('click', '#addUserToTeam', function () {
 
             if ($("#selectTypeOpt").val() == "-1")
                 return;
 
             $.post("@Url.Action("CreateTeamUser")", { UserId: $("#selectTypeOpt").val(), TeamId: $(this).data('id') }).then(resp => {
-
+                getUsers();
             })
         })
 
         $(document).on('click', '.team-manager', function () {
 
-            const current = this;
-
-            //selectTypeOpt
+            current = this;
 
             setTimeout(function(){
 
-                $.get("@Url.Action("GetTeamUsers")?id="+$(current).data('id')).then(resp => {
-
-                    let { teamUsers, users } = resp.responseData;
-
-
-                    users.forEach(user => $("#selectTypeOpt").append(`<option value='${user.id}'>${user.fullName}</option>`));
-
-                })
-
+                
+                getUsers();
 
             },500)
         })
+
+        $(document).on('click', '.delete-team',function(){
+
+            const current = this;
+
+            $.post("@Url.Action("DeleteTeamUsers")", { appUserId: $(current).data('id'), teamId: $(current).data('team') }).then(resp => {
+                getUsers();
+            })
+
+        })
+
+        function getUsers(){
+            $.get("@Url.Action("GetTeamUsers")?id=" + $(current).data('id')).then(resp => {
+
+                let { teamUsers, users } = resp.responseData;
+
+                $("#tblAppUserTeam tbody").html('');
+
+                teamUsers.forEach(user => {
+
+                    $("#tblAppUserTeam tbody").append(` <tr><td>${user.appUser.fullName}</td><td><i class='fa fa-trash-alt delete-team text-danger' data-id='${user.appUserId}' data-team='${user.teamId}'></i></td> </tr>`);
+
+                });
+
+
+                //users.forEach(user => $("#selectTypeOpt").append(`<option value='${user.id}'>${user.fullName}</option>`));
+
+            })
+        }
 
     </script>
 }

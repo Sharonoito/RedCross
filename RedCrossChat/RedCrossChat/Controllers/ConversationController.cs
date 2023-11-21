@@ -435,5 +435,41 @@ namespace RedCrossChat.Controllers
 
             return Success("success", conv);
         }
+        [HttpPost]
+        public async Task<IActionResult> GetMyConversationIncludingHandOverRequests()
+        {
+            var handOverRequests = await _repository.HandOverRequest
+                .FindByCondition(x => x.HasBeenReceived == false)
+                .Include(x=>x.Conversation)
+                .ThenInclude(x=>x.Persona)
+                .Include(x=>x.Conversation)
+                .ThenInclude(x=>x.Feeling)
+                .ToListAsync();
+
+            var myConversations = await _repository.Conversation
+                .FindByCondition(x => x.AppUserId == Guid.Parse(User.FindFirst("UserId").Value) & x.IsActive)
+                
+                .Include(x => x.Persona)
+                .Include(x => x.ChatMessages)
+                .ThenInclude(x => x.Question)
+                .OrderByDescending(x => x.DateCreated)
+                .ToListAsync();
+
+            return Success("Response", new ChatResponseVm
+            {
+                handOverRequests = handOverRequests,
+                myConversations = myConversations
+            });
+        }
+
+        public async Task<IActionResult> GetHistory(Guid id)
+        {
+            var conversations =await _repository.Conversation.FindByCondition(x=>x.PersonaId == id)
+                .Include(x=>x.ChatMessages)
+                .ThenInclude(x=>x.Question)
+                .ToListAsync();
+
+            return Success("closer", conversations);
+        }
     }
 }

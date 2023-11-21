@@ -14,19 +14,14 @@
 
 
 @using (Html.BeginForm(actionName: "SaveTeam", controllerName: "Config", FormMethod.Post, new { @class = "modal-Crud", data_modal = "clientModal", data_callback = "", data_table = "tblTeam", autocomplete = "off", @id = "frmClient" }))
-@*{
-
-    @if (Model != null)
-    {
-    }
-*@
+{
     <input type="hidden" asp-for="Id">
 
 
 
     <div class="modal-body">
         <div class="row">
-            
+
 
             <div class="form-group col-lg-12 mb-2">
                 <label asp-for="Name"></label>
@@ -35,29 +30,41 @@
             </div>
 
             <div class="form-group col-lg-12 mb-2">
+                <label asp-for="SupervisorId"></label>
+                <select asp-for="SupervisorId" class="form-control" autocomplete="off" >
+                    @foreach(var supervisor in Model.Supervisors)
+                    {
+                        <option value="@supervisor.Id">@supervisor.FullName</option>
+                    }
+                </select>
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="form-group col-lg-12 mb-2">
                 <label asp-for="NotificationType"></label>
-                <input asp-for="NotificationType" class="form-control" autocomplete="off" />
+                <select asp-for="NotificationType" class="form-control">
+                    <option value="2">System</option>
+                    <option value="1">SMS</option>
+                </select>
+              
                 <span asp-validation-for="NotificationType" class="text-danger"></span>
             </div>
-         
+
         </div>
 
     </div>
 
-    @if (Model != null && Model.Id != null)
-    {
-        @Html.Partial("_AppUserTeam")
-    }
 
-@*
-    @Html.Partial("_AppUserTeam")*@
 
     <div class="modal-footer">
-       
-            <button type="submit" class="btn btn-primary me-sm-3 me-1 mt-3">Submit</button>
-            <button type="reset" class="btn btn-label-secondary btn-reset mt-3" data-bs-dismiss="modal" aria-label="Close">Cancel</button>
-        
-    </div>
 
-   
+        <button type="submit" class="btn btn-primary me-sm-3 me-1 mt-3">Submit</button>
+        <button type="reset" class="btn btn-label-secondary btn-reset mt-3" data-bs-dismiss="modal" aria-label="Close">Cancel</button>
+
+    </div>
+    
 }
+
+
+
+

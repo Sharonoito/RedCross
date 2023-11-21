@@ -86,14 +86,31 @@ namespace RedCrossChat.Dialogs
         {
             var me = (Client)stepContext.Options;
 
+     //       var savedFeeling = (Feeling)stepContext.Values["Feeling"];
+
             stepContext.Values[UserInfo] = me;
 
+
             Conversation conversation = await getConversation(me);
+
+
 
             Question quiz = await _repository.Question.FindByCondition(x => x.Code == 4).FirstAsync();
           
             var question = me.language ? quiz.question : quiz.Kiswahili;
 
+            DBFeeling feeling = conversation.Feeling;
+
+            if (feeling.Description.ToLower().Trim() == "other" || feeling.Description.ToLower().Trim() == "others")
+            {
+                question = (me.language ? "You said you are feeling " + conversation.FeelingDetail :
+                                                    "Ulisema unahisi " + conversation.FeelingDetail) + ", " + question;
+            }else
+            {
+                question = (me.language ? "You said you are feeling " + feeling.Description :
+                                      "Ulisema unahisi " + feeling.Kiswahili) + ", " + question;
+            }
+            
             _repository.ChatMessage.Create(new ChatMessage
             {
                 QuestionId = quiz.Id,
@@ -108,13 +125,14 @@ namespace RedCrossChat.Dialogs
                 Prompt = MessageFactory.Text(question),
 
                 Choices = me.language ? RedCrossLists.choices : RedCrossLists.choicesKiswahili,
+                Style=ListStyle.HeroCard
 
             };
 
             return await stepContext.PromptAsync(nameof(ChoicePrompt), options, cancellationToken);
 
         }
-
+        //var storedFeeling = (Feeling)stepContext.Values["Feeling"];
         private async Task<DialogTurnResult> ProcessMentalEvaluationChoice(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             Client me = (Client)stepContext.Values[UserInfo];
@@ -420,7 +438,9 @@ namespace RedCrossChat.Dialogs
         }
         private async Task<Conversation> getConversation(Client me)
         {
-            return await _repository.Conversation.FindByCondition(x => x.Id == me.ConversationId).Include(x => x.Persona).FirstAsync();
+            return await _repository.Conversation.FindByCondition(x => x.Id == me.ConversationId)
+                .Include(x => x.Persona)
+                .Include(x=>x.Feeling).FirstAsync();
         }
         private async Task<DialogTurnResult> FinalStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
@@ -454,20 +474,16 @@ namespace RedCrossChat.Dialogs
 
             await _repository.SaveChangesAsync();
 
-            var agentMessage = me.language ? "The next available psychologist will call you shortly, you can also contact us directly by dialing 1199, request to speak to a psychologist." :
+            var agentMessage = me.language ? "The next available psychologist will get in touch with you shortly, you can also contact us directly by dialing 1199, request to speak to a psychologist." :
                              "Utaweza kuzungumza na mhudumu baada ya muda mfupi ama pia unaweza piga nambari 1199 ili kuongea na mshauri. Utaweza kupigiwa na mshauri baada ya muda mfupi, ama upige simu ili kuongea na mwanasaikolojia kupitia nambari 1199";
             await stepContext.Context.SendActivityAsync(MessageFactory.Text(agentMessage), cancellationToken);
-
-
-            var hotline = PersonalDialogCard.GetHotlineCard();
-            var hotlineSwahili = PersonalDialogCard.GetHotlineCardKiswahili();
 
 
             var attachment = new Attachment
             {
                 ContentType = HeroCard.ContentType,
 
-                Content = !me.language ? hotlineSwahili : hotline,
+                Content = PersonalDialogCard.GetHotlineCard(me.language),
             };
 
 
