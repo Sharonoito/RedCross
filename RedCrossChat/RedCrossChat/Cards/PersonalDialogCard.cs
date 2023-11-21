@@ -1,5 +1,5 @@
 ﻿using Microsoft.Bot.Schema;
-using RedCrossChat.Domain.Migrations;
+using RedCrossChat.Domain;
 using RedCrossChat.Objects;
 using System;
 using System.Collections.Generic;
