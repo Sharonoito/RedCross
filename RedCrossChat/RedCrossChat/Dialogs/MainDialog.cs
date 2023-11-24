@@ -122,7 +122,7 @@ namespace RedCrossChat.Dialogs
 
             var question = client.language ?
                 "Hello dear friend!! Welcome to the Kenya Red Cross Society, we're are offering tele - mental health and counseling services to the public at no costs. How can we help you today?" :
-                "Hujambo rafiki? Karibu katika Shirika la Msalaba Mwekundu ambapo tunatoa ushauri kupitia kwenye simu bila malipo yoyote. Je, ungependa nikusaidie vipi?";
+                "Habari rafiki mpendwa!! Karibu kwenye Chama cha Msalaba Mwekundu cha Kenya, tunatoa huduma za afya ya kiakili na ushauri kwa umma bila malipo. Tunawezaje kukusaidia leo?";
 
 
             var messageText = stepContext.Options?.ToString() ?? question;
