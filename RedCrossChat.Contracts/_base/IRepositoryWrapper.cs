@@ -37,6 +37,8 @@ namespace RedCrossChat.Contracts
 
         ITeam Team { get; }
 
+        IExercise Exercise { get; }
+
         IItention Itention { get; }
 
         ISubIntention SubIntention { get; }

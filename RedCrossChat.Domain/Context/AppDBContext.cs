@@ -51,6 +51,8 @@ namespace RedCrossChat.Domain
 
         public DbSet<AppUserTeam> AppUserTeam { get; set; }
 
+        public DbSet<Exercise> Exercise { get; set; }
+
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

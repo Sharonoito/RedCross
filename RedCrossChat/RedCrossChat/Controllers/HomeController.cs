@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RedCrossChat.Contracts;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -28,8 +29,10 @@ namespace RedCrossChat
 
             var genders=await _repository.Gender.FindAll().ToListAsync();
 
+            var handOverRequest = await _repository.HandOverRequest.FindByCondition(x => x.AppUserId== Guid.Parse(User.FindFirst("UserId").Value)).ToListAsync();
 
-            return View(new ReportVm { feelings=feelings,countys=county,Genders=genders,Agebands=ageBands.ToList() });
+
+            return View(new ReportVm { feelings=feelings,countys=county,Genders=genders,HandOverRequests=handOverRequest,Agebands=ageBands.ToList() });
         }
 
         [HttpGet]
@@ -43,6 +46,8 @@ namespace RedCrossChat
             var genders = await _repository.Gender.FindAll().ToListAsync();
             return View();
         }
+
+
 
 
 

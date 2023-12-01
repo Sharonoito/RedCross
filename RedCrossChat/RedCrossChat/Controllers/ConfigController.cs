@@ -198,7 +198,7 @@ namespace RedCrossChat.Controllers
             return Success("Feeling Saved successfully");
         }
 
-#endregion
+        #endregion
 
         #region Professional
         public IActionResult Profession()
@@ -1393,7 +1393,12 @@ namespace RedCrossChat.Controllers
 
             ViewBag.Intentions = intentions;
 
-            return View("_SubIntention");
+            var subIntentionVm = new SubIntentionVm
+            {
+                Intentions = intentions.ToList(),
+            };
+
+            return View("_SubIntention", subIntentionVm);
 
         }
 
@@ -1562,6 +1567,358 @@ namespace RedCrossChat.Controllers
 
 
         #endregion
+
+        #region Questions
+
+        public IActionResult Questions()
+        {
+            ViewBag.PageTitle = "Questions";
+            return View();
+        }
+
+        [HttpPost]
+
+        public async Task<IActionResult> GetQuestions(IDataTablesRequest dtRequest)
+        {
+
+            try
+            {
+                var data = await _repository.Question.GetAllAsync();
+
+                var filteredRows = data
+                    .AsQueryable()
+                    .FilterBy(dtRequest.Search, dtRequest.Columns);
+
+                var pagedRows = filteredRows
+                    .SortBy(dtRequest.Columns)
+                    .Skip(dtRequest.Start)
+                    .Take(dtRequest.Length);
+
+
+                var response = DataTablesResponse.Create(dtRequest, data.Count(),
+                    filteredRows.Count(), pagedRows);
+
+                return new DataTablesJsonResult(response);
+
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+
+            }
+        }
+
+        public IActionResult CreateQuestions()
+        {
+            ViewBag.Title = "Create Questions";
+
+            return View("_Questions");
+        }
+
+        public async Task<IActionResult> EditQuestions(Guid clientId)
+
+        {
+            try
+            {
+                var questionEntity = await _repository.Question.FindByCondition(x => x.Id == clientId).FirstOrDefaultAsync();
+                if (questionEntity == null)
+                {
+                    return NotFound();
+                }
+
+                var questionViewModel = new QuestionVm
+                {
+                    Id = questionEntity.Id,
+                    Question = questionEntity.question,
+                };
+
+                ViewBag.Title = "Edit Question";
+                return View("_Questions", questionViewModel);
+            }
+            catch (Exception ex)
+            {
+                return Error("Something broke" + ex.Message);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveQuestion(QuestionVm quiz)
+        {
+            if (!ModelState.IsValid  && ModelState.ErrorCount >1)
+                return Error("Validation error!, please check your data.");
+
+
+            try
+            {
+                if (quiz.Id == Guid.Empty)
+                {
+                    var questionEntity = new Question
+                    {
+                        question = quiz.Question,
+                        Kiswahili = quiz.Kiswahili,
+                        Code = quiz.Code,
+                    };
+
+                    _repository.Question.Create(questionEntity);
+
+
+                    var result = await _repository.SaveChangesAsync();
+
+                    if (!result)
+                        return Error("Error Creating Question!");
+                }
+                else
+                {
+                    var questionDB = await _repository.Question.FindByCondition(x => x.Id == quiz.Id).FirstOrDefaultAsync();
+
+                    if (questionDB == null)
+                    {
+                        return Error("Question not found");
+                    }
+
+                    questionDB.question=quiz.Question;
+                    questionDB.Kiswahili=quiz.Kiswahili;
+                    questionDB.Code=quiz.Code;
+
+                    _repository.Question.Update(questionDB);
+
+                    var result = await _repository.SaveChangesAsync();
+
+                    if (!result)
+                        return Error("Error updating Question");
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                return Error("Something broke" + ex.Message);
+            }
+            return Success("Profession Saved successfully");
+        }
+
+        public async Task<IActionResult> DeleteQuestion(Guid id)
+        {
+            try
+            {
+                var questionEntity = await _repository.Question.FindByCondition(x => x.Id == id).FirstOrDefaultAsync();
+                if (questionEntity == null)
+                {
+                    return NotFound();
+                }
+
+                _repository.Question.Delete(questionEntity);
+                var result = await _repository.SaveChangesAsync();
+
+                if (!result)
+                {
+                    return Error("Error deleting question");
+                }
+
+                return Success("Question deleted successfully");
+            }
+            catch (Exception ex)
+            {
+                return Error("Something broke" + ex.Message);
+            }
+        }
+
+
+
+        //[HttpPost]
+        //public async Task<IActionResult> SaveQuestion(QuestionVm quiz)
+        //{
+        //    if (!ModelState.IsValid && ModelState.ErrorCount > 1)
+        //        return Error("Validation error!, please check your data.");
+
+        //    try
+        //    {
+        //        var questionDB = await _repository.Question.FindByCondition(x => x.Id == quiz.Id).FirstOrDefaultAsync();
+
+        //        if (questionDB == null)
+        //        {
+        //            return Error("Question not found");
+        //        }
+
+        //        questionDB.question=quiz.Question;
+
+        //        _repository.Question.Update(questionDB);
+
+        //        var result = await _repository.SaveChangesAsync();
+
+        //        if (!result)
+        //            return Error("Error updating team");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Error("Something broke" + ex.Message);
+        //    }
+
+        //    return Success("Question Saved successfully");
+        //}
+
+        #endregion
+
+        #region BreathingExercise
+        public IActionResult Exercise()
+        {
+            ViewBag.PageTitle = "Breathing Exercise";
+            return View();
+        }
+
+        public IActionResult CreateExercise()
+
+        {
+            ViewBag.Title = "Create Exercise";
+            return View("_Exercise");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetExercise(IDataTablesRequest dtRequest)
+        {
+
+            try
+            {
+                var data = await _repository.Exercise.GetAllAsync();
+
+                var filteredRows = data
+                    .AsQueryable()
+                    .FilterBy(dtRequest.Search, dtRequest.Columns);
+
+                var pagedRows = filteredRows
+                    .SortBy(dtRequest.Columns)
+                    .Skip(dtRequest.Start)
+                    .Take(dtRequest.Length);
+
+
+                var response = DataTablesResponse.Create(dtRequest, data.Count(),
+                    filteredRows.Count(), pagedRows);
+
+                return new DataTablesJsonResult(response);
+
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+
+            }
+        }
+
+        public async Task<IActionResult> EditExercise(Guid clientId)
+
+        {
+            try
+            {
+                var exerciseEntity = await _repository.Exercise.FindByCondition(x => x.Id == clientId).FirstOrDefaultAsync();
+                if (exerciseEntity == null)
+                {
+                    return NotFound();
+                }
+
+                var exerciseViewModel = new ExerciseVm
+                {
+                    Id = exerciseEntity.Id,
+                    Feeling = exerciseEntity.Feeling,
+                    Kiswahili=exerciseEntity.Kiswahili,
+                    Exercises = exerciseEntity.Exercises
+                };
+
+                ViewBag.Title = "Edit Exercise";
+                return View("_Exercise", exerciseViewModel);
+            }
+            catch (Exception ex)
+            {
+                return Error("Something broke" + ex.Message);
+            }
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> SaveExercise(ExerciseVm exercise)
+        {
+            if (!ModelState.IsValid && ModelState.ErrorCount >1)
+                return Error("Validation error!, please check your data.");
+
+
+            try
+            {
+                if (exercise.Id == Guid.Empty)
+                {
+                    var exerciseEntity = new Exercise
+                    {
+                        Exercises = exercise.Exercises,
+                        Kiswahili=exercise.Kiswahili,
+                        Feeling = exercise.Feeling,
+                    };
+
+                    _repository.Exercise.Create(exerciseEntity);
+
+
+                    var result = await _repository.SaveChangesAsync();
+
+                    if (!result)
+                        return Error("Error Creating Exercise!");
+                }
+                else
+                {
+                    var exerciseDB = await _repository.Exercise.FindByCondition(x => x.Id == exercise.Id).FirstOrDefaultAsync();
+
+                    if (exerciseDB == null)
+                    {
+                        return Error("Exercise not found");
+                    }
+
+
+                    exerciseDB.Feeling = exercise.Feeling;
+                    exerciseDB.Exercises = exercise.Exercises;
+                    exerciseDB.Kiswahili = exercise.Kiswahili;
+
+                    _repository.Exercise.Update(exerciseDB);
+
+                    var result = await _repository.SaveChangesAsync();
+
+                    if (!result)
+                        // return Success(null, null);
+                        return Error("Error updating Exercise");
+                }
+            }
+            catch (Exception ex)
+            {
+                return Error("Something broke" + ex.Message);
+            }
+            return Success("Exercise Saved successfully");
+        }
+
+        public async Task<IActionResult> DeleteExercise(Guid id)
+        {
+            try
+            {
+                var exerciseEntity = await _repository.Exercise.FindByCondition(x => x.Id == id).FirstOrDefaultAsync();
+                if (exerciseEntity == null)
+                {
+                    return NotFound();
+                }
+
+                _repository.Exercise.Delete(exerciseEntity);
+                var result = await _repository.SaveChangesAsync();
+
+                if (!result)
+                {
+                    return Error("Error deleting Exercise");
+                }
+
+                return Success("Exercise deleted successfully");
+            }
+            catch (Exception ex)
+            {
+                return Error("Something broke" + ex.Message);
+            }
+        }
+
+        #endregion
+
+
+
 
     }
 }

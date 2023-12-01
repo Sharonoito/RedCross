@@ -68,7 +68,15 @@
                         </li>
                     }
 
-                    
+                    @if (User.IsInRole(Constants.SuperAdministrator) || User.IsInRole(Constants.Administrator) || User.IsInRole(Constants.PssManager))
+                    {
+                        <li class="menu-item @Html.IsSelected(controller: "Config", action: "Questions") ">
+                            <a asp-action="Questions" asp-controller="Config" class="menu-link  text-danger">
+                                <i class="menu-icon tf-icons bx bx-layout"></i>
+                                <div data-i18n="Questions"></div>
+                            </a>
+                        </li>
+                    }
 
                 </ul>
             </li>

@@ -98,8 +98,9 @@
                     <form asp-action="login" asp-controller="auth" asp-route-returnUrl="@Model.ReturnUrl" method="post">
                         <div class="mb-3">
                             <label for="Email" class="form-label">Email or Username</label>
-                            <input asp-for="Email" class="form-control" placeholder="Username" autocomplete="username" autofocus>
+                            <input asp-for="Email" class="form-control red-border" placeholder="Username" autocomplete="username" autofocus>
                         </div>
+
                         <div class="mb-3 form-password-toggle">
                             <div class="d-flex justify-content-between">
                                 <label class="form-label" for="password">Password</label>
@@ -122,7 +123,7 @@
                                 </label>
                             </div>
                         </div>
-                        <button class="btn btn-primary d-grid w-100">
+                        <button class="btn btn-danger d-grid w-100">
                             Sign in
                         </button>
                     </form>

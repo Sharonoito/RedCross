@@ -6,5 +6,7 @@ namespace RedCrossChat.Contracts
     public interface IQuestion : IRepositoryBase<Question>
     {
         Task<IEnumerable<Question>> GetAll();
+
+        Task<IEnumerable<Question>> GetAllAsync();
     }
 }

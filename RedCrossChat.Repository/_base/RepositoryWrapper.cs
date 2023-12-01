@@ -174,6 +174,17 @@ namespace RedCrossChat.Repository
             }
         }
 
+        public IExercise _exercise;
+
+        public IExercise Exercise
+        {
+            get
+            {
+                if (_exercise == null) { _exercise = new ExerciseRepo(_repoContext); }
+                return _exercise;
+            }
+        }
+
         public IQuestionOption _questionOption;
         public IQuestionOption QuestionOption
         {

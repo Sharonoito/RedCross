@@ -159,6 +159,19 @@ namespace RedCrossChat.Domain
                     }
                 }
 
+                if (!context.Exercise.Any())
+                {
+                    var data = await SeedHelper.GetSeedData<Exercise>("Exercise.json");
+
+                    foreach(var item in data)
+                    {
+                        context.Exercise.Add(new Exercise { Feeling=item.Feeling,Value=item.Value,Exercises=item.Exercises,Kiswahili=item.Kiswahili });
+
+                        await context.SaveChangesAsync();
+                    }
+
+                }
+
             }
 
         }
