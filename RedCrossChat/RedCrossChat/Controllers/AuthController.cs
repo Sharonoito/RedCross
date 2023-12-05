@@ -135,8 +135,8 @@ namespace RedCrossChat.Controllers
             try
             {
                 var data = await _repository.User
-                    //.GetAllAsync();
-                    .FindByCondition(x=>x.Email !=Constants.DefaultSuperAdminEmail).ToListAsync();
+                    .GetAllAsync();
+                    //.FindByCondition(x=>x.Email !=Constants.DefaultSuperAdminEmail).ToListAsync();
                 // Filter them
 
                 var filteredRows = data
@@ -291,9 +291,9 @@ namespace RedCrossChat.Controllers
                     return Success("Updated Successfully", null);
                 }
             }
-            catch(Exception)
+            catch(Exception ex)
             {
-                return Error("Something broke");
+                return Error(ex.Message);
             }
 
         }
