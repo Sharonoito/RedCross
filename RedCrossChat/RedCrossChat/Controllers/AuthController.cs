@@ -264,31 +264,45 @@ namespace RedCrossChat.Controllers
                     userDB.LastName = user.LastName;
               
                     userDB.PhoneNumber=user.PhoneNumber;
+
+                    try
+                    {
+                        var currentRoles = await _userManager.GetRolesAsync(userDB);
+
+                        _repository.User.Update(userDB);
+
+                        if (currentRoles != null && currentRoles.Count > 0)
+                        {
+                            IdentityResult removeResult = await _userManager.RemoveFromRolesAsync(userDB, currentRoles.ToArray());
+                            if (!removeResult.Succeeded)
+                                return Error("Failed to remove user roles.");
+                        }
+
+                        // Assign the newly selected Roles
+                        if (user.RoleNames != null)
+                        {
+                            IdentityResult addResult = await _userManager.AddToRolesAsync(userDB, user.RoleNames);
+
+                            if (!addResult.Succeeded)
+                                return Error("Failed to assign user roles.");
+                        }
+
+                        var result = await _repository.SaveChangesAsync();
+
+                        if (result)
+                        {
+                            return Success("Updated Successfully");
+                        }
+                    }
+                    catch(Exception ex)
+                    {
+                        return Error(ex.ToString());
+                    }
              
 
-                    var currentRoles = await _userManager.GetRolesAsync(userDB);
+                    
 
-                    _repository.User.Update(userDB);
-
-                    if (currentRoles != null && currentRoles.Count > 0)
-                    {
-                        IdentityResult removeResult = await _userManager.RemoveFromRolesAsync(userDB, currentRoles.ToArray());
-                        if (!removeResult.Succeeded)
-                            return Error("Failed to remove user roles.");
-                    }
-
-                    // Assign the newly selected Roles
-                    if (user.RoleNames != null)
-                    {
-                        IdentityResult addResult = await _userManager.AddToRolesAsync(userDB, user.RoleNames);
-
-                        if (!addResult.Succeeded)
-                            return Error("Failed to assign user roles.");
-                    }
-
-                    var result = await _repository.SaveChangesAsync();
-
-                    return Success("Updated Successfully", null);
+                    return Error("Unable to Update ", null);
                 }
             }
             catch(Exception ex)
