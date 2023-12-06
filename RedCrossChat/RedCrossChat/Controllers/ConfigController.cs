@@ -1723,40 +1723,6 @@ namespace RedCrossChat.Controllers
             }
         }
 
-
-
-        //[HttpPost]
-        //public async Task<IActionResult> SaveQuestion(QuestionVm quiz)
-        //{
-        //    if (!ModelState.IsValid && ModelState.ErrorCount > 1)
-        //        return Error("Validation error!, please check your data.");
-
-        //    try
-        //    {
-        //        var questionDB = await _repository.Question.FindByCondition(x => x.Id == quiz.Id).FirstOrDefaultAsync();
-
-        //        if (questionDB == null)
-        //        {
-        //            return Error("Question not found");
-        //        }
-
-        //        questionDB.question=quiz.Question;
-
-        //        _repository.Question.Update(questionDB);
-
-        //        var result = await _repository.SaveChangesAsync();
-
-        //        if (!result)
-        //            return Error("Error updating team");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return Error("Something broke" + ex.Message);
-        //    }
-
-        //    return Success("Question Saved successfully");
-        //}
-
         #endregion
 
         #region BreathingExercise
@@ -1917,8 +1883,156 @@ namespace RedCrossChat.Controllers
 
         #endregion
 
+        #region IntroductionActions
+        public IActionResult IntroductionChoices()
+        {
+            ViewBag.PageTitle = "Introduction Actions";
+            return View();
+        }
+
+        [HttpPost]
+
+        public async Task<IActionResult> GetIntroductionChoices(IDataTablesRequest dtRequest)
+        {
+
+            try
+            {
+                var data = await _repository.IntroductionChoice.GetAllAsync();
+
+                var filteredRows = data
+                    .AsQueryable()
+                    .FilterBy(dtRequest.Search, dtRequest.Columns);
+
+                var pagedRows = filteredRows
+                    .SortBy(dtRequest.Columns)
+                    .Skip(dtRequest.Start)
+                    .Take(dtRequest.Length);
 
 
+                var response = DataTablesResponse.Create(dtRequest, data.Count(),
+                    filteredRows.Count(), pagedRows);
+
+                return new DataTablesJsonResult(response);
+
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+
+            }
+        }
+
+        public IActionResult CreateIntroductionChoices()
+        {
+            ViewBag.Title = "Create Introduction Actions";
+
+            return View("_IntroductionChoice");
+        }
+
+        public async Task<IActionResult> EditIntroductionChoices(Guid clientId)
+
+        {
+            try
+            {
+                var introChoicesEntity = await _repository.IntroductionChoice.FindByCondition(x => x.Id == clientId).FirstOrDefaultAsync();
+                if (introChoicesEntity == null)
+                {
+                    return NotFound();
+                }
+
+                var introChoicesViewModel = new IntroductionChoicesVm
+                {
+                    Id = introChoicesEntity.Id,
+                    Name = introChoicesEntity.Name,
+                    Kiswahili=introChoicesEntity.Kiswahili,
+
+                };
+
+                ViewBag.Title = "Edit Introduction Action";
+                return View("_IntroductionChoice", introChoicesViewModel);
+            }
+            catch (Exception ex)
+            {
+                return Error("Something broke" + ex.Message);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveIntroductionChoices(IntroductionChoicesVm introductionChoices)
+        {
+            if (!ModelState.IsValid && ModelState.ErrorCount > 1)
+                return Error("Validation error!, please check your data.");
+
+            try
+            {
+                if (introductionChoices.Id == Guid.Empty)
+                {
+                    var introChoicesEntity = new IntroductionChoice
+                    {
+                        Name = introductionChoices.Name,
+                        Kiswahili = introductionChoices.Kiswahili,
+                    };
+
+                    _repository.IntroductionChoice.Create(introChoicesEntity);
+
+                    var result = await _repository.SaveChangesAsync();
+
+                    if (!result)
+                        return Error("Error Creating Introduction Action!");
+                }
+                else
+                {
+                    var introChoicesDB = await _repository.IntroductionChoice.FindByCondition(x => x.Id == introductionChoices.Id).FirstOrDefaultAsync();
+
+                    if (introChoicesDB == null)
+                    {
+                        return Error("Introduction Actions not found");
+                    }
+
+
+                    introChoicesDB.Name = introductionChoices.Name;
+                    introChoicesDB.Kiswahili = introductionChoices.Kiswahili;
+
+                    _repository.IntroductionChoice.Update(introChoicesDB);
+                    var result = await _repository.SaveChangesAsync();
+
+                    if (!result)
+                        return Error("Error updating Introduction Actions");
+                }
+            }
+            catch (Exception ex)
+            {
+                return Error("Something broke" + ex.Message);
+            }
+            return Success("Introduction Actions Saved successfully");
+        }
+
+        public async Task<IActionResult> DeleteIntroductionChoices(Guid id)
+        {
+            try
+            {
+                var introChoicesEntity = await _repository.IntroductionChoice.FindByCondition(x => x.Id == id).FirstOrDefaultAsync();
+                if (introChoicesEntity == null)
+                {
+                    return NotFound();
+                }
+
+                _repository.IntroductionChoice.Delete(introChoicesEntity);
+                var result = await _repository.SaveChangesAsync();
+
+                if (!result)
+                {
+                    return Error("Error deleting introduction action");
+                }
+
+                return Success("Introduction Action deleted successfully");
+            }
+            catch (Exception ex)
+            {
+                return Error("Something broke" + ex.Message);
+            }
+        }
+        #endregion
 
     }
 }

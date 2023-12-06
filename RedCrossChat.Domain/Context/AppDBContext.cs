@@ -53,6 +53,8 @@ namespace RedCrossChat.Domain
 
         public DbSet<Exercise> Exercise { get; set; }
 
+        public DbSet<IntroductionChoice> IntroductionChoice { get; set; }
+
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

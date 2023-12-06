@@ -52,6 +52,11 @@ namespace RedCrossChat.Contracts
 
         IPersonaRepo Persona { get; }
 
+        IIntroductionChoice IntroductionChoice { get; }
+
+        IInitialActionItem InitialActionItem { get; }
+
+
         Task<bool> SaveChangesAsync();
     }
 }

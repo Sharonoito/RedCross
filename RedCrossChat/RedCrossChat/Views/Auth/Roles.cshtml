@@ -33,7 +33,7 @@
 
                         <div class="col-lg-6">
                             <button type="button"
-                                    class="load-modal text-right btn btn-sm btn-outline-primary float-right"
+                                    class="load-modal text-right btn btn-sm btn-outline-primary float-right d-none"
                                     data-toggle="modal"
                                     data-target="#userModal"
                                     data-modal="userModal"
@@ -48,25 +48,17 @@
                         <thead>
                             <tr>
                                 <th>Role</th>
-                                <th class="text-center">Actions</th>
                             </tr>
                         </thead>
                         <tfoot>
                             <tr>
                                 <th>Role</th>
-                                <th class="text-center">Actions</th>
                             </tr>
                         </tfoot>
                     </table>
                 </div>
             </div>
         </div>
-
-
-
-
-
-
 
 
     </div>
@@ -114,20 +106,16 @@
         var jsdtClient = {
             table: null,
             initializeDataTable: function () {
-                jsdtClient.table = $('#tblUsers').DataTable({
+                jsdtClient.table = $('#tblRoles').DataTable({
                     processing: true,
                     serverSide: true,
                     serverMethod: 'post',
                     ajax: {
-                        url: "@Url.Action("GetUsers")",
+                        url: "@Url.Action("GetRoles")",
                         type: "POST"
                     },
                     columns: [
-                        { data: 'firstName' },                 
-                        { data: 'firstName' },
-                        { data: 'lastName' },
-                        { data: 'email', name: 'Id' },
-                        { data: 'id', name: 'Id' },
+                        { data: 'role' },                 
                         { data: 'id', name: 'Id' },
                     ],
                     columnDefs: [{
@@ -140,7 +128,7 @@
 
                             var actionsHtml =
                                 `<div class='text-center'>
-                                                <button class='btn btn-outline-primary btn-xs load-modal'
+                                                <button class='btn btn-outline-primary btn-xs load-modal d-none'
                                                     data-hidden='Id'
                                                     data-id='${row.id}'
                                                     data-toggle='modal'
@@ -154,7 +142,7 @@
                                                 </button>
 
 
-                                                <button class="delete btn btn-outline-danger btn-xs"
+                                                <button class="delete btn btn-outline-danger btn-xs d-none"
                                                     data-bs-toggle="button" aria-pressed="true"
                                                     data-action='@Url.Action("DeactivateAccount", "Auth")?clientId=${row.id}'
                                                     data-table='tblClients'

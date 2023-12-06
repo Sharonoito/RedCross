@@ -12,6 +12,7 @@ using RedCrossChat.ViewModel;
 using Sentry;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Attachment = Microsoft.Bot.Schema.Attachment;
@@ -105,6 +106,7 @@ namespace RedCrossChat.Dialogs
 
         }
 
+
         private async Task<DialogTurnResult> IntroStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             Client client = (Client)stepContext.Values[UserInfo];
@@ -129,17 +131,29 @@ namespace RedCrossChat.Dialogs
 
             var promptMessage = MessageFactory.Text(messageText, messageText, InputHints.ExpectingInput);
 
-            return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions
+
+            var actions = await _repository.IntroductionChoice.GetAll();
+
+            var choices = new List<Choice>();
+
+            foreach (var choice in actions)
+            {
+                choices.Add(new Choice() { Value = client.language ? choice.Name: choice.Kiswahili });
+            }
+
+            var options = new PromptOptions()
             {
                 Prompt = promptMessage,
-                Choices = client.language ? RedCrossLists.Actions : RedCrossLists.ActionKiswahili,
-                Style =  ListStyle.HeroCard,
-            }, cancellationToken);
+                Choices = choices,
+                Style = ListStyle.HeroCard,
+
+            };
+
+            return await stepContext.PromptAsync(nameof(ChoicePrompt), options, cancellationToken);
 
         }
 
    
-
         private async Task<DialogTurnResult> ActStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             Client client = (Client)stepContext.Values[UserInfo];         
@@ -154,12 +168,13 @@ namespace RedCrossChat.Dialogs
             var message = GetAttachment(choiceValues, client.language);
 
 
-            if(choiceValues != null || choiceValues == InitialActions.MentalHealth) {
+            if(choiceValues != null && choiceValues == InitialActions.MentalHealth) {
 
                 return await stepContext.NextAsync(null, cancellationToken);
             }
             else
             {
+
                 await stepContext.Context.SendActivityAsync(message, cancellationToken);
             }
 
@@ -546,32 +561,34 @@ namespace RedCrossChat.Dialogs
             return conversation;
         }
 
-        private IMessageActivity GetAttachment(String choiceValue, Boolean language)
+        private async Task<IMessageActivity> GetAttachment(String choiceValue, Boolean language)
         {
+            IntroductionChoice action = await _repository.IntroductionChoice.FindByCondition(x => x.Name == choiceValue || x.Kiswahili == choiceValue).FirstOrDefaultAsync();
 
-            var message = PersonalDialogCard.GetKnowledgeBaseCard(language);
-
-
-            switch (choiceValue)
+            if (action != null)
             {
-                case InitialActions.Careers:
-                case InitialActionsKiswahili.Careers:
-                    message = PersonalDialogCard.GetKnowledgeCareerCard(language);
-                    break;
-                case InitialActions.VolunteerOpportunities:
-                case InitialActionsKiswahili.VolunteerOpportunities:
-                    message = PersonalDialogCard.GetMembershipCard(language);
-                    break;
-                case InitialActions.VolunteerAndMemberShip:
-                case InitialActionsKiswahili.VolunteerAndMemberShip:
-                    message = PersonalDialogCard.GetKnowledgeBaseCard(language);
-                    break;
+                if (action.ActionType == 1)
+                {
+                    InitialActionItem item = await _repository.InitialActionItem.FindByCondition(x => x.IntroductionChoiceId == action.Id && x.Language == language).FirstOrDefaultAsync();
 
+                    var card = new HeroCard
+                    {
+                        Title = "ChatCare",
+                        Subtitle = item.SubTitle,
+                        Text = item.ActionMessage,
+                        Buttons = new List<CardAction>
+                {
+                    new CardAction(ActionTypes.OpenUrl, item.ActionMessage, value: item.Value)
+                }
+                    };
+
+                    return MessageFactory.Attachment(card.ToAttachment());
+                }
             }
 
-
-            return MessageFactory.Attachment(new Attachment { ContentType = HeroCard.ContentType, Content = message });
+            return MessageFactory.Text("No valid action found");
         }
+
 
     }
 }

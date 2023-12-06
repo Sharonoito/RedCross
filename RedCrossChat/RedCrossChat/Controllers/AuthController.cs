@@ -304,6 +304,41 @@ namespace RedCrossChat.Controllers
             return View();
         }
 
+        [HttpPost]
+
+        public async Task<IActionResult> GetRoles(IDataTablesRequest dtRequest)
+        {
+
+            try
+            {
+
+                var data = await _repository.Role
+                    .GetAllAsync();
+
+                var filteredRows = data
+                    .AsQueryable()
+                    .FilterBy(dtRequest.Search, dtRequest.Columns);
+
+                var pagedRows = filteredRows
+                    .SortBy(dtRequest.Columns)
+                    .Skip(dtRequest.Start)
+                    .Take(dtRequest.Length);
+
+
+                var response = DataTablesResponse.Create(dtRequest, data.Count(),
+                    filteredRows.Count(), pagedRows);
+
+                return new DataTablesJsonResult(response);
+
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+
+            }
+        }
+
+
 
 
     }
