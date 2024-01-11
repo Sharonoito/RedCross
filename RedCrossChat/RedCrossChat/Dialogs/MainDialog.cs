@@ -167,16 +167,7 @@ namespace RedCrossChat.Dialogs
 
             var message = GetAttachment(choiceValues, client.language);
 
-
-            if(choiceValues != null && choiceValues == InitialActions.MentalHealth) {
-
-                return await stepContext.NextAsync(null, cancellationToken);
-            }
-            else
-            {
-
-                await stepContext.Context.SendActivityAsync(message, cancellationToken);
-            }
+            //await stepContext.Context.SendActivityAsync(message, cancellationToken);
 
             return await stepContext.EndDialogAsync(null);
 
@@ -569,7 +560,10 @@ namespace RedCrossChat.Dialogs
             {
                 if (action.ActionType == 1)
                 {
-                    InitialActionItem item = await _repository.InitialActionItem.FindByCondition(x => x.IntroductionChoiceId == action.Id && x.Language == language).FirstOrDefaultAsync();
+                    var item = await _repository.InitialActionItem.FindByCondition(x => x.IntroductionChoiceId == action.Id).FirstOrDefaultAsync(); 
+
+                    //var item = items.First();
+                        //
 
                     var card = new HeroCard
                     {

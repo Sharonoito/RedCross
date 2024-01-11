@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RedCrossChat.Entities
 {
-    public class InitialActionItem
+    public class InitialActionItem:BaseEntity
     {
         public string ActionMessage { get; set; }
 

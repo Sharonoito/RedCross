@@ -55,6 +55,8 @@ namespace RedCrossChat.Domain
 
         public DbSet<IntroductionChoice> IntroductionChoice { get; set; }
 
+        public DbSet<InitialActionItem> InitialActionItem { get; set; }
+
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

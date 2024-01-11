@@ -1,7 +1,11 @@
-﻿namespace RedCrossChat
+﻿using System;
+
+namespace RedCrossChat
 {
     public class AgeBandVM
     {
+        public Guid Id { get; set; }
+
         public string Name { get; set; }
 
         public string Kiswahili { get; set; }
