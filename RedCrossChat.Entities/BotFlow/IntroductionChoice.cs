@@ -10,7 +10,7 @@ namespace RedCrossChat.Entities
 
         public int ActionType { get; set; } = 1;
 
-        //public List<InitialActionItem>? InitialActionItems { get; set; }
+        public List<InitialActionItem>? InitialActionItems { get; set; }
 
 
     }

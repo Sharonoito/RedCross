@@ -3,7 +3,7 @@ using System;
 
 namespace RedCrossChat.ViewModel
 {
-    public class IntroductionChoicesVm
+    public class IntroductionChoiceVm
     {
         public Guid Id { get; set; }
 
@@ -14,6 +14,10 @@ namespace RedCrossChat.ViewModel
         [Display(Name = "Kiswahili")]
         [Required]
         public string Kiswahili { get; set; }
+
+        [Display(Name = "Action Type")]
+        [Required]
+        public int ActionType { get; set; }
 
 
     }

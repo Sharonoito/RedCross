@@ -61,9 +61,15 @@
                     </a>
                 </li>
 
-                <li class="nav-item @(Html.IsSelected(controller: "Config", action: "IntroductionChoices") == "active" ? "active" : "")">
-                    <a asp-action="IntroductionChoices" asp-controller="Config" class="nav-link @(Html.IsSelected(controller: "Config", action: "IntroductionChoices"))">
-                        <i class="bx bx-bell me-1"></i> Introduction Actions
+                <li class="nav-item @(Html.IsSelected(controller: "Config", action: "IntroductionChoice") == "active" ? "active" : "")">
+                    <a asp-action="IntroductionChoice" asp-controller="Config" class="nav-link @(Html.IsSelected(controller: "Config", action: "IntroductionChoice"))">
+                        <i class="bx bx-bell me-1"></i> Introduction Choices
+                    </a>
+                </li>
+
+                <li class="nav-item @(Html.IsSelected(controller: "Config", action: "InitialActionItem") == "active" ? "active" : "")">
+                    <a asp-action="InitialActionItem" asp-controller="Config" class="nav-link @(Html.IsSelected(controller: "Config", action: "InitialActionItem"))">
+                        <i class="bx bx-bell me-1"></i> Initial Actions
                     </a>
                 </li>
 

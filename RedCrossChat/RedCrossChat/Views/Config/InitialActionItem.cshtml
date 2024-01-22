@@ -20,7 +20,7 @@
                             data-target="#clientModal"
                             data-modal="clientModal"
                             data-viewurl="true"
-                            data-action="@Url.Action("CreateIntroductionChoice")" data-bs-toggle="modal" data-bs-target="#clientModal">
+                            data-action="@Url.Action("CreateInitialAction")" data-bs-toggle="modal" data-bs-target="#clientModal">
                         <i class="fa fa-plus"></i> Add Introduction Action
                     </button>
 
@@ -28,13 +28,15 @@
             </div>
 
             <div class="card-body p-1">
-                <table class="table table-striped" id="tblIntroductionChoice">
+                <table class="table table-striped" id="tblInitialAction">
 
                     <thead>
                         <tr>
-                            <th>Name</th>
-                            <th>Kiswahili</th>
-                            <th>Action Type</th>
+                            <th>Choices</th>
+                            <th>Action Message</th>
+                            <th>Value</th>
+                            <th>SubTitle</th>
+                            <th>Language</th>
                             @*<th>Type</th>*@
                             <th style="width: 40px">Actions</th>
                         </tr>
@@ -87,21 +89,31 @@
             jsdtClient.getData();
         });
 
+        $(document).on("change",".selector",function(){
+           // alert ("isWorking")
+            $("input[name='Language']").val($(this).data("value"));
+            console.log("Updated Language Value:", $("input[name='Language']").val());
+
+        })
+
+
         var jsdtClient = {
             table: null,
             initializeDataTable: function () {
-                jsdtClient.table = $('#tblIntroductionChoice').DataTable({
+                jsdtClient.table = $('#tblInitialAction').DataTable({
                     processing: true,
                     serverSide: true,
                     serverMethod: 'post',
                     ajax: {
-                        url: "@Url.Action("GetIntroductionChoice")",
+                        url: "@Url.Action("GetInitialAction")",
                         type: "POST"
                     },
                     columns: [
-                        { data: 'name' },
-                        { data: 'kiswahili' },
-                        { data: 'actionType' },
+                        { data: 'choices' },
+                        { data: 'actionMessage' },
+                        { data: 'value' },
+                        { data: 'subTitle' },
+                        { data: 'language' },
                        // { data: 'type' },
                         { data: 'id', name: 'Id' },
                
@@ -118,12 +130,12 @@
                                                             data-modal='clientModal'
                                                             data-bs-toggle="modal" data-bs-target="#clientModal"
                                                             data-viewurl='true'
-                                                                    data-action='@Url.Action("EditIntroductionChoice", "Config")?clientId=${row.id}'
+                                                                    data-action='@Url.Action("EditInitialAction", "Config")?initialActionItem.Id=${row.id}'
                                                             title='Edit'>
                                                             <i class='fa fa-pencil-alt'></i>
 
                                                             <button class='delete btn btn-outline-danger btn-xs'
-                                                                        data-action='@Url.Action("DeleteIntroductionChoice", "Config")?clientId=${row.id}'
+                                                                data-action='@Url.Action("DeleteInitialAction", "Config")? initialActionItem.Id=${row.id}'
                                                                 data-table='tblClients'
                                                                 data-id='${row.id}'
                                                                 data-toggle='tooltip'

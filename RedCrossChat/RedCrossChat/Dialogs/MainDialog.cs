@@ -165,9 +165,9 @@ namespace RedCrossChat.Dialogs
                 return await stepContext.NextAsync(client);
             }
 
-            var message = GetAttachment(choiceValues, client.language);
+            var message = await GetAttachment(choiceValues, client.language);
 
-            //await stepContext.Context.SendActivityAsync(message, cancellationToken);
+            await stepContext.Context.SendActivityAsync(message, cancellationToken);
 
             return await stepContext.EndDialogAsync(null);
 
@@ -560,10 +560,7 @@ namespace RedCrossChat.Dialogs
             {
                 if (action.ActionType == 1)
                 {
-                    var item = await _repository.InitialActionItem.FindByCondition(x => x.IntroductionChoiceId == action.Id).FirstOrDefaultAsync(); 
-
-                    //var item = items.First();
-                        //
+                    var item = await _repository.InitialActionItem.FindByCondition(x => x.IntroductionChoiceId == action.Id && x.Language == (language? 1:0)).FirstOrDefaultAsync();
 
                     var card = new HeroCard
                     {
@@ -571,9 +568,9 @@ namespace RedCrossChat.Dialogs
                         Subtitle = item.SubTitle,
                         Text = item.ActionMessage,
                         Buttons = new List<CardAction>
-                {
+                    {
                     new CardAction(ActionTypes.OpenUrl, item.ActionMessage, value: item.Value)
-                }
+                   }
                     };
 
                     return MessageFactory.Attachment(card.ToAttachment());

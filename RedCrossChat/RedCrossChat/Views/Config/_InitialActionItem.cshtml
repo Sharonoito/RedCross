@@ -1,0 +1,96 @@
+﻿@using RedCrossChat.ViewModel;
+
+@model InitialActionItemVm
+
+@{
+    Layout = null;
+}
+
+<div class="modal-header">
+    <h5 class="modal-title">@ViewBag.Title</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+
+@using (Html.BeginForm(actionName: "SaveInitialAction", controllerName: "Config", FormMethod.Post, new { @class = "modal-Crud", data_modal = "clientModal", data_callback = "", data_table = "tblInitialAction", autocomplete = "off", @id = "frmClient" }))
+{
+   
+    <input type="hidden" asp-for="Id">
+
+    <div class="modal-body">
+        <div class="row">
+            <div class="form-group col-lg-12 mb-2">
+                <label asp-for="Choices">Select Choice</label>
+                <select asp-for="IntroductionChoiceId" class="form-control" required data-val="true">
+                    <option value="">Select...</option>
+
+                    @if (Model.IntroductionChoices != null)
+                    {
+                        foreach (var choice in Model.IntroductionChoices)
+                        {
+                            @if (choice.Id == Model.IntroductionChoiceId)
+                            {
+                                <option selected value="@choice.Id">@choice.Name</option>
+                            }
+                            else
+                            {
+                                <option value="@choice.Id">@choice.Name</option>
+                            }
+                        }
+                    }
+
+                </select>
+
+                <span asp-validation-for="Choices" class="text-danger"></span>
+            </div>
+            
+
+              <div class="form-group col-lg-12 mb-2">
+                <label asp-for="ActionMessage"></label>
+                <input asp-for="ActionMessage" class="form-control" autocomplete="off" required data-val="true"/>
+                <span asp-validation-for="ActionMessage" class="text-danger"></span>
+            </div>
+           
+            <div class="form-group col-lg-12 mb-2">
+                <label asp-for="SubTitle"></label>
+                <input asp-for="SubTitle" class="form-control" autocomplete="off" required data-val="true"/>
+                <span asp-validation-for="SubTitle" class="text-danger"></span>
+            </div>
+
+            <div class="form-group col-lg-12 mb-2">
+                <label asp-for="Value"></label>
+                <input asp-for="Value" class="form-control" autocomplete="off" required data-val="true" />
+                <span asp-validation-for="Value" class="text-danger"></span>
+            </div>
+     
+            <div class="form-group col-lg-12 mb-2">
+                <label asp-for="Language">Select Action Item Language</label>
+                <input type="hidden" asp-for="Language"/>
+                <div>
+                    <label class="radio-inline">
+                        <input type="radio" data-value="1" name="language" class="selector" checked="@(Model.Language = 1)" />
+                        English
+                    </label>
+                    <label class="radio-inline">
+                        <input type="radio" data-value="0" name="language" class="selector" checked="@(Model.Language = 0)" />
+                        Kiswahili
+                    </label>
+                </div>
+                <span asp-validation-for="Language" class="text-danger"></span>
+            </div>
+
+        </div>
+
+
+
+    </div>
+
+
+
+    <div class="modal-footer">
+
+        <button type="submit" class="btn btn-primary me-sm-3 me-1 mt-3">Submit</button>
+        <button type="reset" class="btn btn-label-secondary btn-reset mt-3" data-bs-dismiss="modal" aria-label="Close">Cancel</button>
+
+    </div>   
+}

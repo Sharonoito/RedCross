@@ -17,6 +17,10 @@ using Microsoft.Bot.Schema;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Model;
 using Microsoft.EntityFrameworkCore.Internal;
 using System.ComponentModel.DataAnnotations;
+using RedCrossChat.Domain.Migrations;
+using RedCrossChat.Objects;
+using Microsoft.Bot.Builder;
+using Newtonsoft.Json.Linq;
 
 namespace RedCrossChat.Controllers
 {
@@ -1884,21 +1888,22 @@ namespace RedCrossChat.Controllers
         #endregion
 
         #region IntroductionActions
-        public IActionResult IntroductionChoices()
+        public IActionResult IntroductionChoice()
         {
-            ViewBag.PageTitle = "Introduction Actions";
+            ViewBag.PageTitle = "Introduction Action";
             return View();
         }
 
         [HttpPost]
 
-        public async Task<IActionResult> GetIntroductionChoices(IDataTablesRequest dtRequest)
+        public async Task<IActionResult> GetIntroductionChoice(IDataTablesRequest dtRequest)
         {
 
             try
             {
                 var data = await _repository.IntroductionChoice.GetAllAsync();
-
+               // I have to add Include method for the selected choices to appear on the table
+                //var data = await _repository.IntroductionChoice.Include(x => x.IntroductionChoi).GetAllAsync();
                 var filteredRows = data
                     .AsQueryable()
                     .FilterBy(dtRequest.Search, dtRequest.Columns);
@@ -1922,14 +1927,14 @@ namespace RedCrossChat.Controllers
             }
         }
 
-        public IActionResult CreateIntroductionChoices()
+        public IActionResult CreateIntroductionChoice()
         {
-            ViewBag.Title = "Create Introduction Actions";
+            ViewBag.Title = "Create Introduction Action";
 
             return View("_IntroductionChoice");
         }
 
-        public async Task<IActionResult> EditIntroductionChoices(Guid clientId)
+        public async Task<IActionResult> EditIntroductionChoice(Guid clientId)
 
         {
             try
@@ -1940,16 +1945,17 @@ namespace RedCrossChat.Controllers
                     return NotFound();
                 }
 
-                var introChoicesViewModel = new IntroductionChoicesVm
+                var introChoiceViewModel = new IntroductionChoiceVm
                 {
                     Id = introChoicesEntity.Id,
                     Name = introChoicesEntity.Name,
                     Kiswahili=introChoicesEntity.Kiswahili,
+                    ActionType = introChoicesEntity.ActionType,
 
                 };
 
                 ViewBag.Title = "Edit Introduction Action";
-                return View("_IntroductionChoice", introChoicesViewModel);
+                return View("_IntroductionChoice", introChoiceViewModel);
             }
             catch (Exception ex)
             {
@@ -1958,7 +1964,7 @@ namespace RedCrossChat.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SaveIntroductionChoices(IntroductionChoicesVm introductionChoices)
+        public async Task<IActionResult> SaveIntroductionChoice(IntroductionChoiceVm introductionChoices)
         {
             if (!ModelState.IsValid && ModelState.ErrorCount > 1)
                 return Error("Validation error!, please check your data.");
@@ -1992,6 +1998,7 @@ namespace RedCrossChat.Controllers
 
                     introChoicesDB.Name = introductionChoices.Name;
                     introChoicesDB.Kiswahili = introductionChoices.Kiswahili;
+                    introChoicesDB.ActionType = introductionChoices.ActionType;
 
                     _repository.IntroductionChoice.Update(introChoicesDB);
                     var result = await _repository.SaveChangesAsync();
@@ -2032,6 +2039,200 @@ namespace RedCrossChat.Controllers
                 return Error("Something broke" + ex.Message);
             }
         }
+        #endregion
+
+        #region InitialAction
+        public IActionResult InitialActionItem()
+        {
+            ViewBag.PageTitle = "Initial Action";
+            return View();
+        }
+
+        public async Task<IActionResult> GetInitialAction(IDataTablesRequest dtRequest)
+        {
+            try
+            {
+                var data = await _repository.InitialActionItem.GetAllAsync();
+
+                var filteredRows = data
+                    .AsQueryable()
+                    .FilterBy(dtRequest.Search, dtRequest.Columns);
+
+                var pagedRows = filteredRows
+                    .SortBy(dtRequest.Columns)
+                    .Skip(dtRequest.Start)
+                    .Take(dtRequest.Length);
+
+
+                var response = DataTablesResponse.Create(dtRequest, data.Count(),
+                    filteredRows.Count(), pagedRows);
+
+                return new DataTablesJsonResult(response);
+
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+
+            }
+        }
+
+        public async Task<IActionResult> CreateInitialAction()
+        {
+            var choices = await _repository.IntroductionChoice.GetAllAsync();
+
+            ViewBag.IntroductionChoices = choices;
+
+            var initialAction = new InitialActionItemVm()
+            {
+                IntroductionChoices = (List<IntroductionChoice>)await _repository.IntroductionChoice.GetAllAsync(),
+               // IntroductionChoices = choices.ToList(),
+                //IntroductionChoices = await _repository.IntroductionChoice.GetAllAsync(),
+
+            };
+
+            return View("_InitialActionItem",initialAction);
+        }
+
+        public async Task<IActionResult> EditInitialAction(InitialActionItemVm initialActionItem)
+
+        {
+            try
+            {
+                var initialActionEntity = await _repository.InitialActionItem.
+                    FindByCondition(x => x.Id == initialActionItem.Id)
+                    .Include(x => x.IntroductionChoice)
+                    .FirstOrDefaultAsync();
+
+                if (initialActionEntity == null)
+                {
+                    return NotFound();
+                }
+
+                var introductionChoices = await _repository.IntroductionChoice.GetAllAsync();
+
+                 var initialActionViewModel = new InitialActionItemVm
+                {
+                    Id = initialActionEntity.Id,
+                    Choices = initialActionEntity.Choices,
+                    ActionMessage = initialActionEntity.ActionMessage,
+                    Value=initialActionEntity.Value,
+                    SubTitle = initialActionEntity.SubTitle,
+                    IntroductionChoices = introductionChoices.ToList(),
+                    Language = initialActionEntity.Language,
+
+            };
+
+                ViewBag.Title = "Edit Initial Action";
+                return View("_InitialActionItem", initialActionViewModel);
+
+            }
+            catch (Exception ex)
+            {
+                return Error("Something broke" + ex.Message);
+            }
+        }
+
+
+        public async Task<IActionResult> DeleteInitialAction(Guid id)
+        {
+            try
+            {
+                var initialActionEntity = await _repository.InitialActionItem.FindByCondition(x => x.Id == id).FirstOrDefaultAsync();
+                if (initialActionEntity == null)
+                {
+                    return NotFound();
+                }
+
+                _repository.InitialActionItem.Delete(initialActionEntity);
+                var result = await _repository.SaveChangesAsync();
+
+                if (!result)
+                {
+                    return Error("Error deleting Initial Action");
+                }
+
+                return Success("Initial Action deleted successfully");
+            }
+            catch (Exception ex)
+            {
+                return Error("Something broke" + ex.Message);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveInitialAction(InitialActionItemVm initialAction)
+        {
+            if (!ModelState.IsValid  && ModelState.ErrorCount >1)
+                return Error("Validation error!, please check your data.");
+
+            try
+            {
+                var introductionChoiceEntity = await _repository.IntroductionChoice.GetByIdAsync(initialAction.IntroductionChoiceId);
+
+                if (introductionChoiceEntity == null)
+                {
+                    ModelState.AddModelError("IntroductionChoiceId", "IntroductionChoice not found");
+                    return View("_InitialActionItem", initialAction);
+                }
+
+
+                if (initialAction.Id == Guid.Empty)
+
+                {
+                    var initialActionEntity = new InitialActionItem
+                    {
+                        Id = initialAction.Id,
+                        Choices = initialAction.Choices,
+                        ActionMessage = initialAction.ActionMessage,
+                        Value = initialAction.Value,
+                        SubTitle = initialAction.SubTitle,
+                        IntroductionChoiceId = initialAction.IntroductionChoiceId,
+                        Language = initialAction.Language,
+                    };
+
+                    _repository.InitialActionItem.Create(initialActionEntity);
+
+                }
+                else
+                {
+                    var initialActionDB = await _repository.InitialActionItem.FindByCondition(x => x.Id == initialAction.Id).FirstOrDefaultAsync();
+                    if (initialActionDB == null)
+                    {
+                        ModelState.AddModelError("Id", "InitialAction not found");
+                        return View("_InitialActionItem", initialAction);
+
+                    }
+
+                    initialActionDB.Id = initialAction.Id;
+                    initialActionDB.Choices = initialAction.Choices;
+                    initialActionDB.ActionMessage = initialAction.ActionMessage;
+                    initialActionDB.Value = initialAction.Value;
+                    initialActionDB.SubTitle = initialAction.SubTitle;
+                    initialActionDB.IntroductionChoiceId = initialAction.IntroductionChoiceId;
+                    initialActionDB.Language = initialAction.Language;
+
+                    _repository.InitialActionItem.Update(initialActionDB);
+
+                }
+
+                var result = await _repository.SaveChangesAsync();
+
+                if (result)
+                {
+
+                    return Success("Initial Action saved Successfully");
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("ServerError", "Something broke: " + ex.Message);
+                return Error("There was an error creating Initial Action");
+            }
+
+            return Error("Sorry Initial Action was not created");
+        }
+
         #endregion
 
     }
