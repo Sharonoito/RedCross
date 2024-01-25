@@ -15,8 +15,8 @@ namespace RedCrossChat.Cards
             return new HeroCard
             {
                 Title = APP_TITLE,
-                Subtitle = language ? "Terms and Conditions" : "Sheria na Masharti",
-                Text = language ? "For us to be able to help you better, we would like to know more about you! Please accept terms and conditions below to continue." : "Tungependa kukufahamu zaidi ya ulivyotueleza. Ili kuendelea, tafadhali kubali sheria na masharti yafuatayo",
+                Subtitle = language ? "Terms and Conditions" : "Masharti na Sheria",
+                Text = language ? "For us to be able to help you better, we would like to know more about you! Please accept terms and conditions below to continue." : "Ili tuweze kukusaidia vizuri, tungependa kujua zaidi kukuhusu! Tafadhali kubali masharti na sheria hapa chini kabla ya kuendelea.\r\n\r\n",
                 Buttons = new List<CardAction> { new CardAction(ActionTypes.OpenUrl, language ? "Terms and Conditions" : "Sheria na Masharti", value: "https://www.redcross.or.ke/ASSETS/DATA-PROTECTION-POLICY.pdf") },
             };
 

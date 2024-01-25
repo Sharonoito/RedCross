@@ -12,18 +12,18 @@ namespace RedCrossChat.Repository
 {
     
 
-    public class QuestionRepo : RepositoryBase<Question>, IQuestion
+    public class ExerciseRepo : RepositoryBase<Exercise>, IExercise
     {
 
-        public QuestionRepo(AppDBContext repoContext) : base(repoContext)
+        public ExerciseRepo(AppDBContext repoContext) : base(repoContext)
         {
 
         }
 
-        public async Task<IEnumerable<Question>> GetAll()
+        public async Task<IEnumerable<Exercise>> GetAll()
         => await FindAll().ToListAsync();
 
-        public async Task <IEnumerable<Question>> GetAllAsync()
+        public async Task <IEnumerable<Exercise>> GetAllAsync()
         {
             return await FindAll().ToListAsync();
         }

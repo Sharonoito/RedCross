@@ -5,5 +5,9 @@ namespace RedCrossChat.Contracts
 {
     public interface IRoleRepository : IRepositoryBase<AppRole>
     {
+        Task<IEnumerable<AppRole>> GetAllUsersAsync();
+        Task<IEnumerable<AppRole>> GetAllAsync();
+
     }
 }
+

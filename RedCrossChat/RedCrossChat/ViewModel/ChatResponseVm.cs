@@ -9,5 +9,7 @@ namespace RedCrossChat
         public List<Conversation> myConversations;
 
         public List<HandOverRequest> handOverRequests;
+
+        public List<HandOverRequest> myHandOverRequests;
     }
 }

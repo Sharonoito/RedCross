@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using RedCrossChat;
+using RedCrossChat.Contracts;
 using RedCrossChat.Entities;
 using RedCrossChat.Entities.Auth;
 using System.Security.Claims;
@@ -157,6 +158,37 @@ namespace RedCrossChat.Domain
 
                         await context.SaveChangesAsync();
                     }
+                }
+
+                if (!context.Exercise.Any())
+                {
+                    var data = await SeedHelper.GetSeedData<Exercise>("Exercise.json");
+
+                    foreach(var item in data)
+                    {
+                        context.Exercise.Add(new Exercise { Feeling=item.Feeling,Value=item.Value,Exercises=item.Exercises,Kiswahili=item.Kiswahili });
+
+                        await context.SaveChangesAsync();
+                    }
+
+                }
+
+                if (!context.IntroductionChoice.Any())
+                {
+                 
+                    context.IntroductionChoice.AddRange(new List<IntroductionChoice>{
+
+                    new IntroductionChoice{Name= "Membership and Volunteerism",Kiswahili="Kujitolea na kuwa mshirika"},
+
+                    new IntroductionChoice{Name= "Careers" ,Kiswahili="Taaluma" },
+
+                    new IntroductionChoice{Name= "Volunteer Opportunities",Kiswahili="Nafasi ya kujitolea"},
+
+                    new IntroductionChoice{Name= "Mental Health" ,Kiswahili="Afya ya kiakili" }
+
+                    });
+                    await context.SaveChangesAsync();
+
                 }
 
             }

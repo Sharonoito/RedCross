@@ -1,0 +1,174 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+<partial name="~/Views/Config/_ConfigLayout.cshtml" />
+
+<section class="content-header container-l flex-grow-1 container-p-y ">
+    <div class="continer-fluid">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fa fa-info-circle"></i> Manage Introduction Actions</h3>
+
+                <div class="card-tools">
+
+                    <button type="button"
+                            class="load-modal text-right btn btn-sm btn-outline-primary float-right"
+                            data-toggle="modal"
+                            data-target="#clientModal"
+                            data-modal="clientModal"
+                            data-viewurl="true"
+                            data-action="@Url.Action("CreateIntroductionChoice")" data-bs-toggle="modal" data-bs-target="#clientModal">
+                        <i class="fa fa-plus"></i> Add Introduction Action
+                    </button>
+
+                </div>
+            </div>
+
+            <div class="card-body p-1">
+                <table class="table table-striped" id="tblIntroductionChoice">
+
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Kiswahili</th>
+                            <th>Action Type</th>
+                            @*<th>Type</th>*@
+                            <th style="width: 40px">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="modal fade" data-keyboard="false" id="clientModal" tabindex="-1" role="dialog" style="display:none" aria-labelledby="clientModal" aria-hidden="true">
+        <div class="modal-dialog ">
+            <div class="modal-content">
+            </div>
+        </div>
+    </div>
+
+</section>
+
+
+@section Styles {
+    <environment names="Development,Staging,Production">
+        <!-- DataTables -->
+        <link rel="stylesheet" href="~/lib/datatables-bs4/css/dataTables.bootstrap4.min.css">
+        <link rel="stylesheet" href="~/lib/datatables-responsive/css/responsive.bootstrap4.min.css">
+        <link rel="stylesheet" href="~/lib/datatables-buttons/css/buttons.bootstrap4.min.css">
+    </environment>
+}
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <environment names="Development,Staging,Production">
+        <!-- DataTables  & Plugins -->
+        <script src="~/lib/datatables/jquery.dataTables.min.js"></script>
+        <script src="~/lib/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+        <script src="~/lib/datatables-responsive/js/dataTables.responsive.min.js"></script>
+        <script src="~/lib/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+        <script src="~/lib/datatables-buttons/js/dataTables.buttons.min.js"></script>
+        <script src="~/lib/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
+
+    </environment>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            jsdtClient.getData();
+        });
+
+        var jsdtClient = {
+            table: null,
+            initializeDataTable: function () {
+                jsdtClient.table = $('#tblIntroductionChoice').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    serverMethod: 'post',
+                    ajax: {
+                        url: "@Url.Action("GetIntroductionChoice")",
+                        type: "POST"
+                    },
+                    columns: [
+                        { data: 'name' },
+                        { data: 'kiswahili' },
+                        { data: 'actionType' },
+                       // { data: 'type' },
+                        { data: 'id', name: 'Id' },
+               
+                    ],
+                    columnDefs: [{
+                        render: function (data, type, row) {
+                            var actionsHtml =
+                                `<div class='text-center'>
+                                                        <button class='btn btn-outline-primary btn-xs load-modal'
+                                                            data-hidden='Id'
+                                                            data-id='${row.id}'
+                                                            data-toggle='modal'
+                                                            data-target='#clientModal'
+                                                            data-modal='clientModal'
+                                                            data-bs-toggle="modal" data-bs-target="#clientModal"
+                                                            data-viewurl='true'
+                                                                    data-action='@Url.Action("EditIntroductionChoice", "Config")?clientId=${row.id}'
+                                                            title='Edit'>
+                                                            <i class='fa fa-pencil-alt'></i>
+
+                                                            <button class='delete btn btn-outline-danger btn-xs'
+                                                                        data-action='@Url.Action("DeleteIntroductionChoice", "Config")?clientId=${row.id}'
+                                                                data-table='tblClients'
+                                                                data-id='${row.id}'
+                                                                data-toggle='tooltip'
+                                                                title='Delete'>
+                                                                <i class='fa fa-trash'></i>
+                                                            </button>
+
+                                                    </div>`;
+
+                            return actionsHtml;
+                        },
+                        targets: -1,
+                        orderable: false
+                    }],
+                    order: [0, 'asc'],
+                    language: {
+                        processing: 'Loading records... Please wait.',
+                    },
+                    pagingType: 'full_numbers',
+                    oLanguage: {
+                        oPaginate: {
+                            sNext: '>',
+                            sPrevious: '<',
+                            sFirst: '<<',
+                            sLast: '>>'
+                        }
+                    }
+                });
+            },
+            getData: function () {
+                if (jsdtClient.table == null) {
+                    jsdtClient.initializeDataTable();
+                } else {
+                    jsdtClient.table.ajax.reload();
+                }
+            }
+        }
+
+    </script>
+}
+
+
+
+
+
+
+
+
