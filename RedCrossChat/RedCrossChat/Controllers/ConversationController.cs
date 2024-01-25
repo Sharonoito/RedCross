@@ -12,6 +12,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
+using RedCrossChat.Objects;
 
 namespace RedCrossChat.Controllers
 {
@@ -91,6 +92,8 @@ namespace RedCrossChat.Controllers
             string gender = formData["Gender"];
 
             string county = formData["County"];
+
+            string intention = formData["Intention"];
 
            // string county = formData["County"];
 
@@ -198,10 +201,10 @@ namespace RedCrossChat.Controllers
             string value = formData["Value"];
             string type = formData["Type"];
 
-             var item = new Entities.Question { Value = value, Type = Int32.Parse(type) };
+             //var item = new Entities.Question { Value = value, Type = Int32.Parse(type) };
 
 
-             _repository.Question.Create(item);
+            // _repository.Question.Create(item);
 
              bool status = await _repository.SaveChangesAsync();
 
@@ -373,7 +376,9 @@ namespace RedCrossChat.Controllers
             var conversations=await _repository.Conversation.
                 FindByCondition(x=>x.AppUserId== Guid.Parse(User.FindFirst("UserId").Value)).
                 Include(x=>x.Persona).
-                Include(x=>x.RawConversations).OrderByDescending(x=>x.DateCreated).
+                Include(x=>x.ChatMessages)
+                .ThenInclude(x=>x.Question)
+                .OrderByDescending(x=>x.DateCreated).
                 ToListAsync();
 
             return Success("Items fetched Successfully", conversations);
@@ -393,23 +398,21 @@ namespace RedCrossChat.Controllers
         public async Task<IActionResult> CreateResponse(RawConversationVm rawConversation)
         {
 
+            var request = await _repository.HandOverRequest.FindByCondition(x => x.ConversationId == rawConversation.ConversationId)
+                         .FirstOrDefaultAsync();
 
-            var conv=new RawConversation
+            ChatMessage chat = new ChatMessage()
             {
-                ConversationId = rawConversation.ConversationId,
-
-                Question = rawConversation.Question,
-
-                HasReply =true,
-
-                QuestionTimeStamp=DateTime.Now,
-
-                IsHandOverMessage=true,
-
-                CreatedById = User.FindFirst("UserId").Value
+                Message= rawConversation.Question,
+                ConversationId=rawConversation.ConversationId,
+                Type=Constants.Bot
             };
 
-            _repository.RawConversation.Create(conv);
+            request.HasResponse = true;
+            request.LastChatMessage = chat;
+
+            _repository.ChatMessage.Create(chat);
+            _repository.HandOverRequest.Update(request);
 
             bool status= await _repository.SaveChangesAsync();
 
@@ -424,9 +427,49 @@ namespace RedCrossChat.Controllers
         public async Task<IActionResult> GetRawConversations(Guid id)
         {
 
-            var conv=await _repository.RawConversation.FindByCondition(x=>x.ConversationId==id).ToListAsync();
+            //var conv=await _repository.RawConversation.FindByCondition(x=>x.ConversationId==id).ToListAsync();
+
+            var conv=await _repository.ChatMessage.FindByCondition(x => x.ConversationId == id)
+                .Include(x=>x.Question)
+                .ToListAsync();
 
             return Success("success", conv);
+        }
+        [HttpPost]
+        public async Task<IActionResult> GetMyConversationIncludingHandOverRequests()
+        {
+            var handOverRequests = await _repository.HandOverRequest
+                .FindByCondition(x => x.HasBeenReceived == false)
+                .Include(x=>x.Conversation)
+                .ThenInclude(x=>x.Persona)
+                .Include(x=>x.Conversation)
+                .ThenInclude(x=>x.Feeling)
+                .ToListAsync();
+
+            var myConversations = await _repository.Conversation
+                .FindByCondition(x => x.AppUserId == Guid.Parse(User.FindFirst("UserId").Value) & x.IsActive)
+                
+                .Include(x => x.Persona)
+                .Include(x => x.ChatMessages)
+                .ThenInclude(x => x.Question)
+                .OrderByDescending(x => x.DateCreated)
+                .ToListAsync();
+
+            return Success("Response", new ChatResponseVm
+            {
+                handOverRequests = handOverRequests,
+                myConversations = myConversations
+            });
+        }
+
+        public async Task<IActionResult> GetHistory(Guid id)
+        {
+            var conversations =await _repository.Conversation.FindByCondition(x=>x.PersonaId == id)
+                .Include(x=>x.ChatMessages)
+                .ThenInclude(x=>x.Question)
+                .ToListAsync();
+
+            return Success("closer", conversations);
         }
     }
 }

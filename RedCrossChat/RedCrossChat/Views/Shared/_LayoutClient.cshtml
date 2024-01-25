@@ -36,7 +36,7 @@
         .custom-footer {
             background-color: #ED1C24;
             color: white;
-            padding: 1%;
+            
         }
     </style>
 </head>
@@ -72,20 +72,11 @@
         </div>
     </div>
     <!-- Layout wrapper -->
-    <div class="layout-wrapper layout-content-navbar">
-        <div class="layout-container">
-            <!-- Menu -->
-           
-            <!-- / Menu -->
-            <!-- Layout container -->
-            <div class="layout-page">
-                <!-- Navbar -->
+    <div class="layout-rapper layout-content-navbar" style="float: left;width: 100%;height: 100vh;">
+        <div class="layot-container" style="display: flex;flex-direction: column;float: left;width: 100%;height: 100%;">
+            
+            <div class="layut-page">
                
-
-                <!-- / Navbar -->
-                <!-- Content wrapper -->
-                
-                    <!-- Content -->
 
                     <div class="container-fluid">
 
@@ -95,9 +86,8 @@
 
 
                     </div>
-                    <!-- / Content -->
-                    <!-- Footer -->
-                    <footer class="content-footer footer custom-footer">
+                   
+                    <footer class="content-footer footer custom-footer py-1 mt-auto">
                         <div class=" d-flex flex-wrap justify-content-between py-2 flex-md-row flex-column">
                             <div class="mb-2 mb-md-0 float-end right">
 
@@ -111,22 +101,19 @@
                             </div>
                         </div>
                     </footer>
-                    <!-- / Footer -->
-                    @*<div class="content-backdrop fade"></div>*@
-                
-                <!-- Content wrapper -->
+                  
+                    <div class="d-none">
+                        <partial name="_Sidebar" />
+                    </div>
             </div>
-            <!-- / Layout page -->
+           
         </div>
-
-        <!-- Overlay -->
-        @*<div class="layout-overlay layout-menu-toggle"></div>*@
     </div>
 
 
     <partial name="_JsScript" />
 
-    @RenderSection("Scripts", required: false);
+    @RenderSection("Scripts", required: false)
 
 
 </body>

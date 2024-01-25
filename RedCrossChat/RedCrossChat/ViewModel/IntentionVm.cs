@@ -11,6 +11,10 @@ namespace RedCrossChat.ViewModel
         [Required]
         public string Name { get; set; }
 
+        [Display(Name = "Kiswahili")]
+        [Required]
+        public string Kiswahili { get; set; }
+
         [Display(Name = "SubIntention")]
         public string SubIntention { get; set; }
 

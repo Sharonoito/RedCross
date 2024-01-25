@@ -5,8 +5,10 @@ namespace RedCrossChat.Entities
     {
         public string Name { get; set; } 
 
+        public string Kiswahili { get; set; }
+
         public bool IsActive { get; set; } = false;
 
-        public List<SubIntention> SubIntentions;
+        public List<SubIntention> SubIntentions { get; set; }
     }
 }

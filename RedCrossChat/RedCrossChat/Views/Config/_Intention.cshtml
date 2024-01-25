@@ -22,24 +22,16 @@
         <div class="row">
               <div class="form-group col-lg-12 mb-2">
                 <label asp-for="Name"></label>
-                <input asp-for="Name" class="form-control" autocomplete="off" />
+                <input asp-for="Name" class="form-control" autocomplete="off" required data-val="true" data-val-required="The Name field is required." />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
 
-            <div class="row gx-3 gy-2 align-items-center">
-                <div class="col-md-6">
-                    <label for="Team">Select SubIntention</label>
-               
-                    <select id="selectTypeOpt" class="form-select color-dropdown" name="employee">
-                        <option value="-1" selected>Select SubIntention</option>
-                    </select>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label" for="showToastPlacement">&nbsp;</label>
-                    <button id="showToastPlacement" class="btn btn-primary d-block" type="button">Add Sub-Intention</button>
-                </div>
+            <div class="form-group col-lg-12 mb-2">
+                <label asp-for="Kiswahili"></label>
+                <input asp-for="Kiswahili" class="form-control" autocomplete="off" required data-val="true" data-val-required="The Kiswahili field is required." />
+                <span asp-validation-for="Kiswahili" class="text-danger"></span>
             </div>
-         
+
         </div>
 
     </div>

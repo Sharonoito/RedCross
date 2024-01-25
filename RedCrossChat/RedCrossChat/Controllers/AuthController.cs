@@ -12,6 +12,9 @@ using System.Linq;
 using DataTables.AspNet.Core;
 using DataTables.AspNet.AspNetCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Data;
+using RedCrossChat.Domain;
 
 namespace RedCrossChat.Controllers
 {
@@ -49,31 +52,32 @@ namespace RedCrossChat.Controllers
             });
         }
 
+
         [HttpPost]
         [AllowAnonymous]
         public async Task<IActionResult> Login(LoginVM model, string returnUrl = null)
         {
-
             if (!ModelState.IsValid)
                 return View(model);
 
             // Sign out any previous sessions
             await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
 
+            var user = await _userManager.FindByEmailAsync(model.Email);
 
-            var result = await _signInManager
-               .PasswordSignInAsync(model.Email, model.Password, true, false);
-
-            if (result.Succeeded)
-                return RedirectToLocal(returnUrl);
-            else
+            if (user != null && !user.IsDeactivated)
             {
-                ModelState.AddModelError("", "Invalid username or password!");
-                return View(new LoginVM()
-                {
-                    ReturnUrl = returnUrl
-                });
+                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, true, false);
+
+                if (result.Succeeded)
+                    return RedirectToLocal(returnUrl);
             }
+
+            ModelState.AddModelError("", "Invalid username or password!");
+            return View(new LoginVM()
+            {
+                ReturnUrl = returnUrl
+            });
         }
 
         private IActionResult RedirectToLocal(string returnUrl)
@@ -87,22 +91,18 @@ namespace RedCrossChat.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> DeactivateAccount(Guid clientId)
         {
-            var user = await _userManager.GetUserAsync(User);
+            var user = await _userManager.FindByIdAsync(clientId.ToString());
 
             if (user != null)
             {
                 user.IsDeactivated = true;
+
                 await _userManager.UpdateAsync(user);
 
-
-                //return PartialView("_AccountDeactivated");
-                return Json(new { success = true });
+                return PartialView("_AccountDeactivated");
             }
             return Json(new { success = false, message = "Account deactivation failed. User not found." });
-
-            //return Content("Account deactivation failed. User not found.");
         }
-
 
 
         public IActionResult Profile()
@@ -134,16 +134,14 @@ namespace RedCrossChat.Controllers
         {
             try
             {
-                var data = await _repository.User.GetAllAsync();
+                var data = await _repository.User
+                    .GetAllAsync();
+                    //.FindByCondition(x=>x.Email !=Constants.DefaultSuperAdminEmail).ToListAsync();
                 // Filter them
-
-
 
                 var filteredRows = data
                     .AsQueryable()
                     .FilterBy(dtRequest.Search, dtRequest.Columns);
-
-                
 
                 // Sort and paginate them
                 var pagedRows = filteredRows
@@ -164,17 +162,38 @@ namespace RedCrossChat.Controllers
             }
         }
 
-        public IActionResult CreateUser()
+        public async Task<IActionResult> CreateUser(Guid clientId)
         {
             ViewBag.Title = "Create User";
 
-            return View("_User");
+            var userVm=new UserVm();
+
+            var roles = _roleManager.Roles.Select(x => new SelectListItem { Text = x.Name, Value = x.Name }).ToList();
+
+            if (clientId != Guid.Empty)
+            {
+                var user = await _repository.User.FindByCondition(x => x.Id == clientId.ToString()).FirstOrDefaultAsync();
+
+                var roleNames = await _userManager.GetRolesAsync(user);
+              
+                userVm = new UserVm
+                {
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Email = user.Email,
+                    PhoneNumber = user.PhoneNumber,
+                    RoleNames= roleNames.Cast<string>().ToArray(),
+                    Id = clientId
+                };
+            }
+
+            userVm.RoleList = roles;
+
+            return View("_User", userVm);
         }
 
-        public async Task<IActionResult> ResetPassword()
+        public IActionResult ResetPassword()
         {
-
-            
 
             return View("_ResetPassword");
         }
@@ -202,21 +221,7 @@ namespace RedCrossChat.Controllers
             return Error("Something broke");
         }
 
-        public async Task<IActionResult> EditUser(Guid clientId)
-        {
-
-            var user=await _repository.User.FindByCondition(x => x.Id == clientId.ToString()).FirstOrDefaultAsync();
-
-            var userVm = new UserVm
-            {
-                FirstName=user.FirstName,
-                LastName=user.LastName,
-                Email=user.Email,
-                PhoneNumber=user.PhoneNumber,
-            };
-
-            return View("_User",userVm);
-        }
+      
 
         public async Task< IActionResult> SaveUser(UserVm user) {
 
@@ -239,6 +244,13 @@ namespace RedCrossChat.Controllers
 
                     var result = await _userManager.CreateAsync(appUser, "Test@!23");
 
+                    if (user.RoleNames != null)
+                    {
+                        IdentityResult addResult = await _userManager.AddToRolesAsync(appUser, user.RoleNames);
+                        if (!addResult.Succeeded)
+                            return Error("Failed to assign user roles.");
+                    }
+
                     if (!result.Succeeded)
                         return Error(result.Errors.First().Description.ToString());
 
@@ -250,25 +262,62 @@ namespace RedCrossChat.Controllers
 
                     userDB.FirstName = user.FirstName;
                     userDB.LastName = user.LastName;
-                    userDB.Email = user.Email;
-                    userDB.UserName = user.UserName;
+              
+                    userDB.PhoneNumber=user.PhoneNumber;
 
-                    _repository.User.Update(userDB);
+                    try
+                    {
+                        var currentRoles = await _userManager.GetRolesAsync(userDB);
 
-                    var result = await _repository.SaveChangesAsync();
+                        _repository.User.Update(userDB);
 
-                    if (result)
-                       return Success(null, null);
+                        if (currentRoles != null && currentRoles.Count > 0)
+                        {
+                            IdentityResult removeResult = await _userManager.RemoveFromRolesAsync(userDB, currentRoles.ToArray());
+                            if (!removeResult.Succeeded)
+                                return Error("Failed to remove user roles.");
+                        }
+
+                        // Assign the newly selected Roles
+                        if (user.RoleNames != null)
+                        {
+                            IdentityResult addResult = await _userManager.AddToRolesAsync(userDB, user.RoleNames);
+
+                            if (!addResult.Succeeded)
+                                return Error("Failed to assign user roles.");
+                        }
+
+                        var result = await _repository.SaveChangesAsync();
+
+                        if (result)
+                        {
+                            return Success("Updated Successfully");
+                        }
+                    }
+                    catch(Exception ex)
+                    {
+                        return Error(ex.ToString());
+                    }
+             
+
+                    
+
+                    return Error("Unable to Update ", null);
                 }
             }
-            catch(Exception)
+            catch(Exception ex)
             {
-                return Error("Something broke");
+                return Error(ex.Message);
             }
 
-
-            return Error("No response");
         }
+
+
+        public IActionResult Roles()
+        {
+            return View();
+        }
+
 
 
     }

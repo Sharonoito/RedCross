@@ -1,4 +1,5 @@
 ﻿using Microsoft.Bot.Builder.Dialogs.Choices;
+using Microsoft.Bot.Schema;
 using System.Collections.Generic;
 
 namespace RedCrossChat.Objects
@@ -6,7 +7,7 @@ namespace RedCrossChat.Objects
 
     public static class RedCrossDialogTypes
     {
-        public static readonly string SelectCounty="Select_County";
+        public const string SelectCounty="Select_County";
     }
 
     public static class RedCrossLists
@@ -75,25 +76,6 @@ namespace RedCrossChat.Objects
             new Choice() { Value = CountrySwahili.Other,Synonyms=new List<string>{"o","other"}},
         };
 
-        public static List<Choice> Reasons = new List<Choice>()
-        {
-            new Choice  { Value ="Suicidal ideations",},
-            new Choice  { Value ="Feelings of hopelessness",},
-            new Choice { Value = "Financial distress" },
-            new Choice { Value = "Childhood trauma" },
-            new Choice { Value = "Work related stress and burnout" },
-        };
-
-        public static List<Choice> ReasonsKiswahili = new List<Choice>()
-        {
-            new Choice  { Value ="Mawazo ya kutaka kujitoaa uhai",},
-            new Choice  { Value ="Hisia za kukata tamaa",},
-            new Choice { Value = "Shida za kifedha" },
-            new Choice { Value = "Msongo wa utotoni wa kisaikolojia" },
-            new Choice { Value = "Msongo wa kazi na kuchoka kikazi" },
-        };
-
-      
     }
 
     public static class Validations
@@ -106,19 +88,6 @@ namespace RedCrossChat.Objects
     {
         public const string YES="Ndio";
         public const string NO="La";
-    }
-
-    public static class Gender
-    {
-        public const string Male = "Male";
-        public const string Female = "Female";
-        public const string Other = "Other";
-    }
-    public static class GenderSwahili
-    {
-        public const string Male = "Mume";
-        public const string Female = "Mke";
-        public const string Other = "Haijatajwa";
     }
 
     public static class CountryValidation
@@ -141,28 +110,20 @@ namespace RedCrossChat.Objects
     }
 
 
-    public static class LanguageOptions
-    {
-        public const string English = "English";
-        public const string Kiswahili = "Kiswahili ";
- 
-    }
-
-
     public static class InitialActions
     {
-        public static readonly string MentalHealth = "Mental Health";
-        public static readonly string Careers = "Careers";
-        public static readonly string VolunteerAndMemberShip = "Volunteer and Membership";
-        public static readonly string VolunteerOpportunities = "Volunteer Opportunities";
+        public const string MentalHealth = "Mental Health";
+        public const string Careers = "Careers";
+        public const string VolunteerAndMemberShip = "Membership and Volunteerism";
+        public const string VolunteerOpportunities = "Volunteer Opportunities";
     }
 
     public static class InitialActionsKiswahili
     {
-        public static readonly string MentalHealth = "Afya ya kiakili";
-        public static readonly string Careers = "Taaluma";
-        public static readonly string VolunteerAndMemberShip = "Kujitolea na kuwa mshirika";
-        public static readonly string VolunteerOpportunities = "Nafasi ya kujitolea";
+        public const string MentalHealth = "Afya ya kiakili";
+        public const string Careers = "Taaluma";
+        public const string VolunteerAndMemberShip = "Kujitolea na kuwa mshirika";
+        public const string VolunteerOpportunities = "Nafasi ya kujitolea";
     }
 
    

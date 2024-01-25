@@ -2,7 +2,7 @@
 @{
 }
 
-<nav class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme" id="layout-navbar">
+<nav class="layout-navbar container-l navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme" id="layout-navbar">
 
 
     <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0   d-xl-none ">
@@ -188,9 +188,7 @@
             <li class="nav-item navbar-dropdown dropdown-user dropdown">
                 <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
                     <div class="avatar avatar-online">
-                        <img src="~/img/RedCrossLogo.png" alt="Kenya Red Cross Logo" class="w-px-40 h-auto rounded-circle"
-                             >
-                       
+                        <img src="~/img/RedCrossLogo.png" alt="Kenya Red Cross Logo" class="w-px-40 h-auto rounded-circle" />
                     </div>
                 </a>
 
@@ -215,13 +213,13 @@
                         <li>
                             <div class="dropdown-divider"></div>
                         </li>
-
+@*
                         <li class="dropdown-item @Html.IsSelected(controller: "Auth", action: "Profile")">
                             <a asp-action="Profile" asp-controller="Auth" style="text-decoration: none; color: inherit; cursor: pointer;">
                                 <i class="bx bx-user me-2"></i>
                                 <span class="align-middle">My Profile</span>
                             </a>
-                        </li>
+                        </li>*@
 
                         <li >
                             <button type="button" class="dropdown-item load-modal"

@@ -21,8 +21,8 @@ namespace RedCrossChat.Domain
                 var userMgr = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
                 var roleMgr = scope.ServiceProvider.GetRequiredService<RoleManager<AppRole>>();
 
-                var superAdminRole = new AppRole(Constants.SuperAdministratorId, "Super Administrator", true, DateTime.Now);
-                var adminRole = new AppRole(Constants.AdministratorId, "Administrator", true, DateTime.Now);
+                var superAdminRole = new AppRole(Constants.SuperAdministratorId, Constants.SuperAdministrator, true, DateTime.Now);
+                var adminRole = new AppRole(Constants.AdministratorId, Constants.Administrator, true, DateTime.Now);
 
                 if (!context.Roles.Any())
                 {
@@ -54,7 +54,7 @@ namespace RedCrossChat.Domain
                     #endregion
                 }
 
-                if (!context.Users.Any(x => x.UserName.ToLower() == "admin@redcross.com"))
+                if (!context.Users.Any(x => x.UserName.ToLower() == Constants.DefaultSuperAdminEmail))
                 {
                     // Create admin user
                     var adminUser = new AppUser
@@ -62,8 +62,8 @@ namespace RedCrossChat.Domain
                         Id = "8bd49ae1-6059-4099-8002-9bdaea92ced3",
                         FirstName = "Admin",
                         LastName = "User",
-                        UserName = "admin@redcross.com",
-                        Email = "admin@redcross.com",
+                        UserName = Constants.DefaultSuperAdminEmail,
+                        Email = Constants.DefaultSuperAdminEmail,
                     };
                     userMgr.CreateAsync(adminUser, "Test@!23").GetAwaiter().GetResult();
 
@@ -142,6 +142,18 @@ namespace RedCrossChat.Domain
                     foreach (var item in data)
                     {
                         context.MaritalState.Add(new MaritalState { Name = item.Name, Kiswahili = item.Kiswahili, Synonyms = "" });
+
+                        await context.SaveChangesAsync();
+                    }
+                }
+
+                if (!context.Question.Any())
+                {
+                    var data = await SeedHelper.GetSeedData<Question>("Questions.json");
+
+                    foreach (var item in data)
+                    {
+                        context.Question.Add(new Question { Kiswahili=item.Kiswahili,question=item.question,Code=item.Code });
 
                         await context.SaveChangesAsync();
                     }

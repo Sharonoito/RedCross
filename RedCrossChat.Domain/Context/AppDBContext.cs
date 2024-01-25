@@ -37,6 +37,8 @@ namespace RedCrossChat.Domain
 
         public DbSet<DBFeeling> Feeling { get; set; }
 
+        public DbSet<ChatMessage> ChatMessage { get; set; }
+
         public DbSet<DBCounty> County { get; set; }
 
         public DbSet<RawConversation> RawConversation { get; set; }
@@ -56,6 +58,13 @@ namespace RedCrossChat.Domain
             base.OnModelCreating(modelBuilder);
 
             new DbInitializer(modelBuilder).Seed();
+
+            modelBuilder.Entity<Intention>()
+                .HasMany(i => i.SubIntentions)
+                .WithOne(si => si.Intention)
+                .HasForeignKey(si => si.IntentionId);
+
+
         }
     }
 }

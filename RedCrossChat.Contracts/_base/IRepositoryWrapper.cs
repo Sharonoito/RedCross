@@ -44,6 +44,8 @@ namespace RedCrossChat.Contracts
         IQuestionOption QuestionOption { get; }
 
         IHandOverRequest HandOverRequest { get; }
+        
+        IChatMessage ChatMessage { get; }
         #endregion
 
         IPersonaRepo Persona { get; }

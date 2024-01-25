@@ -1,13 +1,11 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License.
-//
-// Generated with Bot Builder V4 SDK Template for Visual Studio CoreBot v4.18.1
-
+﻿
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Builder.TraceExtensions;
 using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Bot.Schema;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
 
@@ -15,36 +13,46 @@ namespace RedCrossChat
 {
     public class AdapterWithErrorHandler : CloudAdapter
     {
-        public AdapterWithErrorHandler(BotFrameworkAuthentication auth, ILogger<IBotFrameworkHttpAdapter> logger, ConversationState conversationState = default)
+        private readonly IWebHostEnvironment environment;
+
+        public AdapterWithErrorHandler(BotFrameworkAuthentication auth, ILogger<IBotFrameworkHttpAdapter> logger, ConversationState conversationState = default, IWebHostEnvironment environment=default)
             : base(auth, logger)
         {
+            
+
             OnTurnError = async (turnContext, exception) =>
             {
+
+
                 // Log any leaked exception from the application.
                 logger.LogError(exception, $"[OnTurnError] unhandled error : {exception.Message}");
 
                 // Send a message to the user
 
-
-                var errorMessageText = $"The bot encountered an error or bug. {exception.Message}";
-                var errorMessage = MessageFactory.Text(errorMessageText, errorMessageText, InputHints.ExpectingInput);
-                await turnContext.SendActivityAsync(errorMessage);
-
-                if (exception.InnerException != null)
+                if(environment.IsDevelopment())
                 {
-                    errorMessageText = $"The bot encountered an error or bug. {exception.InnerException}";
+                    var errorMessageText = $"The bot encountered an error or bug. {exception.Message}";
+                    var errorMessage = MessageFactory.Text(errorMessageText, errorMessageText, InputHints.ExpectingInput);
+                    await turnContext.SendActivityAsync(errorMessage);
+
+                    if (exception.InnerException != null)
+                    {
+                        errorMessageText = $"The bot encountered an error or bug. {exception.InnerException}";
+                        errorMessage = MessageFactory.Text(errorMessageText, errorMessageText, InputHints.ExpectingInput);
+                        await turnContext.SendActivityAsync(errorMessage);
+                    }
+                    else
+                    {
+
+                    }
+
+
+                    errorMessageText = "To continue to run this bot, please fix the bot source code.";
                     errorMessage = MessageFactory.Text(errorMessageText, errorMessageText, InputHints.ExpectingInput);
                     await turnContext.SendActivityAsync(errorMessage);
                 }
-                else
-                {
 
-                }
-
-
-                errorMessageText = "To continue to run this bot, please fix the bot source code.";
-                errorMessage = MessageFactory.Text(errorMessageText, errorMessageText, InputHints.ExpectingInput);
-                await turnContext.SendActivityAsync(errorMessage);
+                
 
                 if (conversationState != null)
                 {
@@ -64,7 +72,7 @@ namespace RedCrossChat
                 // Send a trace activity, which will be displayed in the Bot Framework Emulator
                 await turnContext.TraceActivityAsync("OnTurnError Trace", exception.Message, "https://www.botframework.com/schemas/error", "TurnError");
             };
-            
+            this.environment = environment;
         }
     }
 }
