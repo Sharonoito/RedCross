@@ -1,0 +1,93 @@
+﻿
+@{
+
+}
+
+
+<div class="container-l flex-grow-1 container-p-y">
+
+    <h4 class="py-3 mb-4">
+        <span class="text-muted fw-light px-2"> Settings /</span> @ViewBag.PageTitle
+    </h4>
+
+    <div class="row fv-plugins-icon-container">
+        <div class="col-md-12">
+            <ul class="nav nav-pills flex-column flex-md-row mb-3">
+                <li class="nav-item @(Html.IsSelected(controller: "Config", action: "Feeling") )">
+                    <a asp-action="Feeling" asp-controller="Config" class="nav-link @(Html.IsSelected(controller: "Config", action: "Feeling") )">
+                        <i class="bx bx-user me-1"></i> Feelings
+                    </a>
+                </li>
+
+                <li class="nav-item @(Html.IsSelected(controller: "Config", action: "Profession") )">
+                    <a asp-action="Profession" asp-controller="Config" class="nav-link @(Html.IsSelected(controller: "Config", action: "Profession"))">
+                        <i class="bx bx-grid-alt me-1"></i> Professional Status
+                    </a>
+                </li>
+
+                <li class="nav-item @(Html.IsSelected(controller: "Config", action: "AgeBand") == "active" ? "active" : "")">
+                    <a asp-action="AgeBand" asp-controller="Config" class="nav-link @(Html.IsSelected(controller: "Config", action: "AgeBand"))">
+                        <i class="bx bx-bell me-1"></i> Age Band
+                    </a>
+                </li>
+
+                <li class="nav-item @(Html.IsSelected(controller: "Config", action: "MaritalState") == "active" ? "active" : "")">
+                    <a asp-action="MaritalState" asp-controller="Config" class="nav-link @(Html.IsSelected(controller: "Config", action: "MaritalState"))">
+                        <i class="bx bx-bell me-1"></i> Marital Status
+                    </a>
+                </li>
+
+                <li class="nav-item @(Html.IsSelected(controller: "Config", action: "Gender") == "active" ? "active" : "")">
+                    <a asp-action="Gender" asp-controller="Config" class="nav-link @(Html.IsSelected(controller: "Config", action: "Gender"))">
+                        <i class="bx bx-bell me-1"></i> Gender
+                    </a>
+                </li>
+
+                <li class="nav-item @(Html.IsSelected(controller: "Config", action: "Intention") == "active" ? "active" : "")">
+                    <a asp-action="Intention" asp-controller="Config" class="nav-link @(Html.IsSelected(controller: "Config", action: "Intention"))">
+                        <i class="bx bx-bell me-1"></i> Intention
+                    </a>
+                </li>
+
+                <li class="nav-item @(Html.IsSelected(controller: "Config", action: "SubIntention") == "active" ? "active" : "")">
+                    <a asp-action="SubIntention" asp-controller="Config" class="nav-link @(Html.IsSelected(controller: "Config", action: "SubIntention"))">
+                        <i class="bx bx-bell me-1"></i> Sub Intention
+                    </a>
+                </li>
+
+                <li class="nav-item @(Html.IsSelected(controller: "Config", action: "Exercise") == "active" ? "active" : "")">
+                    <a asp-action="Exercise" asp-controller="Config" class="nav-link @(Html.IsSelected(controller: "Config", action: "Exercise"))">
+                        <i class="bx bx-bell me-1"></i> Breathing Exercise
+                    </a>
+                </li>
+
+                <li class="nav-item @(Html.IsSelected(controller: "Config", action: "IntroductionChoice") == "active" ? "active" : "")">
+                    <a asp-action="IntroductionChoice" asp-controller="Config" class="nav-link @(Html.IsSelected(controller: "Config", action: "IntroductionChoice"))">
+                        <i class="bx bx-bell me-1"></i> Introduction Choices
+                    </a>
+                </li>
+
+                <li class="nav-item @(Html.IsSelected(controller: "Config", action: "InitialActionItem") == "active" ? "active" : "")">
+                    <a asp-action="InitialActionItem" asp-controller="Config" class="nav-link @(Html.IsSelected(controller: "Config", action: "InitialActionItem"))">
+                        <i class="bx bx-bell me-1"></i> Initial Actions
+                    </a>
+                </li>
+
+            </ul>
+
+
+        </div>
+    </div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+

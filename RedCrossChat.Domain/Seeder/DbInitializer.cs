@@ -20,8 +20,11 @@ namespace RedCrossChat.Domain
         public  void Seed()
         {
             modelBuilder.Entity<AppRole>().HasData(
-                new AppRole(Constants.SuperAdministratorId, "Super Administrator", true, DateTime.Now),
-                new AppRole(Constants.AdministratorId, "Administrator", true, DateTime.Now)
+                new AppRole(Constants.SuperAdministratorId, Constants.SuperAdministrator, true, DateTime.Now),
+                new AppRole(Constants.AdministratorId, Constants.Administrator, true, DateTime.Now),
+                new AppRole(Guid.NewGuid().ToString(),Constants.PssAgent,true, DateTime.Now),
+                new AppRole(Guid.NewGuid().ToString(),Constants.PssManager,true, DateTime.Now),
+                new AppRole(Guid.NewGuid().ToString(),Constants.AuditRole,true, DateTime.Now)  
            );
         }
     }

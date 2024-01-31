@@ -15,9 +15,24 @@ namespace RedCrossChat.Domain
             string path = "wwwroot/JsonFiles";
             string fullPath = Path.Combine(currentDirectory, path, fileName);
 
-            var data = await File.ReadAllTextAsync(fullPath);
-            //var results = JsonSerializer.Deserialize<List<TEntity>>(elisaPlateDefsData);
-            return JsonSerializer.Deserialize<List<TEntity>>(data);
+            try
+            {
+                var data = await File.ReadAllTextAsync(fullPath);
+                //var results = JsonSerializer.Deserialize<List<TEntity>>(elisaPlateDefsData);
+                var items = JsonSerializer.Deserialize<List<TEntity>>(data);
+
+                if (items == null)
+                {
+                    return new List<TEntity>();
+                }
+                return items;
+            }
+            catch(FileNotFoundException ex)
+            {
+                return new List<TEntity>();
+            }
+
+            
         }
     }
 }

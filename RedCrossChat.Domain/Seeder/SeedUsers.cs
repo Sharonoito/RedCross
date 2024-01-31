@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using RedCrossChat;
+using RedCrossChat.Contracts;
 using RedCrossChat.Entities;
 using RedCrossChat.Entities.Auth;
 using System.Security.Claims;
@@ -21,8 +22,8 @@ namespace RedCrossChat.Domain
                 var userMgr = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
                 var roleMgr = scope.ServiceProvider.GetRequiredService<RoleManager<AppRole>>();
 
-                var superAdminRole = new AppRole(Constants.SuperAdministratorId, "Super Administrator", true, DateTime.Now);
-                var adminRole = new AppRole(Constants.AdministratorId, "Administrator", true, DateTime.Now);
+                var superAdminRole = new AppRole(Constants.SuperAdministratorId, Constants.SuperAdministrator, true, DateTime.Now);
+                var adminRole = new AppRole(Constants.AdministratorId, Constants.Administrator, true, DateTime.Now);
 
                 if (!context.Roles.Any())
                 {
@@ -54,7 +55,7 @@ namespace RedCrossChat.Domain
                     #endregion
                 }
 
-                if (!context.Users.Any(x => x.UserName.ToLower() == "admin@redcross.com"))
+                if (!context.Users.Any(x => x.UserName.ToLower() == Constants.DefaultSuperAdminEmail))
                 {
                     // Create admin user
                     var adminUser = new AppUser
@@ -62,8 +63,8 @@ namespace RedCrossChat.Domain
                         Id = "8bd49ae1-6059-4099-8002-9bdaea92ced3",
                         FirstName = "Admin",
                         LastName = "User",
-                        UserName = "admin@redcross.com",
-                        Email = "admin@redcross.com",
+                        UserName = Constants.DefaultSuperAdminEmail,
+                        Email = Constants.DefaultSuperAdminEmail,
                     };
                     userMgr.CreateAsync(adminUser, "Test@!23").GetAwaiter().GetResult();
 
@@ -145,6 +146,49 @@ namespace RedCrossChat.Domain
 
                         await context.SaveChangesAsync();
                     }
+                }
+
+                if (!context.Question.Any())
+                {
+                    var data = await SeedHelper.GetSeedData<Question>("Questions.json");
+
+                    foreach (var item in data)
+                    {
+                        context.Question.Add(new Question { Kiswahili=item.Kiswahili,question=item.question,Code=item.Code });
+
+                        await context.SaveChangesAsync();
+                    }
+                }
+
+                if (!context.Exercise.Any())
+                {
+                    var data = await SeedHelper.GetSeedData<Exercise>("Exercise.json");
+
+                    foreach(var item in data)
+                    {
+                        context.Exercise.Add(new Exercise { Feeling=item.Feeling,Value=item.Value,Exercises=item.Exercises,Kiswahili=item.Kiswahili });
+
+                        await context.SaveChangesAsync();
+                    }
+
+                }
+
+                if (!context.IntroductionChoice.Any())
+                {
+                 
+                    context.IntroductionChoice.AddRange(new List<IntroductionChoice>{
+
+                    new IntroductionChoice{Name= "Membership and Volunteerism",Kiswahili="Kujitolea na kuwa mshirika"},
+
+                    new IntroductionChoice{Name= "Careers" ,Kiswahili="Taaluma" },
+
+                    new IntroductionChoice{Name= "Volunteer Opportunities",Kiswahili="Nafasi ya kujitolea"},
+
+                    new IntroductionChoice{Name= "Mental Health" ,Kiswahili="Afya ya kiakili" }
+
+                    });
+                    await context.SaveChangesAsync();
+
                 }
 
             }

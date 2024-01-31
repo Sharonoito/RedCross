@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace RedCrossChat
@@ -24,7 +26,10 @@ namespace RedCrossChat
         [Display(Name = "Phone Number")]
         public string PhoneNumber { get; set; }
 
-        [Display(Name = "Role")]
-        public int RoleId { get;set; }
+        [Required]
+        [Display(Name = "Roles")]
+        public string[] RoleNames { get; set; }
+
+        public List<SelectListItem> RoleList { get; set; }
     }
 }

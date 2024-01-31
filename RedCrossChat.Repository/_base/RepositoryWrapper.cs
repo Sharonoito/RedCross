@@ -1,9 +1,6 @@
-﻿using RedCrossChat.Contracts;
-
-
+using RedCrossChat.Contracts;
 using RedCrossChat.Domain;
-
-
+using RedCrossChat.Entities;
 
 namespace RedCrossChat.Repository
 {
@@ -177,6 +174,17 @@ namespace RedCrossChat.Repository
             }
         }
 
+        public IExercise _exercise;
+
+        public IExercise Exercise
+        {
+            get
+            {
+                if (_exercise == null) { _exercise = new ExerciseRepo(_repoContext); }
+                return _exercise;
+            }
+        }
+
         public IQuestionOption _questionOption;
         public IQuestionOption QuestionOption
         {
@@ -214,6 +222,30 @@ namespace RedCrossChat.Repository
         }
 
 
+        public IItention _itention;
+
+        public IItention Itention
+        {
+            get 
+            {
+                if(_itention == null) { _itention = new IntetionRepo(_repoContext); }
+                return _itention;
+            }
+        }
+
+
+        public ISubIntention? _subintention;
+
+        public ISubIntention SubIntention
+        {
+            get
+            {
+                if(_subintention == null) { _subintention = new SubIntentionRepo(_repoContext); };
+                return _subintention; 
+            }
+        }
+
+
         public IRawConversation _rawConversation;
 
         public IRawConversation RawConversation
@@ -223,6 +255,18 @@ namespace RedCrossChat.Repository
                 if (_rawConversation == null) { _rawConversation = new RawConversationRepo(_repoContext); }
 
                 return _rawConversation;
+            }
+        }
+
+        public IChatMessage _chatMessage;
+
+        public IChatMessage ChatMessage
+        {
+            get
+            {
+                if (_chatMessage == null) _chatMessage = new ChatMessageRepo(_repoContext);
+
+                return _chatMessage;
             }
         }
 
@@ -242,6 +286,35 @@ namespace RedCrossChat.Repository
             }
         }
       
+        public IIntroductionChoice _introChoices;
+
+        public IIntroductionChoice IntroductionChoice
+        {
+            get
+            {
+                if(_introChoices == null)
+                {
+                    _introChoices = new IntroductionChoiceRepo(_repoContext);
+                }
+
+                return _introChoices;
+            }
+        }
+
+        public IInitialActionItem _initialActionItem;
+
+        public IInitialActionItem InitialActionItem
+        {
+            get
+            {
+                if (_initialActionItem == null)
+                {
+                    _initialActionItem = new InitialActionItemRepo(_repoContext);
+                }
+
+                return _initialActionItem;
+            }
+        }
 
         public async Task<bool> SaveChangesAsync()
         {

@@ -1,12 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace RedCrossChat.Entities.BotFlow
+﻿
+namespace RedCrossChat.Entities
 {
-    public  class Intention
+    public  class Intention : BaseEntity
     {
+        public string Name { get; set; } 
+
+        public string Kiswahili { get; set; }
+
+        public bool IsActive { get; set; } = false;
+
+        public List<SubIntention> SubIntentions { get; set; }
     }
 }

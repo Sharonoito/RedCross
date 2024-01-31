@@ -1,0 +1,190 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+
+<section class="content-header">
+    <div class="container-fluid">
+        <ul class="nav nav-tabs bordered">
+            <li class="nav-item @(Html.IsSelected(controller: "Config", action: "Users") )">
+                <a asp-action="Users" asp-controller="Auth" class="nav-link @(Html.IsSelected(controller: "Auth", action: "Users") )">
+                    <i class="fa fa-md fa-users mr-2"></i> Users
+                </a>
+            </li>
+
+            <li class="nav-item @(Html.IsSelected(controller: "Auth", action: "Roles") )">
+                <a asp-action="Roles" asp-controller="Auth" class="nav-link @(Html.IsSelected(controller: "Auth", action: "Roles") )">
+                    <i class="fa fa-md fa-th mr-2"></i> Roles
+                </a>
+            </li>
+
+
+        </ul>
+
+
+        <!-- Roles -->
+        <div id="tab-2" class="tab-pane fadeIn mt-1">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row mb-3">
+
+                        <div class="col-lg-6">
+                            <i class="fa fa-info-circle"></i> Setup roles.
+                        </div>
+
+                        <div class="col-lg-6">
+                            <button type="button"
+                                    class="load-modal text-right btn btn-sm btn-outline-primary float-right d-none"
+                                    data-toggle="modal"
+                                    data-target="#userModal"
+                                    data-modal="userModal"
+                                    data-viewurl="true"
+                                    data-action="@Url.Action("CreateRole")">
+                                <i class="fa fa-plus"></i> Add Role
+                            </button>
+                        </div>
+                    </div>
+
+                    <table id="tblRoles" class="table table-bordered table-hover" width="100%">
+                        <thead>
+                            <tr>
+                                <th>Role</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>Role</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+    <div class="modal fade" data-keyboard="false"  id="clientModal" tabindex="-1" role="dialog" style="display:none" aria-labelledby="clientModal" aria-hidden="true">
+        <div class="modal-dialog ">
+            <div class="modal-content">
+            </div>
+        </div>
+    </div>
+    
+</section>
+
+
+@section Styles {
+    <environment names="Development,Staging,Production">
+        <!-- DataTables -->
+        <link rel="stylesheet" href="~/lib/datatables-bs4/css/dataTables.bootstrap4.min.css">
+        <link rel="stylesheet" href="~/lib/datatables-responsive/css/responsive.bootstrap4.min.css">
+        <link rel="stylesheet" href="~/lib/datatables-buttons/css/buttons.bootstrap4.min.css">
+    </environment>
+}
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <environment names="Development,Staging,Production">
+        <!-- DataTables  & Plugins -->
+        <script src="~/lib/datatables/jquery.dataTables.min.js"></script>
+        <script src="~/lib/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+        <script src="~/lib/datatables-responsive/js/dataTables.responsive.min.js"></script>
+        <script src="~/lib/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+        <script src="~/lib/datatables-buttons/js/dataTables.buttons.min.js"></script>
+        <script src="~/lib/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
+       
+    </environment>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            jsdtClient.getData();
+        });
+
+        var jsdtClient = {
+            table: null,
+            initializeDataTable: function () {
+                jsdtClient.table = $('#tblRoles').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    serverMethod: 'post',
+                    ajax: {
+                        url: "@Url.Action("GetRoles")",
+                        type: "POST"
+                    },
+                    columns: [
+                        { data: 'role' },                 
+                        { data: 'id', name: 'Id' },
+                    ],
+                    columnDefs: [{
+                        render: function (data, type, row) {
+
+                            if (row.isDeactivated) {
+                                return '';
+                            }
+
+
+                            var actionsHtml =
+                                `<div class='text-center'>
+                                                <button class='btn btn-outline-primary btn-xs load-modal d-none'
+                                                    data-hidden='Id'
+                                                    data-id='${row.id}'
+                                                    data-toggle='modal'
+                                                    data-target='#clientModal'
+                                                    data-modal='clientModal'
+                                                    data-bs-toggle="modal" data-bs-target="#clientModal"
+                                                    data-viewurl='true'
+                                                    data-action='@Url.Action("EditUser", "Auth")?clientId=${row.id}'
+                                                    title='Edit'>
+                                                    <i class='fa fa-pencil-alt'></i>
+                                                </button>
+
+
+                                                <button class="delete btn btn-outline-danger btn-xs d-none"
+                                                    data-bs-toggle="button" aria-pressed="true"
+                                                    data-action='@Url.Action("DeactivateAccount", "Auth")?clientId=${row.id}'
+                                                    data-table='tblClients'
+                                                    data-id='${row.id}'
+                                                    data-toggle='tooltip'
+                                                    title='Deactivate'>
+                                                    <i class='fas fa-toggle-on'></i>
+                                                </button>
+
+                                            </div>`;
+                           
+
+                            return actionsHtml;
+                        },
+                        targets: -1,
+                        orderable: false
+                    }],
+                    order: [0, 'asc'],
+                    language: {
+                        processing: 'Loading records... Please wait.',
+                    },
+                    pagingType: 'full_numbers',
+                    oLanguage: {
+                        oPaginate: {
+                            sNext: '>',
+                            sPrevious: '<',
+                            sFirst: '<<',
+                            sLast: '>>'
+                        }
+                    }
+                });
+            },
+            getData: function () {
+                if (jsdtClient.table == null) {
+                    jsdtClient.initializeDataTable();
+                } else {
+                    jsdtClient.table.ajax.reload(null,false);
+                }
+            }
+        }
+
+    </script>
+}
+
+

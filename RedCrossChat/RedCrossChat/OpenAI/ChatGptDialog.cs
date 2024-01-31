@@ -7,6 +7,7 @@ using Azure.AI.OpenAI;
 using Azure;
 using System.Collections.Generic;
 using RedCrossChat.Entities;
+using ChatMessage = Azure.AI.OpenAI.ChatMessage;
 
 namespace RedCrossChat
 {
@@ -31,7 +32,7 @@ namespace RedCrossChat
             var chatCompletionsOptions = new ChatCompletionsOptions
             {
                 MaxTokens = 400,
-                Temperature = 2f,
+                Temperature = 1.8f,
                 FrequencyPenalty = 0.0f,
                 PresencePenalty = 0.0f,
                 NucleusSamplingFactor = 0.95f,
@@ -41,6 +42,15 @@ namespace RedCrossChat
                   
                 },
             };
+
+            chatCompletionsOptions.Messages.Add(new ChatMessage(ChatRole.User, "Where can I find several helplines and organizations that offer support for mental health issues in Kenya"));
+            chatCompletionsOptions.Messages.Add(new ChatMessage(ChatRole.System, "KNH provides support and information on mental health issues. You can call them at +254 722 998 767"));
+
+            chatCompletionsOptions.Messages.Add(new ChatMessage(ChatRole.User, "How do you approach counseling for children and adolescents in Kenya, considering their unique needs?"));
+            chatCompletionsOptions.Messages.Add(new ChatMessage(ChatRole.System, "Counseling for children and adolescents in Kenya requires an age-appropriate approach. I use play therapy, art therapy, and engage in age-specific conversations to make counseling relatable and effective"));
+
+            chatCompletionsOptions.Messages.Add(new ChatMessage(ChatRole.User, " What are some common mental health challenges that people in Kenya face, and how do you address them in your counseling sessions?"));
+            chatCompletionsOptions.Messages.Add(new ChatMessage(ChatRole.System, "People in Kenya, like anywhere else, face various mental health challenges, including anxiety, depression, and trauma. I address these challenges by providing a safe and non-judgmental space for clients to talk about their experiences. I use evidence-based therapeutic approaches and work collaboratively with clients to develop coping strategies and resilience."));
 
             while (true)
             {

@@ -18,7 +18,8 @@ namespace RedCrossChat.Repository
         => await FindAll().ToListAsync();
 
         public async Task<IEnumerable<Team>>GetAllAsync()
-        {  return await FindAll().ToListAsync(); }
+        {  return await FindAll().ToListAsync(); 
+        }
     }
 }
 

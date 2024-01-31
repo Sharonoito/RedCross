@@ -62,6 +62,7 @@ document.getElementById("layout-menu") && (isHorizontalLayout = document.getElem
             ? (t &&
                   t.addEventListener("click", function () {
                       window.Helpers.isLightStyle() ? window.templateCustomizer.setStyle("dark") : window.templateCustomizer.setStyle("light");
+                      toggleLogo();
                   }),
               window.Helpers.isLightStyle()
                   ? (t && (t.querySelector("i").classList.add("bx-moon"), new bootstrap.Tooltip(t, { title: "Dark mode", fallbackPlacements: ["bottom"] })), s("light"))
@@ -75,6 +76,27 @@ document.getElementById("layout-menu") && (isHorizontalLayout = document.getElem
                     .then(function (e) {
                         i();
                     });
+
+
+                function toggleLogo() {
+                    if (window.Helpers.isLightStyle()) {
+                        // Light mode
+                        document.querySelector('#light-mode-logo').style.display = 'block'; 
+                        document.querySelector('#dark-mode-logo').style.display = 'none';  
+                    } else {
+                        // Dark mode
+                        document.querySelector('#light-mode-logo').style.display = 'none';  
+                        document.querySelector('#dark-mode-logo').style.display = 'block'; 
+                    }
+                }
+
+                toggleLogo();
+
+
+    function hideNavigation() {
+
+    }
+
         let a = document.getElementsByClassName("dropdown-language");
         if (a.length) {
             var l = a[0].querySelectorAll(".dropdown-item");

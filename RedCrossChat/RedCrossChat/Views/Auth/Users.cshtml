@@ -4,6 +4,23 @@
 
 <section class="content-header">
     <div class="container-fluid">
+        <ul class="nav nav-tabs bordered">
+            <li>
+                <a class="nav-link active" data-toggle="tab" href="#tab-1">
+                    <i class="fa fa-md fa-users mr-2"></i> Users
+                </a>
+            </li>
+
+            <li class="nav-item @(Html.IsSelected(controller: "Auth", action: "Roles") )">
+                <a asp-action="Roles" asp-controller="Auth" class="nav-link @(Html.IsSelected(controller: "Auth", action: "Roles") )">
+                    <i class="fa fa-md fa-th mr-2"></i> Roles
+                </a>
+            </li>
+
+
+        </ul>
+
+        <div id="tab-1" class="tab-pane fade show active mt-1">
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title"><i class="fa fa-info-circle"></i> Manage Users</h3>
@@ -27,12 +44,12 @@
                 <table class="table table-striped" id="tblUsers">
                     <thead>
                         <tr>
-                            <th style="width: 10px">#</th>
+                           
                             <th>First Name</th>
                             <th>Last Name</th>
                             <th>Email Address</th>
-                            <th>latest Login</th>
-                            <th style="width: 40px">Actions</th>
+                            <th>Phone number</th>
+                            <th width="10%">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -44,6 +61,58 @@
             </div>
 
         </div>
+
+    </div>
+
+
+        <!-- Roles -->
+@*        <div id="tab-2" class="tab-pane fadeIn mt-1">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row mb-3">
+
+                        <div class="col-lg-6">
+                            <i class="fa fa-info-circle"></i> Setup roles.
+                        </div>
+
+                        <div class="col-lg-6">
+                            <button type="button"
+                                    class="load-modal text-right btn btn-sm btn-outline-primary float-right"
+                                    data-toggle="modal"
+                                    data-target="#userModal"
+                                    data-modal="userModal"
+                                    data-viewurl="true"
+                                    data-action="@Url.Action("CreateRole")">
+                                <i class="fa fa-plus"></i> Add Role
+                            </button>
+                        </div>
+                    </div>
+
+                    <table id="tblRoles" class="table table-bordered table-hover" width="100%">
+                        <thead>
+                            <tr>
+                                <th>Role</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>Role</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+*@
+
+
+
+
+
+
     </div>
 
     <div class="modal fade" data-keyboard="false"  id="clientModal" tabindex="-1" role="dialog" style="display:none" aria-labelledby="clientModal" aria-hidden="true">
@@ -98,15 +167,21 @@
                         type: "POST"
                     },
                     columns: [
-                        { data: 'firstName' },                 
+                                     
                         { data: 'firstName' },
                         { data: 'lastName' },
-                        { data: 'email', name: 'Id' },
-                        { data: 'id', name: 'Id' },
+                        { data: 'email'},
+                        { data: 'phoneNumber', name: 'Id' },
                         { data: 'id', name: 'Id' },
                     ],
                     columnDefs: [{
                         render: function (data, type, row) {
+
+                            if (row.isDeactivated) {
+                                return '';
+                            }
+
+
                             var actionsHtml =
                                 `<div class='text-center'>
                                                 <button class='btn btn-outline-primary btn-xs load-modal'
@@ -117,7 +192,7 @@
                                                     data-modal='clientModal'
                                                     data-bs-toggle="modal" data-bs-target="#clientModal"
                                                     data-viewurl='true'
-                                                    data-action='@Url.Action("EditUser", "Auth")?clientId=${row.id}'
+                                                    data-action='@Url.Action("CreateUser", "Auth")?clientId=${row.id}'
                                                     title='Edit'>
                                                     <i class='fa fa-pencil-alt'></i>
                                                 </button>
@@ -160,7 +235,7 @@
                 if (jsdtClient.table == null) {
                     jsdtClient.initializeDataTable();
                 } else {
-                    jsdtClient.table.ajax.reload();
+                    jsdtClient.table.ajax.reload(null,false);
                 }
             }
         }
