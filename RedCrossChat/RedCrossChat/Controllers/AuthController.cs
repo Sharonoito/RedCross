@@ -287,9 +287,9 @@ namespace RedCrossChat.Controllers
                                 return Error("Failed to assign user roles.");
                         }
 
-                        var result = await _repository.SaveChangesAsync();
+                        //var result = await _repository.SaveChangesAsync();
 
-                        if (result)
+                        if (true)
                         {
                             return Success("Updated Successfully");
                         }

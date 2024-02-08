@@ -17,7 +17,6 @@ using Microsoft.Bot.Schema;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Model;
 using Microsoft.EntityFrameworkCore.Internal;
 using System.ComponentModel.DataAnnotations;
-using RedCrossChat.Domain.Migrations;
 using RedCrossChat.Objects;
 using Microsoft.Bot.Builder;
 using Newtonsoft.Json.Linq;
@@ -1246,7 +1245,7 @@ namespace RedCrossChat.Controllers
 
             try
             {
-                var data = await _repository.Itention.GetAllAsync();
+                var data = await _repository.Itention.FindByCondition(x=>x.IsActive).ToListAsync();
 
                 var filteredRows = data
                     .AsQueryable()
@@ -1364,7 +1363,12 @@ namespace RedCrossChat.Controllers
                     return NotFound();
                 }
 
-                _repository.Itention.Delete(intentionEntity);
+                intentionEntity.IsActive=false;
+
+                _repository.Itention.Update(intentionEntity);
+
+               // _repository.Itention.Delete(intentionEntity);
+               
                 var result = await _repository.SaveChangesAsync();
 
                 if (!result)
