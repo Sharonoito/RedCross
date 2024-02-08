@@ -1245,7 +1245,7 @@ namespace RedCrossChat.Controllers
 
             try
             {
-                var data = await _repository.Itention.GetAllAsync();
+                var data = await _repository.Itention.FindByCondition(x=>x.IsActive).ToListAsync();
 
                 var filteredRows = data
                     .AsQueryable()
@@ -1363,7 +1363,12 @@ namespace RedCrossChat.Controllers
                     return NotFound();
                 }
 
-                _repository.Itention.Delete(intentionEntity);
+                intentionEntity.IsActive=false;
+
+                _repository.Itention.Update(intentionEntity);
+
+               // _repository.Itention.Delete(intentionEntity);
+               
                 var result = await _repository.SaveChangesAsync();
 
                 if (!result)
