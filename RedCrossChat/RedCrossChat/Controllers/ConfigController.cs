@@ -2052,7 +2052,9 @@ namespace RedCrossChat.Controllers
         {
             try
             {
-                var data = await _repository.InitialActionItem.GetAllAsync();
+               var data = await _repository.InitialActionItem.GetAllAsync();
+
+                //var res = data.Include(GetIntroductionChoice);
 
                 var filteredRows = data
                     .AsQueryable()
