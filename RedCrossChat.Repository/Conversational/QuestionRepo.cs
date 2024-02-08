@@ -22,5 +22,12 @@ namespace RedCrossChat.Repository
 
         public async Task<IEnumerable<Question>> GetAll()
         => await FindAll().ToListAsync();
+
+        public async Task <IEnumerable<Question>> GetAllAsync()
+        {
+            return await FindAll().ToListAsync();
+        }
     }
 }
+
+ 

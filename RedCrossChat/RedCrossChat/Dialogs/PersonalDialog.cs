@@ -123,10 +123,10 @@ namespace RedCrossChat.Dialogs
 
             var question = me.language ? "Which county?" : "Unapatikana kaunti gani?";
 
-            var questionRetry = me.language ? "Please input a county" : "Tafadhali andika katika kaunti";
+            var questionRetry = me.language ? " Please input a county" : "Tafadhali andika katika kaunti";
 
 
-            question = $"{question} \n {hint} ";
+            question = $" {question} \n {hint} ";
 
             var select = ((FoundChoice)stepContext.Result).Value;
 
@@ -171,7 +171,7 @@ namespace RedCrossChat.Dialogs
             var promptOptions = new PromptOptions
             {
                 Prompt = MessageFactory.Text(question),
-                RetryPrompt = MessageFactory.Text($"${questionRetry} \n {hint} "),
+                RetryPrompt = MessageFactory.Text($"{questionRetry} \n {hint} "),
             };
 
             return await stepContext.PromptAsync(promptId, promptOptions, cancellationToken);
@@ -487,12 +487,20 @@ namespace RedCrossChat.Dialogs
 
             }
 
+            
+
             foreach (var county in counties) {
 
                 if (county.Name.ToLower() == validatedResponse || county.Code == code){
                         status = true; break;
                 }
 
+            }
+
+            if(status==false  && promptContext.AttemptCount > 2)
+            {
+                //savee this error in the backend
+                return true;
             }
 
             return status;

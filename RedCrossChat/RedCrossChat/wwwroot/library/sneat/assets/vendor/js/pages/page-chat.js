@@ -1,11 +1,11 @@
 ﻿"use strict";
 document.addEventListener("DOMContentLoaded", function () {
     {
-        const o = document.querySelector(".app-chat-contacts .sidebar-body"),
+        const o = document.querySelector(".app-chat-contacts .sidebar-body ul"),
             n = [].slice.call(document.querySelectorAll(".chat-contact-list-item:not(.chat-contact-list-item-title)")),
             i = document.querySelector(".chat-history-body"),
-            u = document.querySelector(".app-chat-sidebar-left .sidebar-body"),
-            d = document.querySelector(".app-chat-sidebar-right .sidebar-body"),
+            u = document.querySelector(".app-chat-sidebar-left .sidebar-body ul"),
+            d = document.querySelector(".app-chat-sidebar-right .sidebar-body ul"),
             h = [].slice.call(document.querySelectorAll(".form-check-input[name='chat-user-status']")),
             m = $(".chat-sidebar-left-user-about"),
             p = document.querySelector(".form-send-message"),

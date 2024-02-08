@@ -15,6 +15,10 @@ namespace RedCrossChat.ViewModel
         [Display(Name = "Notification Type")]
         public int NotificationType { get; set; }
 
+        [Display(Name="Supervisor")]
+        public Guid? SupervisorId { get; set; }
+
+        public List<AppUser> Supervisors { get; set; }
         public List<AppUser> appUsers { get; set; }
 
     }

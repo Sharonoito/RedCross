@@ -13,5 +13,6 @@ namespace RedCrossChat.Entities
         public Intention Intention { get; set; }
 
         public Guid IntentionId { get; set; }
+
     }
 }

@@ -1,11 +1,7 @@
 ﻿
 @using RedCrossChat.ViewModel;
 
-
-
-
 @model SubIntentionVm
-
 
 @{
     Layout = null;
@@ -27,13 +23,21 @@
                 <div class="col-md-6">
                     <label for="Team">Select Intention</label>
                     <select class="form-select color-dropdown" asp-for="ItentionId">
-                        <option value="-1" selected>Select Intention</option>
+                        <option value="-1" >Select Intention</option>
 
-                        @if (ViewBag.Intentions != null)
+                        @if (Model.Intentions != null)
                         {
-                            foreach (var intention in ViewBag.Intentions)
+                            foreach (var intention in Model.Intentions)
                             {
-                                <option value="@intention.Id">@intention.Name</option>
+                                @if (intention.Id==Model.ItentionId)
+                                {
+                                    <option selected value="@intention.Id">@intention.Name</option>
+                                }
+                                else
+                                {
+                                   <option  value="@intention.Id">@intention.Name</option> 
+                                }
+                                
                             }
                         }
                     </select>

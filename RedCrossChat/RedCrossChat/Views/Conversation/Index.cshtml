@@ -95,17 +95,12 @@
             <div class="sidebar-body ps ps--active-y">
 
                 <!-- Chats -->
-                <ul class="list-unstyled chat-contact-list pt-1" id="chat-list">
-                    <li class="chat-contact-list-item chat-contact-list-item-title">
-                        <h5 class="text-primary mb-0">Chats</h5>
-                    </li>
-                    <li class="chat-contact-list-item chat-list-item-0 d-none" id="no-chats">
-                        <h6 class="text-muted mb-0">No Chats Found</h6>
-                    </li>
-                  
+                <ul class="list-unstyled chat-contact-list pt-1  " id="chat-list" >
                     
+                    <li class="chat-contact-list-item chat-list-item-0 d-none" id="no-chats" >
+                        <h6 class="text-muted mb-0">No Chats Found</h6>
+                    </li>  
                 </ul>
-                
                
                 <div class="ps__rail-x" style="left: 0px; bottom: 0px;"><div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div></div><div class="ps__rail-y" style="top: 0px; height: 675px; right: 0px;"><div class="ps__thumb-y" tabindex="0" style="top: 0px; height: 425px;"></div></div>
             </div>
@@ -119,7 +114,17 @@
                         <div class="d-flex overflow-hidden align-items-center" id='chat-contact-info'>
                             
                         </div>
+
+                        <div class="btn-group">
+                            <button id="btn-active-history" style="position:relative" class="btn btn-info m-0 " data-bs-toggle="" data-bs-target="#offcanvasHistory" aria-controls="offcanvasHistory"> History <span class="badge bg-label-danger d-none rounded-pill" style="position:absolute;left:90%;top:-25%">0</span> </button>
+
+                            <button id="btn-request-details" style="position:relative" class="btn btn-primary m-0" data-bs-toggle="offcanvas" data-bs-target="#offcanvasEnd" aria-controls="offcanvasEnd"> Handover Requests <span class="badge bg-label-danger  rounded-pill" style="position:absolute;left:90%;top:-25%">0</span> </button>   
+                        
+                        </div>
+
+                        
                         <div class="d-flex align-items-center">
+                            
                             <i class="bx bx-phone-call cursor-pointer d-sm-block d-none me-3 fs-4"></i>
                             <i class="bx bx-video cursor-pointer d-sm-block d-none me-3 fs-4"></i>
                             <i class="bx bx-search cursor-pointer d-sm-block d-none me-3 fs-4"></i>
@@ -129,15 +134,17 @@
                                 </button>
                                 </div>
                             </div>
+
+                            
                         </div>
                     </div>
                 </div>
                 <div class="chat-history-body ps ps--active-y d-flex">
                     <ul class="list-unstyled chat-history mb-0 w-100" id="ConvList">
-                        
-                        
-                        
+
                     </ul>
+
+                  
                     <div class="ps__rail-x" style="left: 0px; bottom: 0px;">
                         <div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div>
                     </div>
@@ -225,6 +232,33 @@
         <!-- /Sidebar Right -->
 
         <div class="app-overlay"></div>
+   
+        <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasEnd" aria-labelledby="offcanvasEndLabel">
+            <div class="offcanvas-header">
+                <h5 id="offcanvasEndLabel" class="offcanvas-title">HandOver Requests</h5>
+                <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body  mx-0 flex-grow-0">
+                <div class="sidebar-body ps ps--active-y">
+                    <ul class="list-unstyled chat-contact-list mb-0 w-100  ps ps--active-y" id="chat-handover-requests">
+                    </ul>
+                </div>
+               
+            </div>
+        </div>
+
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasHistory" aria-labelledby="offcanvasHistoryLabel">
+            <div class="offcanvas-header">
+                <h5 id="offcanvasHistoryLabel" class="offcanvas-title">Historical Conversation</h5>
+                    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body  mx-0 flex-grow-0">
+            <ul class="list-unstyled chat-history mb-0" id="chat-prev-history" style="display:flex;flex-direction:column">
+               
+            </ul>
+            
+         </div>
+        </div>
     </div>
 </div>
 
@@ -257,81 +291,114 @@
 
             let backgrounds = ['primary', 'secondary', 'primary', 'danger', 'info', 'success', 'dark','primary','info','success']
 
+            const i = document.querySelector(".chat-history-body")
 
-
-            const GetMyConversations = (func) => {
-
-                $.post("/Conversation/GetMyConversations").then(response => {
-
-                    if (response.success) {
-                        let data = response.responseData;
-
-                        if (data.length == 0) {
-
-                            conversartions = data;
-
-                            $('#no-chats').fadeIn()
-
-                        } else {
-
-                            UpdateUI(data);
-                        }
-
-                        if (func != undefined)
-                            func();
-
-                    }
-                });
-            }
+            showHandOverPopup = false;
 
             const UpdateUI=(data)=>{
 
-                if (conversartions.length > currentLength) {
-                    for (let i = currentLength; i < conversartions.length; i++) {
-                        AppendToSidebar(conversartions[i]);
-                    }
-                } else if (data != undefined){
+                if (data != undefined && conversartions.length < data.length) {
+                    $("#chat-list").html(`<li class="chat-contact-list-item chat-contact-list-item-title">
+                                                <h5 class="text-primary mb-0">Chats</h5>
+                                            </li>`);
 
-                    //check for internal changes in the array -> conversations
                     for (let i = 0; i < data.length; i++) {
-                        AppendToSidebar(data[i])
+                        
+                        AppendToSidebar(data[i]);
+                    }
+                    
+                } else if (data != undefined && conversartions.length == data.length) {
+
+                    let messages = 0;
+
+                    for (let i = 0; i < conversartions.length; i++) {
+
+                        if (conversartions[i].chatMessages.length < data[i].chatMessages.length) {
+
+                            let lastMessage = data[i].chatMessages[data[i].chatMessages.length - 1];
+ 
+                           
+                            if (lastMessage.type == 3) {
+
+                                updateLastMessage(data[i])
+
+                                messages++;
+                            }
+
+                            if (conversartions[i].id == activeConversation.id) {
+
+                                UpdateChatActiveConversation(data[i].chatMessages)
+                            
+                            }
+                        }
+
                     }
 
-                    conversartions = data;
-
-                    if (iteration % 5 == 0) {
-                        interval * 10;
+                    if (messages > 0) {
+                        success("new messages")
                     }
-
-                    iteration++;
                 }
 
+                conversartions = data
             }
 
-            const AppendToSidebar = ({ persona, id, dateCreated,reason }) => {
-                //this is to append the conversation ton the side bar
+            
 
-                console.log(id, persona)
+            const AppendToSidebar = (data, container = "#chat-list") => {
 
+                const { persona, id, dateCreated, reason,chatMessages } = data;
 
-                $("#chat-list").append(`
-                                  <li class="chat-contact-list-item " data-id='${id}'>
+                let str_class='';
+
+                if (activeConversation != null) {
+                    
+                    if (id == activeConversation.id) {
+                        str_class = "active"
+                    }
+                }
+
+                let lastMessage = chatMessages[chatMessages.length - 1];
+
+                if(lastMessage ==null){
+
+                }
+
+                console.log("lastmes", lastMessage)
+
+                $(container).append(`
+                                  <li class="chat-contact-list-item chat-item ${str_class}" data-id='${id}'>
                                     <a class="d-flex align-items-center">
                                         <div class="flex-shrink-0 avatar avatar-busy">
-                                            ${username(persona.chatID)}
+                                                        ${username(persona.codeName)}
                                         </div>
                                         <div class="chat-contact-info flex-grow-1 ms-3">
-                                            <h6 class="chat-contact-name text-truncate m-0">${persona.chatID}</h6>
-                                            <p class="chat-contact-status text-truncate mb-0 text-muted">${reason}</p>
+                                                        <h6 class="chat-contact-name text-truncate m-0">Client ${persona.codeName}</h6>
+                                                        <p class="chat-contact-status text-truncate mb-0 text-muted" id='last-message'>${lastMessage.message}</p>
                                         </div>
-                                        <small class="text-muted mb-auto moment-date" data-date='${dateCreated}'></small>
+                                        <small class="text-muted mb-auto moment-date" data-date='${lastMessage.dateCreated}'></small>
                                     </a>
                                 </li>`);
 
                 CalculateDates();
-            }
+            }, updateLastMessage=(data)=>{
 
-            const username = str => str != null ? `<span class="avatar-initial rounded-circle bg-label-${backgrounds[str.charAt(str.length - 1)]}">${str.charAt(0)}${str.charAt(str.length - 1)}</span>` : '';
+               
+
+                let lastMessage = data.chatMessages[data.chatMessages.length - 1];
+
+                $(".chat-item").toArray().forEach(item => {
+
+                    
+                    if(data.id == $(item).data('id')){
+
+                        console.log($(item).data('id'),lastMessage)
+                      
+                        $(item).find("p").html(lastMessage.message)
+                        $(item).find("small").attr("data-date", lastMessage.dateCreated)
+                    }
+                })
+
+            }, username = str => str != null ? `<span class="avatar-initial rounded-circle bg-label-${backgrounds[str.charAt(str.length - 1)]}">${str.charAt(0)}${str.charAt(str.length - 1)}</span>` : '';
 
             function CalculateDates() {
 
@@ -351,6 +418,8 @@
 
                     var end = moment($(e).data('date')); // another date
 
+                    
+
                     if ($(e).data('format') != undefined) {
 
                         $(e).html(end.format($(e).data('format')));
@@ -358,40 +427,47 @@
                         return;
                     }
 
-                    if (now.diff(end, 'minutes') <= 59) {
+                    let days = now.diff(end, 'days'), hours = now.diff(end, 'hours'), minutes = now.diff(end, 'minutes');
 
-                        $(e).html(now.diff(end, 'minutes') + (" Minutes" + now.diff(end, 'minutes') !=1? 's':''))
-                        return;
+                    if (days == 0 && hours == 0 && minutes == 0) {
+                        $(e).html(now.diff(end, 'seconds') + " s")
+                    }else if (days == 0 && hours == 0 && minutes <= 59  && minutes > 0) {
+                        $(e).html(now.diff(end, 'minutes') + " minutes")
+                    } else if (days == 0 && hours > 0) {
+                        $(e).html(now.diff(end, 'hours') + " hours")
+                    }else if(days <=7 && days > 0){
+                        $(e).html(now.diff(end, 'days') + " days ")
+                    }else{
+                        $(e).html(end.format('MMM Do YY'))
                     }
-                    if (now.diff(end, 'hours') <=24 ) {
 
-                        $(e).html(now.diff(end, 'hours') + (" hour" + now.diff(end, 'days') !=1 ? "s":''))
-
-                        return
-                    }
-
-                    if (now.diff(end, 'days') <= 7) {
-
-                        $(e).html(now.diff(end, 'days') + (" day" + now.diff(end, 'days') !=1 ? 's':''))
-
-                        return
-                    }
+                    
 
                 })
             }
 
             function UpdateChatActiveConversation(data) {
 
-               
+                console.log("active conv",activeConversation)
 
                 if (activeConversation == undefined)
                     return;
 
-                const { id, reason, persona, chatMessages } = activeConversation;
+
+                const { id, reason, chatMessages, isReturnClient } = activeConversation;
+
+                let persona;
+
+                if(activeConversation.persona !=undefined && activeConversation.persona !=null)
+                  persona=activeConversation.persona
 
                 const a = $("#ConvList");
 
-                console.log("UpDateChatActiveConversation", data)
+                let detailed = '';
+
+                if (isReturnClient){
+                    detailed='Return Client'
+                }
 
                 let lastConv;
 
@@ -403,7 +479,10 @@
 
                     a.append(message(lastConv))
 
-                    success("You have a message !")
+                    if (lastConv.type == 1) {
+                        //success("You have a message !")
+                    }
+                    i.scrollTo(0, i.scrollHeight)
 
                     return;
                    
@@ -428,15 +507,17 @@
 
                 $("#chat-contact-info").html(`<i class="bx bx-menu bx-sm cursor-pointer d-lg-none d-block me-2" data-bs-toggle="sidebar" data-overlay="" data-target="#app-chat-contacts"></i>
                                         <div class="flex-shrink-0 avatar">
-                                            ${username(persona.chatID)}
+                                            ${username(persona.codeName)}
                                         </div>
                                         <div class="chat-contact-info flex-grow-1 ms-3" >
-                                            <h6 class="m-0">${persona.chatID}</h6>
+                                            <h6 class="m-0">${persona.codeName}</h6>
                                             <small class="user-status text-muted">${reason}</small>
                                         </div>`);
 
 
                 a.html('');
+
+               
 
                 for (let i = 0; i < chatMessages.length; i++) {
 
@@ -446,21 +527,17 @@
 
                     CalculateDates()
                 }
+                i.scrollTo(0, i.scrollHeight)
+               
             }
 
-            const attachMessage=(conv, a)=>{
-                
-                a.append(message(conv));
-            }
+            const attachMessage=(conv, a,str_class='')=>{
 
-            const message = (conv, isReply = false) => {
+                a.append(message(conv, false,str_class));
+            }, message = (conv, isReply = false, str_class='') => {
 
-                console.log("the message",conv)
-
-                return conv.type == 0 || conv.type==2 ? question(conv) : response(conv);
-            }    
-
-            const response = (conv) => {
+                return conv.type == 0 || conv.type==2 ? question(conv,str_class) : response(conv,str_class);
+            }, response = (conv, str_class='') => {
 
                 let message = conv.message;
 
@@ -469,7 +546,7 @@
 
                 
 
-                return `<li class="chat-message">
+                return `<li class="chat-message ${str_class}">
                                       <div class="d-flex overflow-hidden">
                                         <div class="user-avatar flex-shrink-0 me-3">
                                           <div class="avatar avatar-sm">
@@ -487,9 +564,7 @@
                                       </div>
                                     </li>`;
             
-            } 
-
-            const question = (conv) => {
+            }, question = (conv, str_class = '') => {
 
                 let question = conv.message;
 
@@ -497,7 +572,7 @@
                     question = conv.question.question
                 }
 
-                return `<li class="chat-message chat-message-right ">
+                return `<li class="chat-message ${str_class} chat-message-right ">
                                                     <div class="d-flex overflow-hidden">
                                                         <div class="chat-message-wrapper flex-grow-1">
                                                             <div class="chat-message-text">
@@ -516,32 +591,30 @@
                                                     </div>
                                                 </li>`
             
-            };
-
-
-            const GetConversation = id => {
+            }, GetConversation = id => {
 
                 $.get("/Conversation/GetConversation?id=" + id).then(resp => {
 
                     activeConversation = resp.responseData;
 
-                    console.log("GetConversation")
 
                     UpdateChatActiveConversation();
 
                 })
-            }
-            const StartConversation=(id)=>{
+            }, StartConversation=(id,btn)=>{
 
                 $('.chat-contact-list-item').toArray().forEach(chat => {
                     $(chat).removeClass('active');
                 });
 
+                $("#btn-active-history").attr('data-bs-toggle', 'offcanvas')
+
+                if(btn !=undefined){
+                    $(btn).addClass('active')
+                }
+
 
                 if (conversartions.length == 0) {
-
-                    console.log("fetch the conv", conversartions);
-
                     return GetConversation(id);
                 }
 
@@ -552,21 +625,157 @@
                         activeConversation = conversartions[i];
                     }
                 }
-
-                console.log("ActiveConversation", conversartions)
-
                 UpdateChatActiveConversation();
 
-
                 $(".chat-contact-list-item").find("[data-id='" + id + "']").addClass('active')
+                i.scrollTo(0, i.scrollHeight)
+
+                console.log("scrolling point")
+                i.scrollTo(0, i.scrollHeight)
 
             }
 
-            $(document).on('click', '.chat-contact-list-item', function () {
+            function CheckForUpdatesActiveConversation() {
+
+                if (activeConversation == undefined)
+                    return;
+
+                $.post("/Conversation/GetRawConversations/?id=" + activeConversation.id).then(resp => {
+                    UpdateChatActiveConversation(resp.responseData)
+
+                    
+                    i.scrollTo(0, i.scrollHeight)
+                })
+            }
+
+            function getConversationsObject(){
+                $.post("/Conversation/GetMyConversationIncludingHandOverRequests").then(resp => {
+
+                    const data=resp.responseData
+
+                    $("#btn-request-details span").html(data.handOverRequests.length)
+
+                    if (data.handOverRequests.length > 0){
+
+                        // add the title for the human hand over requesrs
+                        $("#chat-handover-requests").html('').html(
+                            ` <li class="chat-contact-list-item chat-contact-list-item-title">
+                                    <h5 class="text-primary mb-0">Handover Requests </h5>
+                                </li>`);
+
+                        displayHandOverRequests(data.handOverRequests)
+                    }
+
+                    UpdateUI(data.myConversations)
+
+                })
+            }
+
+            function displayHandOverRequests(data){
+
+                data.forEach(request => {
+
+                    $("#chat-handover-requests").append(appendHandOverRequest(request))
+
+                });
+
+            }
+
+            const appendHandOverRequest = (request) => {
+
+                let feeling = '';
+
+                if (request.conversation.feeling != null) {
+                    feeling = request.conversation.feeling.name;
+                }
+
+                if (feeling == 'others' || feeling == 'other')
+                    feeling = request.conversation.feelingDetail;
+
+                return `<li class="chat-contact-list-item" data-id='${request.id}'>
+                                    <a class="d-flex align-items-center">
+                                      <div class="flex-shrink-0 avatar avatar-offline">
+                                          ${username(request.conversation.persona.codeName)}
+                                      </div>
+                                      <div class="chat-contact-info flex-grow-1 ms-3">
+                                        <h6 class="chat-contact-name text-truncate m-0">Client ${request.conversation.persona.codeName} </h6>
+                                        <p class="chat-contact-status text-truncate mb-0 text-muted">${feeling}</p>
+                                      </div>
+                                    </a>
+                                  </li>`
+            };
+
+            $(document).ready(function () {
+
+               /* if (GetActiveConversation() != null) {
+                    StartConversation(GetActiveConversation());
+                }*/
+
+                getConversationsObject();
+
+                setInterval(function () {
+                    CalculateDates();
+
+                    getConversationsObject()
+
+                }, interval);
+
+            });
+
+            $(document).on('click', '#btn-active-history', function () {
+
+                console.log("hide off -chavas")
+
+                if(activeConversation ==null){
+                    $("#offcanvasHistory").removeClass('show')
+
+                    return;
+                }
+
+                $.post("/Conversation/GetHistory/?id=" + activeConversation.persona.id).then(response => {
+                  
+
+                    response.responseData.forEach(conv => {
+                        //chat-history
+
+                        if (activeConversation.id != conv.id){
+                            let chatMessages = conv.chatMessages;
+
+                            for (let i = 0; i < chatMessages.length; i++) {
+
+                                const conv = chatMessages[i];
+
+                                attachMessage(conv, $("#chat-prev-history"), 'card my-2 p-2')
+
+                                CalculateDates()
+                            }
+                        }
+                           
+
+                       
+                    })
+                })
+
+            });
+
+            $(document).on('click', '#chat-list .chat-contact-list-item', function () {
 
                 let current = this;
 
-                StartConversation($(current).data('id'));
+                StartConversation($(current).data('id'),current);
+            });
+
+
+            $(document).on('click', '#chat-handover-requests .chat-contact-list-item', function () {
+
+                let current = this;
+
+                if ($(current).data('id') != undefined) {
+                    $.post("/Conversation/UpdateHandOverRequest/?id=" + $(current).data('id')).then(response => {
+                        $(current).remove();
+                    })
+                }
+
             });
 
             $(document).on('submit', '.fsend-message', function (e) {
@@ -579,61 +788,16 @@
                     error("there is no active conversation");
                 }
 
-                //$("#ConvList").append(message({ question: a.val(), questionTimeStamp:"" } , true))
-
                 $.post("/Conversation/CreateResponse", { conversationId: activeConversation.id, question: a.val() }).then(resp => {
                     a.val('');
                     CheckForUpdatesActiveConversation();
 
                 });
-
-
             });
 
-
-            function CheckForUpdatesActiveConversation() {
-
-                //GetRawConversations
-
-                if (activeConversation == undefined)
-                    return;
-
-                $.post("/Conversation/GetRawConversations/?id=" + activeConversation.id).then(resp => {
-
-
-                    UpdateChatActiveConversation(resp.responseData)
-                })
-            }
-
-
-
-            $(document).ready(function () {
-
-                if (GetActiveConversation() != null) {
-
-                    console.log("CurrentActiveConversation",GetActiveConversation());
-
-                    StartConversation(GetActiveConversation());
-
-                }
-
-
-                GetMyConversations();
-
-                setInterval(function () {
-                    CalculateDates();
-
-                    CheckForUpdatesActiveConversation();
-                }, 5000);
-
-            });
         </script>
 
         <script src="~/library/sneat/assets/vendor/js/pages/page-chat.js"></script>
-
-        
-      
-       
     </environment>
 }
         

@@ -302,10 +302,14 @@
   border: 1px solid #90A4AE;
 }
 
+apexcharts-bar-area {
+    background-color: #ed1c24;
+}
+
 .apexcharts-yaxistooltip.apexcharts-theme-dark {
-  background: rgba(0, 0, 0, 0.7);
-  border: 1px solid rgba(0, 0, 0, 0.5);
-  color: #fff;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(0, 0, 0, 0.5);
+    color: #fff;
 }
 
 .apexcharts-yaxistooltip:after,
@@ -478,7 +482,7 @@
 .apexcharts-canvas .apexcharts-zoom-icon.apexcharts-selected svg,
 .apexcharts-canvas .apexcharts-selection-icon.apexcharts-selected svg,
 .apexcharts-canvas .apexcharts-reset-zoom-icon.apexcharts-selected svg {
-  fill: #008FFB;
+    fill: #ed1c24;
 }
 
 .apexcharts-theme-light .apexcharts-selection-icon:not(.apexcharts-selected):hover svg,

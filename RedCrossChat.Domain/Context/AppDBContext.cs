@@ -51,6 +51,12 @@ namespace RedCrossChat.Domain
 
         public DbSet<AppUserTeam> AppUserTeam { get; set; }
 
+        public DbSet<Exercise> Exercise { get; set; }
+
+        public DbSet<IntroductionChoice> IntroductionChoice { get; set; }
+
+        public DbSet<InitialActionItem> InitialActionItem { get; set; }
+
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -63,6 +69,8 @@ namespace RedCrossChat.Domain
                 .HasMany(i => i.SubIntentions)
                 .WithOne(si => si.Intention)
                 .HasForeignKey(si => si.IntentionId);
+
+
         }
     }
 }
