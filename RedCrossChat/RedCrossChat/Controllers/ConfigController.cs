@@ -17,7 +17,6 @@ using Microsoft.Bot.Schema;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Model;
 using Microsoft.EntityFrameworkCore.Internal;
 using System.ComponentModel.DataAnnotations;
-using RedCrossChat.Domain.Migrations;
 using RedCrossChat.Objects;
 using Microsoft.Bot.Builder;
 using Newtonsoft.Json.Linq;
