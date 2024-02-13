@@ -104,11 +104,12 @@ namespace RedCrossChat.Dialogs
             if (feeling.Description.ToLower().Trim() == "other" || feeling.Description.ToLower().Trim() == "others")
             {
                 question = (me.language ? "You said you are feeling " + conversation.FeelingDetail :
-                                                    "Ulisema  " + conversation.FeelingDetail) + ", " + question;
+
+                                                    "Ulisema " + conversation.FeelingDetail) + ", " + question;
             }else
             {
                 question = (me.language ? "You said you are feeling " + feeling.Description :
-                                      "Ulisema  " + feeling.Kiswahili) + ", " + question;
+                                      "Ulisema " + feeling.Kiswahili) + ", " + question;
             }
             
             _repository.ChatMessage.Create(new ChatMessage
