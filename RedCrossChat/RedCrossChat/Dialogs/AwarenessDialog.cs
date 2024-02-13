@@ -104,11 +104,11 @@ namespace RedCrossChat.Dialogs
             if (feeling.Description.ToLower().Trim() == "other" || feeling.Description.ToLower().Trim() == "others")
             {
                 question = (me.language ? "You said you are feeling " + conversation.FeelingDetail :
-                                                    "Ulisema unahisi " + conversation.FeelingDetail) + ", " + question;
+                                                    "Ulisema  " + conversation.FeelingDetail) + ", " + question;
             }else
             {
                 question = (me.language ? "You said you are feeling " + feeling.Description :
-                                      "Ulisema unahisi " + feeling.Kiswahili) + ", " + question;
+                                      "Ulisema  " + feeling.Kiswahili) + ", " + question;
             }
             
             _repository.ChatMessage.Create(new ChatMessage
@@ -361,7 +361,7 @@ namespace RedCrossChat.Dialogs
 
             await _repository.SaveChangesAsync();
 
-            var intentions=await _repository.Itention.GetAllAsync();
+            List<Intention> intentions=await _repository.Itention.FindByCondition(x=>x.IsActive).ToListAsync();
 
             var list =new List<Choice>();
 
