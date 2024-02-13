@@ -17,6 +17,7 @@ using Microsoft.Bot.Schema;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Model;
 using Microsoft.EntityFrameworkCore.Internal;
 using System.ComponentModel.DataAnnotations;
+using RedCrossChat.Domain.Migrations;
 using RedCrossChat.Objects;
 using Microsoft.Bot.Builder;
 using Newtonsoft.Json.Linq;
@@ -1901,8 +1902,6 @@ namespace RedCrossChat.Controllers
             try
             {
                 var data = await _repository.IntroductionChoice.GetAllAsync();
-               // I have to add Include method for the selected choices to appear on the table
-                //var data = await _repository.IntroductionChoice.Include(x => x.IntroductionChoi).GetAllAsync();
                 var filteredRows = data
                     .AsQueryable()
                     .FilterBy(dtRequest.Search, dtRequest.Columns);
@@ -2051,7 +2050,7 @@ namespace RedCrossChat.Controllers
         {
             try
             {
-                var data = await _repository.InitialActionItem.GetAllAsync();
+               var data = await _repository.InitialActionItem.GetAllAsync();           
 
                 var filteredRows = data
                     .AsQueryable()
@@ -2085,8 +2084,6 @@ namespace RedCrossChat.Controllers
             var initialAction = new InitialActionItemVm()
             {
                 IntroductionChoices = (List<IntroductionChoice>)await _repository.IntroductionChoice.GetAllAsync(),
-               // IntroductionChoices = choices.ToList(),
-                //IntroductionChoices = await _repository.IntroductionChoice.GetAllAsync(),
 
             };
 
