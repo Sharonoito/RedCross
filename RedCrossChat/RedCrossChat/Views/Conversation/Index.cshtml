@@ -768,10 +768,14 @@
             });
 
 
-            $(document).on('click', '#chat-handover-requests .chat-contact-list-item', function () {
+            $(document).on('click', '#chat-handover-requests li', function () {
+
+                
 
                 let current = this;
-
+                
+                console.log("file-manager", $(current).data('id'))
+                
                 if ($(current).data('id') != undefined) {
                     $.post("/Conversation/UpdateHandOverRequest/?id=" + $(current).data('id')).then(response => {
                         $(current).remove();
