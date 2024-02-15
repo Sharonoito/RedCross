@@ -310,7 +310,7 @@ namespace RedCrossChat.Dialogs
 
            
 
-            if (stepContext.Result == null)
+            if (stepContext.Result == null & response=="")
             {
                 persona.WantsToTalkToSomeone = true;
 
@@ -321,6 +321,12 @@ namespace RedCrossChat.Dialogs
 
                 return await stepContext.EndDialogAsync(me, cancellationToken);
             }
+
+            if(stepContext.Result == null && (response == Validations.YES || response == ValidationsSwahili.YES)) {
+
+                return await stepContext.NextAsync(me, cancellationToken);
+            }
+
             await _repository.SaveChangesAsync();
 
             switch (((FoundChoice)stepContext.Result).Value)

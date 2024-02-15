@@ -46,12 +46,28 @@ namespace RedCrossChat.Dialogs
 
             if (!me.HandOverToUser)
             {
-                repository.HandOverRequest.Create(new Entities.HandOverRequest
+
+                var requests=await repository.HandOverRequest.FindByCondition(x => x.ConversationId == me.ConversationId & x.HasBeenReceived==false).ToListAsync();
+
+                if(requests ==null || requests.Count ==0)
                 {
-                    Title=conversation.Persona.Name,
-                    ConversationId=conversation.Id,
-                    isActive=true,
-                });
+                    repository.HandOverRequest.Create(new Entities.HandOverRequest
+                    {
+                        Title = conversation.Persona.Name,
+                        ConversationId = conversation.Id,
+                        isActive = true,
+                    });
+                }
+                else
+                {
+                   var request= requests.First();
+
+                   request.HasBeenReceived = false;
+
+                    repository.HandOverRequest.Update(request);
+                }
+
+               
 
                 conversation.RequestedHandedOver = true;
 
@@ -82,13 +98,30 @@ namespace RedCrossChat.Dialogs
                     if (request.HasResponse && request.LastChatMessage !=null)
                     {
 
-                        skip = false;
+                       
 
                         me.HandOverToUser = true;
 
                         me.ActiveRawConversation = request.LastChatMessage.Id;
 
                         var promptMessage = MessageFactory.Text(request.LastChatMessage.Message, null, InputHints.ExpectingInput);
+
+                        /*if (request.LastChatMessage.Message ==me.LastMessage)
+                        {
+                            
+                        }
+                        else
+                        {
+                            me.LastMessage = request.LastChatMessage.Message;
+
+                        }
+                       
+                        if(skip == false)
+                        {
+                            promptMessage = MessageFactory.Text("", null, InputHints.ExpectingInput);
+                        }
+
+                        skip = false;*/
 
                         return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = promptMessage }, token);
                     }                    
