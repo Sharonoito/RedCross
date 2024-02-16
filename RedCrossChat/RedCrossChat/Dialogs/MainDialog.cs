@@ -1,6 +1,7 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Dialogs.Choices;
+using Microsoft.Bot.Connector;
 using Microsoft.Bot.Schema;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -35,6 +36,7 @@ namespace RedCrossChat.Dialogs
            
             PersonalDialog personalDialog,
             AiDialog aiDialog,
+            BreathingDialog breathingDialog,
             AwarenessDialog awarenessDialog,
             ILogger<MainDialog> logger, 
             IRepositoryWrapper wrapper,
@@ -57,6 +59,7 @@ namespace RedCrossChat.Dialogs
             AddDialog(personalDialog);
             AddDialog(aiDialog);
             AddDialog(awarenessDialog);
+            AddDialog(breathingDialog);
 
             var waterfallSteps = new WaterfallStep[]
             {
@@ -69,6 +72,7 @@ namespace RedCrossChat.Dialogs
                     EvaluateFeelingAsync,
                     HandleFeelingAsync,
                     HandleAiHandOver,
+                    //HandleBreathingStop,
                     FinalStepAsync,
             };
 
@@ -374,6 +378,8 @@ namespace RedCrossChat.Dialogs
                 conversation.FeelingDetail = response;
 
                 _repository.Conversation.Update(conversation);
+
+                await _repository.SaveChangesAsync();
             }
 
             if (stepContext.Context.Activity.ChannelId == "telegram" && !conversation.IsReturnClient)
@@ -406,6 +412,13 @@ namespace RedCrossChat.Dialogs
             return await stepContext.BeginDialogAsync(nameof(AiDialog),me,cancellationToken);
         }
 
+        private async Task<DialogTurnResult> HandleBreathingStop(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        {
+            Client me = (Client)stepContext.Values[UserInfo];
+
+            return await stepContext.BeginDialogAsync(nameof(BreathingDialog), me, cancellationToken);
+        }
+
         private async Task<DialogTurnResult> RateBotAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             Client me = (Client)stepContext.Values[UserInfo];  
@@ -424,8 +437,18 @@ namespace RedCrossChat.Dialogs
 
         private async Task<DialogTurnResult> FinalStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-           
-            return await stepContext.EndDialogAsync(null, cancellationToken);
+            Client me = (Client)stepContext.Values[UserInfo];
+
+            Conversation conversation = await _repository.Conversation
+                    .FindByCondition(x => x.Id == me.ConversationId)
+                    .Include(x => x.Persona)
+                    .FirstOrDefaultAsync();
+
+            var resp = await ChatGptDialog.GetChatGPTResponses("Give me a random encouraging quote", new List<AiConversation>(), conversation.Language);
+
+            await stepContext.Context.SendActivityAsync(MessageFactory.Text(conversation.Language ? $"Thank you , have a lovely day  {resp}" : $" Asante,kuwa na siku njema  {resp}"));
+
+            return await stepContext.EndDialogAsync(null);
         }
 
         private async Task<String> GetPersonaName()

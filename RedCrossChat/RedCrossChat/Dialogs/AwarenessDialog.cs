@@ -101,7 +101,7 @@ namespace RedCrossChat.Dialogs
 
             DBFeeling feeling = conversation.Feeling;
 
-            if (feeling.Description.ToLower().Trim() == "other" || feeling.Description.ToLower().Trim() == "others")
+            if (feeling.Description.ToLower().Trim() == "other" || feeling.Description.ToLower().Trim() == "others" || feeling.Description.ToLower().Trim() =="zinginezo")
             {
                 question = (me.language ? "You said you are feeling " + conversation.FeelingDetail :
 

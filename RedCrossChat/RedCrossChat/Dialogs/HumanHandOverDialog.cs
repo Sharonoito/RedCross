@@ -49,7 +49,25 @@ namespace RedCrossChat.Dialogs
 
                 var requests=await repository.HandOverRequest.FindByCondition(x => x.ConversationId == me.ConversationId & x.HasBeenReceived==false).ToListAsync();
 
-                if(requests ==null || requests.Count ==0)
+                if(requests.Count > 0)
+                {
+
+                    foreach(var request in requests)
+                    {
+                        request.HasBeenReceived = true;
+                    }
+
+                    repository.HandOverRequest.UpdateRange(requests);
+                }
+
+                repository.HandOverRequest.Create(new Entities.HandOverRequest
+                {
+                    Title = conversation.Persona.Name,
+                    ConversationId = conversation.Id,
+                    isActive = true,
+                });
+
+                /*if(requests ==null || requests.Count ==0)
                 {
                     repository.HandOverRequest.Create(new Entities.HandOverRequest
                     {
@@ -65,9 +83,9 @@ namespace RedCrossChat.Dialogs
                    request.HasBeenReceived = false;
 
                     repository.HandOverRequest.Update(request);
-                }
+                }*/
 
-               
+
 
                 conversation.RequestedHandedOver = true;
 
@@ -97,9 +115,6 @@ namespace RedCrossChat.Dialogs
 
                     if (request.HasResponse && request.LastChatMessage !=null)
                     {
-
-                       
-
                         me.HandOverToUser = true;
 
                         me.ActiveRawConversation = request.LastChatMessage.Id;
