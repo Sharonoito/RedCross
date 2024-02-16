@@ -442,7 +442,7 @@ namespace RedCrossChat.Dialogs
         {
 
            // promptContext.Context.Activity.Text
-            var age=await _repository.AgeBand.FindByCondition(x=>x.Name== promptContext.Context.Activity.Text).FirstOrDefaultAsync();
+            var age=await _repository.AgeBand.FindByCondition(x=>x.Name== promptContext.Context.Activity.Text || x.Kiswahili == promptContext.Context.Activity.Text).FirstOrDefaultAsync();
 
             if (age == null)
             {
