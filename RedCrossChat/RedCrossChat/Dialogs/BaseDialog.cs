@@ -178,7 +178,7 @@ namespace RedCrossChat.Dialogs
         {
             Client me = (Client)stepContext.Values[UserInfo];
 
-           var feedbackResponse = stepContext.Result.ToString();
+           var feedbackResponse = stepContext.Context.Activity.Text;
 
 
             var resp = await ChatGptDialog.GetChatGPTResponses("Give me a random encouraging quote", new List<AiConversation>(), me.language);

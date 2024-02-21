@@ -20,6 +20,7 @@ using System.ComponentModel.DataAnnotations;
 using RedCrossChat.Objects;
 using Microsoft.Bot.Builder;
 using Newtonsoft.Json.Linq;
+using RedCrossChat.Domain.Migrations;
 
 namespace RedCrossChat.Controllers
 {
@@ -103,7 +104,7 @@ namespace RedCrossChat.Controllers
                 {
                     Id = feelingEntity.Id,
                     Name = feelingEntity.Name,
-                    //Description = feelingEntity.Description,
+                    Description = feelingEntity.Description,
                     Kiswahili=feelingEntity.Kiswahili,
                     Synonyms = feelingEntity.Synonymns
                 };
@@ -423,7 +424,7 @@ namespace RedCrossChat.Controllers
                     Id = agebandEntity.Id,
                     Name = agebandEntity.Name,
                     Kiswahili=agebandEntity.Kiswahili,
-                    //Highest = agebandEntity.Highest,
+                   // Highest = agebandEntity.Highest,
                     //Lowest = agebandEntity.Lowest,
                     Synonyms = agebandEntity.Synonyms
                 };
@@ -452,6 +453,8 @@ namespace RedCrossChat.Controllers
                     {
                         Name = ageBand.Name,
                         Kiswahili = ageBand.Kiswahili,
+                        //Highest = ageBand.Highest.ToString(),
+                        //Lowest = ageBand.Lowest.ToString()
                         Synonyms = ageBand.Synonyms
                     };
 
@@ -1245,7 +1248,7 @@ namespace RedCrossChat.Controllers
 
             try
             {
-                var data = await _repository.Itention.FindByCondition(x=>x.IsActive).ToListAsync();
+                var data = await _repository.Itention.GetAllAsync();
 
                 var filteredRows = data
                     .AsQueryable()
@@ -1363,12 +1366,7 @@ namespace RedCrossChat.Controllers
                     return NotFound();
                 }
 
-                intentionEntity.IsActive=false;
-
-                _repository.Itention.Update(intentionEntity);
-
-               // _repository.Itention.Delete(intentionEntity);
-               
+                _repository.Itention.Delete(intentionEntity);
                 var result = await _repository.SaveChangesAsync();
 
                 if (!result)
@@ -1638,6 +1636,8 @@ namespace RedCrossChat.Controllers
                 {
                     Id = questionEntity.Id,
                     Question = questionEntity.question,
+                    Kiswahili = questionEntity.Kiswahili,
+                    Code = questionEntity.Code,
                 };
 
                 ViewBag.Title = "Edit Question";
@@ -1906,8 +1906,6 @@ namespace RedCrossChat.Controllers
             try
             {
                 var data = await _repository.IntroductionChoice.GetAllAsync();
-               // I have to add Include method for the selected choices to appear on the table
-                //var data = await _repository.IntroductionChoice.Include(x => x.IntroductionChoi).GetAllAsync();
                 var filteredRows = data
                     .AsQueryable()
                     .FilterBy(dtRequest.Search, dtRequest.Columns);
@@ -2017,8 +2015,8 @@ namespace RedCrossChat.Controllers
             }
             return Success("Introduction Actions Saved successfully");
         }
-
-        public async Task<IActionResult> DeleteIntroductionChoices(Guid id)
+      
+        public async Task<IActionResult> DeleteIntroductionChoice(Guid id)
         {
             try
             {
@@ -2043,6 +2041,8 @@ namespace RedCrossChat.Controllers
                 return Error("Something broke" + ex.Message);
             }
         }
+
+
         #endregion
 
         #region InitialAction
@@ -2056,9 +2056,7 @@ namespace RedCrossChat.Controllers
         {
             try
             {
-               var data = await _repository.InitialActionItem.GetAllAsync();
-
-                //var res = data.Include(GetIntroductionChoice);
+               var data = await _repository.InitialActionItem.GetAllAsync();           
 
                 var filteredRows = data
                     .AsQueryable()
@@ -2091,10 +2089,8 @@ namespace RedCrossChat.Controllers
 
             var initialAction = new InitialActionItemVm()
             {
-                IntroductionChoices = (List<IntroductionChoice>)await _repository.IntroductionChoice.GetAllAsync(),
-               // IntroductionChoices = choices.ToList(),
-                //IntroductionChoices = await _repository.IntroductionChoice.GetAllAsync(),
-
+               // IntroductionChoices = (List<IntroductionChoice>)await _repository.IntroductionChoice.GetAllAsync(),
+               IntroductionChoices = choices.ToList(),
             };
 
             return View("_InitialActionItem",initialAction);
@@ -2121,6 +2117,7 @@ namespace RedCrossChat.Controllers
                 {
                     Id = initialActionEntity.Id,
                     Choices = initialActionEntity.Choices,
+                    IntroductionChoiceId = initialActionEntity.IntroductionChoiceId,
                     ActionMessage = initialActionEntity.ActionMessage,
                     Value=initialActionEntity.Value,
                     SubTitle = initialActionEntity.SubTitle,

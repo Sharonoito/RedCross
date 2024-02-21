@@ -19,7 +19,7 @@
                 <i class="bx bx-x bx-sm cursor-pointer close-sidebar me-1 fs-4 " data-bs-toggle="sidebar" data-overlay="" data-target="#app-chat-sidebar-left"></i>
             </div>
             <div class="sidebar-body px-4 pb-4 ps">
-                <div class="my-4">
+@*                <div class="my-4">
                     <span class="text-muted text-uppercase">Status</span>
                     <div class="d-grid gap-1 mt-2">
                         <div class="form-check form-check-success">
@@ -39,7 +39,7 @@
                             <label class="form-check-label" for="user-offline">Offline</label>
                         </div>
                     </div>
-                </div>
+                </div>*@
                 <div class="my-4">
                     <span class="text-muted text-uppercase"></span>
                     <ul class="list-unstyled d-grid gap-2 mt-2">
@@ -124,7 +124,7 @@
                         <div class="btn-group">
                             <button id="btn-active-history" style="position:relative" class="btn btn-info m-0 " data-bs-toggle="" data-bs-target="#offcanvasHistory" aria-controls="offcanvasHistory"> History <span class="badge bg-label-danger d-none rounded-pill" style="position:absolute;left:90%;top:-25%">0</span> </button>
 
-                            <button id="btn-request-details" style="position:relative" class="btn btn-primary m-0" data-bs-toggle="offcanvas" data-bs-target="#offcanvasEnd" aria-controls="offcanvasEnd"> Handover Requests <span class="badge bg-label-danger  rounded-pill" style="position:absolute;left:90%;top:-25%">0</span> </button>   
+                            <button id="btn-request-details" style="position:relative" class="btn btn-primary m-0" data-bs-toggle="offcanvas" data-bs-target="#offcanvasEnd" aria-controls="offcanvasEnd"> Pending Requests <span class="badge bg-label-danger  rounded-pill" style="position:absolute;left:90%;top:-25%">0</span> </button>   
                         
                         </div>
 
@@ -239,7 +239,7 @@
    
         <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasEnd" aria-labelledby="offcanvasEndLabel">
             <div class="offcanvas-header">
-                <h5 id="offcanvasEndLabel" class="offcanvas-title">HandOver Requests</h5>
+                <h5 id="offcanvasEndLabel" class="offcanvas-title">Pending Requests</h5>
                 <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
             </div>
             <div class="offcanvas-body  mx-0 flex-grow-0">
@@ -768,10 +768,14 @@
             });
 
 
-            $(document).on('click', '#chat-handover-requests .chat-contact-list-item', function () {
+            $(document).on('click', '#chat-handover-requests li', function () {
+
+                
 
                 let current = this;
-
+                
+                console.log("file-manager", $(current).data('id'))
+                
                 if ($(current).data('id') != undefined) {
                     $.post("/Conversation/UpdateHandOverRequest/?id=" + $(current).data('id')).then(response => {
                         $(current).remove();

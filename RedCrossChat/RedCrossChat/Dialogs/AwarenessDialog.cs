@@ -101,9 +101,10 @@ namespace RedCrossChat.Dialogs
 
             DBFeeling feeling = conversation.Feeling;
 
-            if (feeling.Description.ToLower().Trim() == "other" || feeling.Description.ToLower().Trim() == "others")
+            if (feeling.Description.ToLower().Trim() == "other" || feeling.Description.ToLower().Trim() == "others" || feeling.Description.ToLower().Trim() =="zinginezo")
             {
                 question = (me.language ? "You said you are feeling " + conversation.FeelingDetail :
+
                                                     "Ulisema " + conversation.FeelingDetail) + ", " + question;
             }else
             {
@@ -309,7 +310,7 @@ namespace RedCrossChat.Dialogs
 
            
 
-            if (stepContext.Result == null)
+            if (stepContext.Result == null & response=="")
             {
                 persona.WantsToTalkToSomeone = true;
 
@@ -320,6 +321,12 @@ namespace RedCrossChat.Dialogs
 
                 return await stepContext.EndDialogAsync(me, cancellationToken);
             }
+
+            if(stepContext.Result == null && (response == Validations.YES || response == ValidationsSwahili.YES)) {
+
+                return await stepContext.NextAsync(me, cancellationToken);
+            }
+
             await _repository.SaveChangesAsync();
 
             switch (((FoundChoice)stepContext.Result).Value)
@@ -361,7 +368,7 @@ namespace RedCrossChat.Dialogs
 
             await _repository.SaveChangesAsync();
 
-            var intentions=await _repository.Itention.GetAllAsync();
+            List<Intention> intentions=await _repository.Itention.FindByCondition(x=>x.IsActive).ToListAsync();
 
             var list =new List<Choice>();
 
