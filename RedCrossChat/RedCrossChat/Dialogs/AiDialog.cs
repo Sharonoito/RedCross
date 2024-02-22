@@ -212,10 +212,5 @@ namespace RedCrossChat.Dialogs
 
             iteration++;
         }
-
-
-
-
-
     }
 }

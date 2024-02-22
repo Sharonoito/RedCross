@@ -72,7 +72,7 @@ namespace RedCrossChat.Dialogs
                     EvaluateFeelingAsync,
                     HandleFeelingAsync,
                     HandleAiHandOver,
-                    //HandleBreathingStop,
+                    HandleBreathingStop,
                     FinalStepAsync,
             };
 
@@ -409,14 +409,23 @@ namespace RedCrossChat.Dialogs
         {
             Client me = (Client)stepContext.Values[UserInfo];
 
-            return await stepContext.BeginDialogAsync(nameof(AiDialog),me,cancellationToken);
+            if (me.WantsBreathingExercises)
+            {
+                return await stepContext.BeginDialogAsync(nameof(BreathingDialog), me, cancellationToken);
+            }
+            else
+            {
+                return await stepContext.NextAsync(me, cancellationToken);
+            }
+
+            
         }
 
         private async Task<DialogTurnResult> HandleBreathingStop(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             Client me = (Client)stepContext.Values[UserInfo];
 
-            return await stepContext.BeginDialogAsync(nameof(BreathingDialog), me, cancellationToken);
+            return await stepContext.BeginDialogAsync(nameof(AiDialog),me,cancellationToken);
         }
 
         private async Task<DialogTurnResult> RateBotAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
