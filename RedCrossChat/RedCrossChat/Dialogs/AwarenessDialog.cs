@@ -338,8 +338,8 @@ namespace RedCrossChat.Dialogs
 
             var type = stepContext.Result.GetType().ToString();
 
-            if (type == "Client") {
-            
+            if (type == "RedCrossChat.Objects.Client") {
+                return await stepContext.NextAsync(me, cancellationToken);
             }
 
             switch (((FoundChoice)stepContext.Result).Value)
