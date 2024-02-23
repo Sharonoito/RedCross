@@ -249,8 +249,15 @@ namespace RedCrossChat.Dialogs
 
             switch (((FoundChoice)stepContext.Result).Value)
             {
-                case "Yes":
+                case Validations.YES:
+                case ValidationsSwahili.YES:
                     me.HasTalkedToSomeone =true;
+
+
+                    if (me.IsAwareOfFeeling == false)
+                    {
+                        return await stepContext.NextAsync(me);
+                    }
                     break;
                 default:
 
@@ -329,6 +336,12 @@ namespace RedCrossChat.Dialogs
             }
 
             await _repository.SaveChangesAsync();
+
+            var type = stepContext.Result.GetType().ToString();
+
+            if (type == "RedCrossChat.Objects.Client") {
+                return await stepContext.NextAsync(me, cancellationToken);
+            }
 
             switch (((FoundChoice)stepContext.Result).Value)
             {
