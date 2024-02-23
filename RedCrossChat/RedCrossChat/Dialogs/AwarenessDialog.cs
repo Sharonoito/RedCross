@@ -177,11 +177,10 @@ namespace RedCrossChat.Dialogs
                     default:
                         quiz = await _repository.Question.FindByCondition(x => x.Code == 51).FirstAsync();
 
-                        question =me.language ? quiz.question : quiz.Kiswahili;
+                        question =me.language? quiz.question: quiz.Kiswahili ;
 
-                        break;
+                        break;   
                 }
-
 
                 list.Add(new ChatMessage
                 {
@@ -249,15 +248,8 @@ namespace RedCrossChat.Dialogs
 
             switch (((FoundChoice)stepContext.Result).Value)
             {
-                case Validations.YES:
-                case ValidationsSwahili.YES:
+                case "Yes":
                     me.HasTalkedToSomeone =true;
-
-
-                    if (me.IsAwareOfFeeling == false)
-                    {
-                        return await stepContext.NextAsync(me);
-                    }
                     break;
                 default:
 
@@ -336,12 +328,6 @@ namespace RedCrossChat.Dialogs
             }
 
             await _repository.SaveChangesAsync();
-
-            var type = stepContext.Result.GetType().ToString();
-
-            if (type == "RedCrossChat.Objects.Client") {
-                return await stepContext.NextAsync(me, cancellationToken);
-            }
 
             switch (((FoundChoice)stepContext.Result).Value)
             {

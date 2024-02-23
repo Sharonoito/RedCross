@@ -72,7 +72,7 @@ namespace RedCrossChat.Dialogs
                     EvaluateFeelingAsync,
                     HandleFeelingAsync,
                     HandleAiHandOver,
-                    HandleBreathingStop,
+                    //HandleBreathingStop,
                     FinalStepAsync,
             };
 
@@ -128,7 +128,7 @@ namespace RedCrossChat.Dialogs
 
             var question = client.language ?
                 "Hello dear friend!! Welcome to the Kenya Red Cross Society, we're are offering tele - mental health and counseling services to the public at no costs. How can we help you today?" :
-                "Habari rafiki mpendwa!! Karibu kwenye Shirika La Msalaba Mwekundu la Kenya, tunatoa huduma za afya ya kiakili na ushauri kwa umma bila malipo. Tunawezaje kukusaidia leo?";
+                "Habari rafiki mpendwa!! Karibu kwenye Chama cha Msalaba Mwekundu cha Kenya, tunatoa huduma za afya ya kiakili na ushauri kwa umma bila malipo. Tunawezaje kukusaidia leo?";
 
 
             var messageText = stepContext.Options?.ToString() ?? question;
@@ -198,8 +198,8 @@ namespace RedCrossChat.Dialogs
             // Prompt the user if they agree with the terms and conditions
             var options = new PromptOptions()
             {
-                Prompt = MessageFactory.Text(me.language ?"Do you agree to the Terms and Conditions? Please select 'Yes' or 'No'.": "Je, unakubali Sheria na Masharti? Tafadhali chagua 'Ndio' au 'La'."),
-                RetryPrompt = MessageFactory.Text(me.language? "Please select a valid option ('Yes' or 'No').": "Tafadhali chagua chaguo sahihi ('Ndio' au 'La')"),
+                Prompt = MessageFactory.Text(me.language ?"Do you agree to the Terms and Conditions? Please select 'Yes' or 'No'.": "Je, unakubali Sheria na Masharti? Tafadhali chagua 'Ndiyo' au 'La'."),
+                RetryPrompt = MessageFactory.Text(me.language? "Please select a valid option ('Yes' or 'No').": "Tafadhali chagua chaguo sahihi ('Ndiyo' au 'La')"),
                 Choices = me.language ? RedCrossLists.choices : RedCrossLists.choicesKiswahili,
                 Style = ListStyle.HeroCard,
             };
@@ -409,23 +409,14 @@ namespace RedCrossChat.Dialogs
         {
             Client me = (Client)stepContext.Values[UserInfo];
 
-            if (me.WantsBreathingExercises)
-            {
-                return await stepContext.BeginDialogAsync(nameof(BreathingDialog), me, cancellationToken);
-            }
-            else
-            {
-                return await stepContext.NextAsync(me, cancellationToken);
-            }
-
-            
+            return await stepContext.BeginDialogAsync(nameof(AiDialog),me,cancellationToken);
         }
 
         private async Task<DialogTurnResult> HandleBreathingStop(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             Client me = (Client)stepContext.Values[UserInfo];
 
-            return await stepContext.BeginDialogAsync(nameof(AiDialog),me,cancellationToken);
+            return await stepContext.BeginDialogAsync(nameof(BreathingDialog), me, cancellationToken);
         }
 
         private async Task<DialogTurnResult> RateBotAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)

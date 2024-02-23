@@ -38,8 +38,8 @@ namespace RedCrossChat
             services.AddSingleton<IStorage, MemoryStorage>();
 
             //var connectionString = _config.GetConnectionString(HostingEnvironment.IsDevelopment() ?  "DefaultConnection": "LocalConnection");
-            var connectionString = _config.GetConnectionString("DefaultConnection");
-            //var connectionString = _config.GetConnectionString("LocalConnection");
+            //var connectionString = _config.GetConnectionString("DefaultConnection");
+            var connectionString = _config.GetConnectionString("LocalConnection");
 
 
             //Use sql Server Conversations

@@ -2,9 +2,11 @@
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Schema;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using RedCrossChat.Contracts;
 using RedCrossChat.Entities;
 using RedCrossChat.Objects;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -146,18 +148,10 @@ namespace RedCrossChat.Dialogs
 
                 if(iterations % 100 == 0 && !me.HandOverToUser  && iterations !=30)
                 {
-                    //await stepContext.Context.SendActivityAsync(MessageFactory.Text("One of our psychologists  will be getting in touch with you shortly"), token);
-
-
-                    var message = me.language ? "One of our psychologists will be getting in touch with you shortly" :
-                                   "Mmoja wa wanasaikolojia wetu atawasiliana nawe hivi karibuni";
-                    await stepContext.Context.SendActivityAsync(MessageFactory.Text(message), token);
-
-
+                    await stepContext.Context.SendActivityAsync(MessageFactory.Text("One of our psychologists  will be getting in touch with you shortly"), token);
                 }
 
-
-                if (iterations  >=  300 && !me.HandOverToUser)
+                if(iterations  >=  300 && !me.HandOverToUser)
                 {
 
                     request = await repository.HandOverRequest.FindByCondition(x => x.ConversationId == conversation.Id).FirstOrDefaultAsync();
