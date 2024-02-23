@@ -177,10 +177,11 @@ namespace RedCrossChat.Dialogs
                     default:
                         quiz = await _repository.Question.FindByCondition(x => x.Code == 51).FirstAsync();
 
-                        question =me.language? quiz.question: quiz.Kiswahili ;
+                        question =me.language ? quiz.question : quiz.Kiswahili;
 
-                        break;   
+                        break;
                 }
+
 
                 list.Add(new ChatMessage
                 {
