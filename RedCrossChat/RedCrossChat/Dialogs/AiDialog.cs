@@ -62,7 +62,7 @@ namespace RedCrossChat.Dialogs
         {
             Client me = (Client)stepContext.Options;
 
-            var question = me.language ? "You are now interacting with an Generative AI-powered bot, do you wish to continue?" : "Sasa unaingiliana na kijibu kiitwacho Generative AI-powered, ungependa kuendelea?";
+            var question = me.language ? "You are now interacting with a Generative AI-powered bot, do you wish to continue?" : "Sasa unaingiliana na kijibu kiitwacho Generative AI-powered, ungependa kuendelea?";
 
             Conversation conversation = await _repository.Conversation
                    .FindByCondition(x => x.Id == me.ConversationId)
@@ -212,10 +212,5 @@ namespace RedCrossChat.Dialogs
 
             iteration++;
         }
-
-
-
-
-
     }
 }
