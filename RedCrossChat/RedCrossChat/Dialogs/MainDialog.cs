@@ -128,7 +128,7 @@ namespace RedCrossChat.Dialogs
 
             var question = client.language ?
                 "Hello dear friend!! Welcome to the Kenya Red Cross Society, we're are offering tele - mental health and counseling services to the public at no costs. How can we help you today?" :
-                "Habari rafiki mpendwa!! Karibu kwenye Chama cha Msalaba Mwekundu cha Kenya, tunatoa huduma za afya ya kiakili na ushauri kwa umma bila malipo. Tunawezaje kukusaidia leo?";
+                "Habari rafiki mpendwa!! Karibu kwenye Shirika La Msalaba Mwekundu la Kenya, tunatoa huduma za afya ya kiakili na ushauri kwa umma bila malipo. Tunawezaje kukusaidia leo?";
 
 
             var messageText = stepContext.Options?.ToString() ?? question;
@@ -198,8 +198,8 @@ namespace RedCrossChat.Dialogs
             // Prompt the user if they agree with the terms and conditions
             var options = new PromptOptions()
             {
-                Prompt = MessageFactory.Text(me.language ?"Do you agree to the Terms and Conditions? Please select 'Yes' or 'No'.": "Je, unakubali Sheria na Masharti? Tafadhali chagua 'Ndiyo' au 'La'."),
-                RetryPrompt = MessageFactory.Text(me.language? "Please select a valid option ('Yes' or 'No').": "Tafadhali chagua chaguo sahihi ('Ndiyo' au 'La')"),
+                Prompt = MessageFactory.Text(me.language ?"Do you agree to the Terms and Conditions? Please select 'Yes' or 'No'.": "Je, unakubali Sheria na Masharti? Tafadhali chagua 'Ndio' au 'La'."),
+                RetryPrompt = MessageFactory.Text(me.language? "Please select a valid option ('Yes' or 'No').": "Tafadhali chagua chaguo sahihi ('Ndio' au 'La')"),
                 Choices = me.language ? RedCrossLists.choices : RedCrossLists.choicesKiswahili,
                 Style = ListStyle.HeroCard,
             };
