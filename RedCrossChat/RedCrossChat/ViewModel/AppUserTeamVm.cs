@@ -21,8 +21,8 @@ namespace RedCrossChat.ViewModel
         [Display(Name = "Team")]
         public string Team { get; set; }
 
-        public List<AppUser>? AppUsers { get; set; }
+        public List<AppUser> AppUsers { get; set; }
 
-        public List<AppUser>? TeamMembers { get; set; }
+        public List<AppUser> TeamMembers { get; set; }
     }
 }

@@ -292,7 +292,7 @@
 
             let currentLength=0;
 
-            let conversartions = [];
+            let conversartions = [],handOverRequest=[];
 
             let interval = 2500;
 
@@ -359,6 +359,12 @@
 
                 const { persona, id, dateCreated, reason,chatMessages } = data;
 
+                console.log("cgatMess", chatMessages)
+
+                let hasUnread = 0;
+
+
+
                 let str_class='';
 
                 if (activeConversation != null) {
@@ -374,6 +380,20 @@
 
                 }
 
+                chatMessages.forEach(message => {
+                    if (!message.isRead) {
+                        hasUnread++;
+                    }
+                });
+
+                let message=" "+hasUnread+" Unread Messages";
+
+                if(hasUnread ==0){
+                    message=lastMessage.message;
+                }
+
+                console.log("unread messages", hasUnread)
+
                 $(container).append(`
                                   <li class="chat-contact-list-item chat-item ${str_class}" data-id='${id}'>
                                     <a class="d-flex align-items-center">
@@ -382,7 +402,7 @@
                                         </div>
                                         <div class="chat-contact-info flex-grow-1 ms-3">
                                                         <h6 class="chat-contact-name text-truncate m-0">Client ${persona.codeName}</h6>
-                                                        <p class="chat-contact-status text-truncate mb-0 text-muted" id='last-message'>${lastMessage.message}</p>
+                                                        <p class="chat-contact-status text-truncate mb-0 text-muted" id='last-message'>${message}</p>
                                         </div>
                                         <small class="text-muted mb-auto moment-date" data-date='${lastMessage.dateCreated}'></small>
                                     </a>
@@ -391,7 +411,20 @@
                 CalculateDates();
             }, updateLastMessage=(data)=>{
 
-               
+               console.log("data-update-last-message",data)
+               console.log("data-update-last-message",activeConversation)
+
+                let message = '1 New Message';
+
+                let hasUnread = 0;
+                
+                data.chatMessages.forEach(message=>{
+
+                    if(!message.isRead){
+                        hasUnread++;
+                    }
+
+                })
 
                 let lastMessage = data.chatMessages[data.chatMessages.length - 1];
 
@@ -399,8 +432,10 @@
 
                     
                     if(data.id == $(item).data('id')){
-                      
-                        $(item).find("p").html(lastMessage.message)
+
+                        if(hasUnread !=0){
+                            $(item).find("p").html(hasUnread+" new message")
+                        }
                        
                         $(item).find("small").attr("data-date", lastMessage.dateCreated)
                     }
@@ -460,6 +495,7 @@
                     return;
 
                 const { id, reason, chatMessages, isReturnClient } = activeConversation;
+
 
                 let persona;
 
@@ -599,13 +635,13 @@
             }, GetConversation = id => {
 
                 $.get("/Conversation/GetConversation?id=" + id).then(resp => {
-
+                    
                     activeConversation = resp.responseData;
-
 
                     UpdateChatActiveConversation();
 
-                })
+                });
+
             }, StartConversation=(id,btn)=>{
 
                 $('.chat-contact-list-item').toArray().forEach(chat => {
@@ -618,11 +654,9 @@
                     $(btn).addClass('active')
                 }
 
-
                 if (conversartions.length == 0) {
                     return GetConversation(id);
                 }
-
 
                 for (let i = 0; i < conversartions.length; i++) {
 
@@ -635,7 +669,7 @@
                 $(".chat-contact-list-item").find("[data-id='" + id + "']").addClass('active')
                 i.scrollTo(0, i.scrollHeight)
 
-                console.log("scrolling point")
+               
                 i.scrollTo(0, i.scrollHeight)
 
             }
@@ -663,9 +697,24 @@
                     if (data.handOverRequests.length > 0){
 
                         // add the title for the human hand over requesrs
-                        $("#chat-handover-requests").html('');
+                       
 
-                        displayHandOverRequests(data.handOverRequests)
+                        if (handOverRequest.length == 0) {
+                            $("#chat-handover-requests").html('');
+                            handOverRequest = data.handOverRequests;
+                            displayHandOverRequests(handOverRequest)
+                        }
+                        else if (handOverRequest.length > data.handOverRequests){
+                            $("#chat-handover-requests").html('');
+                            handOverRequest = data.handOverRequests;
+                            displayHandOverRequests(handOverRequest)
+                        }else{
+
+                            //we need some logic here
+                            console.log("no update")
+                        }
+
+                        
                     }
 
                     UpdateUI(data.myConversations)
@@ -685,6 +734,8 @@
 
             const appendHandOverRequest = (request) => {
 
+                console.log("AppendHandOverRequest",request)
+
                 let feeling = '';
 
                 if (request.conversation.feeling != null) {
@@ -694,14 +745,21 @@
                 if (feeling == 'others' || feeling == 'other')
                     feeling = request.conversation.feelingDetail;
 
-                return `<li class="card my-2" data-id='${request.id}'>
-                                    <a class="d-flex align-items-center">
+                return `<li class="card border border-danger my-2" data-id='${request.id}'>
+                                    <a class="d-flex align-items-center p-2">
                                       <div class="flex-shrink-0 avatar avatar-offline">
-                                          ${username(request.conversation.persona.codeName)}
+                                          ${username(request.conversation.persona.codeName)} 
                                       </div>
                                       <div class="chat-contact-info flex-grow-1 ms-3">
-                                        <h6 class="chat-contact-name text-truncate m-0">Client ${request.conversation.persona.codeName} </h6>
-                                        <p class="chat-contact-status text-truncate mb-0 text-muted">${feeling}</p>
+                                                    <h6 class="chat-contact-name text-truncate m-0">Client ${request.conversation.persona.codeName}  </h6>
+                                                    <p class="chat-contact-status text-truncate mb-0 text-muted">Language :${(request.conversation.language ? 'English' : 'Kiswahili')} </p>
+                                        <p class="chat-contact-status text-truncate mb-0 text-muted">Feeling :${feeling} </p>
+                                        <p class="chat-contact-status text-truncate mb-0 text-muted">Reason :  </p>
+                                                    <p class="chat-contact-status text-truncate mb-0 text-muted">Return Client : ${request.conversation.isReturnClient} </p>
+
+                                                    <p class="chat-contact-status text-truncate mb-0 text-muted text-end mt-2 moment-date" data-date='${request.dateCreated}'>  </p>
+                                        
+
                                       </div>
                                     </a>
                                   </li>`

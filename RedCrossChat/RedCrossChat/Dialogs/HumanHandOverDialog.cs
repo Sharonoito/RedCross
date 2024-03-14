@@ -109,6 +109,8 @@ namespace RedCrossChat.Dialogs
                     .Include(x=>x.LastChatMessage)
                     .FirstOrDefaultAsync();
 
+                var chatMessages = await repository.ChatMessage.FindByCondition(x => x.ConversationId == conversation.Id & x.IsRead != true ).ToListAsync();
+
                 if (request.HasBeenReceived)
                 {
                     me.HandOverToUser = true;
@@ -119,7 +121,26 @@ namespace RedCrossChat.Dialogs
 
                         me.ActiveRawConversation = request.LastChatMessage.Id;
 
-                        var promptMessage = MessageFactory.Text(request.LastChatMessage.Message, null, InputHints.ExpectingInput);
+                        var promptMessage = MessageFactory.Text("", null, InputHints.ExpectingInput);
+
+                        if (chatMessages == null)
+                        {
+                            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = promptMessage }, token);
+                        }
+
+                        chatMessages.Last().IsRead = true;
+
+                        repository.ChatMessage.Update(chatMessages.Last());
+
+                        await repository.SaveChangesAsync();
+
+                        // repository.ChatMessage.UpdateRange(chatMessages);
+
+                        // await repository.SaveChangesAsync();
+
+                        //todo make a way of presenting all messages incase you have more than one unread message
+
+                        promptMessage = MessageFactory.Text(chatMessages.Last().Message, null, InputHints.ExpectingInput);
 
                         /*if (request.LastChatMessage.Message ==me.LastMessage)
                         {
@@ -225,7 +246,7 @@ namespace RedCrossChat.Dialogs
 
             bool result = await repository.SaveChangesAsync();
 
-
+            //return await InitialAction(stepContext, token);
             return await stepContext.BeginDialogAsync(nameof(WaterfallDialog), me, token);
         }
 

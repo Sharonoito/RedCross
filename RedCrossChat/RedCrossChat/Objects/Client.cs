@@ -26,6 +26,8 @@ namespace RedCrossChat.Objects
 
         public bool WantstoTalkToAProfessional { get; set; } = false;
 
+        public bool MainQuestionAsked {  get; set; } = false;
+
         public bool HandOverToUser { get; set; } = false;
 
         public int Iteration { get; set; } = 0;

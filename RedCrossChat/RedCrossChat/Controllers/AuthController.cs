@@ -302,7 +302,7 @@ namespace RedCrossChat.Controllers
 
                     
 
-                    return Error("Unable to Update ", null);
+                    //return Error("Unable to Update ", null);
                 }
             }
             catch(Exception ex)
