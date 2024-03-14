@@ -481,8 +481,8 @@ namespace RedCrossChat.Dialogs
 
             await _repository.SaveChangesAsync();
 
-            var agentMessage = me.language ? "The next available psychologist will get in touch with you shortly, you can also contact us directly by dialing 1199, request to speak to a psychologist." :
-                             "Utaweza kuzungumza na mhudumu baada ya muda mfupi ama pia unaweza piga nambari 1199 ili kuongea na mshauri. Utaweza kupigiwa na mshauri baada ya muda mfupi, ama upige simu ili kuongea na mwanasaikolojia kupitia nambari 1199";
+            var agentMessage = me.language ? "Next available agent will be with you shortly or you can also call 1199 to connect with our counsellor." :
+                             "Tafadhali subiri, Mhuduma wetu atapatikana hivi karibuni au unaweza pia kupiga simu 1199 bila malipo  kuwasiliana na mshauri wetu.\r\n";
             await stepContext.Context.SendActivityAsync(MessageFactory.Text(agentMessage), cancellationToken);
 
 
