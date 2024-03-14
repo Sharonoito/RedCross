@@ -20,7 +20,7 @@ function ShowHandOverRequest(request) {
 
     if (showHandOverPopup) 
     Swal.fire({
-        title: "Human Hand Over",
+        title: "Human Handover",
         text: "A client needs Mental Support!",
         icon: "warning",
         position: "top-end",

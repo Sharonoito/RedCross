@@ -68,6 +68,7 @@ namespace RedCrossChat.Dialogs
                     case "quit":
                     case "goodbye":
                     case "good bye":
+                    case "ghahiri":
                         
                         //var cancelMessage = MessageFactory.Text(CancelMsgText, CancelMsgText, InputHints.IgnoringInput);
                         
