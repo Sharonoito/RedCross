@@ -33,5 +33,7 @@ namespace RedCrossChat.Objects
         public string LastResponse { get; set; }
 
         public Guid ActiveRawConversation { get; set; }
+
+        public bool ResponseMode { get; set; } = false;
     }
 }

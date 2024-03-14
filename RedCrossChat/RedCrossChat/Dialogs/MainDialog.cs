@@ -513,7 +513,7 @@ namespace RedCrossChat.Dialogs
                     .Include(x => x.Persona)
                     .FirstOrDefaultAsync();
 
-            var resp = await ChatGptDialog.GetChatGPTResponses("Give me a random encouraging quote", new List<AiConversation>(), conversation.Language);
+            var resp = await ChatGptDialog.GetChatGPTResponses("Give me a random encouraging quote",conversation, conversation.Language);
 
             await stepContext.Context.SendActivityAsync(MessageFactory.Text(conversation.Language ? $"Thank you , have a lovely day  {resp}" : $" Asante,kuwa na siku njema  {resp}"));
 

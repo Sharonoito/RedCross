@@ -299,10 +299,7 @@ namespace RedCrossChat.Controllers
                         return Error(ex.ToString());
                     }
              
-
-                    
-
-                    return Error("Unable to Update ", null);
+                    //return Error("Unable to Update ", null);
                 }
             }
             catch(Exception ex)
