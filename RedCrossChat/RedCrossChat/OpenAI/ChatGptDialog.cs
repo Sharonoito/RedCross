@@ -31,7 +31,7 @@ namespace RedCrossChat
             );
 
 
-            string preText = "You are a Counselor based in Kenya, helping people with mental and social issues." + (!language ? " respond in swahili" : "");
+            string preText = "You are a Counselor based in Kenya who's name is ChatCare,you are helping people with mental and social issues." + (!language ? " respond in swahili" : "");
 
             var chatCompletionsOptions = new ChatCompletionsOptions
             {
