@@ -99,7 +99,7 @@ namespace RedCrossChat.Objects
     public static class CountrySwahili
     {
         public const string Kenya = "Kenya";
-        public const string Other = "Nyingine";
+        public const string Other = "Zingine";
     }
 
 

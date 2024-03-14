@@ -19,8 +19,12 @@ namespace RedCrossChat
         
         private static readonly string AzureOpenAIEndpoint = "https://redcross-2023-connect-7abc-xyz.openai.azure.com/";
        
-        public static async Task<string> GetChatGPTResponses(string prompt,List<AiConversation> aiConversations,bool language=true)
+        public static async Task<string> GetChatGPTResponses(string prompt,Conversation conversation,bool language=true)
         {
+
+            List<AiConversation> aiConversations = conversation.AiConversations;    
+
+
             var openAiClient = new OpenAIClient(
                 new Uri(AzureOpenAIEndpoint),
                 new AzureKeyCredential(_apiKey)
@@ -55,11 +59,11 @@ namespace RedCrossChat
             while (true)
             {
 
-                foreach (AiConversation conversation in aiConversations)
+                foreach (AiConversation conv in aiConversations)
                 {
                    
-                    chatCompletionsOptions.Messages.Add(new ChatMessage(ChatRole.System, conversation.Response));
-                    chatCompletionsOptions.Messages.Add(new ChatMessage(ChatRole.User, conversation.Question));
+                    chatCompletionsOptions.Messages.Add(new ChatMessage(ChatRole.System, conv.Response));
+                    chatCompletionsOptions.Messages.Add(new ChatMessage(ChatRole.User, conv.Question));
                 }
 
                 ChatMessage userGreetingMessage = new(ChatRole.User, prompt);
