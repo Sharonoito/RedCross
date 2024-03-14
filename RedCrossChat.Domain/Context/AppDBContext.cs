@@ -7,10 +7,7 @@ namespace RedCrossChat.Domain
 {
     public class AppDBContext : IdentityDbContext<AppUser, AppRole, string>
     {
-        public AppDBContext(DbContextOptions options) : base(options)
-        {
-
-        }
+       
         public DbSet<AppClaim> AppClaims { get; set; }
 
         public DbSet<AppModule> AppModules { get; set; }
@@ -57,7 +54,10 @@ namespace RedCrossChat.Domain
 
         public DbSet<InitialActionItem> InitialActionItem { get; set; }
 
+        public AppDBContext(DbContextOptions options) : base(options)
+        {
 
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

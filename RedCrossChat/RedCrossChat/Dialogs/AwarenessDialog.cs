@@ -1,19 +1,13 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Bot.Builder;
+﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Dialogs.Choices;
 using Microsoft.Bot.Schema;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Clients.ActiveDirectory;
-using Newtonsoft.Json.Linq;
-using NuGet.Protocol.Core.Types;
 using RedCrossChat.Cards;
 using RedCrossChat.Contracts;
 using RedCrossChat.Entities;
 using RedCrossChat.Objects;
-using RedCrossChat.ViewModel;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -86,7 +80,7 @@ namespace RedCrossChat.Dialogs
         {
             var me = (Client)stepContext.Options;
 
-     //       var savedFeeling = (Feeling)stepContext.Values["Feeling"];
+     //    var savedFeeling = (Feeling)stepContext.Values["Feeling"];
 
             stepContext.Values[UserInfo] = me;
 
@@ -175,7 +169,11 @@ namespace RedCrossChat.Dialogs
 
                         break;
                     default:
+
+                        //skip the RedCross Question
                         quiz = await _repository.Question.FindByCondition(x => x.Code == 51).FirstAsync();
+
+                        me.MainQuestionAsked = true;
 
                         question =me.language? quiz.question: quiz.Kiswahili ;
 
@@ -246,10 +244,26 @@ namespace RedCrossChat.Dialogs
 
             var list = new List<ChatMessage>() { chat };
 
+           
+
             switch (((FoundChoice)stepContext.Result).Value)
             {
-                case "Yes":
+                case Validations.YES:
+                case ValidationsSwahili.YES:
                     me.HasTalkedToSomeone =true;
+
+                    if (me.MainQuestionAsked)
+                    {
+
+                        me.WantstoTalkToAProfessional = true;
+
+                        _repository.ChatMessage.CreateRange(list);
+
+                        await _repository.SaveChangesAsync();
+
+                        return await stepContext.NextAsync(me);
+                    }
+
                     break;
                 default:
 
@@ -299,14 +313,15 @@ namespace RedCrossChat.Dialogs
            
             var response = stepContext.Context.Activity.Text;
 
-            var chat = new ChatMessage
-            {
-                Message = response,
-                Type = Constants.User,
-                ConversationId = conversation.Id,
-            };
+            var typeOfResponse = stepContext.Result.GetType().ToString();
 
-            _repository.ChatMessage.Create(chat);
+            if ( typeOfResponse== "RedCrossChat.Objects.Client") {
+
+                if(me.WantstoTalkToAProfessional)
+                    return await stepContext.NextAsync(me, cancellationToken);
+
+            }
+            
 
            
 
@@ -320,6 +335,17 @@ namespace RedCrossChat.Dialogs
                 await _repository.SaveChangesAsync();
 
                 return await stepContext.EndDialogAsync(me, cancellationToken);
+            }
+            else
+            {
+                var chat = new ChatMessage
+                {
+                    Message = response,
+                    Type = Constants.User,
+                    ConversationId = conversation.Id,
+                };
+
+                _repository.ChatMessage.Create(chat);
             }
 
             if(stepContext.Result == null && (response == Validations.YES || response == ValidationsSwahili.YES)) {
@@ -351,11 +377,11 @@ namespace RedCrossChat.Dialogs
 
             Conversation conversation = await getConversation(me);
 
-            Persona persona = conversation.Persona;
+          //  Persona persona = conversation.Persona;
 
-            persona.WantsBreathingExcercises = true;
+           // persona.WantsBreathingExcercises = true;
 
-            _repository.Persona.Update(persona);
+           // _repository.Persona.Update(persona);
 
             var chat = new ChatMessage
             {
