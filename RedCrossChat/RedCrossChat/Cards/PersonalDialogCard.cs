@@ -15,9 +15,9 @@ namespace RedCrossChat.Cards
             return new HeroCard
             {
                 Title = APP_TITLE,
-                Subtitle = language ? "Terms and Conditions" : "Sheria na Masharti",
-                Text = language ? "For us to be able to help you better, we would like to know more about you! Please accept terms and conditions below to continue." : "Tungependa kukufahamu zaidi ya ulivyotueleza. Ili kuendelea, tafadhali kubali sheria na masharti yafuatayo",
-                Buttons = new List<CardAction> { new CardAction(ActionTypes.OpenUrl, language ? "Terms and Conditions" : "Sheria na Masharti", value: "https://www.redcross.or.ke/ASSETS/DATA-PROTECTION-POLICY.pdf") },
+                Subtitle = language ? "Terms and Conditions" : "Masharti na Vigezo",
+                Text = language ? "We would like to know more about you? Please accept terms and conditions below to continue." : "Ili tuweze kukusaidia vizuri zaidi, tungependa kujua zaidi kukuhusu. Tunakuomba usome na kukubali masharti na vigezo hapo chini ili tuweze kuendelea na huduma zetu.\r\n\r\n",
+                Buttons = new List<CardAction> { new CardAction(ActionTypes.OpenUrl, language ? "Terms and Conditions" : "Sheria na Masharti", value: "https://www.redcross.or.ke/privacy-policy/") },
             };
 
         }
@@ -81,6 +81,22 @@ namespace RedCrossChat.Cards
                                  "Kwa msaada wa kiwango cha juu zaidi, tafadhali jisikie huru kuangalia njia zetu za rufaa zilizodhibitiwa kwa undani.",
 
                  Buttons = new List<CardAction> {
+                    new CardAction(ActionTypes.OpenUrl, language ? "Preview": "Angalia kwa hakika.", value: "https://referraldirectories.redcross.or.ke/")
+
+                },
+            };
+
+            return heroCard;
+        }
+
+
+        public static HeroCard GetFAQCard(Boolean language)
+        {
+            var heroCard = new HeroCard
+            {
+                Text = language ? "Most commonly asked questions about KRCS " : "Maswali yanayoulizwa sana kuhusu KRCS ",
+
+                Buttons = new List<CardAction> {
                     new CardAction(ActionTypes.OpenUrl, language ? "Preview": "Angalia kwa hakika.", value: "https://referraldirectories.redcross.or.ke/")
 
                 },

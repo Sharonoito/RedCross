@@ -1,0 +1,51 @@
+﻿@using RedCrossChat.ViewModel;
+
+@model QuestionVm
+
+@{
+    Layout = null;
+}
+
+<div class="modal-header">
+    <h5 class="modal-title">@ViewBag.Title</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+@using (Html.BeginForm(actionName: "SaveQuestion", controllerName: "Config", FormMethod.Post, new { @class = "modal-Crud", data_modal = "clientModal", data_callback = "", data_table = "tblQuestions", autocomplete = "off", @id = "frmClient" }))
+{
+
+    <input type="hidden" asp-for="Id">
+
+    <div class="modal-body">
+        <div class="row">
+            
+
+            <div class="form-group col-lg-12 mb-2">
+                <label asp-for="Question"></label>
+                <input asp-for="Question" class="form-control" autocomplete="off" required data-val="true" data-val-required="The Name field is required." />
+                <span asp-validation-for="Question" class="text-danger"></span>
+            </div>
+
+            <div class="form-group col-lg-12 mb-2">
+                <label asp-for="Kiswahili"></label>
+                <input asp-for="Kiswahili" class="form-control" autocomplete="off" required data-val="true" data-val-required="The Description field is required." />
+                <span asp-validation-for="Kiswahili" class="text-danger"></span>
+            </div>
+
+            <div class="form-group col-lg-12 mb-2">
+                <label asp-for="Code"></label>
+                <input asp-for="Code" class="form-control" autocomplete="off" required data-val="true" data-val-required="The Description field is required." />
+                <span asp-validation-for="Code" class="text-danger"></span>
+            </div>
+        
+        </div>
+
+    </div>
+
+    <div class="modal-footer">
+       
+            <button type="submit" class="btn btn-primary me-sm-3 me-1 mt-3">Submit</button>
+            <button type="reset" class="btn btn-label-secondary btn-reset mt-3" data-bs-dismiss="modal" aria-label="Close">Cancel</button>
+        
+    </div>
+}

@@ -37,14 +37,18 @@ namespace RedCrossChat
             // Create the storage we'll be using for User and Conversation state. (Memory is great for testing purposes.)
             services.AddSingleton<IStorage, MemoryStorage>();
 
-            //var connectionString = _config.GetConnectionString(HostingEnvironment.IsDevelopment() ?  "DefaultConnection": "LocalConnection");
+            var connectionString = _config.GetConnectionString(HostingEnvironment.IsDevelopment() ?  "DefaultConnection": "LocalConnection");
             //var connectionString = _config.GetConnectionString("DefaultConnection");
-            var connectionString = _config.GetConnectionString("LocalConnection");
+            //var connectionString = _config.GetConnectionString("LocalConnection");
 
 
             //Use sql Server Conversations
             services.AddDbContextPool<AppDBContext>(options =>
-                options.UseSqlServer(connectionString));
+                options.UseSqlServer(connectionString)
+                .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
+
+                
+                );
 
             // Create the Bot Framework Authentication to be used with the Bot Adapter.
             services.ConfigureBotServices();

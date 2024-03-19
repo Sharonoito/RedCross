@@ -1,6 +1,7 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Dialogs.Choices;
+using Microsoft.Bot.Connector;
 using Microsoft.Bot.Schema;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -12,6 +13,7 @@ using RedCrossChat.ViewModel;
 using Sentry;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Attachment = Microsoft.Bot.Schema.Attachment;
@@ -34,6 +36,7 @@ namespace RedCrossChat.Dialogs
            
             PersonalDialog personalDialog,
             AiDialog aiDialog,
+            BreathingDialog breathingDialog,
             AwarenessDialog awarenessDialog,
             ILogger<MainDialog> logger, 
             IRepositoryWrapper wrapper,
@@ -56,6 +59,7 @@ namespace RedCrossChat.Dialogs
             AddDialog(personalDialog);
             AddDialog(aiDialog);
             AddDialog(awarenessDialog);
+            AddDialog(breathingDialog);
 
             var waterfallSteps = new WaterfallStep[]
             {
@@ -68,6 +72,7 @@ namespace RedCrossChat.Dialogs
                     EvaluateFeelingAsync,
                     HandleFeelingAsync,
                     HandleAiHandOver,
+                    //HandleBreathingStop,
                     FinalStepAsync,
             };
 
@@ -102,8 +107,10 @@ namespace RedCrossChat.Dialogs
                 Style = ListStyle.HeroCard,
             }, cancellationToken);
 
-
         }
+
+
+
 
         private async Task<DialogTurnResult> IntroStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
@@ -116,62 +123,128 @@ namespace RedCrossChat.Dialogs
                 client.language = !client.language;
             }
 
-            var conv=await CreateConversationDBInstance(stepContext);
+            var conv = await CreateConversationDBInstance(stepContext);
 
             client.ConversationId = conv.Id;
 
             var question = client.language ?
-                "Hello dear friend!! Welcome to the Kenya Red Cross Society, we're are offering tele - mental health and counseling services to the public at no costs. How can we help you today?" :
-                "Hujambo rafiki? Karibu katika Shirika la Msalaba Mwekundu ambapo tunatoa ushauri kupitia kwenye simu bila malipo yoyote. Je, ungependa nikusaidie vipi?";
+
+               //"Hello dear friend!! Welcome to Kenya Red Cross Society, we're are offering tele - mental health and counseling services to the public at no costs. How can we help you today?" :
+               "Hello Welcome to Kenya Red Cross Society. How can I help you today?" :
+               "Habari rafiki mpendwa, karibu kwenye jukwaa la chatbot la Shirika la Msalaba Mwekundu Kenya. Tunatoa huduma ya afya ya akili na ushauri kupitia simu kwa umma bila malipo yoyote. Leo ungependa tukusaidie vipi?";
+
+            var attachment = new Attachment
+            {
+                ContentType = HeroCard.ContentType,
+
+                Content = PersonalDialogCard.GetFAQCard(client.language),
+            };
+
+            var message = MessageFactory.Attachment(attachment);
+
+            await stepContext.Context.SendActivityAsync(message, cancellationToken);
+
+            var choicez = new List<Choice>
+            {
+                new Choice() { Value = "faq", Action = new CardAction() {
+                    Title = "faq", Type = ActionTypes.OpenUrl,
+                    Value = "https://referraldirectories.redcross.or.ke/" }
+                }
+            };
 
 
             var messageText = stepContext.Options?.ToString() ?? question;
 
             var promptMessage = MessageFactory.Text(messageText, messageText, InputHints.ExpectingInput);
 
-            return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions
+
+
+            var actions = await _repository.IntroductionChoice.GetAll();
+
+            var choices = new List<Choice>();
+
+            foreach (var choice in actions)
+            {
+                choices.Add(new Choice() { Value = client.language ? choice.Name : choice.Kiswahili });
+            }
+
+            var options = new PromptOptions()
             {
                 Prompt = promptMessage,
-                Choices = client.language ? RedCrossLists.Actions : RedCrossLists.ActionKiswahili,
-                Style =  ListStyle.HeroCard,
-            }, cancellationToken);
+                Choices = choices,
+                Style = ListStyle.HeroCard,
+
+            };
+
+            return await stepContext.PromptAsync(nameof(ChoicePrompt), options, cancellationToken);
 
         }
 
-   
 
         private async Task<DialogTurnResult> ActStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            Client client = (Client)stepContext.Values[UserInfo];         
+            Client client = (Client)stepContext.Values[UserInfo];
 
             var choiceValues = ((FoundChoice)stepContext.Result).Value;
 
-            if(choiceValues ==InitialActions.MentalHealth || choiceValues == InitialActionsKiswahili.MentalHealth)
+            if (choiceValues.ToString().ToLower().Trim() == InitialActions.MentalHealth.ToString().ToLower().Trim() || choiceValues == InitialActionsKiswahili.MentalHealth)
             {
                 return await stepContext.NextAsync(client);
             }
 
-            var message = GetAttachment(choiceValues, client.language);
+            var message = await GetAttachment(choiceValues, client.language);
 
+            await stepContext.Context.SendActivityAsync(message, cancellationToken);
 
-            if(choiceValues != null || choiceValues == InitialActions.MentalHealth) {
+            client.DialogClosed = true;
 
-                return await stepContext.NextAsync(null, cancellationToken);
-            }
-            else
+            var question = client.language ? "Do you want to continue or exit?" : "Je, ungependa kuendelea au kuondoka?";
+
+            var continueChoice = client.language ? "Continue" : "Endelea";
+            var continueExit = client.language ? "Exit" : "Ondoka";
+
+            var options = new PromptOptions
+
             {
-                await stepContext.Context.SendActivityAsync(message, cancellationToken);
-            }
+                Prompt = MessageFactory.Text(question),
+                Choices = new List<Choice>
+                {
+                    new Choice { Value = continueChoice },
+                    new Choice { Value = continueExit }
+                },
+                Style = ListStyle.HeroCard,
+            };
 
-            return await stepContext.EndDialogAsync(null);
+            return await stepContext.PromptAsync(nameof(ChoicePrompt), options, cancellationToken);
 
         }
+
 
         private async Task<DialogTurnResult> ConfirmTermsAndConditionsAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             Client me = (Client)stepContext.Values[UserInfo];
 
-            if (me.DialogClosed) { return await stepContext.EndDialogAsync(null); }
+            if (me.DialogClosed)
+            {
+                var clientChoice = ((FoundChoice)stepContext.Result)?.Value;
+
+                if (clientChoice == "Continue" || clientChoice == "Endelea")
+                {
+                    return await IntroStepAsync(stepContext, cancellationToken);
+
+                }
+                else
+                {
+                    if (clientChoice == "Exit" || clientChoice == "Ondoka")
+                    {
+                        return await stepContext.EndDialogAsync(cancellationToken: cancellationToken);
+                    }
+                }
+
+
+                return await stepContext.EndDialogAsync(null); 
+
+            }
   
             var attachment = new Attachment
             {
@@ -188,14 +261,15 @@ namespace RedCrossChat.Dialogs
             // Prompt the user if they agree with the terms and conditions
             var options = new PromptOptions()
             {
-                Prompt = MessageFactory.Text(me.language ?"Do you agree to the Terms and Conditions? Please select 'Yes' or 'No'.": "Je, unakubali Sheria na Masharti? Tafadhali chagua 'Ndiyo' au 'La'."),
-                RetryPrompt = MessageFactory.Text(me.language? "Please select a valid option ('Yes' or 'No').": "Tafadhali chagua chaguo sahihi ('Ndiyo' au 'La')"),
+                Prompt = MessageFactory.Text(me.language ?"Do you agree to the Terms and Conditions? Please select 'Yes' or 'No'.": "Je, unakubali Sheria na Masharti? Tafadhali chagua 'Ndio' au 'La'."),
+                RetryPrompt = MessageFactory.Text(me.language? "Please select a valid option ('Yes' or 'No').": "Tafadhali chagua chaguo sahihi ('Ndio' au 'La')"),
                 Choices = me.language ? RedCrossLists.choices : RedCrossLists.choicesKiswahili,
                 Style = ListStyle.HeroCard,
             };
 
             return await stepContext.PromptAsync(nameof(ChoicePrompt), options, cancellationToken);
         }
+
 
         public async Task<DialogTurnResult> ValidateTermsAndConditionsAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
@@ -205,22 +279,27 @@ namespace RedCrossChat.Dialogs
 
             string confirmation = ((FoundChoice)stepContext.Result).Value;
 
-            if (confirmation.Equals(Validations.YES, StringComparison.OrdinalIgnoreCase) ||  confirmation.Equals(ValidationsSwahili.YES, StringComparison.OrdinalIgnoreCase))
+            if (confirmation.Equals(Validations.YES, StringComparison.OrdinalIgnoreCase) || confirmation.Equals(ValidationsSwahili.YES, StringComparison.OrdinalIgnoreCase))
             {
-                if (me.language)
-                    await stepContext.Context.SendActivityAsync(MessageFactory.Text("To exit the bot type exit or cancel at any point ."));
+                    string message = me.language ? 
+                        "**🔴To exit the bot type exit or cancel at any point 🔴**" :
+                        "**🔴Ili kuondoka kwenye aina ya roboti ondoka au ghairi wakati wowote 🔴**";
+
+                    await stepContext.Context.SendActivityAsync(MessageFactory.Text(message), cancellationToken);
 
                 return await stepContext.NextAsync(null);
-  
             }
             else
             {
                 // If the user does not confirm, end the dialog
-                await stepContext.Context.SendActivityAsync(MessageFactory.Text(me.language?"You need to agree to the data protection policy to proceed.": "Unahitaji kukubaliana na sera ya ulinzi wa data ili uendelee"));
-              
+                string messageText = me.language ? "You need to agree to the data protection policy to proceed." : "Unahitaji kukubaliana na sera ya ulinzi wa data ili uendelee";
+                await stepContext.Context.SendActivityAsync(MessageFactory.Text(messageText), cancellationToken);
+
                 return await stepContext.EndDialogAsync(null, cancellationToken);
             }
         }
+
+
 
         private async Task<DialogTurnResult> CheckFeelingAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
@@ -368,6 +447,8 @@ namespace RedCrossChat.Dialogs
                 conversation.FeelingDetail = response;
 
                 _repository.Conversation.Update(conversation);
+
+                await _repository.SaveChangesAsync();
             }
 
             if (stepContext.Context.Activity.ChannelId == "telegram" && !conversation.IsReturnClient)
@@ -400,6 +481,13 @@ namespace RedCrossChat.Dialogs
             return await stepContext.BeginDialogAsync(nameof(AiDialog),me,cancellationToken);
         }
 
+        private async Task<DialogTurnResult> HandleBreathingStop(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        {
+            Client me = (Client)stepContext.Values[UserInfo];
+
+            return await stepContext.BeginDialogAsync(nameof(BreathingDialog), me, cancellationToken);
+        }
+
         private async Task<DialogTurnResult> RateBotAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             Client me = (Client)stepContext.Values[UserInfo];  
@@ -418,8 +506,18 @@ namespace RedCrossChat.Dialogs
 
         private async Task<DialogTurnResult> FinalStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-           
-            return await stepContext.EndDialogAsync(null, cancellationToken);
+            Client me = (Client)stepContext.Values[UserInfo];
+
+            Conversation conversation = await _repository.Conversation
+                    .FindByCondition(x => x.Id == me.ConversationId)
+                    .Include(x => x.Persona)
+                    .FirstOrDefaultAsync();
+
+            var resp = await ChatGptDialog.GetChatGPTResponses("Give me a random encouraging quote",conversation, conversation.Language);
+
+            await stepContext.Context.SendActivityAsync(MessageFactory.Text(conversation.Language ? $"Thank you , have a lovely day  {resp}" : $" Asante,kuwa na siku njema  {resp}"));
+
+            return await stepContext.EndDialogAsync(null);
         }
 
         private async Task<String> GetPersonaName()
@@ -546,32 +644,34 @@ namespace RedCrossChat.Dialogs
             return conversation;
         }
 
-        private IMessageActivity GetAttachment(String choiceValue, Boolean language)
+        private async Task<IMessageActivity> GetAttachment(String choiceValue, Boolean language)
         {
+            IntroductionChoice action = await _repository.IntroductionChoice.FindByCondition(x => x.Name == choiceValue || x.Kiswahili == choiceValue).FirstOrDefaultAsync();
 
-            var message = PersonalDialogCard.GetKnowledgeBaseCard(language);
-
-
-            switch (choiceValue)
+            if (action != null)
             {
-                case InitialActions.Careers:
-                case InitialActionsKiswahili.Careers:
-                    message = PersonalDialogCard.GetKnowledgeCareerCard(language);
-                    break;
-                case InitialActions.VolunteerOpportunities:
-                case InitialActionsKiswahili.VolunteerOpportunities:
-                    message = PersonalDialogCard.GetMembershipCard(language);
-                    break;
-                case InitialActions.VolunteerAndMemberShip:
-                case InitialActionsKiswahili.VolunteerAndMemberShip:
-                    message = PersonalDialogCard.GetKnowledgeBaseCard(language);
-                    break;
+                if (action.ActionType == 1)
+                {
+                    var item = await _repository.InitialActionItem.FindByCondition(x => x.IntroductionChoiceId == action.Id && x.Language == (language? 1:0)).FirstOrDefaultAsync();
 
+                    var card = new HeroCard
+                    {
+                        Title = "ChatCare",
+                        Subtitle = item.SubTitle,
+                        Text = item.ActionMessage,
+                        Buttons = new List<CardAction>
+                    {
+                    new CardAction(ActionTypes.OpenUrl, item.ActionMessage, value: item.Value)
+                   }
+                    };
+
+                    return MessageFactory.Attachment(card.ToAttachment());
+                }
             }
 
-
-            return MessageFactory.Attachment(new Attachment { ContentType = HeroCard.ContentType, Content = message });
+            return MessageFactory.Text("No valid action found");
         }
+
 
     }
 }

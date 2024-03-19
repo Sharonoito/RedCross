@@ -1,19 +1,13 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Bot.Builder;
+﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Dialogs.Choices;
 using Microsoft.Bot.Schema;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Clients.ActiveDirectory;
-using Newtonsoft.Json.Linq;
-using NuGet.Protocol.Core.Types;
 using RedCrossChat.Cards;
 using RedCrossChat.Contracts;
 using RedCrossChat.Entities;
 using RedCrossChat.Objects;
-using RedCrossChat.ViewModel;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -86,7 +80,7 @@ namespace RedCrossChat.Dialogs
         {
             var me = (Client)stepContext.Options;
 
-     //       var savedFeeling = (Feeling)stepContext.Values["Feeling"];
+     //    var savedFeeling = (Feeling)stepContext.Values["Feeling"];
 
             stepContext.Values[UserInfo] = me;
 
@@ -101,14 +95,15 @@ namespace RedCrossChat.Dialogs
 
             DBFeeling feeling = conversation.Feeling;
 
-            if (feeling.Description.ToLower().Trim() == "other" || feeling.Description.ToLower().Trim() == "others")
+            if (feeling.Description.ToLower().Trim() == "other" || feeling.Description.ToLower().Trim() == "others" || feeling.Description.ToLower().Trim() =="zinginezo")
             {
                 question = (me.language ? "You said you are feeling " + conversation.FeelingDetail :
-                                                    "Ulisema unahisi " + conversation.FeelingDetail) + ", " + question;
+
+                                                    "Ulisema " + conversation.FeelingDetail) + ", " + question;
             }else
             {
                 question = (me.language ? "You said you are feeling " + feeling.Description :
-                                      "Ulisema unahisi " + feeling.Kiswahili) + ", " + question;
+                                      "Ulisema " + feeling.Kiswahili) + ", " + question;
             }
             
             _repository.ChatMessage.Create(new ChatMessage
@@ -174,7 +169,11 @@ namespace RedCrossChat.Dialogs
 
                         break;
                     default:
+
+                        //skip the RedCross Question
                         quiz = await _repository.Question.FindByCondition(x => x.Code == 51).FirstAsync();
+
+                        me.MainQuestionAsked = true;
 
                         question =me.language? quiz.question: quiz.Kiswahili ;
 
@@ -245,10 +244,26 @@ namespace RedCrossChat.Dialogs
 
             var list = new List<ChatMessage>() { chat };
 
+           
+
             switch (((FoundChoice)stepContext.Result).Value)
             {
-                case "Yes":
+                case Validations.YES:
+                case ValidationsSwahili.YES:
                     me.HasTalkedToSomeone =true;
+
+                    if (me.MainQuestionAsked)
+                    {
+
+                        me.WantstoTalkToAProfessional = true;
+
+                        _repository.ChatMessage.CreateRange(list);
+
+                        await _repository.SaveChangesAsync();
+
+                        return await stepContext.NextAsync(me);
+                    }
+
                     break;
                 default:
 
@@ -298,18 +313,19 @@ namespace RedCrossChat.Dialogs
            
             var response = stepContext.Context.Activity.Text;
 
-            var chat = new ChatMessage
-            {
-                Message = response,
-                Type = Constants.User,
-                ConversationId = conversation.Id,
-            };
+            var typeOfResponse = stepContext.Result.GetType().ToString();
 
-            _repository.ChatMessage.Create(chat);
+            if ( typeOfResponse== "RedCrossChat.Objects.Client") {
+
+                if(me.WantstoTalkToAProfessional)
+                    return await stepContext.NextAsync(me, cancellationToken);
+
+            }
+            
 
            
 
-            if (stepContext.Result == null)
+            if (stepContext.Result == null & response=="")
             {
                 persona.WantsToTalkToSomeone = true;
 
@@ -320,6 +336,23 @@ namespace RedCrossChat.Dialogs
 
                 return await stepContext.EndDialogAsync(me, cancellationToken);
             }
+            else
+            {
+                var chat = new ChatMessage
+                {
+                    Message = response,
+                    Type = Constants.User,
+                    ConversationId = conversation.Id,
+                };
+
+                _repository.ChatMessage.Create(chat);
+            }
+
+            if(stepContext.Result == null && (response == Validations.YES || response == ValidationsSwahili.YES)) {
+
+                return await stepContext.NextAsync(me, cancellationToken);
+            }
+
             await _repository.SaveChangesAsync();
 
             switch (((FoundChoice)stepContext.Result).Value)
@@ -344,11 +377,11 @@ namespace RedCrossChat.Dialogs
 
             Conversation conversation = await getConversation(me);
 
-            Persona persona = conversation.Persona;
+          //  Persona persona = conversation.Persona;
 
-            persona.WantsBreathingExcercises = true;
+           // persona.WantsBreathingExcercises = true;
 
-            _repository.Persona.Update(persona);
+           // _repository.Persona.Update(persona);
 
             var chat = new ChatMessage
             {
@@ -361,7 +394,7 @@ namespace RedCrossChat.Dialogs
 
             await _repository.SaveChangesAsync();
 
-            var intentions=await _repository.Itention.GetAllAsync();
+            List<Intention> intentions=await _repository.Itention.FindByCondition(x=>x.IsActive).ToListAsync();
 
             var list =new List<Choice>();
 
@@ -474,8 +507,8 @@ namespace RedCrossChat.Dialogs
 
             await _repository.SaveChangesAsync();
 
-            var agentMessage = me.language ? "The next available psychologist will get in touch with you shortly, you can also contact us directly by dialing 1199, request to speak to a psychologist." :
-                             "Utaweza kuzungumza na mhudumu baada ya muda mfupi ama pia unaweza piga nambari 1199 ili kuongea na mshauri. Utaweza kupigiwa na mshauri baada ya muda mfupi, ama upige simu ili kuongea na mwanasaikolojia kupitia nambari 1199";
+            var agentMessage = me.language ? "Next available agent will be with you shortly or you can also call 1199 to connect with our counsellor." :
+                             "Tafadhali subiri, Mhuduma wetu atapatikana hivi karibuni au unaweza pia kupiga simu 1199 bila malipo  kuwasiliana na mshauri wetu.\r\n";
             await stepContext.Context.SendActivityAsync(MessageFactory.Text(agentMessage), cancellationToken);
 
 

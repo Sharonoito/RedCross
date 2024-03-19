@@ -13,6 +13,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using RedCrossChat.Objects;
+using Sentry;
+using Constants = RedCrossChat.Objects.Constants;
+using System.Reflection.Metadata;
 
 namespace RedCrossChat.Controllers
 {
@@ -98,7 +101,7 @@ namespace RedCrossChat.Controllers
            // string county = formData["County"];
 
             
-
+                
             IQueryable<Conversation> conversationObject=conversation.FindAll();
 
             
@@ -170,11 +173,13 @@ namespace RedCrossChat.Controllers
                
             }
 
+
             var report = new DashboardReportVM
             {
                 TotalVisits=conversations.Count,
                 HandledByAgents=handedOver.Count,
                 items=items,
+               
             };
 
             return Success("Fetched SuccessFully", report);
@@ -318,8 +323,17 @@ namespace RedCrossChat.Controllers
 
                             _repository.Persona.Update(conversation.Persona);
                         }
-                         
 
+                        var chatMessages= await _repository.ChatMessage.FindByCondition(x => x.ConversationId == request.ConversationId).ToListAsync();
+
+                        for(int i=0;i<chatMessages.Count; i++)
+                        {
+
+                            chatMessages[i].IsRead = true;
+                        }
+
+                        _repository.ChatMessage.UpdateRange(chatMessages);
+                       
                         _repository.Conversation.Update(conversation);
 
                         _repository.HandOverRequest.Update(request);
@@ -401,6 +415,15 @@ namespace RedCrossChat.Controllers
             var request = await _repository.HandOverRequest.FindByCondition(x => x.ConversationId == rawConversation.ConversationId)
                          .FirstOrDefaultAsync();
 
+            var chatMessagesFromUser= await _repository.ChatMessage.FindByCondition(x=>x.ConversationId==rawConversation.ConversationId 
+            & x.IsRead==false & x.Type==Constants.User).ToListAsync();
+
+
+            foreach (var conv in chatMessagesFromUser)
+            {
+                conv.IsRead = true;
+            }
+
             ChatMessage chat = new ChatMessage()
             {
                 Message= rawConversation.Question,
@@ -412,6 +435,9 @@ namespace RedCrossChat.Controllers
             request.LastChatMessage = chat;
 
             _repository.ChatMessage.Create(chat);
+
+            _repository.ChatMessage.UpdateRange(chatMessagesFromUser);
+
             _repository.HandOverRequest.Update(request);
 
             bool status= await _repository.SaveChangesAsync();
@@ -438,6 +464,8 @@ namespace RedCrossChat.Controllers
         [HttpPost]
         public async Task<IActionResult> GetMyConversationIncludingHandOverRequests()
         {
+            var userId = Guid.Parse(User.FindFirst("UserId").Value);
+
             var handOverRequests = await _repository.HandOverRequest
                 .FindByCondition(x => x.HasBeenReceived == false)
                 .Include(x=>x.Conversation)
@@ -445,6 +473,10 @@ namespace RedCrossChat.Controllers
                 .Include(x=>x.Conversation)
                 .ThenInclude(x=>x.Feeling)
                 .ToListAsync();
+
+            var myHandOverRequests = handOverRequests
+                .Where(x => x.AppUserId == userId)
+                .ToList();
 
             var myConversations = await _repository.Conversation
                 .FindByCondition(x => x.AppUserId == Guid.Parse(User.FindFirst("UserId").Value) & x.IsActive)
@@ -458,7 +490,8 @@ namespace RedCrossChat.Controllers
             return Success("Response", new ChatResponseVm
             {
                 handOverRequests = handOverRequests,
-                myConversations = myConversations
+                myConversations = myConversations,
+                myHandOverRequests = myHandOverRequests
             });
         }
 

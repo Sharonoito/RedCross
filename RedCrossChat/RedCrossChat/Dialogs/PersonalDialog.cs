@@ -115,13 +115,13 @@ namespace RedCrossChat.Dialogs
         {
             Client me = (Client)stepContext.Values[UserInfo];
 
-            var hint = me.language ? "( hint: type in Kiambu or 022,Nairobi or 047 )" : "( dokezo: andika Kiambu au 022, Nairobi au 047 )";
+            var hint = me.language ? "( hint: Nairobi (047),Mombasa (001) )" : "( dokezo:Nairobi (047), Mombasa (001))";
 
             Conversation conv = await _repository.Conversation.FindByCondition(x => x.Id == me.ConversationId).Include(x => x.Persona).FirstAsync();
 
             Persona persona = conv.Persona;
 
-            var question = me.language ? "Which county?" : "Unapatikana kaunti gani?";
+            var question = me.language ? "Which county are you located in ?" : "Kaunti";
 
             var questionRetry = me.language ? " Please input a county" : "Tafadhali andika katika kaunti";
 
@@ -153,7 +153,7 @@ namespace RedCrossChat.Dialogs
 
             if (select != CountryValidation.Kenya || select != CountrySwahili.Kenya)
             {
-                question = me.language ? "Which Country are you from ?" : "Unatoka Nchi gani ?";
+                question = me.language ? "Select country" : "Nchi";
 
                 promptId = nameof(TextPrompt);
             }
@@ -442,7 +442,7 @@ namespace RedCrossChat.Dialogs
         {
 
            // promptContext.Context.Activity.Text
-            var age=await _repository.AgeBand.FindByCondition(x=>x.Name== promptContext.Context.Activity.Text).FirstOrDefaultAsync();
+            var age=await _repository.AgeBand.FindByCondition(x=>x.Name== promptContext.Context.Activity.Text || x.Kiswahili == promptContext.Context.Activity.Text).FirstOrDefaultAsync();
 
             if (age == null)
             {

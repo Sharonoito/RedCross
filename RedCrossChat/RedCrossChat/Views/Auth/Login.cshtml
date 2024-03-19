@@ -98,8 +98,9 @@
                     <form asp-action="login" asp-controller="auth" asp-route-returnUrl="@Model.ReturnUrl" method="post">
                         <div class="mb-3">
                             <label for="Email" class="form-label">Email or Username</label>
-                            <input asp-for="Email" class="form-control" placeholder="Username" autocomplete="username" autofocus>
+                            <input asp-for="Email" class="form-control red-border" placeholder="Username" autocomplete="username" autofocus>
                         </div>
+
                         <div class="mb-3 form-password-toggle">
                             <div class="d-flex justify-content-between">
                                 <label class="form-label" for="password">Password</label>
@@ -111,18 +112,17 @@
 
                                 <input asp-for="Password" class="form-control" placeholder="Password" autocomplete="new-password placeholder=" &#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" aria-describedby="password">
                           
-                                <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
                             </div>
                         </div>
-                        <div class="mb-3">
+@*                        <div class="mb-3">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="remember-me">
                                 <label class="form-check-label" for="remember-me">
                                     Remember Me
                                 </label>
                             </div>
-                        </div>
-                        <button class="btn btn-primary d-grid w-100">
+                        </div>*@
+                        <button class="btn btn-danger d-grid w-100">
                             Sign in
                         </button>
                     </form>

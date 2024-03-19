@@ -127,7 +127,7 @@ namespace RedCrossChat.Dialogs
                 //ask chat gpt for an encouraging quote
                 //todo : make the goodbye dynamic 
                 
-                var resp=await ChatGptDialog.GetChatGPTResponses("Give me a random encouraging quote",new List<AiConversation>(),conversation.Language);
+                var resp=await ChatGptDialog.GetChatGPTResponses("Give me a random encouraging quote",conversation,conversation.Language);
 
                 await stepContext.Context.SendActivityAsync(MessageFactory.Text(conversation.Language ? $"Thank you , have a lovely day  {resp}" : $" Asante,kuwa na siku njema  {resp}"));
 
@@ -178,16 +178,12 @@ namespace RedCrossChat.Dialogs
         {
             Client me = (Client)stepContext.Values[UserInfo];
 
-           var feedbackResponse = stepContext.Result.ToString();
-
-
-            var resp = await ChatGptDialog.GetChatGPTResponses("Give me a random encouraging quote", new List<AiConversation>(), me.language);
-
+           var feedbackResponse = stepContext.Context.Activity.Text;
 
             var conversations = await _repository.Conversation
-               .FindByCondition(x => x.Id == me.ConversationId)
+            .FindByCondition(x => x.Id == me.ConversationId).FirstOrDefaultAsync();
 
-               .FirstOrDefaultAsync();
+            var resp = await ChatGptDialog.GetChatGPTResponses("Give me a random encouraging quote", conversations, me.language);
 
             conversations.RatingReason = feedbackResponse;
 

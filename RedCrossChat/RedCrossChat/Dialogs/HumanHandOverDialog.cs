@@ -46,12 +46,46 @@ namespace RedCrossChat.Dialogs
 
             if (!me.HandOverToUser)
             {
+
+                var requests=await repository.HandOverRequest.FindByCondition(x => x.ConversationId == me.ConversationId & x.HasBeenReceived==false).ToListAsync();
+
+                if(requests.Count > 0)
+                {
+
+                    foreach(var request in requests)
+                    {
+                        request.HasBeenReceived = true;
+                    }
+
+                    repository.HandOverRequest.UpdateRange(requests);
+                }
+
                 repository.HandOverRequest.Create(new Entities.HandOverRequest
                 {
-                    Title=conversation.Persona.Name,
-                    ConversationId=conversation.Id,
-                    isActive=true,
+                    Title = conversation.Persona.Name,
+                    ConversationId = conversation.Id,
+                    isActive = true,
                 });
+
+                /*if(requests ==null || requests.Count ==0)
+                {
+                    repository.HandOverRequest.Create(new Entities.HandOverRequest
+                    {
+                        Title = conversation.Persona.Name,
+                        ConversationId = conversation.Id,
+                        isActive = true,
+                    });
+                }
+                else
+                {
+                   var request= requests.First();
+
+                   request.HasBeenReceived = false;
+
+                    repository.HandOverRequest.Update(request);
+                }*/
+
+
 
                 conversation.RequestedHandedOver = true;
 
@@ -75,20 +109,55 @@ namespace RedCrossChat.Dialogs
                     .Include(x=>x.LastChatMessage)
                     .FirstOrDefaultAsync();
 
+                var chatMessages = await repository.ChatMessage.FindByCondition(x => x.ConversationId == conversation.Id & x.IsRead != true ).ToListAsync();
+
                 if (request.HasBeenReceived)
                 {
                     me.HandOverToUser = true;
 
                     if (request.HasResponse && request.LastChatMessage !=null)
                     {
-
-                        skip = false;
-
                         me.HandOverToUser = true;
 
                         me.ActiveRawConversation = request.LastChatMessage.Id;
 
-                        var promptMessage = MessageFactory.Text(request.LastChatMessage.Message, null, InputHints.ExpectingInput);
+                        var promptMessage = MessageFactory.Text("", null, InputHints.ExpectingInput);
+
+                        if (chatMessages == null)
+                        {
+                            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = promptMessage }, token);
+                        }
+
+                        chatMessages.Last().IsRead = true;
+
+                        repository.ChatMessage.Update(chatMessages.Last());
+
+                        await repository.SaveChangesAsync();
+
+                        // repository.ChatMessage.UpdateRange(chatMessages);
+
+                        // await repository.SaveChangesAsync();
+
+                        //todo make a way of presenting all messages incase you have more than one unread message
+
+                        promptMessage = MessageFactory.Text(chatMessages.Last().Message, null, InputHints.ExpectingInput);
+
+                        /*if (request.LastChatMessage.Message ==me.LastMessage)
+                        {
+                            
+                        }
+                        else
+                        {
+                            me.LastMessage = request.LastChatMessage.Message;
+
+                        }
+                       
+                        if(skip == false)
+                        {
+                            promptMessage = MessageFactory.Text("", null, InputHints.ExpectingInput);
+                        }
+
+                        skip = false;*/
 
                         return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = promptMessage }, token);
                     }                    
@@ -100,10 +169,12 @@ namespace RedCrossChat.Dialogs
 
                 if(iterations % 100 == 0 && !me.HandOverToUser  && iterations !=30)
                 {
-                    await stepContext.Context.SendActivityAsync(MessageFactory.Text("One of our psychologists  will be getting in touch with you shortly"), token);
+                    var message = me.language ? "One of our psychologists  will be getting in touch with you shortly" : "Mmoja wa wanasaikolojia wetu atawasiliana nawe hivi karibuni";
+                    await stepContext.Context.SendActivityAsync(MessageFactory.Text(message), token);
                 }
 
-                if(iterations  >=  300 && !me.HandOverToUser)
+
+                if (iterations  >=  300 && !me.HandOverToUser)
                 {
 
                     request = await repository.HandOverRequest.FindByCondition(x => x.ConversationId == conversation.Id).FirstOrDefaultAsync();
@@ -177,7 +248,7 @@ namespace RedCrossChat.Dialogs
 
             bool result = await repository.SaveChangesAsync();
 
-
+            //return await InitialAction(stepContext, token);
             return await stepContext.BeginDialogAsync(nameof(WaterfallDialog), me, token);
         }
 
