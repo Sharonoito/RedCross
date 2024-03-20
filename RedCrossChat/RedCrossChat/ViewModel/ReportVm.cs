@@ -29,6 +29,8 @@ namespace RedCrossChat
 
         public List<Intention> Intentions;
 
+        public List<HandOverRequest> HandOverRequests;
+
         public ReportVm() { 
         
         }

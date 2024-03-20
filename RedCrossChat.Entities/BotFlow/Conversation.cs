@@ -56,5 +56,7 @@ namespace RedCrossChat.Entities
 
         public Boolean IsActive { get; set; } = true;
 
+       // public Boolean HasUnreadMessages { get; set; } = true;
+
     }
 }

@@ -18,6 +18,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="wwwroot\JsonFiles\Bots\DialogAndWelcomeBot.cs" />
+    <Compile Include="wwwroot\JsonFiles\Bots\DialogBot.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="Controllers\HomeController.cs" />
   </ItemGroup>
 
@@ -59,9 +64,5 @@
     <Content Update="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="wwwroot\JsonFiles\" />
   </ItemGroup>
 </Project>

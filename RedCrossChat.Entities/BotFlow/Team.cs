@@ -1,5 +1,4 @@
 ﻿
-
 namespace RedCrossChat.Entities
 {
     public class Team : BaseEntity

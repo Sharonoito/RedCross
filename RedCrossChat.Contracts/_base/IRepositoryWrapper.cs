@@ -37,6 +37,8 @@ namespace RedCrossChat.Contracts
 
         ITeam Team { get; }
 
+        IExercise Exercise { get; }
+
         IItention Itention { get; }
 
         ISubIntention SubIntention { get; }
@@ -49,6 +51,11 @@ namespace RedCrossChat.Contracts
         #endregion
 
         IPersonaRepo Persona { get; }
+
+        IIntroductionChoice IntroductionChoice { get; }
+
+        IInitialActionItem InitialActionItem { get; }
+
 
         Task<bool> SaveChangesAsync();
     }

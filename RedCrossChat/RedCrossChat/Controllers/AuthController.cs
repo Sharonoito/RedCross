@@ -135,8 +135,8 @@ namespace RedCrossChat.Controllers
             try
             {
                 var data = await _repository.User
-                    //.GetAllAsync();
-                    .FindByCondition(x=>x.Email !=Constants.DefaultSuperAdminEmail).ToListAsync();
+                    .GetAllAsync();
+                    //.FindByCondition(x=>x.Email !=Constants.DefaultSuperAdminEmail).ToListAsync();
                 // Filter them
 
                 var filteredRows = data
@@ -264,36 +264,47 @@ namespace RedCrossChat.Controllers
                     userDB.LastName = user.LastName;
               
                     userDB.PhoneNumber=user.PhoneNumber;
+
+                    try
+                    {
+                        var currentRoles = await _userManager.GetRolesAsync(userDB);
+
+                        _repository.User.Update(userDB);
+
+                        if (currentRoles != null && currentRoles.Count > 0)
+                        {
+                            IdentityResult removeResult = await _userManager.RemoveFromRolesAsync(userDB, currentRoles.ToArray());
+                            if (!removeResult.Succeeded)
+                                return Error("Failed to remove user roles.");
+                        }
+
+                        // Assign the newly selected Roles
+                        if (user.RoleNames != null)
+                        {
+                            IdentityResult addResult = await _userManager.AddToRolesAsync(userDB, user.RoleNames);
+
+                            if (!addResult.Succeeded)
+                                return Error("Failed to assign user roles.");
+                        }
+
+                        //var result = await _repository.SaveChangesAsync();
+
+                        if (true)
+                        {
+                            return Success("Updated Successfully");
+                        }
+                    }
+                    catch(Exception ex)
+                    {
+                        return Error(ex.ToString());
+                    }
              
-
-                    var currentRoles = await _userManager.GetRolesAsync(userDB);
-
-                    _repository.User.Update(userDB);
-
-                    if (currentRoles != null && currentRoles.Count > 0)
-                    {
-                        IdentityResult removeResult = await _userManager.RemoveFromRolesAsync(userDB, currentRoles.ToArray());
-                        if (!removeResult.Succeeded)
-                            return Error("Failed to remove user roles.");
-                    }
-
-                    // Assign the newly selected Roles
-                    if (user.RoleNames != null)
-                    {
-                        IdentityResult addResult = await _userManager.AddToRolesAsync(userDB, user.RoleNames);
-
-                        if (!addResult.Succeeded)
-                            return Error("Failed to assign user roles.");
-                    }
-
-                    var result = await _repository.SaveChangesAsync();
-
-                    return Success("Updated Successfully", null);
+                    //return Error("Unable to Update ", null);
                 }
             }
-            catch(Exception)
+            catch(Exception ex)
             {
-                return Error("Something broke");
+                return Error(ex.Message);
             }
 
         }
@@ -303,6 +314,41 @@ namespace RedCrossChat.Controllers
         {
             return View();
         }
+
+        [HttpPost]
+
+        public async Task<IActionResult> GetRoles(IDataTablesRequest dtRequest)
+        {
+
+            try
+            {
+
+                var data = await _repository.Role
+                    .GetAllAsync();
+
+                var filteredRows = data
+                    .AsQueryable()
+                    .FilterBy(dtRequest.Search, dtRequest.Columns);
+
+                var pagedRows = filteredRows
+                    .SortBy(dtRequest.Columns)
+                    .Skip(dtRequest.Start)
+                    .Take(dtRequest.Length);
+
+
+                var response = DataTablesResponse.Create(dtRequest, data.Count(),
+                    filteredRows.Count(), pagedRows);
+
+                return new DataTablesJsonResult(response);
+
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+
+            }
+        }
+
 
 
 

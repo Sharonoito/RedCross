@@ -43,6 +43,24 @@
         </div>
     </div>
 
+    <div class="col-sm-6 col-lg-3 mb-4" id="myHandOverRequests">
+        <div class="card card-border-shadow-primary h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-2 pb-1">
+                    <div class="avatar me-2">
+                        <span class="avatar-initial rounded bg-label-primary"><i class="bx bxs-truck"></i></span>
+                    </div>
+                    <h4 class="ms-1 mb-0">3</h4>
+                </div>
+                <p class="mb-1">Handled By me</p>
+                @* <p class="mb-0">
+                <span class="fw-medium me-1">+18.2%</span>
+                <small class="text-muted">than last week</small>
+                </p>*@
+            </div>
+        </div>
+    </div>
+
     <div class="col-sm-6 col-lg-3 mb-4" id="unCompletedVisits">
         <div class="card card-border-shadow-primary h-100">
             <div class="card-body">
@@ -50,7 +68,7 @@
                     <div class="avatar me-2">
                         <span class="avatar-initial rounded bg-label-primary"><i class="bx bxs-truck"></i></span>
                     </div>
-                    <h4 class="ms-1 mb-0">10</h4>
+                    <h4 class="ms-1 mb-0">5</h4>
                 </div>
                 <p class="mb-1">Uncompleted Visits</p>
               @*  <p class="mb-0">
@@ -65,7 +83,7 @@
         <div class="card card-border-shadow-primary h-100">
             <div class="card-body">
                 <div class="d-flex align-items-center mb-2 pb-1">
-                    <div class="avatar me-2">
+                    <div class="avatar me-2">f
                         <span class="avatar-initial rounded bg-label-primary"><i class="bx bxs-truck"></i></span>
                     </div>
                     <h4 class="ms-1 mb-0">1</h4>
@@ -249,7 +267,8 @@
 
         var options = {
             chart: {
-                type: 'bar'
+                id: 'mychart',
+                type: 'line',
             },
             series: [{
                 name: 'Visits',
@@ -257,11 +276,17 @@
             }],
             xaxis: {
                 categories: [1,3]
-               
-            }
+
+            },
+            fill:{
+                colors: ['#0e1422']
+
+            },
         };
 
         const chart = new ApexCharts(document.querySelector("#chart"), options);
+
+        chart.render();
 
 
         function capitalizeFirstLetter(string) {
@@ -275,9 +300,6 @@
                 filters[capitalizeFirstLetter($(filter).attr('name'))] = $(filter).val()
             });
 
-            console.log(filters);
-            console.log(JSON.stringify({ ...filters }));
-
             $.post("@Url.Action("EvaluateReport","Conversation")",{name:"Ambrose Mwangi",...filters}).then(data=>{
                 let item = data.responseData;
 
@@ -285,6 +307,8 @@
                 $("#handedOver h4").html(item.handledByAgents);
 
                 $("#totalVisits h4").html(item.totalVisits);
+
+                $("#myHandOverRequests h4").html(item.myHandOverRequests);
 
                 $("#averageBotRating h4").html(item.averageBotRating);
 
@@ -297,28 +321,36 @@
 
         }
 
+        function normalChartDate(date) {
+            let dt = date.split("-")
+
+            return dt[1].toString().trim() + "-" + dt[2].toString().trim() + "-" + dt[0].toString().trim();
+        }
+
         function showGraph(items,state){
-           
+
+            let updateOptions=[]
+
+            Object.values(items).forEach((value, key) => {
+
+                updateOptions.push({ x: normalChartDate(Object.keys(items)[key]), y: value });
+            });
+
+            console.log("showGraphItems", Object.values(items))
+
+            chart.updateOptions({
+                series: [{ name: 'Visits', data: Object.values(items) }],
+                xaxis: {
+                    position: 'bottom',
+                    categories: Object.keys(items)
+                }
+            });
+
+           /* chart.updateSeries([{
+                data: Object.values(items)
+            }])*/
             
-            if(state==0){
-
-                options.xaxis.categories=Object.keys(items);
-
-                options.series=[{
-                    name:"Visits",
-                    data: Object.values(items)
-                }];
-
-                console.log(options);
-
-                chart.render();
-            }
-
-            if(state==1){
-                chart.updateSeries([{
-                    data: Object.values(items)
-                }])
-            }
+          
         }
 
         $(document).on('change', '.filters', function () {

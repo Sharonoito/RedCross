@@ -136,6 +136,7 @@ namespace RedCrossChat.Dialogs
                 Conversation conversation = await _repository.Conversation
                     .FindByCondition(x => x.Id==me.ConversationId)
                     .Include(x => x.AiConversations)
+                    .Include(x=>x.Persona)
                     .FirstAsync();
 
                 string question = stepContext.Context.Activity.Text;
@@ -145,7 +146,7 @@ namespace RedCrossChat.Dialogs
                     return await stepContext.EndDialogAsync(null);
                 }
 
-                string response = await ChatGptDialog.GetChatGPTResponses(question, conversation.AiConversations,me.language);
+                string response = await ChatGptDialog.GetChatGPTResponses(question, conversation,me.language);
 
 
                 await DialogExtensions.UpdateDialogAnswer(stepContext.Context.Activity.Text, response, stepContext, _userProfileAccessor, _userState);

@@ -44,7 +44,11 @@ namespace RedCrossChat
 
             //Use sql Server Conversations
             services.AddDbContextPool<AppDBContext>(options =>
-                options.UseSqlServer(connectionString));
+                options.UseSqlServer(connectionString)
+                .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
+
+                
+                );
 
             // Create the Bot Framework Authentication to be used with the Bot Adapter.
             services.ConfigureBotServices();

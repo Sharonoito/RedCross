@@ -13,6 +13,8 @@ namespace RedCrossChat.Objects
         public string RelationShipStatus { get; set; } = "";
         public string professionlStatus { get; set; }="";
         public string User { get; set; } = null;
+
+        public string LastMessage { get; set; } = "";
         public bool language { get; set; } = true;    
         public bool DialogClosed { get; set; } = false;
 
@@ -24,6 +26,8 @@ namespace RedCrossChat.Objects
 
         public bool WantstoTalkToAProfessional { get; set; } = false;
 
+        public bool MainQuestionAsked {  get; set; } = false;
+
         public bool HandOverToUser { get; set; } = false;
 
         public int Iteration { get; set; } = 0;
@@ -31,5 +35,7 @@ namespace RedCrossChat.Objects
         public string LastResponse { get; set; }
 
         public Guid ActiveRawConversation { get; set; }
+
+        public bool ResponseMode { get; set; } = false;
     }
 }

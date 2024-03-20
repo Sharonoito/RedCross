@@ -174,6 +174,17 @@ namespace RedCrossChat.Repository
             }
         }
 
+        public IExercise _exercise;
+
+        public IExercise Exercise
+        {
+            get
+            {
+                if (_exercise == null) { _exercise = new ExerciseRepo(_repoContext); }
+                return _exercise;
+            }
+        }
+
         public IQuestionOption _questionOption;
         public IQuestionOption QuestionOption
         {
@@ -275,6 +286,35 @@ namespace RedCrossChat.Repository
             }
         }
       
+        public IIntroductionChoice _introChoices;
+
+        public IIntroductionChoice IntroductionChoice
+        {
+            get
+            {
+                if(_introChoices == null)
+                {
+                    _introChoices = new IntroductionChoiceRepo(_repoContext);
+                }
+
+                return _introChoices;
+            }
+        }
+
+        public IInitialActionItem _initialActionItem;
+
+        public IInitialActionItem InitialActionItem
+        {
+            get
+            {
+                if (_initialActionItem == null)
+                {
+                    _initialActionItem = new InitialActionItemRepo(_repoContext);
+                }
+
+                return _initialActionItem;
+            }
+        }
 
         public async Task<bool> SaveChangesAsync()
         {
