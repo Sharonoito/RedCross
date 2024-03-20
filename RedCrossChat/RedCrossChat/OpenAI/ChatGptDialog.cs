@@ -30,8 +30,25 @@ namespace RedCrossChat
                 new AzureKeyCredential(_apiKey)
             );
 
+            string personal = "someone who is";
+            
+            string preText = "You are a Counselor based in Kenya redcross who's name is ChatCare,you are helping people with mental and social issues." + (!language ? " respond in swahili" : "");
 
-            string preText = "You are a Counselor based in Kenya who's name is ChatCare,you are helping people with mental and social issues." + (!language ? " respond in swahili" : "");
+            if(conversation.Feeling != null)
+            {
+                personal += " feeling " + conversation.Feeling.Name;
+            }
+            else
+            {
+                personal += " feeling " + conversation.FeelingDetail;
+            }
+
+            if(conversation.Persona.AgeBand != null)
+            {
+               // personal 
+            }
+
+
 
             var chatCompletionsOptions = new ChatCompletionsOptions
             {
@@ -46,6 +63,10 @@ namespace RedCrossChat
                   
                 },
             };
+
+            chatCompletionsOptions.Messages.Add(new ChatMessage(ChatRole.User, "Who are you"));
+            chatCompletionsOptions.Messages.Add(new ChatMessage(ChatRole.System, "My name is ChatCare , i am an open ai model trained to help people with mental health"));
+
 
             chatCompletionsOptions.Messages.Add(new ChatMessage(ChatRole.User, "Where can I find several helplines and organizations that offer support for mental health issues in Kenya"));
             chatCompletionsOptions.Messages.Add(new ChatMessage(ChatRole.System, "KNH provides support and information on mental health issues. You can call them at +254 722 998 767"));
