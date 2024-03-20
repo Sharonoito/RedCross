@@ -99,11 +99,11 @@ namespace RedCrossChat.Dialogs
             {
                 question = (me.language ? "You said you are feeling " + conversation.FeelingDetail :
 
-                                                    "Ulisema " + conversation.FeelingDetail) + ", " + question;
+                                                    "Ulisema Unahisi "+ conversation.FeelingDetail) + ", " + question;
             }else
             {
                 question = (me.language ? "You said you are feeling " + feeling.Description :
-                                      "Ulisema " + feeling.Kiswahili) + ", " + question;
+                                      "Ulisema Unahisi " + feeling.Kiswahili) + ", " + question;
             }
             
             _repository.ChatMessage.Create(new ChatMessage
