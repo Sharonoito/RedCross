@@ -20,7 +20,7 @@ using System.ComponentModel.DataAnnotations;
 using RedCrossChat.Objects;
 using Microsoft.Bot.Builder;
 using Newtonsoft.Json.Linq;
-using RedCrossChat.Domain.Migrations;
+
 
 namespace RedCrossChat.Controllers
 {
