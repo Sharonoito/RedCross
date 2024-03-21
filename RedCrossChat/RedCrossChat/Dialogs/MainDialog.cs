@@ -88,7 +88,18 @@ namespace RedCrossChat.Dialogs
 
         private async Task<DialogTurnResult> FirstStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            stepContext.Values[UserInfo] = new Client();
+            var client = new Client();
+
+            if( stepContext.Options != null)
+            {
+                client = (Client)stepContext.Options;
+
+                stepContext.Values[UserInfo] = client;
+
+                return await stepContext.NextAsync(client,cancellationToken);
+            }
+
+            stepContext.Values[UserInfo] = client;
 
             //reason  && Context Activity Message 
 
@@ -116,12 +127,17 @@ namespace RedCrossChat.Dialogs
         {
             Client client = (Client)stepContext.Values[UserInfo];
 
-            var choiceValues = ((FoundChoice)stepContext.Result).Value;
-
-            if (choiceValues != null && choiceValues == "Kiswahili")
+            if (stepContext.Result.GetType().Name.ToLower().Trim() != "client")
             {
-                client.language = !client.language;
+                var choiceValues = ((FoundChoice)stepContext.Result).Value;
+
+                if (choiceValues != null && choiceValues == "Kiswahili")
+                {
+                    client.language = !client.language;
+                }
             }
+
+           
 
             var conv = await CreateConversationDBInstance(stepContext);
 
@@ -153,7 +169,7 @@ namespace RedCrossChat.Dialogs
             };
 
 
-            var messageText = stepContext.Options?.ToString() ?? question;
+            var messageText =  question;
 
             var promptMessage = MessageFactory.Text(messageText, messageText, InputHints.ExpectingInput);
 
@@ -224,27 +240,32 @@ namespace RedCrossChat.Dialogs
         {
             Client me = (Client)stepContext.Values[UserInfo];
 
-            if (me.DialogClosed)
+            if (stepContext.Result.GetType().Name.ToLower().Trim() != "client")
             {
-                var clientChoice = ((FoundChoice)stepContext.Result)?.Value;
-
-                if (clientChoice == "Continue" || clientChoice == "Endelea")
+                if (me.DialogClosed)
                 {
-                    return await IntroStepAsync(stepContext, cancellationToken);
+                    var clientChoice = ((FoundChoice)stepContext.Result)?.Value;
 
-                }
-                else
-                {
-                    if (clientChoice == "Exit" || clientChoice == "Ondoka")
+                    if (clientChoice == "Continue" || clientChoice == "Endelea")
                     {
-                        return await stepContext.EndDialogAsync(cancellationToken: cancellationToken);
+                        return await stepContext.ReplaceDialogAsync(nameof(MainDialog), me, cancellationToken);
+
+                        // return await IntroStepAsync(stepContext, cancellationToken);
+
                     }
+                    else
+                    {
+                        if (clientChoice == "Exit" || clientChoice == "Ondoka")
+                        {
+                            return await stepContext.EndDialogAsync(cancellationToken: cancellationToken);
+                        }
+                    }
+
+
+                    return await stepContext.EndDialogAsync(null);
                 }
-
-
-                return await stepContext.EndDialogAsync(null); 
-
             }
+            
   
             var attachment = new Attachment
             {
@@ -607,7 +628,7 @@ namespace RedCrossChat.Dialogs
 
                     AiConversations = new List<AiConversation>(),
 
-                    IsReturnClient = false,
+                    IsReturnClient = true,
 
                     Language = me.language,
 
