@@ -137,6 +137,7 @@ namespace RedCrossChat.Dialogs
                     .FindByCondition(x => x.Id==me.ConversationId)
                     .Include(x => x.AiConversations)
                     .Include(x=>x.Persona)
+                    .ThenInclude(x=>x.Feeling)
                     .FirstAsync();
 
                 string question = stepContext.Context.Activity.Text;
