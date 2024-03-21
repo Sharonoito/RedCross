@@ -62,7 +62,7 @@ namespace RedCrossChat.Dialogs
         {
             Client me = (Client)stepContext.Options;
 
-            var question = me.language ? "You’re now engaging with an artificial intelligence mental health chatbot by the Kenya Red Cross Society (KRCS) which is not a human person. As much as it’s very efficient and effective in offering psychosocial support, it is however bound to make a few mistake in the course of your conversations. For advanced support, kindly contact KRCS toll-free 1199 for further mental health and psychosocial support services through tele-counseling." : "Sasa unaingiliana na kijibu kiitwacho Generative AI-powered, ungependa kuendelea?";
+            var question = me.language ? "You’re now engaging with an artificial intelligence mental health chatbot by the Kenya Red Cross Society (KRCS) which is not a human person. As much as it’s very efficient and effective in offering psychosocial support, it is however bound to make a few mistake in the course of your conversations. For advanced support, kindly contact KRCS toll-free 1199 for further mental health and psychosocial support services through tele-counseling." : "Sasa unaingiliana na kijibu kiitwacho Generative AI-powered, ungependa kuendelea?";
 
             Conversation conversation = await _repository.Conversation
                    .FindByCondition(x => x.Id == me.ConversationId)

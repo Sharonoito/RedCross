@@ -149,24 +149,24 @@ namespace RedCrossChat.Dialogs
                "Hello Welcome to Kenya Red Cross Society. How can I help you today?" :
                "Habari rafiki mpendwa, karibu kwenye jukwaa la chatbot la Shirika la Msalaba Mwekundu Kenya. Tunatoa huduma ya afya ya akili na ushauri kupitia simu kwa umma bila malipo yoyote. Leo ungependa tukusaidie vipi?";
 
-            var attachment = new Attachment
-            {
-                ContentType = HeroCard.ContentType,
+            //var attachment = new Attachment
+            //{
+            //    ContentType = HeroCard.ContentType,
 
-                Content = PersonalDialogCard.GetFAQCard(client.language),
-            };
+            //    Content = PersonalDialogCard.GetFAQCard(client.language),
+            //};
 
-            var message = MessageFactory.Attachment(attachment);
+            //var message = MessageFactory.Attachment(attachment);
 
-            await stepContext.Context.SendActivityAsync(message, cancellationToken);
+            //await stepContext.Context.SendActivityAsync(message, cancellationToken);
 
-            var choicez = new List<Choice>
-            {
-                new Choice() { Value = "faq", Action = new CardAction() {
-                    Title = "faq", Type = ActionTypes.OpenUrl,
-                    Value = "https://referraldirectories.redcross.or.ke/" }
-                }
-            };
+            //var choicez = new List<Choice>
+            //{
+            //    new Choice() { Value = "faq", Action = new CardAction() {
+            //        Title = "faq", Type = ActionTypes.OpenUrl,
+            //        Value = "https://referraldirectories.redcross.or.ke/" }
+            //    }
+            //};
 
 
             var messageText =  question;
