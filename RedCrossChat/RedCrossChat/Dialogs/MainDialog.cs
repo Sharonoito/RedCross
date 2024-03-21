@@ -628,7 +628,7 @@ namespace RedCrossChat.Dialogs
 
                     AiConversations = new List<AiConversation>(),
 
-                    IsReturnClient = true,
+                    IsReturnClient = false,
 
                     Language = me.language,
 
