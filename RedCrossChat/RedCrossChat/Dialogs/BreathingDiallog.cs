@@ -102,23 +102,27 @@ namespace RedCrossChat.Dialogs
 
             var question = user.language? "Do you wish to continue ?": "Je, ungependa kuendelea?";
 
-            var prompts = new PromptOptions
-            {
-                Prompt = MessageFactory.Text(question),
-                Choices = user.language? RedCrossLists.choices : RedCrossLists.choicesKiswahili,
-                Style = ListStyle.HeroCard
-            };
+           
 
             var feelings = GetFeelingToExerciseMap();
 
             if (_exerciseIndex < feelings.Count)
             {
                 var currentExercise = feelings[_exerciseIndex];
-                await stepContext.Context.SendActivityAsync(MessageFactory.Text(user.language? currentExercise.Exercise : currentExercise.Kiswahili));
+               // await stepContext.Context.SendActivityAsync(MessageFactory.Text(user.language? currentExercise.Exercise : currentExercise.Kiswahili));
 
                 stepContext.Values[iterations]=_exerciseIndex+1;
 
                 user.Iteration=user.Iteration+1;
+
+                var exercise = user.language ? currentExercise.Exercise : currentExercise.Kiswahili;
+
+                var prompts = new PromptOptions
+                {
+                    Prompt = MessageFactory.Text(exercise +" \n \n "+question),
+                    Choices = user.language ? RedCrossLists.choices : RedCrossLists.choicesKiswahili,
+                    Style = ListStyle.HeroCard
+                };
 
                 if (_exerciseIndex >= feelings.Count)
                 {

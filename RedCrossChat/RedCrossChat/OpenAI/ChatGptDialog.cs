@@ -43,10 +43,10 @@ namespace RedCrossChat
                 personal += " feeling " + conversation.FeelingDetail;
             }
 
-            if(conversation.Persona.AgeBand != null)
+           /* if(conversation.Persona.AgeBand != null)
             {
                // personal 
-            }
+            }*/
 
 
 
@@ -79,7 +79,7 @@ namespace RedCrossChat
 
             while (true)
             {
-
+                if(aiConversations !=null)
                 foreach (AiConversation conv in aiConversations)
                 {
                    
