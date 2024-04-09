@@ -93,7 +93,7 @@ namespace RedCrossChat.Dialogs
 
 
 
-            if (stepContext.Reason.ToString() == "BeginCalled")
+            if (stepContext.Reason.ToString() == "BeginCalled" & stepContext.Context.Activity.ChannelId == "telegram")
             {
                 return await stepContext.NextAsync(null);
             }

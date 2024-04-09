@@ -61,7 +61,7 @@ namespace RedCrossChat.Dialogs
                 ProfessionalStatusAsync,
                 PrivateDetailsGenderAsync,
                 LaunchAwarenessDialogAsync,
-                HandleBreathingStepAsync,
+                //HandleBreathingStepAsync,
                 FinalStepAsync,
 
             });
@@ -528,32 +528,7 @@ namespace RedCrossChat.Dialogs
             return await stepContext.BeginDialogAsync(nameof(AwarenessDialog), me, cancellationToken);
 
         }
-        private async Task<DialogTurnResult> HandleBreathingStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken) {
-
-            if (stepContext.Result != null)
-            {
-                Client user = (Client)(stepContext.Result);
-
-                if (user.WantsBreathingExercises)
-                {
-                    return await stepContext.BeginDialogAsync(nameof(BreathingDialog), user, cancellationToken);
-                }
-
-                if (user.HasTalkedToSomeone == false && user.IsAwareOfFeeling == false)
-                {
-                    return await stepContext.BeginDialogAsync(nameof(BreathingDialog), user, cancellationToken);
-                }
-
-                if (user.WantsBreathingExercises)
-                {
-                    //handover to ui
-                    return await stepContext.BeginDialogAsync(nameof(BreathingDialog), user, cancellationToken);
-                }
-                
-            }
-
-            return await stepContext.EndDialogAsync(null, cancellationToken);
-        }
+        
 
         private async Task<DialogTurnResult> FinalStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
