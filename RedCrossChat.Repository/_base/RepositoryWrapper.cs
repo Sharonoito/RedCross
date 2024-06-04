@@ -301,6 +301,24 @@ namespace RedCrossChat.Repository
             }
         }
 
+        public IAIRejectedQuestion _aiReJectedQuestion;
+
+        public IAIRejectedQuestion AIRejectedQuestion
+        {
+
+            get
+            {
+                if (_aiReJectedQuestion ==  null)
+                {
+                    _aiReJectedQuestion = new AIRejectedQuestionRepo(_repoContext); 
+                }
+
+                return _aiReJectedQuestion;
+            }
+
+            
+        }
+
         public IInitialActionItem _initialActionItem;
 
         public IInitialActionItem InitialActionItem

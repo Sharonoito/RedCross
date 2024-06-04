@@ -108,8 +108,7 @@ namespace RedCrossChat.Dialogs
                     case ValidationsSwahili.NO:
                         return await stepContext.EndDialogAsync(); 
                 }
-
-
+                
                // await stepContext.Context.SendActivityAsync(MessageFactory.Text("You are now interacting with Chatgpt to exit or opt out type exit or cancel"));
             }
 
@@ -183,8 +182,19 @@ namespace RedCrossChat.Dialogs
             catch (Exception ex)
             {
 
-                await stepContext.Context.SendActivityAsync(MessageFactory.Text("Our AI servers seems to be down please try later"));
+                _repository.AIRejectedQuestion.Create(new AIRejectedQuestion()
+                {
+                    Questions= stepContext.Context.Activity.Text,
+                    Result= ex.Message
+                });
 
+                await _repository.SaveChangesAsync();
+
+                //todo we need to capture the questions asked here to adhere to the OpenAi Policies
+
+                // if(ex.C)
+
+                await stepContext.Context.SendActivityAsync(MessageFactory.Text("Our AI servers seems to be down please try later"));
 
                 _logger.LogError(ex.Message);
 

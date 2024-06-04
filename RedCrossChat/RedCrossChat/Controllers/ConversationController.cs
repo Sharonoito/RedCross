@@ -16,6 +16,7 @@ using RedCrossChat.Objects;
 using Sentry;
 using Constants = RedCrossChat.Objects.Constants;
 using System.Reflection.Metadata;
+using Antlr4.Runtime.Misc;
 
 namespace RedCrossChat.Controllers
 {
@@ -307,7 +308,14 @@ namespace RedCrossChat.Controllers
 
                     if(conversation.AppUserId != null)
                     {
-                        return Error("This Client is already being supported");
+
+                        request.HasBeenReceived = true;
+
+                        _repository.HandOverRequest.Update(request);
+
+                        await _repository.SaveChangesAsync();
+
+                        return Success("This Client is already being supported",request);
                     }
                     else
                     {
@@ -452,17 +460,34 @@ namespace RedCrossChat.Controllers
         [HttpPost]
         public async Task<IActionResult> GetRawConversations(Guid id)
         {
-
-            //var conv=await _repository.RawConversation.FindByCondition(x=>x.ConversationId==id).ToListAsync();
-
-            var conv=await _repository.ChatMessage.FindByCondition(x => x.ConversationId == id)
+            var chatMessages =await _repository.ChatMessage.FindByCondition(x => x.ConversationId == id)
                 .Include(x=>x.Question)
                 .ToListAsync();
 
-            return Success("success", conv);
+            ArrayList<ChatMessage> chat = new ArrayList<ChatMessage>();
+
+            foreach(var chatMessage in chatMessages)
+            {
+
+                if(chatMessage.IsRead == false)
+                {
+                    chat.Add(chatMessage);
+                };
+            }
+
+            foreach(var chatMessage in chat)
+            {
+                chatMessage.IsRead = true;
+            }
+
+            _repository.ChatMessage.UpdateRange(chatMessages);
+
+            await _repository.SaveChangesAsync();
+
+            return Success("success", chatMessages);
         }
         [HttpPost]
-        public async Task<IActionResult> GetMyConversationIncludingHandOverRequests()
+        public async Task<IActionResult> GetMyConversationIncludingHandOverRequests(String Id="")
         {
             var userId = Guid.Parse(User.FindFirst("UserId").Value);
 
@@ -472,16 +497,50 @@ namespace RedCrossChat.Controllers
                 .ThenInclude(x=>x.Persona)
                 .Include(x=>x.Conversation)
                 .ThenInclude(x=>x.Feeling)
+                .Include(x=>x.Conversation)
+                .ThenInclude(x=>x.Intention)
+                .Include(x=>x.Conversation)
+                .ThenInclude(x=>x.SubIntention)
                 .ToListAsync();
 
             var myHandOverRequests = handOverRequests
                 .Where(x => x.AppUserId == userId)
                 .ToList();
 
-            var myConversations = await _repository.Conversation
-                .FindByCondition(x => x.AppUserId == Guid.Parse(User.FindFirst("UserId").Value) & x.IsActive)
+            var conversationObject= _repository.Conversation
+                .FindByCondition(x => x.AppUserId == Guid.Parse(User.FindFirst("UserId").Value) & x.IsActive);
+
+            if(Id != "")
+            {
+
+               Guid activeConversationId = Guid.Parse(Id);
+
+               var messages=await _repository.ChatMessage.FindByCondition(x => x.ConversationId==activeConversationId).ToListAsync();
                 
-                .Include(x => x.Persona)
+
+                ArrayList<ChatMessage> messagesList = new ArrayList<ChatMessage>();
+
+                foreach(var message in messages)
+                {
+                    if (message.Type == 3)
+                    {
+                        message.IsRead = true;
+
+                        messagesList.Add(message);
+                    }
+                }
+
+                if(messagesList.Count > 0)
+                {
+                    _repository.ChatMessage.UpdateRange(messagesList);
+
+                    bool updated = await _repository.SaveChangesAsync();
+                }
+            }
+
+
+
+            var myConversations= await conversationObject.Include(x => x.Persona)
                 .Include(x => x.ChatMessages)
                 .ThenInclude(x => x.Question)
                 .OrderByDescending(x => x.DateCreated)

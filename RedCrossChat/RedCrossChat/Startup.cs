@@ -1,6 +1,7 @@
 ﻿using DataTables.AspNet.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.Bot.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -39,16 +40,18 @@ namespace RedCrossChat
 
             var connectionString = _config.GetConnectionString(HostingEnvironment.IsDevelopment() ?  "DefaultConnection": "LocalConnection");
             //var connectionString = _config.GetConnectionString("DefaultConnection");
-            //var connectionString = _config.GetConnectionString("LocalConnection");
+           // var connectionString = _config.GetConnectionString("LocalConnection");
 
 
             //Use sql Server Conversations
             services.AddDbContextPool<AppDBContext>(options =>
                 options.UseSqlServer(connectionString)
-                .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
+                .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
 
-                
-                );
+            services.Configure<RequestLocalizationOptions>(options =>
+            {
+                options.DefaultRequestCulture = new RequestCulture("en-US");
+            });
 
             // Create the Bot Framework Authentication to be used with the Bot Adapter.
             services.ConfigureBotServices();

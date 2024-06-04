@@ -50,7 +50,7 @@ namespace RedCrossChat.Dialogs
 
             stepContext.Values[UserInfo] = user;
 
-            var question = user.language? "Would you like me to take you through some breathing exercises or tips on managing mental health? ":
+            var question = user.language? "Would you like me to take you through some relaxational exercises or tips on managing mental health? ":
                 "Je, ungependa nikupitishe baadhi ya mazoezi ya kupumua au vidokezo kuhusu kudhibiti afya ya akili?";
 
             if (user.Iteration !=0)

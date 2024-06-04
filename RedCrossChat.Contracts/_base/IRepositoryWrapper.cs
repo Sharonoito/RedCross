@@ -1,5 +1,7 @@
 ﻿
 
+using RedCrossChat.Entities;
+
 namespace RedCrossChat.Contracts
 {
 
@@ -56,6 +58,7 @@ namespace RedCrossChat.Contracts
 
         IInitialActionItem InitialActionItem { get; }
 
+        IAIRejectedQuestion AIRejectedQuestion { get; }
 
         Task<bool> SaveChangesAsync();
     }
