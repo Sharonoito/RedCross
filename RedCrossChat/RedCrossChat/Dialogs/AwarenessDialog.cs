@@ -8,6 +8,7 @@ using RedCrossChat.Cards;
 using RedCrossChat.Contracts;
 using RedCrossChat.Entities;
 using RedCrossChat.Objects;
+using RedCrossChat.ViewModel;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -34,7 +35,8 @@ namespace RedCrossChat.Dialogs
             IRepositoryWrapper wrapper, UserState userState,
             HumanHandOverDialog humanHandOverDialog,
             BaseDialog baseDialog,
-            BreathingDialog breathingDialog
+            BreathingDialog breathingDialog,
+            AiDialog aiDialog
             ) : base(nameof(AwarenessDialog), baseDialog,wrapper)
         {
 
@@ -55,6 +57,7 @@ namespace RedCrossChat.Dialogs
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), CreateWaterFallSteps()));
 
             AddDialog(humanHandOverDialog);
+            AddDialog(aiDialog);
    
             InitialDialogId = nameof(WaterfallDialog);
         }
@@ -68,6 +71,9 @@ namespace RedCrossChat.Dialogs
                 ProcessMentalEvaluationChoice,
                 HandleCaregiverChoiceAsync,
                 EvaluateDialogTurnAsync,
+                
+                CheckHandOverToAI,
+                ValidateHandOver,
                 CheckFeelingAware,
                 ValidateFeeling,
                 //CheckProfessionalSwitchAsync,
@@ -365,7 +371,63 @@ namespace RedCrossChat.Dialogs
             }
         }
 
-        
+        public async Task<DialogTurnResult> CheckHandOverToAI(WaterfallStepContext stepContext,CancellationToken cancellationToken)
+        {
+            Client me = (Client)stepContext.Values[UserInfo];
+
+            string question = me.language ? "It's always relieving to talk to someone trusted about what we're feeling. Would you like to speak to a professional therapist from the Kenya Red Cross Society, or would you prefer to talk to Chat Care, the Kenya Red Cross AI chatbot? " :
+                " Unashauriwa kila wakati kuongea na mtu unayemwamini kuhusu jinsi unavyohisi. Je, ungependa kuongea na Mshauri Mtaalamu wa Msalaba Mwekundu wa Kenya, au ungependelea kuzungumza na Chat Care, chatbot ya AI ya Kenya Red Cross?";
+
+            List<Choice> choices = new List<Choice>();
+
+            if (me.language) {
+
+                choices.Add(new Choice { Value= "Human Agent" });
+                choices.Add(new Choice { Value= "Chat Care" });
+            }
+            else
+            {
+                choices.Add(new Choice { Value = "Mshauri Mtaalamu" });
+                choices.Add(new Choice { Value = "Chat Care" });
+            }
+
+         
+
+            return await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions()
+            {
+                Prompt = MessageFactory.Text(question),
+                Choices = choices,
+                Style = ListStyle.HeroCard
+            }, cancellationToken);
+
+        }
+
+        public async Task<DialogTurnResult> ValidateHandOver(WaterfallStepContext stepContext, CancellationToken token)
+        {
+            Client me = (Client)stepContext.Values[UserInfo];
+
+            
+            var response = stepContext.Context.Activity.Text;
+
+            if (stepContext.Result == null & response == "")
+            {
+                return await stepContext.EndDialogAsync(me);
+
+            }else if(response != "Chat Care")
+            {
+                return await stepContext.NextAsync(me);
+            }
+            else
+            {
+                me.HandOverToAI = true;
+
+                return await stepContext.BeginDialogAsync(nameof(AiDialog), me, token);
+            }
+
+        }
+
+
+
 
         public async Task<DialogTurnResult> CheckFeelingAware(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {

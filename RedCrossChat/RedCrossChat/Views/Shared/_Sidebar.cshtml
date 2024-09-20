@@ -31,12 +31,12 @@
 
         @if (User.IsInRole(Constants.PssManager))
         {
-            <li class="menu-item @Html.IsSelected(controller: "Conversation", action: "List")">
+           @*  <li class="menu-item @Html.IsSelected(controller: "Conversation", action: "List")">
                 <a asp-action="List" asp-controller="Conversation" class="menu-link text-danger">
                     <i class="menu-icon tf-icons bx bx-chat text-danger"></i>
                     <div data-i18n="Conversations"></div>
                 </a>
-            </li>
+            </li> *@
         }
        
         @if (User.IsInRole(Constants.SuperAdministrator) || User.IsInRole(Constants.Administrator) || User.IsInRole(Constants.PssManager))

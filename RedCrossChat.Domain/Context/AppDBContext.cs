@@ -56,6 +56,8 @@ namespace RedCrossChat.Domain
 
         public DbSet<AIRejectedQuestion> AIRejectedQuestion { get; set; }
 
+        public DbSet<AuthLoginLog> AuthLoginLog { get; set; }
+
         public AppDBContext(DbContextOptions options) : base(options)
         {
 

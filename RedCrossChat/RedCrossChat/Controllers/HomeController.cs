@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using RedCrossChat.Contracts;
 using System;
@@ -45,6 +46,22 @@ namespace RedCrossChat
         {
             var genders = await _repository.Gender.FindAll().ToListAsync();
             return View();
+        }
+
+        [HttpGet, HttpPost]
+        public JsonResult GetReportData(int Type=0)
+        {
+            string ConnectionString=System.Configuration.ConfigurationManager.ConnectionStrings["LocalConnection"].ConnectionString;
+
+            using (SqlConnection con = new SqlConnection(ConnectionString))
+            {
+                string Query = "";
+
+
+
+            }
+
+            return base.Json(new { });
         }
 
 

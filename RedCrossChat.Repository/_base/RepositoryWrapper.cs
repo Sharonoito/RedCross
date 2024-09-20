@@ -24,6 +24,18 @@ namespace RedCrossChat.Repository
             }
         }
 
+        private IAuthLoginLog? _authLoginLog;
+
+        public IAuthLoginLog AuthLoginLog
+        {
+            get
+            {
+                if(_authLoginLog ==null) _authLoginLog= new AuthLoginLogRepo(_repoContext);
+
+                return _authLoginLog;
+            }
+        }
+
         private IRoleRepository? _role;
         public IRoleRepository Role
         {

@@ -3,125 +3,109 @@
 *@
 
 <section class="content-header">
-    <div class="container-fluid">
-        <ul class="nav nav-tabs bordered">
-            <li>
-                <a class="nav-link active" data-toggle="tab" href="#tab-1">
-                    <i class="fa fa-md fa-users mr-2"></i> Users
-                </a>
-            </li>
 
-            <li class="nav-item @(Html.IsSelected(controller: "Auth", action: "Roles") )">
-                <a asp-action="Roles" asp-controller="Auth" class="nav-link @(Html.IsSelected(controller: "Auth", action: "Roles") )">
-                    <i class="fa fa-md fa-th mr-2"></i> Roles
-                </a>
-            </li>
+    <div class="col-xl-12">
+        <h6 class="text-muted">Basic</h6>
+        <div class="nav-align-top nav-tabs-shadow mb-6">
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-home" aria-controls="navs-top-home" aria-selected="true">Users</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-profile" aria-controls="navs-top-profile" aria-selected="false" tabindex="-1">Logs</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-messages" aria-controls="navs-top-messages" aria-selected="false" tabindex="-1">Roles</button>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane fade active show" id="navs-top-home" role="tabpanel">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fa fa-info-circle"></i> Manage Users</h3>
 
+                            <div class="card-tools">
 
-        </ul>
+                                <button type="button"
+                                        class="load-modal text-right btn btn-sm btn-outline-primary float-right"
+                                        data-toggle="modal"
+                                        data-target="#clientModal"
+                                        data-modal="clientModal"
+                                        data-viewurl="true"
+                                        data-action="@Url.Action("CreateUser")" data-bs-toggle="modal" data-bs-target="#clientModal">
+                                    <i class="fa fa-plus"></i> Add Client
+                                </button>
 
-        <div id="tab-1" class="tab-pane fade show active mt-1">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title"><i class="fa fa-info-circle"></i> Manage Users</h3>
-
-                <div class="card-tools">
-                   
-                    <button type="button"
-                            class="load-modal text-right btn btn-sm btn-outline-primary float-right"
-                            data-toggle="modal"
-                            data-target="#clientModal"
-                            data-modal="clientModal"
-                            data-viewurl="true"
-                            data-action="@Url.Action("CreateUser")" data-bs-toggle="modal" data-bs-target="#clientModal">
-                        <i class="fa fa-plus"></i> Add Client
-                    </button>
-
-                </div>
-            </div>
-
-            <div class="card-body p-0">
-                <table class="table table-striped" id="tblUsers">
-                    <thead>
-                        <tr>
-                           
-                            <th>First Name</th>
-                            <th>Last Name</th>
-                            <th>Email Address</th>
-                            <th>Phone number</th>
-                            <th width="10%">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                      
-                       
-                       
-                    </tbody>
-                </table>
-            </div>
-
-        </div>
-
-    </div>
-
-
-        <!-- Roles -->
-@*        <div id="tab-2" class="tab-pane fadeIn mt-1">
-            <div class="card">
-                <div class="card-body">
-                    <div class="row mb-3">
-
-                        <div class="col-lg-6">
-                            <i class="fa fa-info-circle"></i> Setup roles.
+                            </div>
                         </div>
 
-                        <div class="col-lg-6">
-                            <button type="button"
-                                    class="load-modal text-right btn btn-sm btn-outline-primary float-right"
-                                    data-toggle="modal"
-                                    data-target="#userModal"
-                                    data-modal="userModal"
-                                    data-viewurl="true"
-                                    data-action="@Url.Action("CreateRole")">
-                                <i class="fa fa-plus"></i> Add Role
-                            </button>
+                        <div class="card-body p-0">
+                            <table class="table table-striped" id="tblUsers">
+                                <thead>
+                                    <tr>
+
+                                        <th>First Name</th>
+                                        <th>Last Name</th>
+                                        <th>Email Address</th>
+                                        <th>Phone number</th>
+                                        <th width="10%">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
                         </div>
+
                     </div>
+                </div>
+                <div class="tab-pane fade" id="navs-top-profile" role="tabpanel">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fa fa-info-circle"></i> Logs </h3>
 
-                    <table id="tblRoles" class="table table-bordered table-hover" width="100%">
-                        <thead>
-                            <tr>
-                                <th>Role</th>
-                                <th class="text-center">Actions</th>
-                            </tr>
-                        </thead>
-                        <tfoot>
-                            <tr>
-                                <th>Role</th>
-                                <th class="text-center">Actions</th>
-                            </tr>
-                        </tfoot>
-                    </table>
+                            <div class="card-tools">
+
+                              
+
+                            </div>
+                        </div>
+
+                        <div class="card-body p-0">
+                            <table class="table table-striped" id="tblLogs">
+                                <thead>
+                                    <tr>
+
+                                        <th>Username</th>
+                                        <th>Email Address</th>
+                                        <th>Ip Address</th>
+                                        <th>Host</th>
+                                        <th>Log time</th>
+                                       
+                                        <th width="10%">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="navs-top-messages" role="tabpanel">
+                    
+                    
                 </div>
             </div>
         </div>
-
-*@
-
-
-
-
-
-
     </div>
 
-    <div class="modal fade" data-keyboard="false"  id="clientModal" tabindex="-1" role="dialog" style="display:none" aria-labelledby="clientModal" aria-hidden="true">
+    <div class="modal fade" data-keyboard="false" id="clientModal" tabindex="-1" role="dialog" style="display:none" aria-labelledby="clientModal" aria-hidden="true">
         <div class="modal-dialog ">
             <div class="modal-content">
             </div>
         </div>
     </div>
-    
+
 </section>
 
 
@@ -147,12 +131,14 @@
         <script src="~/lib/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
         <script src="~/lib/datatables-buttons/js/dataTables.buttons.min.js"></script>
         <script src="~/lib/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
-       
+
     </environment>
 
     <script type="text/javascript">
         $(document).ready(function () {
             jsdtClient.getData();
+
+            tblLogs.getData();
         });
 
         var jsdtClient = {
@@ -167,10 +153,10 @@
                         type: "POST"
                     },
                     columns: [
-                                     
+
                         { data: 'firstName' },
                         { data: 'lastName' },
-                        { data: 'email'},
+                        { data: 'email' },
                         { data: 'phoneNumber', name: 'Id' },
                         { data: 'id', name: 'Id' },
                     ],
@@ -184,32 +170,32 @@
 
                             var actionsHtml =
                                 `<div class='text-center'>
-                                                <button class='btn btn-outline-primary btn-xs load-modal'
-                                                    data-hidden='Id'
-                                                    data-id='${row.id}'
-                                                    data-toggle='modal'
-                                                    data-target='#clientModal'
-                                                    data-modal='clientModal'
-                                                    data-bs-toggle="modal" data-bs-target="#clientModal"
-                                                    data-viewurl='true'
-                                                    data-action='@Url.Action("CreateUser", "Auth")?clientId=${row.id}'
-                                                    title='Edit'>
-                                                    <i class='fa fa-pencil-alt'></i>
-                                                </button>
+                                                        <button class='btn btn-outline-primary btn-xs load-modal'
+                                                            data-hidden='Id'
+                                                            data-id='${row.id}'
+                                                            data-toggle='modal'
+                                                            data-target='#clientModal'
+                                                            data-modal='clientModal'
+                                                            data-bs-toggle="modal" data-bs-target="#clientModal"
+                                                            data-viewurl='true'
+                                                            data-action='@Url.Action("CreateUser", "Auth")?clientId=${row.id}'
+                                                            title='Edit'>
+                                                            <i class='fa fa-pencil-alt'></i>
+                                                        </button>
 
 
-                                                <button class="delete btn btn-outline-danger btn-xs"
-                                                    data-bs-toggle="button" aria-pressed="true"
-                                                    data-action='@Url.Action("DeactivateAccount", "Auth")?clientId=${row.id}'
-                                                    data-table='tblClients'
-                                                    data-id='${row.id}'
-                                                    data-toggle='tooltip'
-                                                    title='Deactivate'>
-                                                    <i class='fas fa-toggle-on'></i>
-                                                </button>
+                                                        <button class="delete btn btn-outline-danger btn-xs"
+                                                            data-bs-toggle="button" aria-pressed="true"
+                                                            data-action='@Url.Action("DeactivateAccount", "Auth")?clientId=${row.id}'
+                                                            data-table='tblClients'
+                                                            data-id='${row.id}'
+                                                            data-toggle='tooltip'
+                                                            title='Deactivate'>
+                                                            <i class='fas fa-toggle-on'></i>
+                                                        </button>
 
-                                            </div>`;
-                           
+                                                    </div>`;
+
 
                             return actionsHtml;
                         },
@@ -235,7 +221,95 @@
                 if (jsdtClient.table == null) {
                     jsdtClient.initializeDataTable();
                 } else {
-                    jsdtClient.table.ajax.reload(null,false);
+                    jsdtClient.table.ajax.reload(null, false);
+                }
+            }
+        }
+
+
+        var tblLogs = {
+            table: null,
+            initializeDataTable: function () {
+                jsdtClient.table = $('#tblLogs').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    serverMethod: 'post',
+                    ajax: {
+                        url: "@Url.Action("GetLogs")",
+                        type: "POST"
+                    },
+                    columns: [
+
+                        { data: 'id', render: (obj, _, row) => {  return row.appUser.fullName} },
+                        { data: 'loginTime', render: (obj, _, row) => { return row.appUser.email } },
+                        { data: 'ipAddress' },
+                        { data: 'userAgent' },
+                        { data: 'dateCreated' },
+                 
+                        { data: 'id', name: 'Id' },
+                    ],
+                    columnDefs: [{
+                        render: function (data, type, row) {
+
+                            if (row.isDeactivated) {
+                                return '';
+                            }
+
+
+                            var actionsHtml =
+                                `<div class='text-center'>
+                                                                <button class='btn btn-outline-primary btn-xs load-modal'
+                                                                    data-hidden='Id'
+                                                                    data-id='${row.id}'
+                                                                    data-toggle='modal'
+                                                                    data-target='#clientModal'
+                                                                    data-modal='clientModal'
+                                                                    data-bs-toggle="modal" data-bs-target="#clientModal"
+                                                                    data-viewurl='true'
+                                                                    data-action='@Url.Action("CreateUser", "Auth")?clientId=${row.id}'
+                                                                    title='Edit'>
+                                                                    <i class='fa fa-pencil-alt'></i>
+                                                                </button>
+
+
+                                                                <button class="delete btn btn-outline-danger btn-xs"
+                                                                    data-bs-toggle="button" aria-pressed="true"
+                                                                    data-action='@Url.Action("DeactivateAccount", "Auth")?clientId=${row.id}'
+                                                                    data-table='tblClients'
+                                                                    data-id='${row.id}'
+                                                                    data-toggle='tooltip'
+                                                                    title='Deactivate'>
+                                                                    <i class='fas fa-toggle-on'></i>
+                                                                </button>
+
+                                                            </div>`;
+
+
+                            return actionsHtml;
+                        },
+                        targets: -1,
+                        orderable: false
+                    }],
+                    order: [0, 'asc'],
+                    language: {
+                        processing: 'Loading records... Please wait.',
+                    },
+                    pagingType: 'full_numbers',
+                    oLanguage: {
+                        oPaginate: {
+                            sNext: '>',
+                            sPrevious: '<',
+                            sFirst: '<<',
+                            sLast: '>>'
+                        }
+                    }
+                });
+            },
+            getData: function () {
+                if (tblLogs.table == null) {
+                    tblLogs.initializeDataTable();
+                } else {
+                    tblLogs.table.ajax.reload(null, false);
                 }
             }
         }

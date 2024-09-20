@@ -15,6 +15,8 @@ namespace RedCrossChat.Contracts
 
         IAppUserTeam AppUserTeam { get; }
 
+        IAuthLoginLog AuthLoginLog { get; }
+
         #endregion
 
         #region Dependencies              
@@ -59,6 +61,8 @@ namespace RedCrossChat.Contracts
         IInitialActionItem InitialActionItem { get; }
 
         IAIRejectedQuestion AIRejectedQuestion { get; }
+
+
 
         Task<bool> SaveChangesAsync();
     }

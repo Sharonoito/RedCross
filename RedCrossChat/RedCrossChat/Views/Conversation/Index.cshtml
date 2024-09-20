@@ -873,6 +873,13 @@
 
                 if ($(current).data('id') != undefined) {
                     $.post("/Conversation/UpdateHandOverRequest/?id=" + $(current).data('id')).then(response => {
+
+                        console.log("Handover -request-response", response);
+
+                        activeConversation = response.responseData
+
+                        UpdateChatActiveConversation()
+
                         $(current).remove();
                     })
                 }

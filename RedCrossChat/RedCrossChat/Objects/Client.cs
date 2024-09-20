@@ -29,6 +29,7 @@ namespace RedCrossChat.Objects
         public bool MainQuestionAsked {  get; set; } = false;
 
         public bool HandOverToUser { get; set; } = false;
+        public bool HandOverToAI { get; set; } = false;
 
         public int Iteration { get; set; } = 0;
 

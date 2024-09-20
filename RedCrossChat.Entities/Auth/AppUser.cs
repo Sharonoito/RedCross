@@ -10,8 +10,12 @@ namespace RedCrossChat.Entities
         
         public string LastName { get; set; }
 
+        public int LastOTP { get; set; } = 0;
+
         [NotMapped]
         public List<string> Roles { get; set; }
+
+
 
         [NotMapped]
         public string FullName

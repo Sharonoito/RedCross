@@ -304,6 +304,7 @@ namespace RedCrossChat.Controllers
                 if (request != null)
                 {                  
                     var conversation=  await _repository.Conversation.
+                       
                         FindByCondition(x=>x.Id==request.ConversationId).Include(x=>x.Persona).FirstOrDefaultAsync();
 
                     if(conversation.AppUserId != null)
@@ -348,8 +349,14 @@ namespace RedCrossChat.Controllers
 
                         var status = await _repository.SaveChangesAsync();
 
+
+                        var data = await _repository.Conversation.FindByCondition(x => x.Id == request.ConversationId)             
+                                   .Include(x => x.ChatMessages).ThenInclude(x=>x.Question)
+                                   .Include(x=>x.Persona)
+                                   .FirstOrDefaultAsync();
+
                         if (status)
-                            return Success("Updated Successfully");
+                            return Success("Updated Successfully",data);
                     }  
                 }
 
