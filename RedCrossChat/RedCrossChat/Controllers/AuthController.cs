@@ -15,6 +15,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Data;
 using RedCrossChat.Domain;
+using RedCrossChat.ViewModel;
+using RedCrossChat.Extensions;
+using System.Text;
 
 namespace RedCrossChat.Controllers
 {
@@ -26,9 +29,10 @@ namespace RedCrossChat.Controllers
 
         private readonly IRepositoryWrapper _repository ;
 
-        public AuthController(UserManager<AppUser> userManager,
-        SignInManager<AppUser> signInManager,
-        RoleManager<AppRole> roleManager,
+        public AuthController(
+            UserManager<AppUser> userManager,
+            SignInManager<AppUser> signInManager,
+       RoleManager<AppRole> roleManager,
         IRepositoryWrapper repository)
         {
             _userManager = userManager;
@@ -53,6 +57,110 @@ namespace RedCrossChat.Controllers
         }
 
 
+        #region ResetPassword
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult ResetPassword(string returnUrl = null)
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> ResetPasswordOTP(ResetViewModel resetViewModel)
+        {
+            AppUser user = await _userManager.FindByEmailAsync(resetViewModel.Email);
+
+            if (user == null)
+            {
+                return Error("Not found in the system");
+            }
+
+            // Build the email body
+            if (user.LastOTP == 0)
+            {
+                user.LastOTP = new Random().Next(1000, 9999); // Generate a 6-digit OTP
+
+                await _userManager.UpdateAsync(user); // Save the OTP to the database
+            }
+
+            // Build the email body
+            StringBuilder body = new StringBuilder();
+            body.AppendLine($"Dear {user.FullName},");
+            body.AppendLine();
+            body.AppendLine("We received a request to reset your password.");
+            body.AppendLine("Please use the OTP below to complete your password reset:");
+            body.AppendLine();
+            body.AppendLine(user.LastOTP.ToString()); // Include the OTP
+            body.AppendLine();
+            body.AppendLine("If you did not request a password reset, please ignore this email.");
+            body.AppendLine();
+            body.AppendLine("Thank you,");
+            body.AppendLine("RedCross Chatbot Team");
+
+            // Send the email using SMTP
+            bool response = await SmptMailExtension.SendEmailAsync(resetViewModel.Email, "RedCross Chatbot | Reset Password", body.ToString());
+
+            if (response)
+            {
+                return Success("Otp Sent Successfully");
+            }
+
+            return Error("Unable to Send OTP");
+        }
+
+
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> ResetPasswordVerify(ResetViewModel resetViewModel)
+        {
+            var user=await _userManager.FindByEmailAsync(resetViewModel.Email);
+
+            if (user != null) { 
+
+                if(user.LastOTP.ToString() == resetViewModel.OTP)
+                {
+                    String response= await _userManager.GeneratePasswordResetTokenAsync(user);
+
+                    resetViewModel.Token = response;
+
+                    return Success("Validated Successfully",resetViewModel);
+                }
+            }
+
+            return Error("This token is invalid");
+        }
+
+
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> ResetConfirmPassword(ResetViewModel resetViewModel)
+        {
+
+            var user = await _userManager.FindByEmailAsync(resetViewModel.Email);
+
+            if (user != null)
+            {
+
+                if (user.LastOTP.ToString() == resetViewModel.OTP)
+                {
+
+                    await _userManager.ResetPasswordAsync(user,resetViewModel.Token,resetViewModel.Password);
+
+                    user.LastOTP= new Random().Next(1000, 9999);
+
+                    await _userManager.UpdateAsync(user);
+
+                    return Success("Validated Successfully");
+                }
+            }
+
+            return Error("Unable to update password");
+        }
+        
+        #endregion 
+
         [HttpPost]
         [AllowAnonymous]
         public async Task<IActionResult> Login(LoginVM model, string returnUrl = null)
@@ -69,11 +177,38 @@ namespace RedCrossChat.Controllers
             {
                 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, true, false);
 
+
+                var ipAddress = HttpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault();
+
+                if (string.IsNullOrEmpty(ipAddress))
+                {
+                    ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+                }
+
+                var userAgent = HttpContext.Request.Headers["User-Agent"].ToString();
+
+              
+
                 if (result.Succeeded)
+                {
+                    _repository.AuthLoginLog.Create(new AuthLoginLog()
+                    {
+                        AppUserId = user.Id,
+                        IpAddress = ipAddress,
+                        UserAgent = userAgent,
+
+                    });
+
+                    await _repository.SaveChangesAsync();
+
                     return RedirectToLocal(returnUrl);
+
+                }
+                   
             }
 
             ModelState.AddModelError("", "Invalid username or password!");
+          
             return View(new LoginVM()
             {
                 ReturnUrl = returnUrl
@@ -86,7 +221,6 @@ namespace RedCrossChat.Controllers
             return RedirectToAction(nameof(HomeController.Index), "Home");
 
         }
-
 
         [AllowAnonymous]
         public async Task<IActionResult> DeactivateAccount(Guid clientId)
@@ -104,22 +238,25 @@ namespace RedCrossChat.Controllers
             return Json(new { success = false, message = "Account deactivation failed. User not found." });
         }
 
-
         public IActionResult Profile()
         {
             return View();
         }
-
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> LogOut()
         {
             //Sign out using the specific identity
-            //await _signInManager.SignOutAsync();
+            await _signInManager.SignOutAsync();
 
             // Sign out using a generic context - makes sure it signs out all 
             await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
+
+            foreach (var cookie in Request.Cookies.Keys)
+            {
+                Response.Cookies.Delete(cookie);
+            }
 
             return RedirectToAction("login", "auth");
         }
@@ -135,8 +272,8 @@ namespace RedCrossChat.Controllers
             try
             {
                 var data = await _repository.User
-                    .GetAllAsync();
-                    //.FindByCondition(x=>x.Email !=Constants.DefaultSuperAdminEmail).ToListAsync();
+                  //  .GetAllAsync();
+                    .FindByCondition(x=>x.IsDeactivated ==false).ToListAsync();
                 // Filter them
 
                 var filteredRows = data
@@ -161,6 +298,43 @@ namespace RedCrossChat.Controllers
                 return Error(ex.Message);
             }
         }
+        [HttpPost]
+        public async Task<IActionResult> GetLogs(IDataTablesRequest dtRequest)
+        {
+            try
+            {
+
+               var data= await _repository.AuthLoginLog.FindByCondition(x=>x.AppUser !=null).Include(x=>x.AppUser).ToListAsync();
+
+               /* var data = await _repository.AuthLoginLog
+                    
+                      .GetAllAsync();*/
+                   // .FindByCondition(x => x.IsDeactivated == false).ToListAsync();
+                // Filter them
+
+                var filteredRows = data
+                    .AsQueryable()
+                    .FilterBy(dtRequest.Search, dtRequest.Columns);
+
+                // Sort and paginate them
+                var pagedRows = filteredRows
+                    .SortBy(dtRequest.Columns)
+                    .Skip(dtRequest.Start)
+                    .Take(dtRequest.Length);
+
+                var response = DataTablesResponse.Create(dtRequest, data.Count(),
+                    filteredRows.Count(), pagedRows);
+
+                return new DataTablesJsonResult(response);
+                //   return Ok("Success");
+
+            }
+            catch (Exception ex)
+            {
+                return Error(ex.Message);
+            }
+
+        }
 
         public async Task<IActionResult> CreateUser(Guid clientId)
         {
@@ -175,6 +349,8 @@ namespace RedCrossChat.Controllers
                 var user = await _repository.User.FindByCondition(x => x.Id == clientId.ToString()).FirstOrDefaultAsync();
 
                 var roleNames = await _userManager.GetRolesAsync(user);
+
+
               
                 userVm = new UserVm
                 {
@@ -220,9 +396,7 @@ namespace RedCrossChat.Controllers
             }
             return Error("Something broke");
         }
-
-      
-
+   
         public async Task< IActionResult> SaveUser(UserVm user) {
 
             if (!ModelState.IsValid && ModelState.ErrorCount >1)
@@ -232,7 +406,7 @@ namespace RedCrossChat.Controllers
             {
                 if (user.Id == Guid.Empty)  //install instance
                 {
-                    var appUser = new AppUser
+                    AppUser appUser = new AppUser
                     {
                         FirstName = user.FirstName,
                         LastName = user.LastName,
@@ -241,15 +415,18 @@ namespace RedCrossChat.Controllers
                         NormalizedEmail = user.Email.ToUpper(),
                         NormalizedUserName = user.Email.ToUpper()
                     };
+                    
+                    appUser.LastOTP = new Random().Next(1000, 9999); // Generate a 6-digit OTP
+                        
 
                     var result = await _userManager.CreateAsync(appUser, "Test@!23");
-
+/*
                     if (user.RoleNames != null)
                     {
                         IdentityResult addResult = await _userManager.AddToRolesAsync(appUser, user.RoleNames);
                         if (!addResult.Succeeded)
                             return Error("Failed to assign user roles.");
-                    }
+                    }*/
 
                     if (!result.Succeeded)
                         return Error(result.Errors.First().Description.ToString());
@@ -308,7 +485,6 @@ namespace RedCrossChat.Controllers
             }
 
         }
-
 
         public IActionResult Roles()
         {

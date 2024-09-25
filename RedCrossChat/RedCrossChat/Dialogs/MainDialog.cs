@@ -137,37 +137,12 @@ namespace RedCrossChat.Dialogs
                 }
             }
 
-           
-
             var conv = await CreateConversationDBInstance(stepContext);
 
             client.ConversationId = conv.Id;
 
-            var question = client.language ?
-
-               //"Hello dear friend!! Welcome to Kenya Red Cross Society, we're are offering tele - mental health and counseling services to the public at no costs. How can we help you today?" :
-               "Hello Welcome to Kenya Red Cross Society. How can I help you today?" :
+            var question = client.language ? "Hello Welcome to Kenya Red Cross Society. How can I help you today?" :
                "Habari rafiki mpendwa, karibu kwenye jukwaa la chatbot la Shirika la Msalaba Mwekundu Kenya. Tunatoa huduma ya afya ya akili na ushauri kupitia simu kwa umma bila malipo yoyote. Leo ungependa tukusaidie vipi?";
-
-            //var attachment = new Attachment
-            //{
-            //    ContentType = HeroCard.ContentType,
-
-            //    Content = PersonalDialogCard.GetFAQCard(client.language),
-            //};
-
-            //var message = MessageFactory.Attachment(attachment);
-
-            //await stepContext.Context.SendActivityAsync(message, cancellationToken);
-
-            //var choicez = new List<Choice>
-            //{
-            //    new Choice() { Value = "faq", Action = new CardAction() {
-            //        Title = "faq", Type = ActionTypes.OpenUrl,
-            //        Value = "https://referraldirectories.redcross.or.ke/" }
-            //    }
-            //};
-
 
             var messageText =  question;
 
@@ -217,6 +192,7 @@ namespace RedCrossChat.Dialogs
             var question = client.language ? "Do you want to continue or exit?" : "Je, ungependa kuendelea au kuondoka?";
 
             var continueChoice = client.language ? "Continue" : "Endelea";
+            
             var continueExit = client.language ? "Exit" : "Ondoka";
 
             var options = new PromptOptions

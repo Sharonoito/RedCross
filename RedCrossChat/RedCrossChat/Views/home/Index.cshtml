@@ -2,248 +2,384 @@
 
 <!-- Content wrapper -->
 
-<h4 class="py-3 mb-4">
-    <span class="text-muted fw-light">Insight /</span> Dashboard
-</h4>
+<style>
+    .report-list .report-list-item {
+        padding: .75rem 1rem
+    }
+
+    .report-list .report-list-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 40px;
+        min-width: 40px
+    }
+
+    .vehicles-progress-labels .vehicles-progress-label {
+        position: relative;
+        padding-bottom: 15px
+    }
+
+        .vehicles-progress-labels .vehicles-progress-label::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            display: inline-block;
+            height: 10px;
+            width: 2px
+        }
+
+    [dir=rtl] .vehicles-progress-labels .vehicles-progress-label::after {
+        left: unset;
+        right: 0
+    }
+
+    .vehicles-overview-progress .bg-gray-900 {
+        color: #fff
+    }
+
+    #shipmentStatisticsChart .apexcharts-legend-series, #carrierPerformance .apexcharts-legend-series {
+        padding: 4px 12px;
+        padding-inline-start: 17px;
+        border-radius: .375rem;
+        height: 83%
+    }
+
+    .light-style .report-list .report-list-item {
+        background-color: rgba(34,48,62,.06)
+    }
+
+    .light-style .report-list .report-list-icon {
+        background-color: #fff;
+        border-radius: .375rem
+    }
+
+    .light-style .vehicles-progress-labels .vehicles-progress-label::after {
+        background-color: #e4e6e8
+    }
+
+    .light-style .vehicles-overview-progress .snackbar {
+        background-color: #22303e
+    }
+
+    .light-style #shipmentStatisticsChart .apexcharts-legend-series, .light-style #carrierPerformance .apexcharts-legend-series {
+        border: 1px solid #e4e6e8
+    }
+
+    .dark-style .report-list .report-list-item {
+        background-color: rgba(230,230,241,.06)
+    }
+
+    .dark-style .report-list .report-list-icon {
+        background-color: #2b2c40;
+        border-radius: .375rem
+    }
+
+    .dark-style .vehicles-progress-labels .vehicles-progress-label::after {
+        background-color: #4e4f6c
+    }
+
+    .dark-style .vehicles-overview-progress .snackbar {
+        background-color: #e6e6f1
+    }
+
+    .dark-style #shipmentStatisticsChart .apexcharts-legend-series, .dark-style #carrierPerformance .apexcharts-legend-series {
+        border: 1px solid #4e4f6c
+    }
+</style>
 
 <div class="row">
-    <div class="col-sm-6 col-lg-3 mb-4" id="totalVisits">
-        <div class="card card-border-shadow-primary h-100">
-            <div class="card-body">
-                <div class="d-flex align-items-center mb-2 pb-1">
-                    <div class="avatar me-2">
-                        <span class="avatar-initial rounded bg-label-primary"><i class="bx bxs-truck"></i></span>
+    <div class="col-md-12 col-xxl-4 my-4">
+        <div class="card h-100">
+            <div class="d-flex align-items-end row">
+                <div class="col-7">
+                    <div class="card-body">
+                        <h5 class="card-title mb-1 text-nowrap">Welcome Back 🎉</h5>
+                        <p class="card-subtitle text-nowrap mb-3 d-none">Best seller of the month</p>
+
+                        <h5 class="card-title text-primary mb-3">Peter Hagono</h5>
+                       
+
+                        <a href="/Conversation" class="btn btn-sm btn-primary mb-1">View Chats</a>
                     </div>
-                    <h4 class="ms-1 mb-0">42</h4>
                 </div>
-                <p class="mb-1">Total Visits</p>
-               @* <p class="mb-0">
-                    <span class="fw-medium me-1">+18.2%</span>
-                    <small class="text-muted">than last week</small>
-                </p>*@
+                
             </div>
         </div>
     </div>
-
-    <div class="col-sm-6 col-lg-3 mb-4" id="handedOver">
-        <div class="card card-border-shadow-primary h-100">
-            <div class="card-body">
-                <div class="d-flex align-items-center mb-2 pb-1">
-                    <div class="avatar me-2">
-                        <span class="avatar-initial rounded bg-label-primary"><i class="bx bxs-truck"></i></span>
+    <!-- New Visitors & Activity -->
+    <div class="col-xxl-6 my-4">
+        <div class="card h-100">
+            <div class="card-body row g-4 p-0">
+                <div class="col-md-6 card-separator">
+                    <div class="p-4">
+                        <div class="card-title d-flex align-items-start justify-content-between">
+                            <h5 class="mb-0">Total Handover Requests</h5>
+                            <small>This Week</small>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <div class="mt-auto">
+                                <h3 class="mb-1">23%</h3>
+                                <small class="text-danger text-nowrap fw-medium"><i class='bx bx-down-arrow-alt'></i> -13.24%</small>
+                            </div>
+                            <div id="visitorsChart"></div>
+                        </div>
                     </div>
-                    <h4 class="ms-1 mb-0">11</h4>
                 </div>
-                <p class="mb-1">Handled By agents</p>
-               @* <p class="mb-0">
-                    <span class="fw-medium me-1">+18.2%</span>
-                    <small class="text-muted">than last week</small>
-                </p>*@
+                <div class="col-md-6">
+                    <div class="p-4">
+                        <div class="card-title d-flex align-items-start justify-content-between">
+                            <h5 class="mb-0">Handover Requests </h5>
+                            <small>This Week</small>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <div class="mt-auto">
+                                <h3 class="mb-1">120</h3>
+                                <small class="text-success text-nowrap fw-medium"><i class='bx bx-up-arrow-alt'></i> 24.8%</small>
+                            </div>
+                            <div id="activityChart"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+    <!--/ New Visitors & Activity -->
 
-    <div class="col-sm-6 col-lg-3 mb-4" id="myHandOverRequests">
-        <div class="card card-border-shadow-primary h-100">
-            <div class="card-body">
-                <div class="d-flex align-items-center mb-2 pb-1">
-                    <div class="avatar me-2">
-                        <span class="avatar-initial rounded bg-label-primary"><i class="bx bxs-truck"></i></span>
-                    </div>
-                    <h4 class="ms-1 mb-0">3</h4>
-                </div>
-                <p class="mb-1">Handled By me</p>
-                @* <p class="mb-0">
-                <span class="fw-medium me-1">+18.2%</span>
-                <small class="text-muted">than last week</small>
-                </p>*@
-            </div>
-        </div>
-    </div>
-
-    <div class="col-sm-6 col-lg-3 mb-4" id="unCompletedVisits">
-        <div class="card card-border-shadow-primary h-100">
-            <div class="card-body">
-                <div class="d-flex align-items-center mb-2 pb-1">
-                    <div class="avatar me-2">
-                        <span class="avatar-initial rounded bg-label-primary"><i class="bx bxs-truck"></i></span>
-                    </div>
-                    <h4 class="ms-1 mb-0">5</h4>
-                </div>
-                <p class="mb-1">Uncompleted Visits</p>
-              @*  <p class="mb-0">
-                    <span class="fw-medium me-1">+18.2%</span>
-                    <small class="text-muted">than last week</small>
-                </p>*@
-            </div>
-        </div>
-    </div>
-
-    <div class="col-sm-6 col-lg-3 mb-4" id="averageBotRating">
-        <div class="card card-border-shadow-primary h-100">
-            <div class="card-body">
-                <div class="d-flex align-items-center mb-2 pb-1">
-                    <div class="avatar me-2">f
-                        <span class="avatar-initial rounded bg-label-primary"><i class="bx bxs-truck"></i></span>
-                    </div>
-                    <h4 class="ms-1 mb-0">1</h4>
-                </div>
-                <p class="mb-1">Average Bot Rating</p>
-                @*<p class="mb-0">
-                    <span class="fw-medium me-1">+18.2%</span>
-                    <small class="text-muted">than last week</small>
-                </p>*@
-            </div>
-        </div>
-    </div>
-
-
-</div>
-
-<div class="row">
-
-    <div class="col-lg-9">
+    <div class="col-lg-12 col-xxl-4">
         <div class="row">
-            <div class="card">
-                <div class="card-body">
-                    <div id="chart"> </div>
+            <div class="col-xxl-6 col-md-3 col-6 my-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        
+                        <p class="mb-1">Gender Ratio</p>
+                        <h4 class="card-title mb-3"></h4>
+                        <div class="row">
+                            <small class="text-success fw-medium col-6"><i class='bx bx-up-arrow-alt'></i> Male 20</small>
+                            <small class="text-success fw-medium col-6"><i class='bx bx-up-arrow-alt'></i> Female 10</small>
+                        </div>
+                       
+                    </div>
                 </div>
             </div>
            
+            <div class="col-xxl-6 col-md-3 col-6 my-4">
+                <div class="card h-100">
+                    <div class="card-body pb-2">
+                        <span class="d-block fw-medium mb-1">County Visits</span>
+                        <h4 class="card-title mb-4">10</h4>
+                        <div id="profitChart"></div>
+                    </div>
+                </div>
+            </div>
 
+
+            <div class="col-xxl-6 col-md-3 col-6 my-4">
+                <div class="card h-100">
+                    <div class="card-body">
+
+
+                        <span class="d-block fw-medium mb-1">Total Conversations</span>
+                        <h4 class="card-title mb-4">10</h4>
+                        <div id="profitChart"></div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xxl-6 col-md-3 col-6 my-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <span class="d-block fw-medium mb-1">Total Handover Requests</span>
+                        <h4 class="card-title mb-4">10</h4>
+                        <div id="profitChart"></div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xxl-6 col-md-3 col-6 my-4">
+                <div class="card h-100">
+                    <div class="card-body">
+
+                        <span class="d-block fw-medium mb-1">Uncompleted Visits</span>
+                        <h4 class="card-title mb-4">10</h4>
+                        <div id="profitChart"></div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xxl-6 col-md-3 col-6 my-4">
+                <div class="card h-100">
+                    <div class="card-body">
+
+                        <p class="mb-1">Average Bot Rating</p>
+                        <h4 class="card-title mb-3">Bad</h4>
+                       
+
+                    </div>
+                </div>
+            </div>
+
+         
         </div>
     </div>
 
-    <div class="col-lg-3">
-
-       @* <div class="col-12 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <div class="card-title">
-                        <h5 class="text-nowrap mb-2">Country</h5>
-
+    <!-- Total Income -->
+    <div class="col-md-12 col-xxl-8 my-4">
+        <div class="card h-100">
+            <div class="row row-bordered g-0">
+                <div class="col-md-8">
+                    <div class="card-header d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title mb-1">Total Visits</h5>
+                            <p class="card-subtitle">Yearly report overview</p>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn p-0" type="button" id="totalIncome" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="bx bx-dots-vertical-rounded bx-lg text-muted"></i>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-end text-small" aria-labelledby="totalIncome">
+                                <a class="dropdown-item active options" href="javascript:void(0);" data-id="1">Last 7 Days</a>
+                                <a class="dropdown-item options" href="javascript:void(0);" data-id="2">Last Month</a>
+                                <a class="dropdown-item options" href="javascript:void(0);" data-id="3">Last Year</a>
+                            </div>
+                        </div>
                     </div>
-                    <div class="">
-                        <select class="form-control filters" name="county">
-                            <option value="-1">Select Country</option>
-                            <option value="kenya">Kenya</option>
-                            <option value="Other">Other</option>
-                        </select>
+                    <div class="card-body">
+                        <div id="totalVisitChart"></div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card-header d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title mb-1">Report</h5>
+                            <p class="card-subtitle">Monthly avg by Age Bands</p>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn p-0" type="button" id="totalReport" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="bx bx-dots-vertical-rounded bx-lg text-muted"></i>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="totalReport">
+                                <a class="dropdown-item" href="javascript:void(0);">Gender</a>
+                                <a class="dropdown-item" href="javascript:void(0);">Feeling</a>
+                                <a class="dropdown-item" href="javascript:void(0);">Intention</a>
+                                <a class="dropdown-item" href="javascript:void(0);">Age Band</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body pt-lg-6">
+                        <div class="report-list">
+                            <div class="report-list-item rounded-2 mb-4">
+                                <div class="d-flex align-items-center">
+                                  
+                                    <div class="d-flex justify-content-between align-items-center w-100 flex-wrap gap-2">
+                                        <div class="d-flex flex-column">
+                                            <span>Below 15</span>
+                                            <h5 class="mb-0">50</h5>
+                                        </div>
+                                        <small class="text-success">+2.34k</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="report-list-item rounded-2 mb-4">
+                                <div class="d-flex align-items-center">
+                                   
+                                    <div class="d-flex justify-content-between align-items-center w-100 flex-wrap gap-2">
+                                        <div class="d-flex flex-column">
+                                            <span>15-20</span>
+                                            <h5 class="mb-0">150</h5>
+                                        </div>
+                                        <small class="text-danger">-1.15k</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="report-list-item rounded-2 mb-4">
+                                <div class="d-flex align-items-center">
+                        
+                                    <div class="d-flex justify-content-between align-items-center w-100 flex-wrap gap-2">
+                                        <div class="d-flex flex-column">
+                                            <span>21-30</span>
+                                            <h5 class="mb-0">250</h5>
+                                        </div>
+                                        <small class="text-success">+1.35k</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="report-list-item rounded-2">
+                                <div class="d-flex align-items-center">
+
+                                    <div class="d-flex justify-content-between align-items-center w-100 flex-wrap gap-2">
+                                        <div class="d-flex flex-column">
+                                            <span>31-40</span>
+                                            <h5 class="mb-0">250</h5>
+                                        </div>
+                                        <small class="text-success">+1.35k</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-*@
-
-        <div class="col-12 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <div class="card-title">
-                        <h5 class="text-nowrap mb-2">County</h5>
-
-                    </div>
-                    <div class="">
-                        <select class="form-control filters" name="county">
-                            <option value="-1">Select County</option>
-                            @foreach (var county in Model.countys)
-                            {
-                                <option value="@county.Id">@county.Name</option>
-                            }
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-12 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <div class="card-title">
-                        <h5 class="text-nowrap mb-2">Gender</h5>
-
-                    </div>
-                    <div class="">
-                        <select class="form-control filters" name="gender">
-                            <option value="-1">__All__</option>
-                            @foreach(var gender in Model.Genders)
-                            {
-                                <option value="@gender.Id">@gender.Name</option>
-                            }
-                           
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-12 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <div class="card-title">
-                        <h5 class="text-nowrap mb-2">Age Bands</h5>
-
-                    </div>
-                   <div class="">
-                        <select class="form-control filters" name="ageband">
-                            <option value="-1">__All__</option>
-                            @foreach (var ageBand in Model.Agebands)
-                            {
-                                <option value="@ageBand.Id">@ageBand.Name</option>
-                            }
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-12 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <div class="card-title">
-                        <h5 class="text-nowrap mb-2">Feeling</h5>
-
-                    </div>
-                    <div class="">
-                        <select class="form-control filters" name="feeling">
-                            <option value="-1">Select Feeling</option>
-                            @foreach(var feeling in Model.feelings)
-                            {
-                                <option value="@feeling.Id">@feeling.Description</option>
-                            }
-                           
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-12 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <div class="card-title">
-                        <h5 class="text-nowrap mb-2">Intention</h5>
-
-                    </div>
-                    <div class="">
-                        <select class="form-control filters" name="intention">
-                            <option value="-1">Select Intention</option>
-                            @if (Model.Intentions != null)
-                            {
-                                @foreach (var intention in Model.Intentions)
-                                {
-                                    <option value="@intention.Id">@intention.Name</option>
-                                }
-                            }
-
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <!--/ Total Income -->
     </div>
-
+    <!--/ Total Income -->
 </div>
-<br><br>
+
+<h6>Hand over Requests </h6>
+<div class="row">
+    <div class="col-lg-3 col-sm-6">
+        <div class="card card-border-shadow-primary bg-success text-white h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-2">
+                    <div class="avatar me-4">
+                        <span class="avatar-initial rounded bg-label-primary"><i class="fa-brands fa-telegram" style="font-size:24px"></i></span>
+                    </div>
+                    <h4 class="mb-0">42</h4>
+                </div>
+                <p class="mb-2">Telegram</p>
+             
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-sm-6 ">
+        <div class="card card-border-shadow-danger bg-primary text-white h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-2">
+                    <div class="avatar me-4">
+                        <span class="avatar-initial rounded bg-label-primary"><i class="fa-brands fa-square-facebook fa-xl"></i></span>
+                    </div>
+                    <h4 class="mb-0">4</h4>
+                </div>
+                <p class="mb-2">Facebook</p>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-sm-6">
+        <div class="card card-border-shadow-info bg-secondary text-white h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-2">
+                    <div class="avatar me-4">
+                        <span class="avatar-initial rounded bg-label-primary"><i class="fa-solid fa-blog"></i></span>
+                    </div>
+                    <h4 class="mb-0">12</h4>
+                </div>
+                <p class="mb-2">Live Chat</p>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 
 @section Scripts {
     @{
@@ -264,6 +400,31 @@
 
 
     <script>
+
+        //totalVisitChart
+
+        var options = {
+            chart: {
+                type: 'line'
+            },
+            series: [{
+                name: 'sales',
+                data: [30, 40, 35, 50, 49, 60, 70, 91, 125]
+            }],
+            xaxis: {
+                categories: [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999]
+            },
+            markers: {
+                size: 0,
+            }, 
+            fill: {
+                colors: ['#ff0000']
+            }
+        }
+
+        var chartSimple = new ApexCharts(document.querySelector("#totalVisitChart"), options);
+
+        chartSimple.render();
 
         var options = {
             chart: {

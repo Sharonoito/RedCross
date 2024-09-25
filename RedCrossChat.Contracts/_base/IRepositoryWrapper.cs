@@ -1,5 +1,7 @@
 ﻿
 
+using RedCrossChat.Entities;
+
 namespace RedCrossChat.Contracts
 {
 
@@ -12,6 +14,8 @@ namespace RedCrossChat.Contracts
         IAppModuleRepository AppModule { get; }
 
         IAppUserTeam AppUserTeam { get; }
+
+        IAuthLoginLog AuthLoginLog { get; }
 
         #endregion
 
@@ -55,6 +59,9 @@ namespace RedCrossChat.Contracts
         IIntroductionChoice IntroductionChoice { get; }
 
         IInitialActionItem InitialActionItem { get; }
+
+        IAIRejectedQuestion AIRejectedQuestion { get; }
+
 
 
         Task<bool> SaveChangesAsync();

@@ -62,41 +62,15 @@ namespace RedCrossChat.Dialogs
 
                 repository.HandOverRequest.Create(new Entities.HandOverRequest
                 {
-                    Title = conversation.Persona.Name,
+                    Title = conversation.Persona.CodeName, // we has an error here using the Persona.Name;
                     ConversationId = conversation.Id,
                     isActive = true,
                 });
 
-                /*if(requests ==null || requests.Count ==0)
-                {
-                    repository.HandOverRequest.Create(new Entities.HandOverRequest
-                    {
-                        Title = conversation.Persona.Name,
-                        ConversationId = conversation.Id,
-                        isActive = true,
-                    });
-                }
-                else
-                {
-                   var request= requests.First();
-
-                   request.HasBeenReceived = false;
-
-                    repository.HandOverRequest.Update(request);
-                }*/
-
-
-
                 conversation.RequestedHandedOver = true;
 
-                //repository.Conversation.Update(conversation);
-
                 await repository.SaveChangesAsync();
-
             }
-
-          
-
             bool skip = true;
 
             int iterations = 0;
@@ -128,9 +102,9 @@ namespace RedCrossChat.Dialogs
                             return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = promptMessage }, token);
                         }
 
-                        chatMessages.Last().IsRead = true;
+                        //chatMessages.Last().IsRead = true;
 
-                        repository.ChatMessage.Update(chatMessages.Last());
+                       // repository.ChatMessage.Update(chatMessages.Last());
 
                         await repository.SaveChangesAsync();
 

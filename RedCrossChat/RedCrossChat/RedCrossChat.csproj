@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <Content Remove="Cards\welcomeCard.json" />
+    <Content Remove="Views\Auth\_AuthLogView.cshtml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,6 +33,7 @@
 
   <ItemGroup>
     <None Include="..\..\.editorconfig" Link=".editorconfig" />
+    <None Include="Views\Auth\_AuthLogView.cshtml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -40,7 +42,7 @@
     <PackageReference Include="DataTables.AspNet.AspNetCore" Version="2.0.2" />
     <PackageReference Include="DataTables.AspNet.Core" Version="2.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.32" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="3.1.27" />
     <PackageReference Include="Microsoft.Bot.Builder.AI.Luis" Version="4.18.1" />
     <PackageReference Include="Microsoft.Bot.Builder.Dialogs" Version="4.18.1" />
@@ -64,5 +66,13 @@
     <Content Update="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Views\Auth\_AuthLogView.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Views\Auth\_AuthLogView.cshtml" />
   </ItemGroup>
 </Project>

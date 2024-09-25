@@ -24,6 +24,18 @@ namespace RedCrossChat.Repository
             }
         }
 
+        private IAuthLoginLog? _authLoginLog;
+
+        public IAuthLoginLog AuthLoginLog
+        {
+            get
+            {
+                if(_authLoginLog ==null) _authLoginLog= new AuthLoginLogRepo(_repoContext);
+
+                return _authLoginLog;
+            }
+        }
+
         private IRoleRepository? _role;
         public IRoleRepository Role
         {
@@ -299,6 +311,24 @@ namespace RedCrossChat.Repository
 
                 return _introChoices;
             }
+        }
+
+        public IAIRejectedQuestion _aiReJectedQuestion;
+
+        public IAIRejectedQuestion AIRejectedQuestion
+        {
+
+            get
+            {
+                if (_aiReJectedQuestion ==  null)
+                {
+                    _aiReJectedQuestion = new AIRejectedQuestionRepo(_repoContext); 
+                }
+
+                return _aiReJectedQuestion;
+            }
+
+            
         }
 
         public IInitialActionItem _initialActionItem;
