@@ -53,4 +53,4 @@ jobs:
           app-name: 'redcrossbot'
           slot-name: 'Production'
           package: .
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_D4AEB651CB984C428C7AF8B570794580 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_F4793B7AF9E24E19ADF5B5C65F85B399 }}
